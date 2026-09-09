@@ -1,0 +1,6 @@
+{
+  "name": "Sales Collection Hub",
+  "description": "منصة جمع بيانات المبيعات - Arabic-first bilingual dynamic field sales collection platform with custom authentication, device binding, and Admin Dashboard.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

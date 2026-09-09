@@ -1,0 +1,410 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { useApp } from '../../context/AppContext';
+import { PWAInstallBanner } from './PWAInstallBanner';
+import { ShareRepLinkModal } from './ShareRepLinkModal';
+import {
+  Smartphone,
+  LayoutDashboard,
+  FileCode,
+  Globe,
+  Wifi,
+  WifiOff,
+  UserCheck,
+  Bell,
+  LogOut,
+  Shield,
+  Key,
+  Lock,
+  PhoneCall,
+  RefreshCw,
+  Share2,
+} from 'lucide-react';
+
+export const TopNavbar: React.FC = () => {
+  const {
+    lang,
+    setLang,
+    dir,
+    t,
+    activeView,
+    setActiveView,
+    currentUser,
+    users,
+    quickSwitchUser,
+    logout,
+    isOnline,
+    setIsOnline,
+    notifications,
+    offlineQueue,
+    syncOfflineQueue,
+  } = useApp();
+
+  const [showRoleMenu, setShowRoleMenu] = useState(false);
+  const [showNotifMenu, setShowNotifMenu] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const roleMenuRef = useRef<HTMLDivElement>(null);
+  const notifMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close menus when clicking outside or pressing Escape
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      if (roleMenuRef.current && !roleMenuRef.current.contains(target)) {
+        setShowRoleMenu(false);
+      }
+      if (notifMenuRef.current && !notifMenuRef.current.contains(target)) {
+        setShowNotifMenu(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowRoleMenu(false);
+        setShowNotifMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const closeAllMenus = () => {
+    setShowRoleMenu(false);
+    setShowNotifMenu(false);
+  };
+
+  const unreadCount = notifications.filter(
+    (n) => n.status !== 'READ' && (!currentUser || n.userId === currentUser.userId || currentUser.role === 'ADMIN')
+  ).length;
+
+  const isAdminOrSupervisor = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPERVISOR';
+  const isRep = currentUser?.role === 'REP';
+
+  return (
+    <header className="sticky top-0 z-40 bg-[#2d0a3d] text-white shadow-md border-b border-purple-900/50">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
+        {/* Brand & Identity */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-purple-700/80 border border-purple-500/40 flex items-center justify-center text-white font-bold shadow-inner">
+            <span className="text-xl">📊</span>
+          </div>
+          <div>
+            <div className="font-extrabold text-base sm:text-lg leading-tight tracking-wide flex items-center gap-2">
+              <span>{lang === 'ar' ? 'منصة جمع بيانات المبيعات' : 'Sales Collection Hub'}</span>
+              <span className="hidden md:inline-block text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-purple-800 text-purple-200 border border-purple-600/40">
+                Enterprise v2.4
+              </span>
+            </div>
+            <div className="text-[11px] text-purple-200/80 font-medium">
+              {lang === 'ar' ? 'نظام الحقول الديناميكية والمصادقة المخصصة' : 'Dynamic Fields & Custom Auth Platform'}
+            </div>
+          </div>
+        </div>
+
+        {/* Center View Selector Tabs - ONLY FOR ADMIN / SUPERVISOR */}
+        {isAdminOrSupervisor && (
+          <div className="hidden lg:flex items-center bg-purple-950/70 p-1 rounded-xl border border-purple-800/60">
+            <button
+              onClick={() => {
+                setActiveView('admin');
+                closeAllMenus();
+              }}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                activeView === 'admin'
+                  ? 'bg-purple-600 text-white shadow'
+                  : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              <span>{lang === 'ar' ? 'لوحة تحكم الإدارة' : 'Admin Web'}</span>
+            </button>
+            <button
+              onClick={() => {
+                setActiveView('mobile');
+                closeAllMenus();
+              }}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                activeView === 'mobile'
+                  ? 'bg-purple-600 text-white shadow'
+                  : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
+              }`}
+            >
+              <Smartphone className="w-4 h-4" />
+              <span>{lang === 'ar' ? 'معاينة المندوب (موبايل)' : 'Rep Mobile Preview'}</span>
+            </button>
+            <button
+              onClick={() => {
+                setActiveView('docs');
+                closeAllMenus();
+              }}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                activeView === 'docs'
+                  ? 'bg-purple-600 text-white shadow'
+                  : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
+              }`}
+            >
+              <FileCode className="w-4 h-4" />
+              <span>{lang === 'ar' ? 'المعمارية والمواصفات' : 'Architecture & Specs'}</span>
+            </button>
+          </div>
+        )}
+
+        {/* Rep Identifier Badge if logged in as REP */}
+        {isRep && (
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-900/70 border border-purple-700/50 text-xs">
+            <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="font-bold text-white">
+              {lang === 'ar' ? 'المندوب الميداني:' : 'Field Rep:'}
+            </span>
+            <span className="text-purple-200 font-medium">
+              {currentUser?.repNameAr}
+            </span>
+            <span className="px-2 py-0.5 rounded-md bg-purple-800 text-purple-100 font-mono font-bold text-[10px]">
+              {lang === 'ar' ? `منطقة ${currentUser?.regionNo}` : `Region ${currentUser?.regionNo}`}
+            </span>
+          </div>
+        )}
+
+        {/* Right Controls: Connectivity, Share Link, Lang, User */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Share Rep Link Button - ONLY VISIBLE TO ADMIN */}
+          {currentUser?.role === 'ADMIN' && (
+            <button
+              type="button"
+              onClick={() => setShowShareModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black shadow-md border border-emerald-400/40 transition-all cursor-pointer shrink-0 animate-in fade-in"
+              title={lang === 'ar' ? 'مشاركة رابط التطبيق للمناديب' : 'Share link for field reps'}
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">
+                {lang === 'ar' ? 'مشاركة رابط المندوبين' : 'Share Rep Link'}
+              </span>
+            </button>
+          )}
+
+          {/* Online/Offline Toggle for Testing */}
+          <button
+            onClick={() => {
+              setIsOnline(!isOnline);
+              closeAllMenus();
+            }}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all ${
+              isOnline
+                ? 'bg-emerald-900/40 border-emerald-500/40 text-emerald-300 hover:bg-emerald-800/50'
+                : 'bg-rose-900/50 border-rose-500/50 text-rose-300 hover:bg-rose-800/60 animate-pulse'
+            }`}
+            title={
+              isOnline
+                ? (lang === 'ar' ? 'متصل بالإنترنت - اضغط لمحاكاة انقطاع الاتصال' : 'Online - Click to simulate offline mode')
+                : (lang === 'ar' ? 'غير متصل (أوفلاين) - اضغط لإعادة الاتصال والمزامنة' : 'Offline - Click to reconnect and sync')
+            }
+          >
+            {isOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">{isOnline ? (lang === 'ar' ? 'متصل' : 'Online') : (lang === 'ar' ? 'أوفلاين' : 'Offline')}</span>
+          </button>
+
+          {/* Sync Trigger if offline queue has items */}
+          {offlineQueue.length > 0 && isOnline && (
+            <button
+              onClick={() => {
+                syncOfflineQueue();
+                closeAllMenus();
+              }}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white shadow transition-all animate-bounce"
+              title={lang === 'ar' ? 'مزامنة السجلات المحفوظة أوفلاين' : 'Sync offline records'}
+            >
+              <RefreshCw className="w-3 h-3 animate-spin" />
+              <span>{offlineQueue.length}</span>
+            </button>
+          )}
+
+          {/* Language Switcher */}
+          <button
+            onClick={() => {
+              setLang(lang === 'ar' ? 'en' : 'ar');
+              closeAllMenus();
+            }}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-900/60 hover:bg-purple-800/80 border border-purple-700/50 text-purple-200 transition-all cursor-pointer"
+          >
+            <Globe className="w-3.5 h-3.5" />
+            <span>{lang === 'ar' ? 'English' : 'عربي'}</span>
+          </button>
+
+          {/* PWA Install Button */}
+          <div className="hidden sm:block">
+            <PWAInstallBanner variant="button" />
+          </div>
+
+          {/* Quick Role Switcher Dropdown - ONLY FOR ADMIN (QA Tools) */}
+          {currentUser?.role === 'ADMIN' && (
+            <div className="relative" ref={roleMenuRef}>
+              <button
+                onClick={() => {
+                  setShowRoleMenu((prev) => !prev);
+                  setShowNotifMenu(false);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-800/60 hover:bg-purple-700/70 border border-purple-600/50 text-white transition-all cursor-pointer"
+                title={lang === 'ar' ? 'تبديل الأدوار للتجربة السريعة (QA)' : 'Quick Role Switcher (QA)'}
+              >
+                <UserCheck className="w-3.5 h-3.5 text-purple-300" />
+                <span className="hidden md:inline font-bold">
+                  {lang === 'ar' ? 'مدير النظام' : 'Admin'}
+                </span>
+              </button>
+
+              {showRoleMenu && (
+                <div
+                  className={`absolute ${
+                    dir === 'rtl' ? 'left-0' : 'right-0'
+                  } mt-2 w-72 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 py-2 z-50 text-xs animate-in fade-in zoom-in-95 duration-150`}
+                >
+                  <div className="px-3 py-1.5 font-bold text-slate-500 border-b border-slate-100 flex items-center justify-between">
+                    <span>{lang === 'ar' ? 'تبديل الحساب السريع لاختبار النظام' : 'Switch Account for QA / Demo'}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded">QA Tools</span>
+                  </div>
+
+                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
+                    {users.map((u) => {
+                      const isSelected = currentUser?.userId === u.userId;
+                      return (
+                        <button
+                          key={u.userId}
+                          onClick={() => {
+                            quickSwitchUser(u.userId);
+                            setShowRoleMenu(false);
+                          }}
+                          className={`w-full text-start px-3 py-2.5 hover:bg-purple-50 flex items-center justify-between transition-colors cursor-pointer ${
+                            isSelected ? 'bg-purple-100/70 font-bold' : ''
+                          }`}
+                        >
+                          <div className="min-w-0 flex-1 me-2">
+                            <div className="font-bold text-slate-800 flex items-center gap-1.5 truncate">
+                              {u.role === 'ADMIN' ? (
+                                <Shield className="w-3.5 h-3.5 text-purple-700 shrink-0" />
+                              ) : u.role === 'SUPERVISOR' ? (
+                                <UserCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                              ) : (
+                                <Smartphone className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                              )}
+                              <span className="truncate">{lang === 'ar' ? u.repNameAr : (u.repNameEn || u.repNameAr)}</span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 truncate">
+                              {u.role === 'ADMIN'
+                                ? (lang === 'ar' ? 'مسؤول النظام • كامل الصلاحيات' : 'System Admin • Full Access')
+                                : u.role === 'SUPERVISOR'
+                                ? (lang === 'ar' ? `مشرف • ${u.branchNameAr || u.branchId}` : `Supervisor • ${u.branchNameEn || u.branchNameAr || u.branchId}`)
+                                : (lang === 'ar' ? `مندوب • منطقة ${u.regionNo} • ${u.branchNameAr || u.branchId}` : `Rep • Region ${u.regionNo} • ${u.branchNameEn || u.branchNameAr || u.branchId}`)}
+                            </div>
+                          </div>
+                          {(() => {
+                            const isLocked = Boolean(u.lockedUntil && new Date(u.lockedUntil) > new Date());
+                            return (
+                              <span
+                                className={`text-[10px] px-1.5 py-0.5 rounded font-bold shrink-0 ${
+                                  u.role === 'ADMIN'
+                                    ? 'bg-purple-200 text-purple-900'
+                                    : u.role === 'SUPERVISOR'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : isLocked
+                                    ? 'bg-rose-100 text-rose-800'
+                                    : u.mustChangePassword
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-emerald-100 text-emerald-800'
+                                }`}
+                              >
+                                {isLocked
+                                  ? (lang === 'ar' ? 'مقفل' : 'Locked')
+                                  : u.mustChangePassword
+                                  ? (lang === 'ar' ? 'تغيير كلمة المرور' : 'New PW')
+                                  : u.role}
+                              </span>
+                            );
+                          })()}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Notifications Icon with unread badge */}
+          {currentUser && (
+            <div className="relative" ref={notifMenuRef}>
+              <button
+                onClick={() => {
+                  setShowNotifMenu((prev) => !prev);
+                  setShowRoleMenu(false);
+                }}
+                className="p-2 rounded-lg bg-purple-900/60 hover:bg-purple-800/80 border border-purple-700/50 text-purple-200 relative transition-all cursor-pointer"
+              >
+                <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-purple-950">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {showNotifMenu && (
+                <div
+                  className={`absolute ${
+                    dir === 'rtl' ? 'left-0' : 'right-0'
+                  } mt-2 w-80 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 p-3 z-50 text-xs animate-in fade-in zoom-in-95 duration-150`}
+                >
+                  <div className="font-bold text-sm text-slate-800 pb-2 border-b border-slate-100 flex items-center justify-between">
+                    <span>{lang === 'ar' ? 'إشعارات النظام' : 'System Notifications'}</span>
+                    <span className="text-purple-600 text-xs font-semibold">{notifications.length} إشعار</span>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 mt-2">
+                    {notifications.slice(0, 5).map((notif) => (
+                      <div key={notif.notificationId} className="py-2.5">
+                        <div className="font-bold text-slate-800">
+                          {lang === 'ar' ? notif.titleAr : notif.titleEn}
+                        </div>
+                        <div className="text-slate-600 text-[11px] mt-0.5">
+                          {lang === 'ar' ? notif.bodyAr : notif.bodyEn}
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-1 flex items-center justify-between">
+                          <span>{new Date(notif.sentAt).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US')}</span>
+                          <span className="uppercase text-purple-600 font-bold">{notif.channel}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Logout if user is logged in */}
+          {currentUser && (
+            <button
+              onClick={logout}
+              className="p-2 rounded-lg bg-purple-900/60 hover:bg-rose-800/80 border border-purple-700/50 text-purple-200 hover:text-white transition-all cursor-pointer"
+              title={lang === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Share Rep Link Modal */}
+      <ShareRepLinkModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+      />
+    </header>
+  );
+};
+

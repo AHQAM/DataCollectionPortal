@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="pwaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b0764"/>
+      <stop offset="100%" stop-color="#581c87"/>
+    </linearGradient>
+    <linearGradient id="barGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Rect -->
+  <rect width="512" height="512" rx="110" fill="url(#pwaGrad)"/>
+  
+  <!-- Clipboard Card -->
+  <rect x="130" y="110" width="252" height="310" rx="24" fill="#ffffff" filter="drop-shadow(0 12px 24px rgba(0,0,0,0.25))"/>
+  
+  <!-- Clipboard Top Clip -->
+  <rect x="200" y="90" width="112" height="42" rx="12" fill="#7e22ce"/>
+  <circle cx="256" cy="111" r="8" fill="#ffffff"/>
+
+  <!-- Content Lines & Badges -->
+  <rect x="170" y="170" width="172" height="18" rx="9" fill="url(#barGrad)"/>
+  <rect x="170" y="215" width="140" height="18" rx="9" fill="#9333ea"/>
+  <rect x="170" y="260" width="120" height="18" rx="9" fill="#3b82f6"/>
+  
+  <!-- Checkmark circle -->
+  <circle cx="195" cy="335" r="22" fill="#10b981"/>
+  <path d="M186 335 L193 342 L205 328" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Stat line -->
+  <rect x="230" y="325" width="110" height="18" rx="9" fill="#e2e8f0"/>
+</svg>
