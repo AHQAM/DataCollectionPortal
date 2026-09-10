@@ -35,6 +35,8 @@ import {
   getNotificationPermissionStatus,
   isNotificationSupported,
 } from '../utils/webNotification';
+import { db } from '../firebase';
+import { collection, onSnapshot, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 
 interface LoginResult {
   success: boolean;
@@ -203,25 +205,60 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isOnline, setIsOnline] = useState<boolean>(true);
 
   // Entities stored in local state with localStorage persistence
-  const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}users`);
-    if (!saved) return INITIAL_USERS;
-    try {
-      const parsed: User[] = JSON.parse(saved);
-      return parsed.map((u) => {
-        if (u.repNameAr && u.repNameAr.includes('القحطاني')) {
-          return {
-            ...u,
-            repNameAr: 'المهندس عبد الرحمن المجيدي (مدير النظام)',
-            repNameEn: 'Eng. Abdulrahman Al-Majeedi (System Admin)',
-          };
+  const [users, setUsers] = useState<User[]>(INITIAL_USERS);
+
+  // Sync users with Firestore real-time
+  useEffect(() => {
+    const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
+      const firestoreUsers: User[] = [];
+      snapshot.forEach((docSnap) => firestoreUsers.push(docSnap.data() as User));
+      if (firestoreUsers.length > 0) setUsers(firestoreUsers);
+    }, (error) => console.error("Error listening to users:", error));
+
+    const unsubRequests = onSnapshot(collection(db, 'requests'), (snapshot) => {
+      const data: RequestItem[] = [];
+      snapshot.forEach((docSnap) => data.push(docSnap.data() as RequestItem));
+      setRequests(data);
+    }, (error) => console.error("Error listening to requests:", error));
+
+    const unsubFields = onSnapshot(collection(db, 'request_fields'), (snapshot) => {
+      const data: RequestField[] = [];
+      snapshot.forEach((docSnap) => data.push(docSnap.data() as RequestField));
+      setFields(data);
+    }, (error) => console.error("Error listening to fields:", error));
+
+    const unsubAssignments = onSnapshot(collection(db, 'assignments'), (snapshot) => {
+      const data: Assignment[] = [];
+      snapshot.forEach((docSnap) => data.push(docSnap.data() as Assignment));
+      setAssignments(data);
+    }, (error) => console.error("Error listening to assignments:", error));
+
+    const unsubRecords = onSnapshot(collection(db, 'records'), (snapshot) => {
+      const data: RecordItem[] = [];
+      snapshot.forEach((docSnap) => data.push(docSnap.data() as RecordItem));
+      setRecords(data);
+    }, (error) => console.error("Error listening to records:", error));
+
+    const unsubResponses = onSnapshot(collection(db, 'responses'), (snapshot) => {
+      const data: Record<string, Record<string, any>> = {};
+      snapshot.forEach((docSnap) => {
+        const resp = docSnap.data();
+        if (resp.recordId && resp.answers) {
+          data[resp.recordId] = resp.answers;
         }
-        return u;
       });
-    } catch {
-      return INITIAL_USERS;
-    }
-  });
+      setRecordResponses(data);
+    }, (error) => console.error("Error listening to responses:", error));
+
+    return () => {
+      unsubUsers();
+      unsubRequests();
+      unsubFields();
+      unsubAssignments();
+      unsubRecords();
+      unsubResponses();
+    };
+  }, []);
 
   const [branches, setBranches] = useState<Branch[]>(() => {
     const saved = localStorage.getItem(`${STORAGE_PREFIX}branches`);
@@ -232,74 +269,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_REGIONS;
   });
 
-  const [requests, setRequests] = useState<RequestItem[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}requests`);
-    return saved ? JSON.parse(saved) : SAMPLE_REQUESTS;
-  });
-
-  const [fields, setFields] = useState<RequestField[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}fields`);
-    return saved ? JSON.parse(saved) : ZERO_INVENTORY_FIELDS;
-  });
-
-  const [assignments, setAssignments] = useState<Assignment[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}assignments`);
-    return saved ? JSON.parse(saved) : INITIAL_ASSIGNMENTS;
-  });
-
-  const [records, setRecords] = useState<RecordItem[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}records`);
-    return saved ? JSON.parse(saved) : INITIAL_RECORDS;
-  });
-
-  const [recordResponses, setRecordResponses] = useState<Record<string, Record<string, any>>>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}responses`);
-    if (saved) return JSON.parse(saved);
-    // Initial completed sample responses
-    return {
-      'REC-101-01': {
-        zero_stock_reason: 'supply_delay',
-        customer_visited: true,
-        order_taken: true,
-        expected_order_value: 12500,
-        visit_date: '2026-09-02',
-        gps_location: '24.7136, 46.6753',
-      },
-      'REC-101-02': {
-        zero_stock_reason: 'no_need_now',
-        customer_visited: true,
-        order_taken: false,
-        visit_date: '2026-09-04',
-      },
-      'REC-101-03': {
-        zero_stock_reason: 'other_reason',
-        other_reason_details: 'مستودع العميل تحت أعمال الصيانة السنوية حتى منتصف الشهر',
-        customer_visited: true,
-      },
-      'REC-102-01': {
-        zero_stock_reason: 'competitor_used',
-        customer_visited: true,
-        order_taken: false,
-        visit_date: '2026-09-03',
-      },
-      'REC-104-01': {
-        zero_stock_reason: 'no_customer_order',
-        customer_visited: true,
-        order_taken: false,
-      },
-      'REC-104-02': {
-        zero_stock_reason: 'pricing_issue',
-        customer_visited: true,
-        order_taken: true,
-        expected_order_value: 8400,
-      },
-      'REC-104-03': {
-        zero_stock_reason: 'temp_closed',
-        customer_visited: false,
-        order_taken: false,
-      },
-    };
-  });
+  const [requests, setRequests] = useState<RequestItem[]>([]);
+  const [fields, setFields] = useState<RequestField[]>([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [records, setRecords] = useState<RecordItem[]>([]);
+  const [recordResponses, setRecordResponses] = useState<Record<string, Record<string, any>>>({});
 
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
     const saved = localStorage.getItem(`${STORAGE_PREFIX}notifications`);
@@ -360,18 +334,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return currentUser ? currentUser.regionNo : '101';
   });
 
-  // Sync state changes to localStorage
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_PREFIX}users`, JSON.stringify(users));
-  }, [users]);
+  // Removed syncing users to localStorage because we sync to Firestore
 
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_PREFIX}requests`, JSON.stringify(requests));
-  }, [requests]);
-
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_PREFIX}fields`, JSON.stringify(fields));
-  }, [fields]);
 
   useEffect(() => {
     localStorage.setItem(`${STORAGE_PREFIX}branches`, JSON.stringify(branches));
@@ -380,18 +344,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem(`${STORAGE_PREFIX}regions`, JSON.stringify(regions));
   }, [regions]);
-
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_PREFIX}assignments`, JSON.stringify(assignments));
-  }, [assignments]);
-
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_PREFIX}records`, JSON.stringify(records));
-  }, [records]);
-
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_PREFIX}responses`, JSON.stringify(recordResponses));
-  }, [recordResponses]);
 
   useEffect(() => {
     localStorage.setItem(`${STORAGE_PREFIX}notifications`, JSON.stringify(notifications));
@@ -795,12 +747,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     logAudit('DEVICE_RELEASED', 'DeviceBinding', userId, { reason });
   };
 
-  const updateUser = (user: User) => {
+  const updateUser = async (user: User) => {
     setUsers((prev) => prev.map((u) => (u.userId === user.userId ? user : u)));
+    try {
+      await updateDoc(doc(db, 'users', user.userId), { ...user });
+    } catch (err) {
+      console.error("Firestore update error:", err);
+    }
     logAudit('USER_UPDATED', 'User', user.userId, { role: user.role, active: user.isActive });
   };
 
-  const addUser = (user: Partial<User>) => {
+  const addUser = async (user: Partial<User>) => {
     const defaultBranch = branches.find((b) => b.branchId === user.branchId) || branches[0];
     const newUser: User = {
       userId: 'USER-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
@@ -813,6 +770,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       branchId: user.branchId || defaultBranch?.branchId || '',
       branchNameAr: user.branchNameAr || defaultBranch?.branchNameAr || '',
       role: user.role || 'REP',
+      permissions: user.permissions || {
+        canManageUsers: false,
+        canManageRequests: false,
+        canManageRegions: false,
+        canViewAllBranches: false
+      },
       mustChangePassword: true,
       isActive: true,
       failedLoginCount: 0,
@@ -823,78 +786,98 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updatedAt: new Date().toISOString(),
     };
     setUsers((prev) => [...prev, newUser]);
+    
+    try {
+      await setDoc(doc(db, 'users', newUser.userId), newUser);
+    } catch (err) {
+      console.error("Firestore add error:", err);
+    }
+    
     logAudit('USER_CREATED', 'User', newUser.userId, { username: newUser.username });
   };
 
-  const importUsersBatch = (importedUsers: User[]) => {
-    setUsers((prev) => {
-      const updated = [...prev];
-      importedUsers.forEach((newUser) => {
-        const existingIdx = updated.findIndex(
-          (u) =>
-            u.username === newUser.username ||
-            u.regionNo === newUser.regionNo ||
-            u.userId === newUser.userId ||
-            (u.repNameAr && newUser.repNameAr && u.repNameAr.trim() === newUser.repNameAr.trim())
-        );
-        if (existingIdx >= 0) {
-          const existing = updated[existingIdx];
-          const mergedRegions = Array.from(
-            new Set([
-              ...(existing.allowedRegionNos || [existing.regionNo]),
-              ...(newUser.allowedRegionNos || [newUser.regionNo]),
-            ])
+  const importUsersBatch = async (importedUsers: User[]) => {
+    // Save to Firestore using a batch
+    try {
+      const batch = writeBatch(db);
+      
+      setUsers((prev) => {
+        const updated = [...prev];
+        importedUsers.forEach((newUser) => {
+          const existingIdx = updated.findIndex(
+            (u) =>
+              u.username === newUser.username ||
+              u.regionNo === newUser.regionNo ||
+              u.userId === newUser.userId ||
+              (u.repNameAr && newUser.repNameAr && u.repNameAr.trim() === newUser.repNameAr.trim())
           );
-          updated[existingIdx] = {
-            ...existing,
-            allowedRegionNos: mergedRegions,
-            repNo: existing.repNo || newUser.repNo,
-            branchId: newUser.branchId || existing.branchId,
-            branchNameAr: newUser.branchNameAr || existing.branchNameAr,
-            branchNameEn: newUser.branchNameEn || existing.branchNameEn,
-            passwordHash: existing.passwordHash || '1234',
-            mustChangePassword: existing.passwordHash && !existing.mustChangePassword ? false : true,
-            failedLoginAttempts: 0,
-            failedLoginCount: 0,
-            updatedAt: new Date().toISOString(),
-          };
-        } else {
-          updated.push(newUser);
-        }
+          if (existingIdx >= 0) {
+            const existing = updated[existingIdx];
+            const mergedRegions = Array.from(
+              new Set([
+                ...(existing.allowedRegionNos || [existing.regionNo]),
+                ...(newUser.allowedRegionNos || [newUser.regionNo]),
+              ])
+            );
+            const mergedUser = {
+              ...existing,
+              allowedRegionNos: mergedRegions,
+              branchNameAr: newUser.branchNameAr || existing.branchNameAr,
+              branchId: newUser.branchId || existing.branchId,
+              repNo: existing.repNo || newUser.repNo,
+              updatedAt: new Date().toISOString(),
+            };
+            updated[existingIdx] = mergedUser;
+            batch.set(doc(db, 'users', existing.userId), mergedUser, { merge: true });
+          } else {
+            const userToInsert = {
+              ...newUser,
+              permissions: {
+                canManageUsers: false,
+                canManageRequests: false,
+                canManageRegions: false,
+                canViewAllBranches: false
+              },
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+            updated.push(userToInsert);
+            batch.set(doc(db, 'users', newUser.userId), userToInsert);
+          }
+        });
+        return updated;
       });
-      localStorage.setItem(`${STORAGE_PREFIX}users`, JSON.stringify(updated));
-      return updated;
-    });
 
-    // Register any newly imported branches so that system filters recognize them
-    setBranches((prev) => {
-      const updated = [...prev];
-      importedUsers.forEach((u) => {
-        if (u.branchNameAr && !updated.some((b) => b.branchNameAr === u.branchNameAr || b.branchId === u.branchId)) {
-          updated.push({
-            branchId: u.branchId,
-            branchNameAr: u.branchNameAr,
-            branchNameEn: u.branchNameEn || u.branchNameAr,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          });
-        }
+      // Register any newly imported branches
+      setBranches((prev) => {
+        const updated = [...prev];
+        importedUsers.forEach((u) => {
+          if (u.branchNameAr && !updated.some((b) => b.branchNameAr === u.branchNameAr || b.branchId === u.branchId)) {
+            updated.push({
+              branchId: u.branchId,
+              branchNameAr: u.branchNameAr,
+              branchNameEn: u.branchNameEn || u.branchNameAr,
+              isActive: true,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            });
+          }
+        });
+        localStorage.setItem(`${STORAGE_PREFIX}branches`, JSON.stringify(updated));
+        return updated;
       });
-      localStorage.setItem(`${STORAGE_PREFIX}branches`, JSON.stringify(updated));
-      return updated;
-    });
 
-    logAudit('USERS_IMPORTED_EXCEL', 'User', 'BATCH', {
-      count: importedUsers.length,
-      sampleUsernames: importedUsers.slice(0, 5).map((u) => u.username),
-    });
+      await batch.commit();
+      logAudit('USERS_IMPORTED_EXCEL', 'User', 'BATCH', { count: importedUsers.length });
+    } catch (err) {
+      console.error("Error committing batch to Firestore:", err);
+    }
   };
 
   // -------------------------------------------------------------
   // REQUEST & FORM ENGINE
   // -------------------------------------------------------------
-  const createRequest = (newReq: Partial<RequestItem>, newFields: RequestField[]): string => {
+  const createRequest = async (newReq: Partial<RequestItem>, newFields: RequestField[]): Promise<string> => {
     const reqId = 'REQ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
     const requestCode = newReq.requestCode || 'REQ-' + Math.floor(100 + Math.random() * 900);
 
@@ -924,180 +907,201 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       totalAssignments: 0,
     };
 
-    setRequests((prev) => [fullRequest, ...prev]);
+    try {
+      const batch = writeBatch(db);
+      batch.set(doc(db, 'requests', reqId), fullRequest);
 
-    // Attach fields
-    const attachedFields = newFields.map((f, idx) => ({
-      ...f,
-      fieldId: f.fieldId || 'FLD-' + Math.random().toString(36).substring(2, 8),
-      requestId: reqId,
-      schemaVersion: 1,
-      sortOrder: idx + 1,
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }));
+      const attachedFields = newFields.map((f, idx) => {
+        const fieldId = f.fieldId || 'FLD-' + Math.random().toString(36).substring(2, 8);
+        const newField = {
+          ...f,
+          fieldId,
+          requestId: reqId,
+          schemaVersion: 1,
+          sortOrder: idx + 1,
+          isActive: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        batch.set(doc(db, 'request_fields', fieldId), newField);
+        return newField;
+      });
 
-    setFields((prev) => [...prev, ...attachedFields]);
-
-    logAudit('REQUEST_CREATED', 'Request', reqId, { code: requestCode, fieldsCount: attachedFields.length });
+      await batch.commit();
+      logAudit('REQUEST_CREATED', 'Request', reqId, { code: requestCode, fieldsCount: attachedFields.length });
+    } catch (err) {
+      console.error("Error creating request in Firestore:", err);
+    }
     return reqId;
   };
 
-  const updateRequest = (requestId: string, updates: Partial<RequestItem>) => {
-    setRequests((prev) =>
-      prev.map((r) => (r.requestId === requestId ? { ...r, ...updates, updatedAt: new Date().toISOString() } : r))
-    );
-    logAudit('REQUEST_UPDATED', 'Request', requestId, updates);
+  const updateRequest = async (requestId: string, updates: Partial<RequestItem>) => {
+    try {
+      await updateDoc(doc(db, 'requests', requestId), {
+        ...updates,
+        updatedAt: new Date().toISOString()
+      });
+      logAudit('REQUEST_UPDATED', 'Request', requestId, updates);
+    } catch (err) {
+      console.error("Error updating request:", err);
+    }
   };
 
-  const updateRequestFields = (requestId: string, newFields: RequestField[]) => {
+  const updateRequestFields = async (requestId: string, newFields: RequestField[]) => {
     const targetReq = requests.find((r) => r.requestId === requestId);
     const newVersion = (targetReq?.formSchemaVersion || 1) + 1;
     const nowIso = new Date().toISOString();
 
-    // Ensure all fields have the new schema version and valid sort order
-    const stampedFields = newFields.map((f, idx) => ({
-      ...f,
-      schemaVersion: newVersion,
-      sortOrder: idx + 1,
-      updatedAt: nowIso,
-    }));
+    try {
+      const batch = writeBatch(db);
+      
+      // Update form version on the request
+      batch.update(doc(db, 'requests', requestId), {
+        formSchemaVersion: newVersion,
+        updatedAt: nowIso
+      });
 
-    setFields((prev) => {
-      const other = prev.filter((f) => f.requestId !== requestId);
-      return [...other, ...stampedFields];
-    });
+      // We should ideally delete removed fields or just rely on the new ones overriding
+      // For simplicity, we just set the new fields.
+      const oldFields = fields.filter((f) => f.requestId === requestId);
+      const oldFieldIds = oldFields.map(f => f.fieldId);
+      const newFieldIds = newFields.map(f => f.fieldId).filter(id => id);
 
-    // Bump formSchemaVersion on the request itself
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.requestId === requestId
-          ? {
-              ...r,
-              formSchemaVersion: newVersion,
-              updatedAt: nowIso,
-            }
-          : r
-      )
-    );
+      // Delete old fields that are not in the new array
+      const toDelete = oldFieldIds.filter(id => !newFieldIds.includes(id));
+      toDelete.forEach(id => {
+        batch.delete(doc(db, 'request_fields', id));
+      });
 
-    // If request is published, notify all active representatives that form schema has been updated live!
-    if (targetReq && targetReq.status === 'Published') {
-      const activeReps = users.filter((u) => u.role === 'REP' && u.isActive);
-      const schemaNotifs: NotificationItem[] = activeReps.map((u) => ({
-        notificationId: 'NOTIF-SCH-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-        userId: u.userId,
-        requestId,
-        notificationType: 'NEW_REQUEST',
-        channel: 'IN_APP',
-        titleAr: `تحديث حقول النموذج: ${targetReq.titleAr} (v${newVersion})`,
-        titleEn: `Form Fields Updated: ${targetReq.titleEn} (v${newVersion})`,
-        bodyAr: `تم تحديث نموذج "${targetReq.titleAr}" وإضافة/تعديل الحقول. تم مزامنة النموذج تلقائياً على جهازك دون التأثير على بياناتك المسجلة.`,
-        bodyEn: `Form "${targetReq.titleEn}" was updated with new fields (v${newVersion}). Synced automatically to your device.`,
-        status: 'SENT',
-        sentAt: nowIso,
-        createdAt: nowIso,
-      }));
-      setNotifications((prev) => [...schemaNotifs, ...prev]);
+      newFields.forEach((f, idx) => {
+        const fieldId = f.fieldId || 'FLD-' + Math.random().toString(36).substring(2, 8);
+        batch.set(doc(db, 'request_fields', fieldId), {
+          ...f,
+          fieldId,
+          requestId,
+          schemaVersion: newVersion,
+          sortOrder: idx + 1,
+          updatedAt: nowIso
+        });
+      });
+
+      await batch.commit();
+
+      if (targetReq && targetReq.status === 'Published') {
+        const activeReps = users.filter((u) => u.role === 'REP' && u.isActive);
+        const schemaNotifs: NotificationItem[] = activeReps.map((u) => ({
+          notificationId: 'NOTIF-SCH-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+          userId: u.userId,
+          requestId,
+          notificationType: 'NEW_REQUEST',
+          channel: 'IN_APP',
+          titleAr: `تحديث حقول النموذج: ${targetReq.titleAr} (v${newVersion})`,
+          titleEn: `Form Fields Updated: ${targetReq.titleEn} (v${newVersion})`,
+          bodyAr: `تم تحديث نموذج "${targetReq.titleAr}" وإضافة/تعديل الحقول. تم مزامنة النموذج تلقائياً على جهازك دون التأثير على بياناتك المسجلة.`,
+          bodyEn: `Form "${targetReq.titleEn}" was updated with new fields (v${newVersion}). Synced automatically to your device.`,
+          status: 'SENT',
+          sentAt: nowIso,
+          createdAt: nowIso,
+        }));
+        setNotifications((prev) => [...schemaNotifs, ...prev]);
+      }
+
+      logAudit('FIELDS_UPDATED', 'Request', requestId, { fieldsCount: newFields.length, newVersion });
+    } catch (err) {
+      console.error("Error updating fields in Firestore:", err);
     }
-
-    logAudit('FIELDS_UPDATED', 'Request', requestId, {
-      fieldsCount: newFields.length,
-      newVersion,
-      wasPublished: targetReq?.status === 'Published',
-    });
   };
 
-  const publishRequest = (requestId: string) => {
+  const publishRequest = async (requestId: string) => {
     const req = requests.find((r) => r.requestId === requestId);
     if (!req) return;
 
-    // Calculate assignments & update status
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.requestId === requestId
-          ? {
-              ...r,
-              status: 'Published',
-              publishedAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            }
-          : r
-      )
-    );
+    try {
+      await updateDoc(doc(db, 'requests', requestId), {
+        status: 'Published',
+        publishedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
 
-    // Generate notifications for assigned reps
-    const assignedUsers = users.filter((u) => u.role === 'REP' && u.isActive);
-    const newNotifications: NotificationItem[] = assignedUsers.map((u) => ({
-      notificationId: 'NOTIF-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-      userId: u.userId,
-      requestId,
-      notificationType: 'NEW_REQUEST',
-      channel: 'PUSH',
-      titleAr: 'لديك طلب جديد لجمع البيانات',
-      titleEn: 'You have a new data collection request',
-      bodyAr: `تم نشر حملة جديدة: "${req.titleAr}". يرجى الاطلاع وتحديث السجلات المسندة إليك.`,
-      bodyEn: `New campaign published: "${req.titleEn}". Please update assigned records.`,
-      status: 'SENT',
-      sentAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-    }));
+      // Generate notifications for assigned reps
+      const assignedUsers = users.filter((u) => u.role === 'REP' && u.isActive);
+      const newNotifications: NotificationItem[] = assignedUsers.map((u) => ({
+        notificationId: 'NOTIF-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+        userId: u.userId,
+        requestId,
+        notificationType: 'NEW_REQUEST',
+        channel: 'PUSH',
+        titleAr: 'لديك طلب جديد لجمع البيانات',
+        titleEn: 'You have a new data collection request',
+        bodyAr: `تم نشر حملة جديدة: "${req.titleAr}". يرجى الاطلاع وتحديث السجلات المسندة إليك.`,
+        bodyEn: `New campaign published: "${req.titleEn}". Please update assigned records.`,
+        status: 'SENT',
+        sentAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      }));
 
-    setNotifications((prev) => [...newNotifications, ...prev]);
+      setNotifications((prev) => [...newNotifications, ...prev]);
 
-    // Send native device push notification if supported & permitted
-    sendBrowserNotification(
-      lang === 'ar' ? `طلب جديد: ${req.titleAr}` : `New Request: ${req.titleEn}`,
-      {
-        body:
-          lang === 'ar'
-            ? `تم نشر حملة جديدة: "${req.titleAr}". يرجى فتح التطبيق لمعاينة السجلات المسندة.`
-            : `New campaign published: "${req.titleEn}". Tap to view assigned records.`,
-        tag: `req-pub-${requestId}`,
-      }
-    );
+      // Send native device push notification if supported & permitted
+      sendBrowserNotification(
+        lang === 'ar' ? `طلب جديد: ${req.titleAr}` : `New Request: ${req.titleEn}`,
+        {
+          body:
+            lang === 'ar'
+              ? `تم نشر حملة جديدة: "${req.titleAr}". يرجى فتح التطبيق لمعاينة السجلات المسندة.`
+              : `New campaign published: "${req.titleEn}". Tap to view assigned records.`,
+          tag: `req-pub-${requestId}`,
+        }
+      );
 
-    logAudit('REQUEST_PUBLISHED', 'Request', requestId, {
-      titleAr: req.titleAr,
-      notificationsSent: newNotifications.length,
-    });
+      logAudit('REQUEST_PUBLISHED', 'Request', requestId, {
+        titleAr: req.titleAr,
+        notificationsSent: newNotifications.length,
+      });
+    } catch (err) {
+      console.error("Error publishing request:", err);
+    }
   };
 
-  const closeRequest = (requestId: string) => {
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.requestId === requestId
-          ? { ...r, status: 'Closed', closedAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
-          : r
-      )
-    );
-    logAudit('REQUEST_CLOSED', 'Request', requestId, {});
+  const closeRequest = async (requestId: string) => {
+    try {
+      await updateDoc(doc(db, 'requests', requestId), {
+        status: 'Closed',
+        closedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      logAudit('REQUEST_CLOSED', 'Request', requestId, {});
+    } catch (err) {
+      console.error("Error closing request:", err);
+    }
   };
 
-  const archiveRequest = (requestId: string) => {
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.requestId === requestId
-          ? { ...r, status: 'Archived', archivedAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
-          : r
-      )
-    );
-    logAudit('REQUEST_ARCHIVED', 'Request', requestId, {});
+  const archiveRequest = async (requestId: string) => {
+    try {
+      await updateDoc(doc(db, 'requests', requestId), {
+        status: 'Archived',
+        archivedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      logAudit('REQUEST_ARCHIVED', 'Request', requestId, {});
+    } catch (err) {
+      console.error("Error archiving request:", err);
+    }
   };
 
-  const reopenRequest = (requestId: string) => {
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.requestId === requestId
-          ? { ...r, status: 'Published', updatedAt: new Date().toISOString() }
-          : r
-      )
-    );
-    logAudit('REQUEST_REOPENED', 'Request', requestId, {});
+  const reopenRequest = async (requestId: string) => {
+    try {
+      await updateDoc(doc(db, 'requests', requestId), {
+        status: 'Published',
+        updatedAt: new Date().toISOString()
+      });
+      logAudit('REQUEST_REOPENED', 'Request', requestId, {});
+    } catch (err) {
+      console.error("Error reopening request:", err);
+    }
   };
 
-  const cloneRequest = (requestId: string): string => {
+  const cloneRequest = async (requestId: string): Promise<string> => {
     const src = requests.find((r) => r.requestId === requestId);
     if (!src) return '';
     const newId = 'REQ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -1118,25 +1122,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     const srcFields = fields.filter((f) => f.requestId === requestId);
-    const clonedFields = srcFields.map((f) => ({
-      ...f,
-      fieldId: 'FLD-' + Math.random().toString(36).substring(2, 8),
-      requestId: newId,
-    }));
+    
+    try {
+      const batch = writeBatch(db);
+      batch.set(doc(db, 'requests', newId), clonedReq);
 
-    setRequests((prev) => [clonedReq, ...prev]);
-    setFields((prev) => [...prev, ...clonedFields]);
+      srcFields.forEach((f) => {
+        const fieldId = 'FLD-' + Math.random().toString(36).substring(2, 8);
+        batch.set(doc(db, 'request_fields', fieldId), {
+          ...f,
+          fieldId,
+          requestId: newId,
+        });
+      });
 
-    logAudit('REQUEST_CLONED', 'Request', newId, { sourceRequestId: requestId });
+      await batch.commit();
+      logAudit('REQUEST_CLONED', 'Request', newId, { sourceRequestId: requestId });
+    } catch (err) {
+      console.error("Error cloning request:", err);
+    }
     return newId;
   };
 
   // -------------------------------------------------------------
   // RECORD SUBMISSION & OFFLINE ENGINE
   // -------------------------------------------------------------
-  const saveDraftRecord = (recordId: string, values: Record<string, any>) => {
+  const saveDraftRecord = async (recordId: string, values: Record<string, any>) => {
     if (!isOnline) {
-      // Add to offline queue
       const queueItem: OfflineQueueItem = {
         id: 'Q-' + Math.random().toString(36).substring(2, 8),
         recordId,
@@ -1147,33 +1159,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         status: 'QUEUED',
       };
       setOfflineQueue((prev) => [queueItem, ...prev.filter((q) => q.recordId !== recordId)]);
+      return;
     }
 
-    setRecordResponses((prev) => ({
-      ...prev,
-      [recordId]: { ...(prev[recordId] || {}), ...values },
-    }));
-
-    setRecords((prev) =>
-      prev.map((r) =>
-        r.recordId === recordId
-          ? {
-              ...r,
-              recordStatus: 'DraftSaved',
-              completionPercent: 50,
-              draftSavedAt: new Date().toISOString(),
-              lastSavedAt: new Date().toISOString(),
-              lastSavedBy: currentUser?.userId,
-              updatedAt: new Date().toISOString(),
-            }
-          : r
-      )
-    );
-
-    logAudit('RECORD_DRAFT_SAVED', 'Record', recordId, { isOffline: !isOnline });
+    try {
+      const batch = writeBatch(db);
+      batch.set(doc(db, 'responses', recordId), values, { merge: true });
+      batch.update(doc(db, 'records', recordId), {
+        recordStatus: 'DraftSaved',
+        completionPercent: 50,
+        draftSavedAt: new Date().toISOString(),
+        lastSavedAt: new Date().toISOString(),
+        lastSavedBy: currentUser?.userId,
+        updatedAt: new Date().toISOString(),
+      });
+      await batch.commit();
+      logAudit('RECORD_DRAFT_SAVED', 'Record', recordId, { isOffline: false });
+    } catch (err) {
+      console.error('Error saving draft:', err);
+    }
   };
 
-  const submitRecord = (recordId: string, values: Record<string, any>) => {
+  const submitRecord = async (recordId: string, values: Record<string, any>) => {
     if (!isOnline) {
       const queueItem: OfflineQueueItem = {
         id: 'Q-' + Math.random().toString(36).substring(2, 8),
@@ -1185,154 +1192,103 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         status: 'QUEUED',
       };
       setOfflineQueue((prev) => [queueItem, ...prev.filter((q) => q.recordId !== recordId)]);
-
-      setRecordResponses((prev) => ({
-        ...prev,
-        [recordId]: { ...(prev[recordId] || {}), ...values },
-      }));
-
-      setRecords((prev) =>
-        prev.map((r) =>
-          r.recordId === recordId
-            ? {
-                ...r,
-                recordStatus: 'Submitted',
-                completionPercent: 100,
-                lastSavedAt: new Date().toISOString(),
-                lastSavedBy: currentUser?.userId,
-              }
-            : r
-        )
-      );
-
       return {
         success: true,
         message: lang === 'ar' ? 'تم الحفظ محلياً (غير متصل). ستتم المزامنة تلقائياً عند عودة الاتصال.' : 'Saved locally (offline). Will sync when connection returns.',
       };
     }
 
-    // Online submission
-    setRecordResponses((prev) => ({
-      ...prev,
-      [recordId]: { ...(prev[recordId] || {}), ...values },
-    }));
-
     const targetRecord = records.find((r) => r.recordId === recordId);
+    try {
+      const batch = writeBatch(db);
+      batch.set(doc(db, 'responses', recordId), values, { merge: true });
+      batch.update(doc(db, 'records', recordId), {
+        recordStatus: 'Completed',
+        completionPercent: 100,
+        submittedAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
+        lastSavedAt: new Date().toISOString(),
+        lastSavedBy: currentUser?.userId,
+        updatedAt: new Date().toISOString(),
+      });
 
-    setRecords((prev) =>
-      prev.map((r) =>
-        r.recordId === recordId
-          ? {
-              ...r,
-              recordStatus: 'Completed',
-              completionPercent: 100,
-              submittedAt: new Date().toISOString(),
-              completedAt: new Date().toISOString(),
-              lastSavedAt: new Date().toISOString(),
-              lastSavedBy: currentUser?.userId,
-              updatedAt: new Date().toISOString(),
-            }
-          : r
-      )
-    );
+      if (targetRecord && targetRecord.assignmentId !== 'UNASSIGNED') {
+        const asg = assignments.find((a) => a.assignmentId === targetRecord.assignmentId);
+        if (asg) {
+          const completed = asg.completedRecords + 1;
+          const pending = Math.max(0, asg.totalRecords - completed);
+          const progressPercent = Math.round((completed / asg.totalRecords) * 100);
+          batch.update(doc(db, 'assignments', targetRecord.assignmentId), {
+            completedRecords: completed,
+            pendingRecords: pending,
+            progressPercent,
+            completedAt: completed >= asg.totalRecords ? new Date().toISOString() : null,
+            lastActivityAt: new Date().toISOString(),
+          });
+        }
+      }
 
-    // Update assignment progress
-    if (targetRecord) {
-      setAssignments((prev) =>
-        prev.map((asg) => {
-          if (asg.assignmentId === targetRecord.assignmentId) {
-            const completed = asg.completedRecords + 1;
-            const pending = Math.max(0, asg.totalRecords - completed);
-            const progressPercent = Math.round((completed / asg.totalRecords) * 100);
-            return {
-              ...asg,
-              completedRecords: completed,
-              pendingRecords: pending,
-              progressPercent,
-              completedAt: completed >= asg.totalRecords ? new Date().toISOString() : undefined,
-              lastActivityAt: new Date().toISOString(),
-            };
-          }
-          return asg;
-        })
-      );
+      await batch.commit();
+      logAudit('RECORD_COMPLETED', 'Record', recordId, {
+        customerNo: targetRecord?.customerNo,
+        values,
+      });
+
+      return {
+        success: true,
+        message: lang === 'ar' ? 'تم الحفظ والاعتماد بنجاح.' : 'Saved and submitted successfully.',
+      };
+    } catch (err) {
+      console.error('Error submitting record:', err);
+      return { success: false, message: 'Error submitting record to Firestore' };
     }
-
-    logAudit('RECORD_COMPLETED', 'Record', recordId, {
-      customerNo: targetRecord?.customerNo,
-      values,
-    });
-
-    return {
-      success: true,
-      message: lang === 'ar' ? 'تم الحفظ والاعتماد بنجاح.' : 'Saved and submitted successfully.',
-    };
   };
 
-  const syncOfflineQueue = () => {
-    if (offlineQueue.length === 0) return;
+  const syncOfflineQueue = async () => {
+    if (offlineQueue.length === 0 || !isOnline) return;
 
-    offlineQueue.forEach((q) => {
-      setRecordResponses((prev) => ({
-        ...prev,
-        [q.recordId]: { ...(prev[q.recordId] || {}), ...q.responses },
-      }));
-
-      setRecords((prev) =>
-        prev.map((r) =>
-          r.recordId === q.recordId
-            ? {
-                ...r,
-                recordStatus: q.isDraft ? 'DraftSaved' : 'Completed',
-                completionPercent: q.isDraft ? 50 : 100,
-                completedAt: !q.isDraft ? new Date().toISOString() : undefined,
-                lastSavedAt: new Date().toISOString(),
-              }
-            : r
-        )
-      );
-
+    for (const q of offlineQueue) {
+      if (q.isDraft) {
+        await saveDraftRecord(q.recordId, q.responses);
+      } else {
+        await submitRecord(q.recordId, q.responses);
+      }
       logAudit('OFFLINE_RECORD_SYNCED', 'Record', q.recordId, { wasDraft: q.isDraft });
-    });
-
+    }
     setOfflineQueue([]);
   };
 
-  const reassignRecord = (recordId: string, newUserId: string, reason: string) => {
+  const reassignRecord = async (recordId: string, newUserId: string, reason: string) => {
     const newRep = users.find((u) => u.userId === newUserId);
     if (!newRep) return;
 
-    setRecords((prev) =>
-      prev.map((r) =>
-        r.recordId === recordId
-          ? {
-              ...r,
-              assignedUserId: newRep.userId,
-              assignedRegionNo: newRep.regionNo,
-              repNo: newRep.repNo,
-              repName: newRep.repNameAr,
-              updatedAt: new Date().toISOString(),
-            }
-          : r
-      )
-    );
-
-    logAudit('RECORD_REASSIGNED', 'Record', recordId, {
-      newUserId,
-      newRepName: newRep.repNameAr,
-      reason,
-    });
+    try {
+      await updateDoc(doc(db, 'records', recordId), {
+        assignedUserId: newRep.userId,
+        assignedRegionNo: newRep.regionNo,
+        repNo: newRep.repNo,
+        repName: newRep.repNameAr,
+        updatedAt: new Date().toISOString(),
+      });
+      logAudit('RECORD_REASSIGNED', 'Record', recordId, {
+        newUserId,
+        newRepName: newRep.repNameAr,
+        reason,
+      });
+    } catch (err) {
+      console.error('Error reassigning record:', err);
+    }
   };
 
   // -------------------------------------------------------------
   // IMPORT ENGINE
   // -------------------------------------------------------------
-  const commitImport = (
+  const commitImport = async (
     requestId: string,
     importedRows: any[],
     mapping: Record<string, string>,
     fileName: string
-  ): { total: number; created: number } => {
+  ): Promise<{ total: number; created: number }> => {
     const targetReq = requests.find((r) => r.requestId === requestId);
     if (!targetReq) return { total: 0, created: 0 };
 
@@ -1481,9 +1437,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       createdCount++;
     });
 
-    setRecords((prev) => [...prev, ...newRecords]);
-    setRecordResponses((prev) => ({ ...prev, ...newResponses }));
-
     // Create assignments for newly imported regions if not already existing
     const newAssignments: Assignment[] = [];
     touchedRegionNos.forEach((regNo) => {
@@ -1512,11 +1465,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     });
 
-    if (newAssignments.length > 0) {
-      setAssignments((prev) => [...prev, ...newAssignments]);
+    // We will chunk Firestore writes to stay within the 500 ops limit
+    try {
+      const chunks = [];
+      const CHUNK_SIZE = 200; // 2 ops per record (record + response) = 400 ops, well under 500 limit
+      for (let i = 0; i < newRecords.length; i += CHUNK_SIZE) {
+        chunks.push(newRecords.slice(i, i + CHUNK_SIZE));
+      }
+
+      for (let i = 0; i < chunks.length; i++) {
+        const chunk = chunks[i];
+        const batch = writeBatch(db);
+        
+        chunk.forEach(rec => {
+          batch.set(doc(db, 'records', rec.recordId), rec);
+          batch.set(doc(db, 'responses', rec.recordId), newResponses[rec.recordId]);
+        });
+
+        if (i === 0) {
+          newAssignments.forEach(asg => {
+            batch.set(doc(db, 'assignments', asg.assignmentId), asg);
+          });
+          batch.update(doc(db, 'requests', requestId), {
+            totalRecords: targetReq.totalRecords + createdCount,
+            updatedAt: new Date().toISOString(),
+          });
+        }
+        await batch.commit();
+      }
+
+      logAudit('IMPORT_COMMITTED', 'Import', requestId, {
+        fileName,
+        totalRows: importedRows.length,
+        createdCount,
+        regionsCovered: Array.from(touchedRegionNos),
+      });
+
+    } catch (err) {
+      console.error('Error committing import to Firestore:', err);
     }
 
-    // Notify representatives of the new records
+    // Notifications (Optional, local state logic remains)
     touchedRegionNos.forEach((regNo) => {
       const rep = users.find((u) => u.regionNo === regNo || u.allowedRegionNos?.includes(regNo));
       if (rep) {
@@ -1535,11 +1524,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           sentAt: nowIso,
           createdAt: nowIso,
         };
+        // Can write notifs to firestore if needed, but keeping local for now
         setNotifications((prev) => [newNotif, ...prev]);
       }
     });
 
-    // Send native device push notification if supported
     sendBrowserNotification(
       lang === 'ar' ? `تم استيراد بيانات جديدة: ${targetReq.titleAr}` : `New records: ${targetReq.titleEn}`,
       {
@@ -1550,26 +1539,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         tag: `imp-${requestId}`,
       }
     );
-
-    // Update request count
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.requestId === requestId
-          ? {
-              ...r,
-              totalRecords: r.totalRecords + createdCount,
-              updatedAt: new Date().toISOString(),
-            }
-          : r
-      )
-    );
-
-    logAudit('IMPORT_COMMITTED', 'Import', requestId, {
-      fileName,
-      totalRows: importedRows.length,
-      createdCount,
-      regionsCovered: Array.from(touchedRegionNos),
-    });
 
     return { total: importedRows.length, created: createdCount };
   };

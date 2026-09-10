@@ -1,5 +1,12 @@
 export type UserRole = 'ADMIN' | 'SUPERVISOR' | 'REP';
 
+export interface UserPermissions {
+  canManageUsers: boolean;
+  canManageRequests: boolean;
+  canManageRegions: boolean;
+  canViewAllBranches: boolean;
+}
+
 export type RequestStatus = 'Draft' | 'ReadyForReview' | 'Published' | 'Closed' | 'Archived' | 'Cancelled';
 export type RequestPriority = 'Low' | 'Normal' | 'High' | 'Urgent';
 export type RequestType = 'per_record' | 'per_rep' | 'per_region' | 'per_branch';
@@ -109,6 +116,7 @@ export interface User {
   branchNameAr?: string;
   branchNameEn?: string;
   role: UserRole;
+  permissions?: UserPermissions;
   mustChangePassword: boolean;
   isActive: boolean;
   failedLoginCount: number;

@@ -50,6 +50,12 @@ export const AdminUsers: React.FC = () => {
   const [newRepNameEn, setNewRepNameEn] = useState('');
   const [newBranchId, setNewBranchId] = useState(branches[0]?.branchId || '');
   const [newAllowedRegions, setNewAllowedRegions] = useState<string[]>([]);
+  const [newPermissions, setNewPermissions] = useState({
+    canManageUsers: false,
+    canManageRequests: false,
+    canManageRegions: false,
+    canViewAllBranches: false
+  });
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -85,6 +91,7 @@ export const AdminUsers: React.FC = () => {
       branchNameAr: branch?.branchNameAr || 'فرع الرياض',
       branchNameEn: branch?.branchNameEn || 'Riyadh Branch',
       allowedRegionNos: newAllowedRegions.length > 0 ? newAllowedRegions : [newRegionNo],
+      permissions: newRole === 'SUPERVISOR' ? newPermissions : undefined,
       passwordHash: '1234',
       mustChangePassword: true,
       isActive: true,
@@ -475,6 +482,53 @@ export const AdminUsers: React.FC = () => {
                   })}
                 </div>
               </div>
+
+              {/* Granular Permissions for Supervisor */}
+              {newRole === 'SUPERVISOR' && (
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <label className="block font-bold text-slate-700 mb-2">
+                    {lang === 'ar' ? 'صلاحيات المشرف الدقيقة (Granular Permissions):' : 'Supervisor Granular Permissions:'}
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={newPermissions.canManageUsers}
+                        onChange={(e) => setNewPermissions(p => ({ ...p, canManageUsers: e.target.checked }))}
+                        className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
+                      />
+                      {lang === 'ar' ? 'إدارة المستخدمين والمندوبين' : 'Manage Users & Reps'}
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={newPermissions.canManageRequests}
+                        onChange={(e) => setNewPermissions(p => ({ ...p, canManageRequests: e.target.checked }))}
+                        className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
+                      />
+                      {lang === 'ar' ? 'إدارة طلبات الجمع والنماذج' : 'Manage Requests & Forms'}
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={newPermissions.canManageRegions}
+                        onChange={(e) => setNewPermissions(p => ({ ...p, canManageRegions: e.target.checked }))}
+                        className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
+                      />
+                      {lang === 'ar' ? 'إدارة المناطق وتعيينها' : 'Manage Regions Assignments'}
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={newPermissions.canViewAllBranches}
+                        onChange={(e) => setNewPermissions(p => ({ ...p, canViewAllBranches: e.target.checked }))}
+                        className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
+                      />
+                      {lang === 'ar' ? 'رؤية بيانات جميع الفروع' : 'View All Branches Data'}
+                    </label>
+                  </div>
+                </div>
+              )}
 
               <div className="p-3 bg-purple-50 rounded-xl text-[11px] text-purple-900 space-y-1">
                 <span className="font-bold">ملاحظات الأمان الإلزامية:</span>

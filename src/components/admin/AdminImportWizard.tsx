@@ -368,7 +368,7 @@ export const AdminImportWizard: React.FC<Props> = ({ initialRequestId, onBack })
   };
 
   // Step 4: Commit Valid Rows to App Context & Local Database
-  const handleCommitImport = () => {
+  const handleCommitImport = async () => {
     setIsImporting(true);
 
     const mergedMapping: Record<string, string> = {
@@ -376,7 +376,7 @@ export const AdminImportWizard: React.FC<Props> = ({ initialRequestId, onBack })
       ...fieldColMap,
     };
 
-    const res = commitImport(selectedRequestId, validRows, mergedMapping, fileName || 'imported_file.xlsx');
+    const res = await commitImport(selectedRequestId, validRows, mergedMapping, fileName || 'imported_file.xlsx');
     setImportStats(res);
     setIsImporting(false);
     confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });

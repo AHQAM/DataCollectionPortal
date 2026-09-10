@@ -1,0 +1,81 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      // In a real app we check custom claims (request.auth.token.role)
+      // Here we might just check if the user is in the database with role ADMIN
+      // But assuming custom claims are set:
+      return isAuthenticated() && (request.auth.token.role == 'ADMIN' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN');
+    }
+
+    function isSupervisor() {
+      return isAuthenticated() && (request.auth.token.role == 'SUPERVISOR' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'SUPERVISOR');
+    }
+
+    function isRep() {
+      return isAuthenticated() && (request.auth.token.role == 'REP' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'REP');
+    }
+    
+    function hasPerm(perm) {
+      // Helper to check granular permissions on supervisor
+      return isSupervisor() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions[perm] == true;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isAdmin() || hasPerm('canManageUsers') || hasPerm('canViewAllBranches') || (isAuthenticated() && request.auth.uid == userId);
+      allow update: if isAdmin() || hasPerm('canManageUsers') || (isAuthenticated() && request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deviceId', 'isPasswordChanged']));
+      allow create, delete: if isAdmin() || hasPerm('canManageUsers');
+    }
+
+    // Requests Collection (Dynamic Forms)
+    match /requests/{requestId} {
+      allow read: if isAdmin() || hasPerm('canManageRequests') || hasPerm('canViewAllBranches') || (isAuthenticated() && resource.data.status in ['Published', 'Closed', 'Archived']);
+      allow write: if isAdmin() || hasPerm('canManageRequests');
+    }
+
+    // Request Fields (Top-Level Collection)
+    match /request_fields/{fieldId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || hasPerm('canManageRequests');
+    }
+
+    // Assignments
+    match /assignments/{assignmentId} {
+      allow read: if isAdmin() || hasPerm('canManageRegions') || hasPerm('canViewAllBranches') || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow write: if isAdmin() || hasPerm('canManageRegions');
+    }
+
+    // Records
+    match /records/{recordId} {
+      // Reps can read their own assigned records, or if no assignment yet, read regions they belong to.
+      allow read: if isAdmin() || isSupervisor() || (isAuthenticated() && resource.data.assignedUserId == request.auth.uid);
+      allow write: if isAdmin() || hasPerm('canManageRequests');
+    }
+    
+    // Responses
+    match /responses/{responseId} {
+      allow read: if isAdmin() || isSupervisor() || (isAuthenticated() && resource.data.submittedBy == request.auth.uid);
+      allow write: if isAdmin() || (isAuthenticated() && isRep());
+    }
+
+    // Audit Logs
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+  }
+}

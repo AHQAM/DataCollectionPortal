@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { auth } from '../../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import {
   ShieldCheck,
   Smartphone,
@@ -64,10 +66,10 @@ export const AuthPortal: React.FC = () => {
     }
   };
 
-  const handleAdminLogin = (e?: React.FormEvent) => {
+  const handleAdminLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!adminUsername.trim()) {
-      setAdminError(lang === 'ar' ? 'يرجى إدخال اسم المستخدم' : 'Please enter username');
+      setAdminError(lang === 'ar' ? 'يرجى إدخال اسم المستخدم (البريد الإلكتروني)' : 'Please enter username (email)');
       return;
     }
     if (!adminPassword.trim()) {
@@ -78,11 +80,21 @@ export const AuthPortal: React.FC = () => {
     setLoading(true);
     setAdminError(null);
 
-    const result = login(adminUsername.trim(), adminPassword);
-    setLoading(false);
-
-    if (!result.success) {
-      setAdminError(lang === 'ar' ? result.messageAr : result.messageEn);
+    try {
+      // First try standard context login for backwards compatibility with mock admin (if still needed)
+      const mockResult = login(adminUsername.trim(), adminPassword);
+      
+      if (!mockResult.success) {
+         // Attempt Firebase Auth
+         await signInWithEmailAndPassword(auth, adminUsername.trim(), adminPassword);
+         // If successful, we need to force login in context using a generic admin payload
+         login('admin', 'admin123'); // This is a hack to trigger the mock context update for now
+      }
+    } catch (err: any) {
+       console.error("Firebase Auth Error:", err);
+       setAdminError(lang === 'ar' ? 'كلمة المرور غير صحيحة أو الحساب غير موجود' : 'Invalid credentials or user not found');
+    } finally {
+       setLoading(false);
     }
   };
 
