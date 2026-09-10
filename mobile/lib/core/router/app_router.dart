@@ -7,6 +7,7 @@ import '../../features/auth/presentation/change_password_screen.dart';
 import '../../features/auth/presentation/auth_controller.dart';
 import '../../features/requests/presentation/my_requests_screen.dart';
 import '../../features/forms/presentation/dynamic_form_screen.dart';
+import '../../features/notifications/presentation/notifications_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -62,6 +63,10 @@ GoRouter appRouter(AppRouterRef ref) {
             fields: const [], // Placeholder empty fields
           );
         },
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationsScreen(),
       ),
     ],
   );

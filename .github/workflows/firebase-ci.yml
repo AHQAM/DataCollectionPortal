@@ -1,0 +1,31 @@
+name: Firebase Functions CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        
+    - name: Install dependencies
+      run: cd firebase/functions && npm ci
+      
+    - name: Lint code
+      run: cd firebase/functions && npm run lint
+
+    - name: Run tests
+      run: cd firebase/functions && npm run test
+
+    - name: Build
+      run: cd firebase/functions && npm run build

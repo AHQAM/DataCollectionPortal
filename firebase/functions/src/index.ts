@@ -51,6 +51,11 @@ export {
   commitImport,
 } from "./importWizard";
 
+// External Integration Adapter
+export {
+  exportDataToExternalSystem,
+} from "./externalIntegrationAdapter";
+
 // Notification Service
 export {
   sendBroadcastNotification,
