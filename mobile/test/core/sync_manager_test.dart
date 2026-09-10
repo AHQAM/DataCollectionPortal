@@ -85,7 +85,9 @@ void main() {
     when(() => mockCollection.add(any())).thenAnswer((_) async => mockDoc);
 
     await syncManager.enqueueAction(action);
-    await Future.delayed(const Duration(milliseconds: 50)); // wait for _processQueue
+    await Future.delayed(
+      const Duration(milliseconds: 50),
+    ); // wait for _processQueue
 
     verify(() => mockBox.put(action.id, any())).called(1); // the initial put
     verify(() => mockFirestore.collection('records')).called(1);
