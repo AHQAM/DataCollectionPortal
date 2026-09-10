@@ -3,16 +3,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../domain/request_model.dart';
-import '../../auth/presentation/auth_controller.dart';
-import '../../../core/storage/hive_service.dart';
 
 part 'requests_repository.g.dart';
 
 class RequestsRepository {
   final FirebaseFirestore _firestore;
-  final HiveService _hiveService;
 
-  RequestsRepository(this._firestore, this._hiveService);
+  RequestsRepository(this._firestore);
 
   Stream<List<RequestModel>> watchMyRequests(String regionNo) {
     // We listen to Firestore, and simultaneously cache the results in Hive.
@@ -63,6 +60,5 @@ class RequestsRepository {
 RequestsRepository requestsRepository(Ref ref) {
   return RequestsRepository(
     FirebaseFirestore.instance,
-    ref.watch(hiveServiceProvider),
   );
 }

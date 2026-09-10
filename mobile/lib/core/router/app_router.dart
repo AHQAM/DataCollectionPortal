@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -33,8 +32,9 @@ GoRouter appRouter(Ref ref) {
           if (state.uri.path != '/change-password') return '/change-password';
         } else {
           // Logged in, no forced password change
-          if (isLoggingIn || state.uri.path == '/change-password')
+          if (isLoggingIn || state.uri.path == '/change-password') {
             return '/requests';
+          }
         }
       }
       return null; // No redirect needed

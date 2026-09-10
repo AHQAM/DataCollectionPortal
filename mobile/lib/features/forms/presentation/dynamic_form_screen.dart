@@ -113,7 +113,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       default:
         // Placeholder for complex types (photo, signature, location)
         return Card(
-          color: Theme.of(context).colorScheme.surfaceVariant,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Text(

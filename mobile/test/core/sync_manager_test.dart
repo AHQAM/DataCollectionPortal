@@ -17,9 +17,11 @@ class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
 class MockBox<E> extends Mock implements Box<E> {}
 
+// ignore: subtype_of_sealed_class
 class MockCollectionReference<T extends Object?> extends Mock
     implements CollectionReference<T> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentReference<T extends Object?> extends Mock
     implements DocumentReference<T> {}
 

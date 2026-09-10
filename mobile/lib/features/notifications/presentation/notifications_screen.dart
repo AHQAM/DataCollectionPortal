@@ -14,12 +14,12 @@ class NotificationsScreen extends ConsumerWidget {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.notifications ?? 'Notifications')),
+      appBar: AppBar(title: Text(l10n.notifications)),
       body: notificationsAsync.when(
         data: (notifications) {
           if (notifications.isEmpty) {
             return Center(
-              child: Text(l10n.noNotifications ?? 'No new notifications'),
+              child: Text(l10n.noNotifications),
             );
           }
           return ListView.builder(
@@ -29,7 +29,7 @@ class NotificationsScreen extends ConsumerWidget {
               final isUnread = notification.status != 'READ';
 
               return ListTile(
-                tileColor: isUnread ? Colors.blue.withOpacity(0.1) : null,
+                tileColor: isUnread ? Colors.blue.withValues(alpha: 0.1) : null,
                 leading: Icon(
                   isUnread ? Icons.notifications_active : Icons.notifications,
                   color: isUnread

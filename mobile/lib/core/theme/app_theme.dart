@@ -11,7 +11,7 @@ class AppTheme {
         secondary: AppConstants.secondaryColor,
         tertiary: AppConstants.accentColor,
         error: AppConstants.errorColor,
-        background: AppConstants.backgroundColor,
+        surface: AppConstants.backgroundColor,
       ),
       fontFamily:
           'Tajawal', // Assumes Tajawal is added to pubspec or Google Fonts
