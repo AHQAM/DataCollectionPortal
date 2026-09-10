@@ -27,12 +27,15 @@ class RequestsRepository {
         final data = doc.data();
         data['id'] = doc.id;
         // Handle Firestore Timestamp conversions
-        data['assignedAt'] = (data['assignedAt'] as Timestamp).toDate().toIso8601String();
+        data['assignedAt'] =
+            (data['assignedAt'] as Timestamp).toDate().toIso8601String();
         if (data['dueDate'] != null) {
-          data['dueDate'] = (data['dueDate'] as Timestamp).toDate().toIso8601String();
+          data['dueDate'] =
+              (data['dueDate'] as Timestamp).toDate().toIso8601String();
         }
         if (data['completedAt'] != null) {
-          data['completedAt'] = (data['completedAt'] as Timestamp).toDate().toIso8601String();
+          data['completedAt'] =
+              (data['completedAt'] as Timestamp).toDate().toIso8601String();
         }
         return RequestModel.fromJson(data);
       }).toList();
@@ -40,7 +43,7 @@ class RequestsRepository {
       // Cache locally
       // For simplicity, we can store them in Hive, but Firestore already has a local cache.
       // We will rely on Firestore's cache for reads, and SyncManager for offline writes.
-      
+
       return requests;
     });
   }

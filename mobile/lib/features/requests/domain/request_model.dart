@@ -18,5 +18,6 @@ class RequestModel with _$RequestModel {
     @Default({}) Map<String, dynamic> metadata,
   }) = _RequestModel;
 
-  factory RequestModel.fromJson(Map<String, dynamic> json) => _$RequestModelFromJson(json);
+  factory RequestModel.fromJson(Map<String, dynamic> json) =>
+      _$RequestModelFromJson(json);
 }

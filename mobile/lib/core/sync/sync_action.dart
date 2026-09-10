@@ -13,5 +13,6 @@ class SyncAction with _$SyncAction {
     @Default(0) int retryCount,
   }) = _SyncAction;
 
-  factory SyncAction.fromJson(Map<String, dynamic> json) => _$SyncActionFromJson(json);
+  factory SyncAction.fromJson(Map<String, dynamic> json) =>
+      _$SyncActionFromJson(json);
 }

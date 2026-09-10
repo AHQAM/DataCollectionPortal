@@ -27,7 +27,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
   void _saveForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      
+
       // TODO: Queue this data using SyncManager
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.save)),
@@ -38,7 +38,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Sort fields by orderIndex
     final sortedFields = List<FormFieldModel>.from(widget.fields)
       ..sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
@@ -85,11 +85,13 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
             labelText: label,
             hintText: label,
           ),
-          keyboardType: field.type == 'number' ? TextInputType.number : TextInputType.text,
+          keyboardType: field.type == 'number'
+              ? TextInputType.number
+              : TextInputType.text,
           readOnly: field.isReadOnly,
           validator: (value) {
             if (field.isRequired && (value == null || value.isEmpty)) {
-              return isArabic 
+              return isArabic
                   ? (field.validationMessageAr ?? l10n.requiredField)
                   : (field.validationMessageEn ?? l10n.requiredField);
             }
@@ -103,11 +105,12 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
             labelText: label,
           ),
           items: field.options?.map((option) {
-            return DropdownMenuItem(value: option, child: Text(option));
-          }).toList() ?? [],
+                return DropdownMenuItem(value: option, child: Text(option));
+              }).toList() ??
+              [],
           validator: (value) {
             if (field.isRequired && value == null) {
-              return isArabic 
+              return isArabic
                   ? (field.validationMessageAr ?? l10n.requiredField)
                   : (field.validationMessageEn ?? l10n.requiredField);
             }
@@ -122,7 +125,8 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           color: Theme.of(context).colorScheme.surfaceVariant,
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Text('[$label] - Field Type: ${field.type} (To Be Implemented)'),
+            child: Text(
+                '[$label] - Field Type: ${field.type} (To Be Implemented)'),
           ),
         );
     }

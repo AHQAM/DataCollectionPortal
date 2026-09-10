@@ -21,15 +21,15 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   // Initialize FCM
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  
+
   // Request permission (iOS/Web mainly)
   await FirebaseMessaging.instance.requestPermission(
     alert: true,
@@ -58,7 +58,7 @@ class SalesCollectionApp extends ConsumerWidget {
       title: 'Sales Collection Hub',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      
+
       // Localization setup
       localizationsDelegates: const [
         AppLocalizations.delegate,

@@ -10,11 +10,18 @@ import 'package:mobile/core/sync/sync_manager.dart';
 import 'package:mobile/core/sync/sync_action.dart';
 
 class MockHiveService extends Mock implements HiveService {}
+
 class MockNetworkInfo extends Mock implements NetworkInfo {}
+
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
+
 class MockBox<E> extends Mock implements Box<E> {}
-class MockCollectionReference<T extends Object?> extends Mock implements CollectionReference<T> {}
-class MockDocumentReference<T extends Object?> extends Mock implements DocumentReference<T> {}
+
+class MockCollectionReference<T extends Object?> extends Mock
+    implements CollectionReference<T> {}
+
+class MockDocumentReference<T extends Object?> extends Mock
+    implements DocumentReference<T> {}
 
 void main() {
   late MockHiveService mockHiveService;
@@ -30,7 +37,8 @@ void main() {
     mockBox = MockBox<String>();
 
     when(() => mockHiveService.syncQueueBox).thenReturn(mockBox);
-    when(() => mockNetworkInfo.onConnectivityChanged).thenAnswer((_) => Stream.value(false));
+    when(() => mockNetworkInfo.onConnectivityChanged)
+        .thenAnswer((_) => Stream.value(false));
     when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
 
     syncManager = SyncManager(mockHiveService, mockNetworkInfo, mockFirestore);
@@ -53,25 +61,25 @@ void main() {
 
   test('enqueueAction attempts to sync if online', () async {
     when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-    
+
     // Setup queue iteration mocks
     when(() => mockBox.keys).thenReturn(['test_id']);
-    
+
     final action = SyncAction(
       id: 'test_id',
       type: 'CREATE_RECORD',
       payload: '{"collection": "records", "data": {"key": "value"}}',
       createdAt: DateTime.now(),
     );
-    
+
     when(() => mockBox.get('test_id')).thenReturn(jsonEncode(action.toJson()));
     when(() => mockBox.put(any(), any())).thenAnswer((_) async => {});
     when(() => mockBox.delete(any())).thenAnswer((_) async => {});
-    
+
     // Setup firestore mocks
     final mockCollection = MockCollectionReference<Map<String, dynamic>>();
     final mockDoc = MockDocumentReference<Map<String, dynamic>>();
-    
+
     when(() => mockFirestore.collection('records')).thenReturn(mockCollection);
     when(() => mockCollection.add(any())).thenAnswer((_) async => mockDoc);
 

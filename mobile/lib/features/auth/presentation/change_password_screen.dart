@@ -7,7 +7,8 @@ class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
 
   @override
-  ConsumerState<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+  ConsumerState<ChangePasswordScreen> createState() =>
+      _ChangePasswordScreenState();
 }
 
 class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
@@ -27,9 +28,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   void _changePassword() {
     if (_formKey.currentState!.validate()) {
       ref.read(authControllerProvider.notifier).changePassword(
-        _currentPasswordController.text,
-        _newPasswordController.text,
-      );
+            _currentPasswordController.text,
+            _newPasswordController.text,
+          );
     }
   }
 
@@ -65,13 +66,16 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+                    color:
+                        Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Theme.of(context).colorScheme.tertiary),
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.tertiary),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: Theme.of(context).colorScheme.tertiary),
+                      Icon(Icons.info_outline,
+                          color: Theme.of(context).colorScheme.tertiary),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -94,7 +98,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   ),
                   obscureText: true,
                   validator: (value) {
-                    if (value == null || value.isEmpty) return l10n.requiredField;
+                    if (value == null || value.isEmpty)
+                      return l10n.requiredField;
                     return null;
                   },
                 ),
@@ -107,7 +112,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   ),
                   obscureText: true,
                   validator: (value) {
-                    if (value == null || value.isEmpty) return l10n.requiredField;
+                    if (value == null || value.isEmpty)
+                      return l10n.requiredField;
                     if (value.length < 6) return l10n.passwordLengthError;
                     return null;
                   },
@@ -121,7 +127,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   ),
                   obscureText: true,
                   validator: (value) {
-                    if (value == null || value.isEmpty) return l10n.requiredField;
+                    if (value == null || value.isEmpty)
+                      return l10n.requiredField;
                     if (value != _newPasswordController.text) {
                       return l10n.passwordMismatch;
                     }
@@ -135,7 +142,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2),
                         )
                       : Text(l10n.submit),
                 ),
@@ -146,7 +154,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   },
                   child: Text(
                     l10n.logout,
-                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.error),
                   ),
                 ),
               ],

@@ -26,9 +26,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void _login() {
     if (_formKey.currentState!.validate()) {
       ref.read(authControllerProvider.notifier).login(
-        _regionNoController.text.trim(),
-        _passwordController.text,
-      );
+            _regionNoController.text.trim(),
+            _passwordController.text,
+          );
     }
   }
 
@@ -69,9 +69,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Text(
                     l10n.loginTitle,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
@@ -99,7 +99,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       prefixIcon: const Icon(Icons.lock),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                          _obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                         ),
                         onPressed: () {
                           setState(() {

@@ -30,7 +30,7 @@ class SyncManager {
   Future<void> enqueueAction(SyncAction action) async {
     final box = _hiveService.syncQueueBox;
     await box.put(action.id, jsonEncode(action.toJson()));
-    
+
     // Attempt to sync immediately if online
     if (await _networkInfo.isConnected) {
       _processQueue();
@@ -50,14 +50,15 @@ class SyncManager {
         if (jsonString == null) continue;
 
         final action = SyncAction.fromJson(jsonDecode(jsonString));
-        
+
         bool success = await _executeAction(action);
-        
+
         if (success) {
           await box.delete(key);
         } else {
           // Increment retry count
-          final updatedAction = action.copyWith(retryCount: action.retryCount + 1);
+          final updatedAction =
+              action.copyWith(retryCount: action.retryCount + 1);
           await box.put(key, jsonEncode(updatedAction.toJson()));
         }
       }
@@ -69,13 +70,13 @@ class SyncManager {
   Future<bool> _executeAction(SyncAction action) async {
     try {
       final payload = jsonDecode(action.payload) as Map<String, dynamic>;
-      
+
       switch (action.type) {
         case 'CREATE_RECORD':
           final collection = payload['collection'] as String;
           final docId = payload['docId'] as String?;
           final data = payload['data'] as Map<String, dynamic>;
-          
+
           if (docId != null) {
             await _firestore.collection(collection).doc(docId).set(data);
           } else {
@@ -87,7 +88,7 @@ class SyncManager {
           final collection = payload['collection'] as String;
           final docId = payload['docId'] as String;
           final data = payload['data'] as Map<String, dynamic>;
-          
+
           await _firestore.collection(collection).doc(docId).update(data);
           return true;
 

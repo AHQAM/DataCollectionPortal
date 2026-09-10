@@ -9,13 +9,13 @@ class AuthController extends _$AuthController {
   @override
   FutureOr<UserModel?> build() async {
     final authRepo = ref.watch(authRepositoryProvider);
-    
+
     // Listen to auth state changes to refresh user data
     ref.listen<AsyncValue<void>>(
-      authRepositoryProvider.select((repo) => const AsyncData(null)), 
+      authRepositoryProvider.select((repo) => const AsyncData(null)),
       (previous, next) {},
     ); // Placeholder to ensure repo is watched if we need to listen directly.
-    
+
     // The actual stream of Firebase user
     return await authRepo.getUserData();
   }
@@ -29,7 +29,8 @@ class AuthController extends _$AuthController {
     });
   }
 
-  Future<void> changePassword(String currentPassword, String newPassword) async {
+  Future<void> changePassword(
+      String currentPassword, String newPassword) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final authRepo = ref.read(authRepositoryProvider);

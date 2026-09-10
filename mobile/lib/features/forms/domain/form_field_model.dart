@@ -7,7 +7,8 @@ part 'form_field_model.g.dart';
 class FormFieldModel with _$FormFieldModel {
   const factory FormFieldModel({
     required String id,
-    required String type, // 'text', 'number', 'dropdown', 'location', 'photo', 'signature', 'barcode'
+    required String
+        type, // 'text', 'number', 'dropdown', 'location', 'photo', 'signature', 'barcode'
     required String labelAr,
     required String labelEn,
     @Default(true) bool isRequired,
@@ -23,5 +24,6 @@ class FormFieldModel with _$FormFieldModel {
     @Default(0) int orderIndex,
   }) = _FormFieldModel;
 
-  factory FormFieldModel.fromJson(Map<String, dynamic> json) => _$FormFieldModelFromJson(json);
+  factory FormFieldModel.fromJson(Map<String, dynamic> json) =>
+      _$FormFieldModelFromJson(json);
 }

@@ -18,5 +18,6 @@ class NotificationModel with _$NotificationModel {
     required DateTime createdAt,
   }) = _NotificationModel;
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) => _$NotificationModelFromJson(json);
+  factory NotificationModel.fromJson(Map<String, dynamic> json) =>
+      _$NotificationModelFromJson(json);
 }

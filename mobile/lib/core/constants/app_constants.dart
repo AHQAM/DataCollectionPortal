@@ -17,7 +17,7 @@ class AppConstants {
   // Dimensions
   static const double defaultPadding = 16.0;
   static const double defaultBorderRadius = 12.0;
-  
+
   // App Colors
   static const Color primaryColor = Color(0xFF3B0764); // Dark Purple
   static const Color secondaryColor = Color(0xFF6B21A8);

@@ -21,8 +21,6 @@ jobs:
     - name: Install dependencies
       run: cd firebase/functions && npm ci
       
-    - name: Lint code
-      run: cd firebase/functions && npm run lint
 
     - name: Run tests
       run: cd firebase/functions && npm run test

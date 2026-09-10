@@ -23,14 +23,15 @@ class AuthRepository {
     String? deviceId = await _secureStorage.read(key: AppConstants.deviceIdKey);
     if (deviceId == null) {
       deviceId = const Uuid().v4();
-      await _secureStorage.write(key: AppConstants.deviceIdKey, value: deviceId);
+      await _secureStorage.write(
+          key: AppConstants.deviceIdKey, value: deviceId);
     }
     return deviceId;
   }
 
   Future<void> login(String regionNo, String password) async {
     final deviceId = await _getOrGenerateDeviceId();
-    
+
     // Call the custom login Cloud Function
     final HttpsCallable callable = _functions.httpsCallable('login');
     final response = await callable.call(<String, dynamic>{
@@ -40,12 +41,13 @@ class AuthRepository {
     });
 
     final String customToken = response.data['customToken'];
-    
+
     // Sign in with the generated custom token
     await _auth.signInWithCustomToken(customToken);
   }
 
-  Future<void> changePassword(String currentPassword, String newPassword) async {
+  Future<void> changePassword(
+      String currentPassword, String newPassword) async {
     final HttpsCallable callable = _functions.httpsCallable('changePassword');
     final response = await callable.call(<String, dynamic>{
       'currentPassword': currentPassword,
@@ -76,7 +78,8 @@ class AuthRepository {
       branchId: claims['branchId'] as String?,
       role: claims['role'] as String? ?? 'sales_rep',
       mustChangePassword: claims['mustChangePassword'] as bool? ?? false,
-      lastLoginAt: DateTime.parse(claims['lastLoginAt'] as String? ?? DateTime.now().toIso8601String()),
+      lastLoginAt: DateTime.parse(
+          claims['lastLoginAt'] as String? ?? DateTime.now().toIso8601String()),
       sessionVersion: claims['sessionVersion'] as String? ?? '',
     );
   }

@@ -9,7 +9,7 @@ part 'requests_controller.g.dart';
 @riverpod
 Stream<List<RequestModel>> myRequests(MyRequestsRef ref) {
   final user = ref.watch(authControllerProvider).value;
-  
+
   if (user == null) {
     return const Stream.empty();
   }

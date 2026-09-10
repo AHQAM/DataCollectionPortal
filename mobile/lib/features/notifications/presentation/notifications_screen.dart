@@ -20,23 +20,27 @@ class NotificationsScreen extends ConsumerWidget {
       body: notificationsAsync.when(
         data: (notifications) {
           if (notifications.isEmpty) {
-            return Center(child: Text(l10n.noNotifications ?? 'No new notifications'));
+            return Center(
+                child: Text(l10n.noNotifications ?? 'No new notifications'));
           }
           return ListView.builder(
             itemCount: notifications.length,
             itemBuilder: (context, index) {
               final notification = notifications[index];
               final isUnread = notification.status != 'READ';
-              
+
               return ListTile(
                 tileColor: isUnread ? Colors.blue.withOpacity(0.1) : null,
                 leading: Icon(
                   isUnread ? Icons.notifications_active : Icons.notifications,
-                  color: isUnread ? Theme.of(context).primaryColor : Colors.grey,
+                  color:
+                      isUnread ? Theme.of(context).primaryColor : Colors.grey,
                 ),
                 title: Text(
                   isAr ? notification.titleAr : notification.titleEn,
-                  style: TextStyle(fontWeight: isUnread ? FontWeight.bold : FontWeight.normal),
+                  style: TextStyle(
+                      fontWeight:
+                          isUnread ? FontWeight.bold : FontWeight.normal),
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,7 +55,9 @@ class NotificationsScreen extends ConsumerWidget {
                 ),
                 onTap: () {
                   if (isUnread) {
-                    ref.read(notificationsControllerProvider.notifier).markAsRead(notification.notificationId);
+                    ref
+                        .read(notificationsControllerProvider.notifier)
+                        .markAsRead(notification.notificationId);
                   }
                   // Optionally navigate based on notification.data
                 },

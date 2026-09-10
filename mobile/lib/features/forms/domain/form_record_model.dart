@@ -17,5 +17,6 @@ class FormRecordModel with _$FormRecordModel {
     Map<String, dynamic>? metadata, // Device info, exact location, etc.
   }) = _FormRecordModel;
 
-  factory FormRecordModel.fromJson(Map<String, dynamic> json) => _$FormRecordModelFromJson(json);
+  factory FormRecordModel.fromJson(Map<String, dynamic> json) =>
+      _$FormRecordModelFromJson(json);
 }

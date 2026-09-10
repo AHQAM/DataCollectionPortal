@@ -13,7 +13,8 @@ class AppTheme {
         error: AppConstants.errorColor,
         background: AppConstants.backgroundColor,
       ),
-      fontFamily: 'Tajawal', // Assumes Tajawal is added to pubspec or Google Fonts
+      fontFamily:
+          'Tajawal', // Assumes Tajawal is added to pubspec or Google Fonts
       appBarTheme: const AppBarTheme(
         centerTitle: true,
         backgroundColor: AppConstants.primaryColor,
@@ -26,7 +27,8 @@ class AppTheme {
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 50),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
+            borderRadius:
+                BorderRadius.circular(AppConstants.defaultBorderRadius),
           ),
           textStyle: const TextStyle(
             fontSize: 16,
@@ -47,13 +49,15 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
-          borderSide: const BorderSide(color: AppConstants.primaryColor, width: 2),
+          borderSide:
+              const BorderSide(color: AppConstants.primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
           borderSide: const BorderSide(color: AppConstants.errorColor),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
       cardTheme: CardTheme(
         color: Colors.white,

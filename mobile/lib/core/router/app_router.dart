@@ -14,7 +14,7 @@ part 'app_router.g.dart';
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
   final authState = ref.watch(authControllerProvider);
-  
+
   return GoRouter(
     initialLocation: '/login',
     redirect: (context, state) {
@@ -23,7 +23,7 @@ GoRouter appRouter(AppRouterRef ref) {
 
       final user = authState.value;
       final isLoggingIn = state.uri.path == '/login';
-      
+
       if (user == null) {
         // Not logged in and trying to access a secure page
         if (!isLoggingIn) return '/login';
@@ -33,7 +33,8 @@ GoRouter appRouter(AppRouterRef ref) {
           if (state.uri.path != '/change-password') return '/change-password';
         } else {
           // Logged in, no forced password change
-          if (isLoggingIn || state.uri.path == '/change-password') return '/requests';
+          if (isLoggingIn || state.uri.path == '/change-password')
+            return '/requests';
         }
       }
       return null; // No redirect needed
