@@ -58,7 +58,5 @@ class RequestsRepository {
 
 @riverpod
 RequestsRepository requestsRepository(Ref ref) {
-  return RequestsRepository(
-    FirebaseFirestore.instance,
-  );
+  return RequestsRepository(FirebaseFirestore.instance);
 }

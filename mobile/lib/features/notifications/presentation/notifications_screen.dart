@@ -18,9 +18,7 @@ class NotificationsScreen extends ConsumerWidget {
       body: notificationsAsync.when(
         data: (notifications) {
           if (notifications.isEmpty) {
-            return Center(
-              child: Text(l10n.noNotifications),
-            );
+            return Center(child: Text(l10n.noNotifications));
           }
           return ListView.builder(
             itemCount: notifications.length,
