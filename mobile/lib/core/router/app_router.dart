@@ -1,0 +1,68 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../features/auth/presentation/login_screen.dart';
+import '../../features/auth/presentation/change_password_screen.dart';
+import '../../features/auth/presentation/auth_controller.dart';
+import '../../features/requests/presentation/my_requests_screen.dart';
+import '../../features/forms/presentation/dynamic_form_screen.dart';
+
+part 'app_router.g.dart';
+
+@riverpod
+GoRouter appRouter(AppRouterRef ref) {
+  final authState = ref.watch(authControllerProvider);
+  
+  return GoRouter(
+    initialLocation: '/login',
+    redirect: (context, state) {
+      final isAuthLoading = authState.isLoading;
+      if (isAuthLoading) return null; // Wait for loading
+
+      final user = authState.value;
+      final isLoggingIn = state.uri.path == '/login';
+      
+      if (user == null) {
+        // Not logged in and trying to access a secure page
+        if (!isLoggingIn) return '/login';
+      } else {
+        // Logged in
+        if (user.mustChangePassword) {
+          if (state.uri.path != '/change-password') return '/change-password';
+        } else {
+          // Logged in, no forced password change
+          if (isLoggingIn || state.uri.path == '/change-password') return '/requests';
+        }
+      }
+      return null; // No redirect needed
+    },
+    routes: [
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/change-password',
+        builder: (context, state) => const ChangePasswordScreen(),
+      ),
+      GoRoute(
+        path: '/requests',
+        builder: (context, state) => const MyRequestsScreen(),
+      ),
+      GoRoute(
+        path: '/form/:requestId/:activityId',
+        builder: (context, state) {
+          final requestId = state.pathParameters['requestId']!;
+          final activityId = state.pathParameters['activityId']!;
+          // TODO: Fetch actual fields from provider based on activityId
+          return DynamicFormScreen(
+            requestId: requestId,
+            activityId: activityId,
+            fields: const [], // Placeholder empty fields
+          );
+        },
+      ),
+    ],
+  );
+}

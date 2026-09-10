@@ -1,5 +1,5 @@
 {
-  "name": "functions",
+  "name": "sales-collection-hub-functions",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
@@ -8,18 +8,23 @@
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test": "jest --config jest.config.js"
   },
   "engines": {
-    "node": "18"
+    "node": "20"
   },
   "main": "lib/index.js",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "firebase-admin": "^12.0.0",
-    "firebase-functions": "^5.0.0"
+    "firebase-functions": "^5.0.0",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "typescript": "^4.9.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.5.0",
     "firebase-functions-test": "^3.1.0"
   },
   "private": true

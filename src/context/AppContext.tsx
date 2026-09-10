@@ -35,8 +35,9 @@ import {
   getNotificationPermissionStatus,
   isNotificationSupported,
 } from '../utils/webNotification';
-import { db } from '../firebase';
 import { collection, onSnapshot, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../firebase';
 
 interface LoginResult {
   success: boolean;
@@ -134,8 +135,8 @@ interface AppContextType {
   ) => { success: boolean; count: number };
 
   // Notifications & Push
-  markNotificationAsRead: (notificationId: string) => void;
-  sendBroadcastNotification: (titleAr: string, titleEn: string, bodyAr: string, bodyEn: string, targetRole?: string) => void;
+  markNotificationAsRead: (notificationId: string) => Promise<void>;
+  sendBroadcastNotification: (titleAr: string, titleEn: string, bodyAr: string, bodyEn: string, targetRole?: string) => Promise<void>;
   enablePushNotifications: () => Promise<boolean>;
   isPushSupported: boolean;
   pushPermission: NotificationPermission | 'unsupported';
@@ -250,6 +251,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setRecordResponses(data);
     }, (error) => console.error("Error listening to responses:", error));
 
+    const unsubNotifications = onSnapshot(collection(db, 'notifications'), (snapshot) => {
+      const data: NotificationItem[] = [];
+      snapshot.forEach((docSnap) => data.push(docSnap.data() as NotificationItem));
+      setNotifications(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+    }, (error) => console.error("Error listening to notifications:", error));
+
     return () => {
       unsubUsers();
       unsubRequests();
@@ -257,6 +264,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unsubAssignments();
       unsubRecords();
       unsubResponses();
+      unsubNotifications();
     };
   }, []);
 
@@ -275,10 +283,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [records, setRecords] = useState<RecordItem[]>([]);
   const [recordResponses, setRecordResponses] = useState<Record<string, Record<string, any>>>({});
 
-  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}notifications`);
-    return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
-  });
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
   const [deviceBindings, setDeviceBindings] = useState<DeviceBinding[]>(() => {
     const saved = localStorage.getItem(`${STORAGE_PREFIX}device_bindings`);
@@ -345,9 +350,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem(`${STORAGE_PREFIX}regions`, JSON.stringify(regions));
   }, [regions]);
 
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_PREFIX}notifications`, JSON.stringify(notifications));
-  }, [notifications]);
+
 
   useEffect(() => {
     localStorage.setItem(`${STORAGE_PREFIX}device_bindings`, JSON.stringify(deviceBindings));
@@ -878,69 +881,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // REQUEST & FORM ENGINE
   // -------------------------------------------------------------
   const createRequest = async (newReq: Partial<RequestItem>, newFields: RequestField[]): Promise<string> => {
-    const reqId = 'REQ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-    const requestCode = newReq.requestCode || 'REQ-' + Math.floor(100 + Math.random() * 900);
-
-    const fullRequest: RequestItem = {
-      requestId: reqId,
-      requestCode,
-      titleAr: newReq.titleAr || 'طلب جمع بيانات جديد',
-      titleEn: newReq.titleEn?.trim() || newReq.titleAr || 'New Data Collection Request',
-      descriptionAr: newReq.descriptionAr || '',
-      descriptionEn: newReq.descriptionEn || '',
-      requestType: newReq.requestType || 'per_record',
-      status: 'Draft',
-      priority: newReq.priority || 'Normal',
-      category: newReq.category || 'General Field Survey',
-      tags: newReq.tags || ['ميداني'],
-      startAt: newReq.startAt || new Date().toISOString(),
-      dueAt: newReq.dueAt || new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-      allowEditAfterSubmit: newReq.allowEditAfterSubmit ?? true,
-      allowEditAfterDueDate: newReq.allowEditAfterDueDate ?? false,
-      requireSupervisorApproval: newReq.requireSupervisorApproval ?? false,
-      completionRule: 'all_required_fields',
-      formSchemaVersion: 1,
-      createdBy: currentUser?.userId || 'ADMIN',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      totalRecords: 0,
-      totalAssignments: 0,
-    };
-
     try {
-      const batch = writeBatch(db);
-      batch.set(doc(db, 'requests', reqId), fullRequest);
-
-      const attachedFields = newFields.map((f, idx) => {
-        const fieldId = f.fieldId || 'FLD-' + Math.random().toString(36).substring(2, 8);
-        const newField = {
-          ...f,
-          fieldId,
-          requestId: reqId,
-          schemaVersion: 1,
-          sortOrder: idx + 1,
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        batch.set(doc(db, 'request_fields', fieldId), newField);
-        return newField;
-      });
-
-      await batch.commit();
-      logAudit('REQUEST_CREATED', 'Request', reqId, { code: requestCode, fieldsCount: attachedFields.length });
+      const createReqFn = httpsCallable(functions, 'createRequest');
+      const response = await createReqFn({ ...newReq });
+      const data = response.data as any;
+      const newActivityId = data.activityId;
+      
+      if (newFields.length > 0) {
+        const saveFieldsFn = httpsCallable(functions, 'saveRequestFields');
+        await saveFieldsFn({ activityId: newActivityId, fields: newFields });
+      }
+      
+      logAudit('REQUEST_CREATED', 'Request', newActivityId, { code: newReq.requestCode, fieldsCount: newFields.length });
+      return newActivityId;
     } catch (err) {
-      console.error("Error creating request in Firestore:", err);
+      console.error("Error creating request via CF:", err);
+      return '';
     }
-    return reqId;
   };
 
   const updateRequest = async (requestId: string, updates: Partial<RequestItem>) => {
     try {
-      await updateDoc(doc(db, 'requests', requestId), {
-        ...updates,
-        updatedAt: new Date().toISOString()
-      });
+      const updateReqFn = httpsCallable(functions, 'updateDraftRequest');
+      await updateReqFn({ requestId, updates });
       logAudit('REQUEST_UPDATED', 'Request', requestId, updates);
     } catch (err) {
       console.error("Error updating request:", err);
@@ -948,116 +911,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateRequestFields = async (requestId: string, newFields: RequestField[]) => {
-    const targetReq = requests.find((r) => r.requestId === requestId);
-    const newVersion = (targetReq?.formSchemaVersion || 1) + 1;
-    const nowIso = new Date().toISOString();
-
     try {
-      const batch = writeBatch(db);
-      
-      // Update form version on the request
-      batch.update(doc(db, 'requests', requestId), {
-        formSchemaVersion: newVersion,
-        updatedAt: nowIso
-      });
-
-      // We should ideally delete removed fields or just rely on the new ones overriding
-      // For simplicity, we just set the new fields.
-      const oldFields = fields.filter((f) => f.requestId === requestId);
-      const oldFieldIds = oldFields.map(f => f.fieldId);
-      const newFieldIds = newFields.map(f => f.fieldId).filter(id => id);
-
-      // Delete old fields that are not in the new array
-      const toDelete = oldFieldIds.filter(id => !newFieldIds.includes(id));
-      toDelete.forEach(id => {
-        batch.delete(doc(db, 'request_fields', id));
-      });
-
-      newFields.forEach((f, idx) => {
-        const fieldId = f.fieldId || 'FLD-' + Math.random().toString(36).substring(2, 8);
-        batch.set(doc(db, 'request_fields', fieldId), {
-          ...f,
-          fieldId,
-          requestId,
-          schemaVersion: newVersion,
-          sortOrder: idx + 1,
-          updatedAt: nowIso
-        });
-      });
-
-      await batch.commit();
-
-      if (targetReq && targetReq.status === 'Published') {
-        const activeReps = users.filter((u) => u.role === 'REP' && u.isActive);
-        const schemaNotifs: NotificationItem[] = activeReps.map((u) => ({
-          notificationId: 'NOTIF-SCH-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-          userId: u.userId,
-          requestId,
-          notificationType: 'NEW_REQUEST',
-          channel: 'IN_APP',
-          titleAr: `تحديث حقول النموذج: ${targetReq.titleAr} (v${newVersion})`,
-          titleEn: `Form Fields Updated: ${targetReq.titleEn} (v${newVersion})`,
-          bodyAr: `تم تحديث نموذج "${targetReq.titleAr}" وإضافة/تعديل الحقول. تم مزامنة النموذج تلقائياً على جهازك دون التأثير على بياناتك المسجلة.`,
-          bodyEn: `Form "${targetReq.titleEn}" was updated with new fields (v${newVersion}). Synced automatically to your device.`,
-          status: 'SENT',
-          sentAt: nowIso,
-          createdAt: nowIso,
-        }));
-        setNotifications((prev) => [...schemaNotifs, ...prev]);
-      }
-
-      logAudit('FIELDS_UPDATED', 'Request', requestId, { fieldsCount: newFields.length, newVersion });
+      const saveFieldsFn = httpsCallable(functions, 'saveRequestFields');
+      await saveFieldsFn({ requestId, fields: newFields });
+      logAudit('FIELDS_UPDATED', 'Request', requestId, { fieldsCount: newFields.length });
     } catch (err) {
       console.error("Error updating fields in Firestore:", err);
     }
   };
 
   const publishRequest = async (requestId: string) => {
-    const req = requests.find((r) => r.requestId === requestId);
-    if (!req) return;
-
     try {
-      await updateDoc(doc(db, 'requests', requestId), {
-        status: 'Published',
-        publishedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
-
-      // Generate notifications for assigned reps
-      const assignedUsers = users.filter((u) => u.role === 'REP' && u.isActive);
-      const newNotifications: NotificationItem[] = assignedUsers.map((u) => ({
-        notificationId: 'NOTIF-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-        userId: u.userId,
-        requestId,
-        notificationType: 'NEW_REQUEST',
-        channel: 'PUSH',
-        titleAr: 'لديك طلب جديد لجمع البيانات',
-        titleEn: 'You have a new data collection request',
-        bodyAr: `تم نشر حملة جديدة: "${req.titleAr}". يرجى الاطلاع وتحديث السجلات المسندة إليك.`,
-        bodyEn: `New campaign published: "${req.titleEn}". Please update assigned records.`,
-        status: 'SENT',
-        sentAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-      }));
-
-      setNotifications((prev) => [...newNotifications, ...prev]);
-
-      // Send native device push notification if supported & permitted
-      sendBrowserNotification(
-        lang === 'ar' ? `طلب جديد: ${req.titleAr}` : `New Request: ${req.titleEn}`,
-        {
-          body:
-            lang === 'ar'
-              ? `تم نشر حملة جديدة: "${req.titleAr}". يرجى فتح التطبيق لمعاينة السجلات المسندة.`
-              : `New campaign published: "${req.titleEn}". Tap to view assigned records.`,
-          tag: `req-pub-${requestId}`,
-        }
-      );
-
-      logAudit('REQUEST_PUBLISHED', 'Request', requestId, {
-        titleAr: req.titleAr,
-        notificationsSent: newNotifications.length,
-      });
+      const publishReqFn = httpsCallable(functions, 'publishRequest');
+      await publishReqFn({ requestId });
+      
+      const req = requests.find((r) => r.requestId === requestId);
+      if (req) {
+        logAudit('REQUEST_PUBLISHED', 'Request', requestId, { titleAr: req.titleAr });
+      }
     } catch (err) {
       console.error("Error publishing request:", err);
     }
@@ -1065,11 +936,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const closeRequest = async (requestId: string) => {
     try {
-      await updateDoc(doc(db, 'requests', requestId), {
-        status: 'Closed',
-        closedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
+      const closeReqFn = httpsCallable(functions, 'closeRequest');
+      await closeReqFn({ requestId });
       logAudit('REQUEST_CLOSED', 'Request', requestId, {});
     } catch (err) {
       console.error("Error closing request:", err);
@@ -1078,11 +946,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const archiveRequest = async (requestId: string) => {
     try {
-      await updateDoc(doc(db, 'requests', requestId), {
-        status: 'Archived',
-        archivedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
+      const archiveReqFn = httpsCallable(functions, 'archiveRequest');
+      await archiveReqFn({ requestId });
       logAudit('REQUEST_ARCHIVED', 'Request', requestId, {});
     } catch (err) {
       console.error("Error archiving request:", err);
@@ -1091,10 +956,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const reopenRequest = async (requestId: string) => {
     try {
-      await updateDoc(doc(db, 'requests', requestId), {
-        status: 'Published',
-        updatedAt: new Date().toISOString()
-      });
+      const reopenReqFn = httpsCallable(functions, 'reopenRequest');
+      await reopenReqFn({ requestId });
       logAudit('REQUEST_REOPENED', 'Request', requestId, {});
     } catch (err) {
       console.error("Error reopening request:", err);
@@ -1259,22 +1122,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const reassignRecord = async (recordId: string, newUserId: string, reason: string) => {
-    const newRep = users.find((u) => u.userId === newUserId);
-    if (!newRep) return;
-
     try {
-      await updateDoc(doc(db, 'records', recordId), {
-        assignedUserId: newRep.userId,
-        assignedRegionNo: newRep.regionNo,
-        repNo: newRep.repNo,
-        repName: newRep.repNameAr,
-        updatedAt: new Date().toISOString(),
-      });
-      logAudit('RECORD_REASSIGNED', 'Record', recordId, {
-        newUserId,
-        newRepName: newRep.repNameAr,
-        reason,
-      });
+      const reassignFn = httpsCallable(functions, 'reassignRecords');
+      await reassignFn({ recordIds: [recordId], newUserId });
+      
+      const newRep = users.find((u) => u.userId === newUserId);
+      if (newRep) {
+        logAudit('RECORD_REASSIGNED', 'Record', recordId, {
+          newUserId,
+          newRepName: newRep.repNameAr,
+          reason,
+        });
+      }
     } catch (err) {
       console.error('Error reassigning record:', err);
     }
@@ -1289,294 +1148,103 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     mapping: Record<string, string>,
     fileName: string
   ): Promise<{ total: number; created: number }> => {
-    const targetReq = requests.find((r) => r.requestId === requestId);
-    if (!targetReq) return { total: 0, created: 0 };
+    try {
+      const commitFn = httpsCallable<{
+        requestId: string;
+        importedRows: any[];
+        mapping: Record<string, string>;
+        fileName: string;
+        lang: string;
+      }, { total: number; created: number; skipped: number; success: boolean }>(functions, 'commitImport');
 
-    const reqFields = fields.filter((f) => f.requestId === requestId);
-    let createdCount = 0;
-    const newRecords: RecordItem[] = [];
-    const newResponses: Record<string, Record<string, any>> = {};
-    const touchedRegionNos = new Set<string>();
-
-    importedRows.forEach((row, idx) => {
-      // 1. Resolve Region Number for routing
-      const regKey = mapping['regionNo'] || 'RegionNo';
-      const regionVal = String(
-        row[regKey] ||
-        row['regionNo'] ||
-        row['RegionNo'] ||
-        row['رقم المنطقة'] ||
-        row['رقم_المنطقة'] ||
-        row['المنطقة'] ||
-        ''
-      ).trim();
-
-      // Find rep assigned to this region
-      const matchedUser = regionVal
-        ? users.find((u) => u.regionNo === regionVal || u.allowedRegionNos?.includes(regionVal))
-        : undefined;
-
-      // 2. Resolve Customer Identification
-      const custNoKey = mapping['customerNo'] || mapping['customer_no'] || 'CustomerNo';
-      const customerNo = String(
-        row[custNoKey] ||
-        row['customerNo'] ||
-        row['CustomerNo'] ||
-        row['رقم العميل'] ||
-        row['رقم_العميل'] ||
-        `CUST-${1000 + idx + 1}`
-      ).trim();
-
-      const custNameKey = mapping['customerName'] || mapping['customer_name'] || 'CustomerName';
-      const customerName = String(
-        row[custNameKey] ||
-        row['customerName'] ||
-        row['CustomerName'] ||
-        row['اسم العميل'] ||
-        row['اسم_العميل'] ||
-        (lang === 'ar' ? `عميل ${idx + 1}` : `Customer ${idx + 1}`)
-      ).trim();
-
-      // 3. Resolve Branch
-      const branchCol = mapping['branchName'] || mapping['branch_name'] || 'BranchName';
-      const defaultBranch = matchedUser
-        ? branches.find((b) => b.branchId === matchedUser.branchId)
-        : branches[0];
-      const branchName = String(
-        row[branchCol] ||
-        row['BranchName'] ||
-        row['Branch'] ||
-        row['الفرع'] ||
-        row['اسم الفرع'] ||
-        matchedUser?.branchNameAr ||
-        defaultBranch?.branchNameAr ||
-        ''
-      ).trim();
-      const branchId = matchedUser?.branchId || defaultBranch?.branchId || 'BR-01';
-
-      // 4. Resolve Rep
-      const repNameCol = mapping['repName'] || 'RepName';
-      const repName = String(
-        row[repNameCol] ||
-        row['RepName'] ||
-        row['اسم المندوب'] ||
-        row['المندوب'] ||
-        matchedUser?.repNameAr ||
-        ''
-      ).trim();
-
-      const repNoCol = mapping['repNo'] || 'RepNo';
-      const repNo = String(
-        row[repNoCol] ||
-        row['RepNo'] ||
-        row['رقم المندوب'] ||
-        matchedUser?.repNo ||
-        (regionVal ? `REP-${regionVal}` : '')
-      ).trim();
-
-      // 5. Build dynamic field values and rawData for this record
-      const rowRawData: Record<string, any> = { ...row };
-      const rowResponses: Record<string, any> = {};
-
-      reqFields.forEach((f) => {
-        const mappedCol = mapping[f.fieldKey];
-        let val = mappedCol ? row[mappedCol] : undefined;
-
-        if (val === undefined) {
-          // Direct key or Arabic/English label match
-          val = row[f.fieldKey] ?? row[f.fieldLabelAr] ?? row[f.fieldLabelEn];
-        }
-
-        // Standard field fallbacks
-        if (val === undefined && (f.fieldKey === 'customer_no' || f.fieldKey === 'cust_no')) val = customerNo;
-        if (val === undefined && (f.fieldKey === 'customer_name' || f.fieldKey === 'cust_name')) val = customerName;
-        if (val === undefined && (f.fieldKey === 'branch_name' || f.fieldKey === 'branch')) val = branchName;
-
-        if (val !== undefined && val !== null && String(val).trim() !== '') {
-          if (f.fieldType === 'currency' || f.fieldType === 'number') {
-            const num = parseFloat(String(val).replace(/[^0-9.-]+/g, ''));
-            val = isNaN(num) ? val : num;
-          }
-          rowRawData[f.fieldKey] = val;
-          rowResponses[f.fieldKey] = val;
-        } else if (f.defaultValue !== undefined && f.defaultValue !== null) {
-          rowRawData[f.fieldKey] = f.defaultValue;
-          rowResponses[f.fieldKey] = f.defaultValue;
-        }
+      const result = await commitFn({
+        requestId,
+        importedRows,
+        mapping,
+        fileName,
+        lang,
       });
 
-      const recordId = 'REC-IMP-' + Math.random().toString(36).substring(2, 9);
-      newResponses[recordId] = rowResponses;
-
-      const newRec: RecordItem = {
-        recordId,
-        requestId,
-        assignmentId: regionVal ? `ASG-${regionVal}-${requestId}` : 'UNASSIGNED',
-        assignedUserId: matchedUser ? matchedUser.userId : 'UNASSIGNED',
-        assignedRegionNo: regionVal || 'UNASSIGNED',
-        customerNo,
-        customerName,
-        branchId,
-        branchName,
-        regionNo: regionVal || 'UNASSIGNED',
-        repNo,
-        repName,
-        inventoryValue: Number(rowResponses['debit_balance'] || rowResponses['inventory_value'] || row[mapping['inventoryValue']] || 0) || 0,
-        area: String(row[mapping['area']] || row['Area'] || row['المنطقة'] || row['الحي'] || row['الموقع'] || rowResponses['location'] || '').trim(),
-        rawData: rowRawData,
-        recordStatus: 'Pending',
-        completionPercent: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      if (regionVal) {
-        touchedRegionNos.add(regionVal);
-      }
-      newRecords.push(newRec);
-      createdCount++;
-    });
-
-    // Create assignments for newly imported regions if not already existing
-    const newAssignments: Assignment[] = [];
-    touchedRegionNos.forEach((regNo) => {
-      const exists = assignments.some((a) => a.requestId === requestId && a.regionNo === regNo);
-      if (!exists) {
-        const rep = users.find((u) => u.regionNo === regNo || u.allowedRegionNos?.includes(regNo));
-        if (rep) {
-          const nowIso = new Date().toISOString();
-          newAssignments.push({
-            assignmentId: `ASG-${regNo}-${requestId}-${Date.now()}`,
-            requestId,
-            userId: rep.userId,
-            regionNo: regNo,
-            branchId: rep.branchId,
-            assignmentStatus: 'Active',
-            assignedAt: nowIso,
-            assignedBy: currentUser?.userId || 'SYSTEM',
-            totalRecords: newRecords.filter((r) => r.assignedRegionNo === regNo).length,
-            completedRecords: 0,
-            pendingRecords: newRecords.filter((r) => r.assignedRegionNo === regNo).length,
-            progressPercent: 0,
-            createdAt: nowIso,
-            updatedAt: nowIso,
-          });
-        }
-      }
-    });
-
-    // We will chunk Firestore writes to stay within the 500 ops limit
-    try {
-      const chunks = [];
-      const CHUNK_SIZE = 200; // 2 ops per record (record + response) = 400 ops, well under 500 limit
-      for (let i = 0; i < newRecords.length; i += CHUNK_SIZE) {
-        chunks.push(newRecords.slice(i, i + CHUNK_SIZE));
-      }
-
-      for (let i = 0; i < chunks.length; i++) {
-        const chunk = chunks[i];
-        const batch = writeBatch(db);
-        
-        chunk.forEach(rec => {
-          batch.set(doc(db, 'records', rec.recordId), rec);
-          batch.set(doc(db, 'responses', rec.recordId), newResponses[rec.recordId]);
+      if (result.data.success) {
+        logAudit('IMPORT_COMMITTED', 'Import', requestId, {
+          fileName,
+          totalRows: result.data.total,
+          createdCount: result.data.created,
+          skippedCount: result.data.skipped,
         });
 
-        if (i === 0) {
-          newAssignments.forEach(asg => {
-            batch.set(doc(db, 'assignments', asg.assignmentId), asg);
-          });
-          batch.update(doc(db, 'requests', requestId), {
-            totalRecords: targetReq.totalRecords + createdCount,
-            updatedAt: new Date().toISOString(),
-          });
-        }
-        await batch.commit();
+        sendBrowserNotification(
+          lang === 'ar' ? `تم استيراد بيانات جديدة بنجاح` : `Records imported successfully`,
+          {
+            body:
+              lang === 'ar'
+                ? `تم إدراج ${result.data.created} سجل جديد.`
+                : `${result.data.created} new records uploaded.`,
+            tag: `imp-${requestId}`,
+          }
+        );
+
+        return { total: result.data.total, created: result.data.created };
+      } else {
+        throw new Error('Import failed on server');
       }
-
-      logAudit('IMPORT_COMMITTED', 'Import', requestId, {
-        fileName,
-        totalRows: importedRows.length,
-        createdCount,
-        regionsCovered: Array.from(touchedRegionNos),
-      });
-
     } catch (err) {
-      console.error('Error committing import to Firestore:', err);
+      console.error('Error committing import via Cloud Function:', err);
+      return { total: 0, created: 0 };
     }
-
-    // Notifications (Optional, local state logic remains)
-    touchedRegionNos.forEach((regNo) => {
-      const rep = users.find((u) => u.regionNo === regNo || u.allowedRegionNos?.includes(regNo));
-      if (rep) {
-        const nowIso = new Date().toISOString();
-        const newNotif: NotificationItem = {
-          notificationId: 'NOTIF-' + Math.random().toString(36).substring(2, 9),
-          userId: rep.userId,
-          requestId,
-          notificationType: 'NEW_REQUEST',
-          channel: 'IN_APP',
-          titleAr: `تم استيراد وتعيين بيانات جديدة: ${targetReq.titleAr}`,
-          titleEn: `New records assigned: ${targetReq.titleEn}`,
-          bodyAr: `تم إدراج سجلات عملاء جديدة لمنطقتك (${regNo}) في حملة "${targetReq.titleAr}". يمكنك الآن فتح التطبيق والبدء في تعبئة البيانات المطلوبة.`,
-          bodyEn: `New customer records have been assigned to your region (${regNo}) for campaign "${targetReq.titleEn}".`,
-          status: 'SENT',
-          sentAt: nowIso,
-          createdAt: nowIso,
-        };
-        // Can write notifs to firestore if needed, but keeping local for now
-        setNotifications((prev) => [newNotif, ...prev]);
-      }
-    });
-
-    sendBrowserNotification(
-      lang === 'ar' ? `تم استيراد بيانات جديدة: ${targetReq.titleAr}` : `New records: ${targetReq.titleEn}`,
-      {
-        body:
-          lang === 'ar'
-            ? `تم إدراج سجلات جديدة لـ ${touchedRegionNos.size} مناطق. يمكنك البدء في تعبئتها الآن.`
-            : `New records uploaded for ${touchedRegionNos.size} regions. Tap to review.`,
-        tag: `imp-${requestId}`,
-      }
-    );
-
-    return { total: importedRows.length, created: createdCount };
   };
 
-  const markNotificationAsRead = (notifId: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.notificationId === notifId ? { ...n, status: 'READ', readAt: new Date().toISOString() } : n))
-    );
+  const markNotificationAsRead = async (notifId: string) => {
+    try {
+      // Find the notification to get its exact ID if it differs, though notifId should be the doc ID
+      // If we stored notificationId as doc ID:
+      const docRef = doc(db, 'notifications', notifId);
+      await updateDoc(docRef, {
+        status: 'READ',
+        readAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
   };
 
-  const sendBroadcastNotification = (
+  const sendBroadcastNotification = async (
     titleAr: string,
     titleEn: string,
     bodyAr: string,
     bodyEn: string,
     targetRole?: string
   ) => {
-    const targetUsers = users.filter((u) => (!targetRole ? true : u.role === targetRole));
-    const newItems: NotificationItem[] = targetUsers.map((u) => ({
-      notificationId: 'NOTIF-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-      userId: u.userId,
-      channel: 'PUSH',
-      notificationType: 'NEW_REQUEST',
-      titleAr,
-      titleEn,
-      bodyAr,
-      bodyEn,
-      status: 'SENT',
-      sentAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-    }));
+    try {
+      const sendBroadcastFn = httpsCallable<{
+        targetAudience: string;
+        titleAr: string;
+        titleEn: string;
+        bodyAr: string;
+        bodyEn: string;
+      }, { success: boolean; count: number }>(functions, 'sendBroadcastNotification');
 
-    setNotifications((prev) => [...newItems, ...prev]);
-    sendBrowserNotification(lang === 'ar' ? titleAr : titleEn, {
-      body: lang === 'ar' ? bodyAr : bodyEn,
-      tag: 'broadcast-notification',
-    });
-    logAudit('BROADCAST_NOTIFICATION_SENT', 'Notification', 'ALL', { count: newItems.length });
+      const targetAudience = targetRole === 'representative' ? 'REPRESENTATIVES' :
+                             targetRole === 'supervisor' ? 'SUPERVISORS' : 'ALL';
+
+      const result = await sendBroadcastFn({
+        targetAudience,
+        titleAr,
+        titleEn,
+        bodyAr,
+        bodyEn,
+      });
+
+      if (result.data.success) {
+        logAudit('BROADCAST_NOTIFICATION_SENT', 'Notification', 'ALL', { count: result.data.count });
+        sendBrowserNotification(lang === 'ar' ? titleAr : titleEn, {
+          body: lang === 'ar' ? bodyAr : bodyEn,
+          tag: 'broadcast-notification',
+        });
+      }
+    } catch (err) {
+      console.error('Error sending broadcast notification:', err);
+    }
   };
 
   const saveAsTemplate = (requestId: string, nameAr: string, nameEn: string, category: string) => {

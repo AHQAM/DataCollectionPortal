@@ -1,0 +1,110 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ============================================================
+    // DEFAULT DENY
+    // ============================================================
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // ============================================================
+    // HELPER FUNCTIONS
+    // ============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.role == 'ADMIN';
+    }
+
+    function isSupervisor() {
+      return isAuthenticated() && request.auth.token.role == 'SUPERVISOR';
+    }
+
+    function isRep() {
+      return isAuthenticated() && request.auth.token.role == 'REP';
+    }
+
+    // Max file size: 10 MB
+    function isValidFileSize() {
+      return request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // Allowed image types
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    // Allowed document types
+    function isDocument() {
+      return request.resource.contentType.matches('application/pdf')
+        || request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.*')
+        || request.resource.contentType.matches('application/vnd.ms-excel')
+        || request.resource.contentType.matches('text/csv');
+    }
+
+    // Allowed types for uploads
+    function isAllowedType() {
+      return isImage() || isDocument();
+    }
+
+    // ============================================================
+    // UPLOADS: /uploads/{requestId}/{recordId}/{userId}/{filename}
+    // Representatives can upload to their own paths
+    // ============================================================
+    match /uploads/{requestId}/{recordId}/{userId}/{fileName} {
+      // Rep can upload to own path only
+      allow create: if isRep()
+        && request.auth.uid == userId
+        && isValidFileSize()
+        && isAllowedType();
+
+      // Rep can read own files
+      allow read: if isAuthenticated()
+        && (request.auth.uid == userId || isAdmin() || isSupervisor());
+
+      // No updates or deletes
+      allow update, delete: if isAdmin();
+    }
+
+    // ============================================================
+    // IMPORTS: /imports/{requestId}/{importId}/{filename}
+    // Admin only
+    // ============================================================
+    match /imports/{requestId}/{importId}/{fileName} {
+      allow read, write: if isAdmin();
+    }
+
+    // ============================================================
+    // EXPORTS: /exports/{requestId}/{filename}
+    // Admin and authorized supervisors
+    // ============================================================
+    match /exports/{requestId}/{fileName} {
+      allow read: if isAdmin() || isSupervisor();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // ARCHIVE: /archive/{year}/{requestCode}/{filename}
+    // Admin only
+    // ============================================================
+    match /archive/{year}/{requestCode}/{fileName} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // REQUEST COVERS: /covers/{requestId}/{filename}
+    // Admin write, all authenticated read
+    // ============================================================
+    match /covers/{requestId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+}

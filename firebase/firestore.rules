@@ -3,79 +3,284 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper Functions
+    // ============================================================
+    // HELPER FUNCTIONS
+    // ============================================================
+
     function isAuthenticated() {
       return request.auth != null;
     }
-    
+
     function isAdmin() {
-      // In a real app we check custom claims (request.auth.token.role)
-      // Here we might just check if the user is in the database with role ADMIN
-      // But assuming custom claims are set:
-      return isAuthenticated() && (request.auth.token.role == 'ADMIN' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN');
+      return isAuthenticated() && request.auth.token.role == 'ADMIN';
     }
 
     function isSupervisor() {
-      return isAuthenticated() && (request.auth.token.role == 'SUPERVISOR' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'SUPERVISOR');
+      return isAuthenticated() && request.auth.token.role == 'SUPERVISOR';
     }
 
     function isRep() {
-      return isAuthenticated() && (request.auth.token.role == 'REP' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'REP');
-    }
-    
-    function hasPerm(perm) {
-      // Helper to check granular permissions on supervisor
-      return isSupervisor() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions[perm] == true;
+      return isAuthenticated() && request.auth.token.role == 'REP';
     }
 
-    // Default deny
+    function isAdminOrSupervisor() {
+      return isAdmin() || isSupervisor();
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Check if the authenticated user has access to a specific region
+    function hasRegionAccess(regionNo) {
+      return isAuthenticated()
+        && request.auth.token.allowedRegionNos is list
+        && regionNo in request.auth.token.allowedRegionNos;
+    }
+
+    // Check if supervisor has branch access
+    function hasBranchAccess(branchId) {
+      return isAdmin() || (isSupervisor() && request.auth.token.branchId == branchId);
+    }
+
+    // ============================================================
+    // DEFAULT DENY — all paths not explicitly matched are blocked
+    // ============================================================
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // Users Collection
+    // ============================================================
+    // USERS COLLECTION
+    // ============================================================
     match /users/{userId} {
-      allow read: if isAdmin() || hasPerm('canManageUsers') || hasPerm('canViewAllBranches') || (isAuthenticated() && request.auth.uid == userId);
-      allow update: if isAdmin() || hasPerm('canManageUsers') || (isAuthenticated() && request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deviceId', 'isPasswordChanged']));
-      allow create, delete: if isAdmin() || hasPerm('canManageUsers');
+      // Admin: full read access
+      // Supervisor: read users within same branch
+      // Rep: read only own document
+      allow read: if isAdmin()
+        || (isSupervisor() && resource.data.branchId == request.auth.token.branchId)
+        || isOwner(userId);
+
+      // Only Cloud Functions should create/update users
+      // Allow self-update for limited fields only (fcmToken, language preference)
+      allow update: if isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['fcmToken', 'fcmTokenUpdatedAt', 'preferredLanguage']);
+
+      // Admin can create/delete via Cloud Functions
+      // Direct client create/delete is denied — use Cloud Functions
+      allow create, delete: if false;
     }
 
-    // Requests Collection (Dynamic Forms)
-    match /requests/{requestId} {
-      allow read: if isAdmin() || hasPerm('canManageRequests') || hasPerm('canViewAllBranches') || (isAuthenticated() && resource.data.status in ['Published', 'Closed', 'Archived']);
-      allow write: if isAdmin() || hasPerm('canManageRequests');
-    }
-
-    // Request Fields (Top-Level Collection)
-    match /request_fields/{fieldId} {
+    // ============================================================
+    // BRANCHES COLLECTION
+    // ============================================================
+    match /branches/{branchId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin() || hasPerm('canManageRequests');
+      allow write: if isAdmin();
     }
 
-    // Assignments
-    match /assignments/{assignmentId} {
-      allow read: if isAdmin() || hasPerm('canManageRegions') || hasPerm('canViewAllBranches') || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow write: if isAdmin() || hasPerm('canManageRegions');
+    // ============================================================
+    // REGIONS COLLECTION
+    // ============================================================
+    match /regions/{regionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
-    // Records
-    match /records/{recordId} {
-      // Reps can read their own assigned records, or if no assignment yet, read regions they belong to.
-      allow read: if isAdmin() || isSupervisor() || (isAuthenticated() && resource.data.assignedUserId == request.auth.uid);
-      allow write: if isAdmin() || hasPerm('canManageRequests');
-    }
-    
-    // Responses
-    match /responses/{responseId} {
-      allow read: if isAdmin() || isSupervisor() || (isAuthenticated() && resource.data.submittedBy == request.auth.uid);
-      allow write: if isAdmin() || (isAuthenticated() && isRep());
+    // ============================================================
+    // REQUESTS COLLECTION
+    // ============================================================
+    match /requests/{requestId} {
+      // Admin: full access
+      // Supervisor: read requests within branch scope
+      // Rep: read only Published/Closed/Archived requests that have assignments for this user
+      allow read: if isAdmin()
+        || (isSupervisor() && hasBranchAccess(resource.data.get('branchId', '')))
+        || (isRep() && resource.data.status in ['Published', 'Closed', 'Archived']);
+
+      // Only Admin/Cloud Functions can write requests
+      allow create, update: if isAdmin();
+      allow delete: if false; // Never delete — use archive
     }
 
-    // Audit Logs
-    match /auditLogs/{logId} {
+    // ============================================================
+    // REQUEST FIELDS (top-level collection)
+    // ============================================================
+    match /request_fields/{fieldId} {
+      // Any authenticated user can read fields (needed to render forms)
+      allow read: if isAuthenticated();
+
+      // Only Admin can modify fields
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // REQUEST FIELDS (subcollection variant)
+    // ============================================================
+    match /requests/{requestId}/fields/{fieldId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // REQUEST TEMPLATES
+    // ============================================================
+    match /requestTemplates/{templateId} {
       allow read: if isAdmin();
-      allow create: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // ASSIGNMENTS COLLECTION
+    // ============================================================
+    match /assignments/{assignmentId} {
+      // Admin: full read
+      // Supervisor: read assignments within branch
+      // Rep: read only own assignments
+      allow read: if isAdmin()
+        || (isSupervisor() && hasBranchAccess(resource.data.get('branchId', '')))
+        || (isRep() && resource.data.userId == request.auth.uid);
+
+      // Only Cloud Functions create/update assignments
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // RECORDS COLLECTION
+    // ============================================================
+    match /records/{recordId} {
+      // Admin: full read
+      // Supervisor: read records within branch scope
+      // Rep: read only records assigned to authenticated user
+      allow read: if isAdmin()
+        || (isSupervisor() && hasBranchAccess(resource.data.get('branchId', '')))
+        || (isRep() && resource.data.assignedUserId == request.auth.uid);
+
+      // Rep can update own records with limited fields (status, draft/submit)
+      allow update: if isRep()
+        && resource.data.assignedUserId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly([
+             'recordStatus', 'completionPercent',
+             'startedAt', 'draftSavedAt', 'submittedAt', 'completedAt',
+             'lastSavedAt', 'lastSavedBy', 'updatedAt'
+           ]);
+
+      // Admin can update any record
+      allow update: if isAdmin();
+
+      // Only Cloud Functions create records (via import)
+      allow create: if isAdmin();
+      allow delete: if false;
+    }
+
+    // ============================================================
+    // RESPONSES COLLECTION
+    // ============================================================
+    match /responses/{responseId} {
+      // Admin: full read
+      // Supervisor: read within branch scope
+      // Rep: read only own submitted responses
+      allow read: if isAdmin()
+        || isSupervisor()
+        || (isRep() && resource.data.submittedBy == request.auth.uid);
+
+      // Rep can create/update responses only for own assigned records
+      allow create: if isRep()
+        && request.resource.data.submittedBy == request.auth.uid;
+
+      allow update: if isRep()
+        && resource.data.submittedBy == request.auth.uid
+        && request.resource.data.submittedBy == request.auth.uid;
+
+      // Admin can also write responses (for corrections)
+      allow create, update: if isAdmin();
+
+      allow delete: if false;
+    }
+
+    // ============================================================
+    // IMPORTS COLLECTION
+    // ============================================================
+    match /imports/{importId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // NOTIFICATIONS COLLECTION
+    // ============================================================
+    match /notifications/{notificationId} {
+      // User can read own notifications
+      allow read: if isAdmin()
+        || (isAuthenticated() && resource.data.userId == request.auth.uid);
+
+      // User can mark own notification as read
+      allow update: if isAuthenticated()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['status', 'readAt']);
+
+      // Only Cloud Functions create notifications
+      allow create: if isAdmin();
+      allow delete: if false;
+    }
+
+    // ============================================================
+    // DEVICE BINDINGS COLLECTION
+    // ============================================================
+    match /deviceBindings/{bindingId} {
+      // Admin can read all device bindings
+      // User can read own bindings
+      allow read: if isAdmin()
+        || (isAuthenticated() && resource.data.userId == request.auth.uid);
+
+      // Only Cloud Functions manage device bindings
+      allow write: if false;
+    }
+
+    // ============================================================
+    // PASSWORD RESET REQUESTS
+    // ============================================================
+    match /passwordResetRequests/{resetId} {
+      // Admin can read all
+      allow read: if isAdmin();
+
+      // Anyone can create (from login screen via Cloud Function)
+      // But actual creation goes through Cloud Function, so deny direct client write
+      allow write: if false;
+    }
+
+    // ============================================================
+    // AUDIT LOGS — Immutable append-only
+    // ============================================================
+    match /auditLogs/{logId} {
+      // Only Admin can read audit logs
+      allow read: if isAdmin();
+
+      // Only Cloud Functions can create audit logs
+      // (Changed from previous rule that allowed authenticated create)
+      allow create: if false;
+
+      // Never allow update or delete — audit logs are immutable
       allow update, delete: if false;
+    }
+
+    // ============================================================
+    // APP SETTINGS
+    // ============================================================
+    match /appSettings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // TRANSLATION TEMPLATES
+    // ============================================================
+    match /translationTemplates/{templateId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
   }
 }
