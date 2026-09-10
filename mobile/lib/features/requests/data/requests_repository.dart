@@ -23,29 +23,32 @@ class RequestsRepository {
         .orderBy('assignedAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      final requests = snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        // Handle Firestore Timestamp conversions
-        data['assignedAt'] =
-            (data['assignedAt'] as Timestamp).toDate().toIso8601String();
-        if (data['dueDate'] != null) {
-          data['dueDate'] =
-              (data['dueDate'] as Timestamp).toDate().toIso8601String();
-        }
-        if (data['completedAt'] != null) {
-          data['completedAt'] =
-              (data['completedAt'] as Timestamp).toDate().toIso8601String();
-        }
-        return RequestModel.fromJson(data);
-      }).toList();
+          final requests = snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            // Handle Firestore Timestamp conversions
+            data['assignedAt'] = (data['assignedAt'] as Timestamp)
+                .toDate()
+                .toIso8601String();
+            if (data['dueDate'] != null) {
+              data['dueDate'] = (data['dueDate'] as Timestamp)
+                  .toDate()
+                  .toIso8601String();
+            }
+            if (data['completedAt'] != null) {
+              data['completedAt'] = (data['completedAt'] as Timestamp)
+                  .toDate()
+                  .toIso8601String();
+            }
+            return RequestModel.fromJson(data);
+          }).toList();
 
-      // Cache locally
-      // For simplicity, we can store them in Hive, but Firestore already has a local cache.
-      // We will rely on Firestore's cache for reads, and SyncManager for offline writes.
+          // Cache locally
+          // For simplicity, we can store them in Hive, but Firestore already has a local cache.
+          // We will rely on Firestore's cache for reads, and SyncManager for offline writes.
 
-      return requests;
-    });
+          return requests;
+        });
   }
 
   Future<void> updateRequestStatus(String requestId, String status) async {
@@ -57,7 +60,7 @@ class RequestsRepository {
 }
 
 @riverpod
-RequestsRepository requestsRepository(RequestsRepositoryRef ref) {
+RequestsRepository requestsRepository(Ref ref) {
   return RequestsRepository(
     FirebaseFirestore.instance,
     ref.watch(hiveServiceProvider),

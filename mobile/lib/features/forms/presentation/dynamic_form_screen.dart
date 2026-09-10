@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mobile/l10n/app_localizations.dart';
 
 import '../domain/form_field_model.dart';
 
@@ -44,9 +44,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       ..sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Activity: ${widget.activityId}'),
-      ),
+      appBar: AppBar(title: Text('Activity: ${widget.activityId}')),
       body: Form(
         key: _formKey,
         child: ListView.builder(
@@ -64,10 +62,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: ElevatedButton(
-            onPressed: _saveForm,
-            child: Text(l10n.submit),
-          ),
+          child: ElevatedButton(onPressed: _saveForm, child: Text(l10n.submit)),
         ),
       ),
     );
@@ -81,10 +76,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case 'text':
       case 'number':
         return TextFormField(
-          decoration: InputDecoration(
-            labelText: label,
-            hintText: label,
-          ),
+          decoration: InputDecoration(labelText: label, hintText: label),
           keyboardType: field.type == 'number'
               ? TextInputType.number
               : TextInputType.text,
@@ -101,10 +93,9 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
         );
       case 'dropdown':
         return DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-          ),
-          items: field.options?.map((option) {
+          decoration: InputDecoration(labelText: label),
+          items:
+              field.options?.map((option) {
                 return DropdownMenuItem(value: option, child: Text(option));
               }).toList() ??
               [],
@@ -126,7 +117,8 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-                '[$label] - Field Type: ${field.type} (To Be Implemented)'),
+              '[$label] - Field Type: ${field.type} (To Be Implemented)',
+            ),
           ),
         );
     }

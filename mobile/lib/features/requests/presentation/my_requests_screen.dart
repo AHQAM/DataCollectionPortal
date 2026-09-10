@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mobile/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import 'requests_controller.dart';
@@ -36,8 +36,10 @@ class MyRequestsScreen extends ConsumerWidget {
         data: (requests) {
           if (requests.isEmpty) {
             return Center(
-              child: Text(l10n.emptyState,
-                  style: Theme.of(context).textTheme.titleMedium),
+              child: Text(
+                l10n.emptyState,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             );
           }
 
@@ -51,7 +53,8 @@ class MyRequestsScreen extends ConsumerWidget {
                 child: ListTile(
                   title: Text('Activity: ${request.activityId}'),
                   subtitle: Text(
-                      'Status: ${request.status}\nAssigned: ${request.assignedAt}'),
+                    'Status: ${request.status}\nAssigned: ${request.assignedAt}',
+                  ),
                   isThreeLine: true,
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
@@ -64,8 +67,10 @@ class MyRequestsScreen extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(
-          child:
-              Text('${l10n.errorGeneric}\n$error', textAlign: TextAlign.center),
+          child: Text(
+            '${l10n.errorGeneric}\n$error',
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );

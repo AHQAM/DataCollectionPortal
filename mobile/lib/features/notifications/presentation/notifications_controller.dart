@@ -5,7 +5,7 @@ import '../data/notifications_repository.dart';
 part 'notifications_controller.g.dart';
 
 @riverpod
-Stream<List<NotificationModel>> myNotifications(MyNotificationsRef ref) {
+Stream<List<NotificationModel>> myNotifications(Ref ref) {
   final repository = ref.watch(notificationsRepositoryProvider);
   if (repository == null) {
     return Stream.value([]);

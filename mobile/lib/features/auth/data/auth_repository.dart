@@ -24,7 +24,9 @@ class AuthRepository {
     if (deviceId == null) {
       deviceId = const Uuid().v4();
       await _secureStorage.write(
-          key: AppConstants.deviceIdKey, value: deviceId);
+        key: AppConstants.deviceIdKey,
+        value: deviceId,
+      );
     }
     return deviceId;
   }
@@ -47,7 +49,9 @@ class AuthRepository {
   }
 
   Future<void> changePassword(
-      String currentPassword, String newPassword) async {
+    String currentPassword,
+    String newPassword,
+  ) async {
     final HttpsCallable callable = _functions.httpsCallable('changePassword');
     final response = await callable.call(<String, dynamic>{
       'currentPassword': currentPassword,
@@ -79,14 +83,15 @@ class AuthRepository {
       role: claims['role'] as String? ?? 'sales_rep',
       mustChangePassword: claims['mustChangePassword'] as bool? ?? false,
       lastLoginAt: DateTime.parse(
-          claims['lastLoginAt'] as String? ?? DateTime.now().toIso8601String()),
+        claims['lastLoginAt'] as String? ?? DateTime.now().toIso8601String(),
+      ),
       sessionVersion: claims['sessionVersion'] as String? ?? '',
     );
   }
 }
 
 @riverpod
-AuthRepository authRepository(AuthRepositoryRef ref) {
+AuthRepository authRepository(Ref ref) {
   return AuthRepository(
     FirebaseAuth.instance,
     FirebaseFunctions.instance,

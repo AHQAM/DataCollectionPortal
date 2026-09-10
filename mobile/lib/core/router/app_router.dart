@@ -12,7 +12,7 @@ import '../../features/notifications/presentation/notifications_screen.dart';
 part 'app_router.g.dart';
 
 @riverpod
-GoRouter appRouter(AppRouterRef ref) {
+GoRouter appRouter(Ref ref) {
   final authState = ref.watch(authControllerProvider);
 
   return GoRouter(
@@ -40,10 +40,7 @@ GoRouter appRouter(AppRouterRef ref) {
       return null; // No redirect needed
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/change-password',
         builder: (context, state) => const ChangePasswordScreen(),

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mobile/l10n/app_localizations.dart';
 
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
@@ -23,9 +23,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Initialize FCM
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -40,11 +38,7 @@ void main() async {
   // Initialize local storage
   await Hive.initFlutter();
 
-  runApp(
-    const ProviderScope(
-      child: SalesCollectionApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: SalesCollectionApp()));
 }
 
 class SalesCollectionApp extends ConsumerWidget {
@@ -66,12 +60,8 @@ class SalesCollectionApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('ar', ''),
-        Locale('en', ''),
-      ],
+      supportedLocales: const [Locale('ar', ''), Locale('en', '')],
       locale: const Locale('ar', ''), // Default to Arabic
-
       // Router setup
       routerConfig: router,
     );

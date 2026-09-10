@@ -27,5 +27,6 @@
   "passwordMismatch": "كلمة المرور غير متطابقة",
   "passwordLengthError": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
   "mustChangePasswordMsg": "يجب تغيير كلمة المرور للمتابعة",
-  "notifications": "الإشعارات"
+  "notifications": "الإشعارات",
+  "noNotifications": "لا توجد إشعارات جديدة"
 }

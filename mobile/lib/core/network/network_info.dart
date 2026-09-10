@@ -36,6 +36,6 @@ class NetworkInfoImpl implements NetworkInfo {
 }
 
 @riverpod
-NetworkInfo networkInfo(NetworkInfoRef ref) {
+NetworkInfo networkInfo(Ref ref) {
   return NetworkInfoImpl(Connectivity());
 }

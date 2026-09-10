@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/auth_repository.dart';
 import '../domain/user_model.dart';
 
@@ -30,7 +31,9 @@ class AuthController extends _$AuthController {
   }
 
   Future<void> changePassword(
-      String currentPassword, String newPassword) async {
+    String currentPassword,
+    String newPassword,
+  ) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final authRepo = ref.read(authRepositoryProvider);

@@ -27,5 +27,6 @@
   "passwordMismatch": "Passwords do not match",
   "passwordLengthError": "Password must be at least 6 characters",
   "mustChangePasswordMsg": "You must change your password to continue",
-  "notifications": "Notifications"
+  "notifications": "Notifications",
+  "noNotifications": "No new notifications"
 }

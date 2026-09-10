@@ -12,20 +12,24 @@ part of 'requests_repository.dart';
 @ProviderFor(requestsRepository)
 final requestsRepositoryProvider = RequestsRepositoryProvider._();
 
-final class RequestsRepositoryProvider extends $FunctionalProvider<
-    RequestsRepository,
-    RequestsRepository,
-    RequestsRepository> with $Provider<RequestsRepository> {
+final class RequestsRepositoryProvider
+    extends
+        $FunctionalProvider<
+          RequestsRepository,
+          RequestsRepository,
+          RequestsRepository
+        >
+    with $Provider<RequestsRepository> {
   RequestsRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'requestsRepositoryProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'requestsRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$requestsRepositoryHash();
@@ -33,8 +37,8 @@ final class RequestsRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<RequestsRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   RequestsRepository create(Ref ref) {
@@ -51,4 +55,4 @@ final class RequestsRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$requestsRepositoryHash() =>
-    r'0916ab9cbaf60a264b0728bdbb8d37f45a83fbc1';
+    r'e5d32b39f450efb3a1d5d607b75353304b72fe12';

@@ -4,11 +4,11 @@ part 'form_field_model.freezed.dart';
 part 'form_field_model.g.dart';
 
 @freezed
-class FormFieldModel with _$FormFieldModel {
+abstract class FormFieldModel with _$FormFieldModel {
   const factory FormFieldModel({
     required String id,
     required String
-        type, // 'text', 'number', 'dropdown', 'location', 'photo', 'signature', 'barcode'
+    type, // 'text', 'number', 'dropdown', 'location', 'photo', 'signature', 'barcode'
     required String labelAr,
     required String labelEn,
     @Default(true) bool isRequired,

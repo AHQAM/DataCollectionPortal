@@ -4,7 +4,7 @@ part 'request_model.freezed.dart';
 part 'request_model.g.dart';
 
 @freezed
-class RequestModel with _$RequestModel {
+abstract class RequestModel with _$RequestModel {
   const factory RequestModel({
     required String id,
     required String activityId,

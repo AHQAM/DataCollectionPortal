@@ -27,6 +27,6 @@ class HiveService {
 }
 
 @Riverpod(keepAlive: true)
-HiveService hiveService(HiveServiceRef ref) {
+HiveService hiveService(Ref ref) {
   return HiveService();
 }

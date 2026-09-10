@@ -16,15 +16,15 @@ final class HiveServiceProvider
     extends $FunctionalProvider<HiveService, HiveService, HiveService>
     with $Provider<HiveService> {
   HiveServiceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'hiveServiceProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'hiveServiceProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$hiveServiceHash();
@@ -48,4 +48,4 @@ final class HiveServiceProvider
   }
 }
 
-String _$hiveServiceHash() => r'736c4ce10a0f18e71445b2cae3c365a50f24d1d0';
+String _$hiveServiceHash() => r'98523be1ff1d06e445495c9df58b7f72e1fd0d15';

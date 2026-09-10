@@ -16,15 +16,15 @@ final class SyncManagerProvider
     extends $FunctionalProvider<SyncManager, SyncManager, SyncManager>
     with $Provider<SyncManager> {
   SyncManagerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'syncManagerProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'syncManagerProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$syncManagerHash();
@@ -48,4 +48,4 @@ final class SyncManagerProvider
   }
 }
 
-String _$syncManagerHash() => r'2005aa2294fd9e46e6902ef92246d0e649be6d88';
+String _$syncManagerHash() => r'16c177fee865952b18903727117c22cdc9f653ee';

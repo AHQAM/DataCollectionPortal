@@ -7,7 +7,7 @@ import '../../auth/presentation/auth_controller.dart';
 part 'requests_controller.g.dart';
 
 @riverpod
-Stream<List<RequestModel>> myRequests(MyRequestsRef ref) {
+Stream<List<RequestModel>> myRequests(Ref ref) {
   final user = ref.watch(authControllerProvider).value;
 
   if (user == null) {

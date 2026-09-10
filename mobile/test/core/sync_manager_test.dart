@@ -37,8 +37,9 @@ void main() {
     mockBox = MockBox<String>();
 
     when(() => mockHiveService.syncQueueBox).thenReturn(mockBox);
-    when(() => mockNetworkInfo.onConnectivityChanged)
-        .thenAnswer((_) => Stream.value(false));
+    when(
+      () => mockNetworkInfo.onConnectivityChanged,
+    ).thenAnswer((_) => Stream.value(false));
     when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
 
     syncManager = SyncManager(mockHiveService, mockNetworkInfo, mockFirestore);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mobile/l10n/app_localizations.dart';
 import 'auth_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -25,10 +25,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _login() {
     if (_formKey.currentState!.validate()) {
-      ref.read(authControllerProvider.notifier).login(
-            _regionNoController.text.trim(),
-            _passwordController.text,
-          );
+      ref
+          .read(authControllerProvider.notifier)
+          .login(_regionNoController.text.trim(), _passwordController.text);
     }
   }
 
@@ -69,9 +68,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Text(
                     l10n.loginTitle,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),

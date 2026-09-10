@@ -57,8 +57,9 @@ class SyncManager {
           await box.delete(key);
         } else {
           // Increment retry count
-          final updatedAction =
-              action.copyWith(retryCount: action.retryCount + 1);
+          final updatedAction = action.copyWith(
+            retryCount: action.retryCount + 1,
+          );
           await box.put(key, jsonEncode(updatedAction.toJson()));
         }
       }
@@ -104,7 +105,7 @@ class SyncManager {
 }
 
 @Riverpod(keepAlive: true)
-SyncManager syncManager(SyncManagerRef ref) {
+SyncManager syncManager(Ref ref) {
   return SyncManager(
     ref.watch(hiveServiceProvider),
     ref.watch(networkInfoProvider),

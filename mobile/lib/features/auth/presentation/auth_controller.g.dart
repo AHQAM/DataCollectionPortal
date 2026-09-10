@@ -15,15 +15,15 @@ final authControllerProvider = AuthControllerProvider._();
 final class AuthControllerProvider
     extends $AsyncNotifierProvider<AuthController, UserModel?> {
   AuthControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'authControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'authControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$authControllerHash();
@@ -41,11 +41,14 @@ abstract class _$AuthController extends $AsyncNotifier<UserModel?> {
   @override
   WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<UserModel?>, UserModel?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<UserModel?>, UserModel?>,
-        AsyncValue<UserModel?>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<UserModel?>, UserModel?>,
+              AsyncValue<UserModel?>,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, build);
   }
 }

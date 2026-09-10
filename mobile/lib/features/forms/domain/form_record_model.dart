@@ -4,7 +4,7 @@ part 'form_record_model.freezed.dart';
 part 'form_record_model.g.dart';
 
 @freezed
-class FormRecordModel with _$FormRecordModel {
+abstract class FormRecordModel with _$FormRecordModel {
   const factory FormRecordModel({
     required String id,
     required String requestId,

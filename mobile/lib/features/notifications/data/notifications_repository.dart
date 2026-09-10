@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../domain/notification_model.dart';
-import '../../auth/data/auth_repository.dart';
+import '../../auth/presentation/auth_controller.dart';
 
 part 'notifications_repository.g.dart';
 
@@ -18,13 +18,13 @@ class NotificationsRepository {
         .orderBy('sentAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return NotificationModel.fromJson({
-          ...doc.data(),
-          'notificationId': doc.id,
+          return snapshot.docs.map((doc) {
+            return NotificationModel.fromJson({
+              ...doc.data(),
+              'notificationId': doc.id,
+            });
+          }).toList();
         });
-      }).toList();
-    });
   }
 
   Future<void> markAsRead(String notificationId) async {
@@ -36,8 +36,9 @@ class NotificationsRepository {
 
 @riverpod
 NotificationsRepository? notificationsRepository(
-    NotificationsRepositoryRef ref) {
-  final user = ref.watch(authStateProvider).value;
+  Ref ref,
+) {
+  final user = ref.watch(authControllerProvider).value;
   if (user == null) return null;
   return NotificationsRepository(FirebaseFirestore.instance, user.uid);
 }

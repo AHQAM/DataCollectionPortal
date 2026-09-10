@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mobile/l10n/app_localizations.dart';
 import 'auth_controller.dart';
 
 class ChangePasswordScreen extends ConsumerStatefulWidget {
@@ -27,7 +27,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
   void _changePassword() {
     if (_formKey.currentState!.validate()) {
-      ref.read(authControllerProvider.notifier).changePassword(
+      ref
+          .read(authControllerProvider.notifier)
+          .changePassword(
             _currentPasswordController.text,
             _newPasswordController.text,
           );
@@ -51,9 +53,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.changePassword),
-      ),
+      appBar: AppBar(title: Text(l10n.changePassword)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -66,16 +66,20 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.tertiary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                        color: Theme.of(context).colorScheme.tertiary),
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline,
-                          color: Theme.of(context).colorScheme.tertiary),
+                      Icon(
+                        Icons.info_outline,
+                        color: Theme.of(context).colorScheme.tertiary,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -143,7 +147,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                           height: 24,
                           width: 24,
                           child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2),
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
                       : Text(l10n.submit),
                 ),
@@ -154,8 +160,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   },
                   child: Text(
                     l10n.logout,
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.error),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ),
               ],

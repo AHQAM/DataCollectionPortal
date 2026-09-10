@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mobile/l10n/app_localizations.dart';
 import 'notifications_controller.dart';
 import 'package:intl/intl.dart';
 
@@ -14,14 +14,13 @@ class NotificationsScreen extends ConsumerWidget {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.notifications ?? 'Notifications'),
-      ),
+      appBar: AppBar(title: Text(l10n.notifications ?? 'Notifications')),
       body: notificationsAsync.when(
         data: (notifications) {
           if (notifications.isEmpty) {
             return Center(
-                child: Text(l10n.noNotifications ?? 'No new notifications'));
+              child: Text(l10n.noNotifications ?? 'No new notifications'),
+            );
           }
           return ListView.builder(
             itemCount: notifications.length,
@@ -33,14 +32,15 @@ class NotificationsScreen extends ConsumerWidget {
                 tileColor: isUnread ? Colors.blue.withOpacity(0.1) : null,
                 leading: Icon(
                   isUnread ? Icons.notifications_active : Icons.notifications,
-                  color:
-                      isUnread ? Theme.of(context).primaryColor : Colors.grey,
+                  color: isUnread
+                      ? Theme.of(context).primaryColor
+                      : Colors.grey,
                 ),
                 title: Text(
                   isAr ? notification.titleAr : notification.titleEn,
                   style: TextStyle(
-                      fontWeight:
-                          isUnread ? FontWeight.bold : FontWeight.normal),
+                    fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
+                  ),
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
