@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:flutter/foundation.dart';
+
 import '../network/network_info.dart';
 import '../storage/hive_service.dart';
 import 'sync_action.dart';
@@ -94,11 +96,11 @@ class SyncManager {
           return true;
 
         default:
-          print('Unknown sync action type: ${action.type}');
+          debugPrint('Unknown sync action type: ${action.type}');
           return true; // Mark as true to discard unknown actions
       }
     } catch (e) {
-      print('Failed to execute sync action ${action.id}: $e');
+      debugPrint('Failed to execute sync action ${action.id}: $e');
       return false; // Will retry
     }
   }

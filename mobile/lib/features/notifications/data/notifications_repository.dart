@@ -35,9 +35,7 @@ class NotificationsRepository {
 }
 
 @riverpod
-NotificationsRepository? notificationsRepository(
-  Ref ref,
-) {
+NotificationsRepository? notificationsRepository(Ref ref) {
   final user = ref.watch(authControllerProvider).value;
   if (user == null) return null;
   return NotificationsRepository(FirebaseFirestore.instance, user.uid);
