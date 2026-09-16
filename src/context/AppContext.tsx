@@ -447,26 +447,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           await firebaseUser.getIdTokenResult(true);
         } catch (err) {
           console.error('Error refreshing Firebase Auth token:', err);
+          setCurrentUser(null);
+          setAuthReady(true);
+          return;
         }
-        // Try to find user in already-loaded state first
-        const firestoreUser = users.find(u => u.userId === firebaseUser.uid);
-        if (firestoreUser) {
-          setCurrentUser(firestoreUser);
-          setSelectedRegionNo(firestoreUser.regionNo);
-        } else {
-          // Fetch directly from Firestore if not yet in state (e.g., on first load)
-          try {
-            const userDocRef = doc(db, 'users', firebaseUser.uid);
-            const userDocSnap = await getDoc(userDocRef);
-            if (userDocSnap.exists()) {
-              const userData = userDocSnap.data() as User;
-              setCurrentUser(userData);
-              setSelectedRegionNo(userData.regionNo);
-            }
-          } catch (err) {
-            console.error('Error fetching user from Firestore:', err);
+
+        try {
+          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data() as User;
+            setCurrentUser(userData);
+            setSelectedRegionNo(userData.regionNo);
+          } else {
             setCurrentUser(null);
           }
+        } catch (err) {
+          console.error('Error fetching user from Firestore:', err);
+          setCurrentUser(null);
         }
       } else {
         // If not logged in on Firebase, clear context user
@@ -476,7 +474,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setAuthReady(true);
     });
     return () => unsubscribe();
-  }, [users]);
+  }, []);
 
   const login = async (regionNoOrEmail: string, passwordInput: string): Promise<LoginResult> => {
     const trimmedInput = regionNoOrEmail.trim();
