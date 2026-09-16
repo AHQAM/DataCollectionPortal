@@ -36,9 +36,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSystemHealth = void 0;
 const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
+const roles_1 = require("./roles");
 const db = (0, firestore_1.getFirestore)('datacollectionportal');
 exports.getSystemHealth = functions.https.onCall(async (data, context) => {
-    if (!context.auth || (context.auth.token.role !== "admin" && context.auth.token.role !== "supervisor")) {
+    if (!context.auth || (context.auth.token.role !== roles_1.USER_ROLES.ADMIN && context.auth.token.role !== roles_1.USER_ROLES.SUPERVISOR)) {
         throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can check system health.");
     }
     try {

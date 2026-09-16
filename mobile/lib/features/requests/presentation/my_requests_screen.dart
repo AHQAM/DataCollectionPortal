@@ -58,7 +58,9 @@ class MyRequestsScreen extends ConsumerWidget {
                   isThreeLine: true,
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    context.push('/form/${request.id}/${request.activityId}');
+                    context.push(
+                      '/form/${request.id}/${request.activityId}?recordId=${Uri.encodeComponent(request.id)}',
+                    );
                   },
                 ),
               );

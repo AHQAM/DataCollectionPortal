@@ -15,8 +15,10 @@ _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
   branchId: json['branchId'] as String?,
   role: json['role'] as String,
   mustChangePassword: json['mustChangePassword'] as bool? ?? false,
-  lastLoginAt: DateTime.parse(json['lastLoginAt'] as String),
-  sessionVersion: json['sessionVersion'] as String,
+  lastLoginAt: json['lastLoginAt'] == null
+      ? null
+      : DateTime.parse(json['lastLoginAt'] as String),
+  sessionVersion: json['sessionVersion'] as String? ?? '0',
   isActive: json['isActive'] as bool? ?? true,
 );
 
@@ -28,7 +30,7 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       'branchId': instance.branchId,
       'role': instance.role,
       'mustChangePassword': instance.mustChangePassword,
-      'lastLoginAt': instance.lastLoginAt.toIso8601String(),
+      'lastLoginAt': instance.lastLoginAt?.toIso8601String(),
       'sessionVersion': instance.sessionVersion,
       'isActive': instance.isActive,
     };

@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../network/network_info.dart';
 import '../storage/hive_service.dart';
 import 'sync_action.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 part 'sync_manager.g.dart';
 
@@ -76,11 +77,23 @@ class SyncManager {
       final payload = jsonDecode(action.payload) as Map<String, dynamic>;
 
       switch (action.type) {
+        case 'SUBMIT_RESPONSE':
+          final callable = FirebaseFunctions.instanceFor(
+            region: 'us-central1',
+          ).httpsCallable('submitResponse');
+          await callable.call(<String, dynamic>{
+            'requestId': payload['data']['requestId'],
+            'recordId': payload['data']['recordId'],
+            'activityId': payload['data']['activityId'],
+            'formData': payload['data']['formData'],
+            'submittedAt': payload['data']['submittedAt'],
+          });
+          return true;
+
         case 'CREATE_RECORD':
           final collection = payload['collection'] as String;
           final docId = payload['docId'] as String?;
           final data = payload['data'] as Map<String, dynamic>;
-
           if (docId != null) {
             await _firestore.collection(collection).doc(docId).set(data);
           } else {
@@ -100,6 +113,15 @@ class SyncManager {
           debugPrint('Unknown sync action type: ${action.type}');
           return true; // Mark as true to discard unknown actions
       }
+    } on FirebaseFunctionsException catch (e) {
+      if (e.code == 'permission-denied' ||
+          e.code == 'invalid-argument' ||
+          e.code == 'failed-precondition') {
+        debugPrint('Permanent sync failure for ${action.id}: ${e.code}');
+        return true;
+      }
+      debugPrint('Retryable sync failure ${action.id}: ${e.code}');
+      return false;
     } catch (e) {
       debugPrint('Failed to execute sync action ${action.id}: $e');
       return false; // Will retry

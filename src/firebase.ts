@@ -4,16 +4,21 @@ import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
-// Your web app's Firebase configuration
-// In a real production environment, replace these with actual values from Firebase Console
-// or load them from environment variables (.env file).
+function requiredFirebaseEnv(name: string): string {
+  const value = import.meta.env[name];
+  if (!value) {
+    throw new Error(`Missing required Firebase configuration: ${name}`);
+  }
+  return value;
+}
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "demo-api-key",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "demo-project.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "demo-project",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "demo-project.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:123456789:web:abcdef123456"
+  apiKey: requiredFirebaseEnv('VITE_FIREBASE_API_KEY'),
+  authDomain: requiredFirebaseEnv('VITE_FIREBASE_AUTH_DOMAIN'),
+  projectId: requiredFirebaseEnv('VITE_FIREBASE_PROJECT_ID'),
+  storageBucket: requiredFirebaseEnv('VITE_FIREBASE_STORAGE_BUCKET'),
+  messagingSenderId: requiredFirebaseEnv('VITE_FIREBASE_MESSAGING_SENDER_ID'),
+  appId: requiredFirebaseEnv('VITE_FIREBASE_APP_ID'),
 };
 
 // Initialize Firebase
@@ -21,7 +26,7 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
 export const auth = getAuth(app);
-export const db = getFirestore(app, import.meta.env.VITE_FIREBASE_DATABASE_ID || "datacollectionportal");
+export const db = getFirestore(app, import.meta.env.VITE_FIREBASE_DATABASE_ID || 'datacollectionportal');
 export const functions = getFunctions(app);
 export const storage = getStorage(app);
 

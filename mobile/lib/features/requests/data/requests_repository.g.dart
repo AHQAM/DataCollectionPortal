@@ -55,4 +55,4 @@ final class RequestsRepositoryProvider
 }
 
 String _$requestsRepositoryHash() =>
-    r'97c1cf3c0a57c34909b0db26978a3fbd33a137ed';
+    r'84c298c016dcecb1fe0c43617df979b6817f5ac9';

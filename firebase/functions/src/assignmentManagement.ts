@@ -2,6 +2,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { sendNotificationInternal } from "./notificationService";
+import { USER_ROLES } from "./roles";
 
 const db = getFirestore('datacollectionportal');
 
@@ -10,7 +11,7 @@ const checkAdminOrSupervisor = (context: functions.https.CallableContext) => {
     throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
   }
   const role = context.auth.token.role;
-  if (role !== "admin" && role !== "supervisor") {
+  if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {
     throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
   }
 };
@@ -32,7 +33,7 @@ export const reassignRecords = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError("not-found", "Target user not found.");
   }
 
-  if (userDoc.data()?.role !== "representative") {
+  if (userDoc.data()?.role !== USER_ROLES.REP) {
     throw new functions.https.HttpsError("invalid-argument", "Target user must be a representative.");
   }
 

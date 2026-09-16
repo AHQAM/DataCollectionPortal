@@ -17,7 +17,7 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-100 text-slate-900 font-sans selection:bg-purple-900 selection:text-white">
-      {/* Top QA Navigation Bar with view switchers and role simulation */}
+      {/* Navigation and authenticated user controls */}
       <TopNavbar />
 
       {/* Main View Mode Container */}

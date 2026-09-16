@@ -2,6 +2,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { logAuditSafe } from "./auditLogger";
+import { USER_ROLES } from "./roles";
 
 /**
  * Cloud Function: releaseDevice
@@ -12,7 +13,7 @@ import { logAuditSafe } from "./auditLogger";
  */
 export const releaseDevice = functions.https.onCall(
   async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Only administrators can release devices."
@@ -127,7 +128,7 @@ export const releaseDevice = functions.https.onCall(
  */
 export const replaceDevice = functions.https.onCall(
   async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required."
@@ -228,7 +229,7 @@ export const replaceDevice = functions.https.onCall(
  */
 export const forceLogoutUser = functions.https.onCall(
   async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required."

@@ -256,6 +256,7 @@ exports.authenticateWithRegionPassword = functions.https.onCall(async (data, con
         const customClaims = {
             role: userData.role,
             branchId: userData.branchId || null,
+            regionNo: userData.regionNo || null,
             allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
             sessionVersion: (userData.sessionVersion || 0) + 0, // Keep current version
             mustChangePassword: userData.mustChangePassword || false,
@@ -295,14 +296,17 @@ exports.authenticateWithRegionPassword = functions.https.onCall(async (data, con
             },
         });
         return {
+            userId,
             token,
             mustChangePassword: userData.mustChangePassword || false,
             repNameAr: userData.repNameAr,
             repNameEn: userData.repNameEn || null,
+            repNo: userData.repNo || userData.regionNo,
             role: userData.role,
             allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
             branchId: userData.branchId,
             regionNo: userData.regionNo,
+            sessionVersion: userData.sessionVersion || 0,
         };
     }
     catch (error) {

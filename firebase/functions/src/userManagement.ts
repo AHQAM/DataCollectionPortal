@@ -1,10 +1,10 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { v4 as uuidv4 } from "uuid";
+import { randomBytes } from "crypto";
 import { logAuditSafe } from "./auditLogger";
 import { hashPassword } from "./auth";
-
-const DEFAULT_PASSWORD = "1234";
+import { USER_ROLES } from "./roles";
 
 /**
  * Cloud Function: createUser
@@ -14,7 +14,7 @@ const DEFAULT_PASSWORD = "1234";
  */
 export const createUser = functions.https.onCall(
   async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required."
@@ -42,7 +42,7 @@ export const createUser = functions.https.onCall(
       );
     }
 
-    if (!["REP", "SUPERVISOR"].includes(role)) {
+    if (![USER_ROLES.REP, USER_ROLES.SUPERVISOR].includes(role)) {
       throw new functions.https.HttpsError(
         "invalid-argument",
         "الدور يجب أن يكون REP أو SUPERVISOR. | Role must be REP or SUPERVISOR."
@@ -66,8 +66,8 @@ export const createUser = functions.https.onCall(
         );
       }
 
-      // Hash default password
-      const passwordHash = await hashPassword(DEFAULT_PASSWORD);
+      const temporaryPassword = randomBytes(9).toString("base64url");
+      const passwordHash = await hashPassword(temporaryPassword);
       const userId = `USER-${uuidv4().substring(0, 8).toUpperCase()}`;
 
       const newUser = {
@@ -123,6 +123,7 @@ export const createUser = functions.https.onCall(
       return {
         success: true,
         userId,
+        temporaryPassword,
         messageAr: `تم إنشاء المستخدم ${repNameAr} بنجاح.`,
         messageEn: `User ${repNameAr} created successfully.`,
       };
@@ -147,7 +148,7 @@ export const createUser = functions.https.onCall(
  */
 export const updateUser = functions.https.onCall(
   async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required."
@@ -251,7 +252,7 @@ export const updateUser = functions.https.onCall(
  */
 export const deactivateUser = functions.https.onCall(
   async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required."
@@ -333,11 +334,11 @@ export const deactivateUser = functions.https.onCall(
  * Cloud Function: importUsersBatch
  *
  * Admin-only batch user creation from import.
- * Each user gets default password 1234, mustChangePassword = true.
+ * Each user gets a unique temporary password and mustChangePassword = true.
  */
 export const importUsersBatch = functions.https.onCall(
   async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required."
@@ -369,8 +370,12 @@ export const importUsersBatch = functions.https.onCall(
         existingUsers.docs.map((d) => d.data().username)
       );
 
-      const defaultHash = await hashPassword(DEFAULT_PASSWORD);
-      const results = { created: 0, skipped: 0, errors: [] as string[] };
+      const results = {
+        created: 0,
+        skipped: 0,
+        errors: [] as string[],
+        temporaryPasswords: [] as Array<{ username: string; password: string }>,
+      };
 
       const batch = db.batch();
 
@@ -393,6 +398,8 @@ export const importUsersBatch = functions.https.onCall(
 
         const userId = `USER-${uuidv4().substring(0, 8).toUpperCase()}`;
         const userRef = db.collection("users").doc(userId);
+        const temporaryPassword = randomBytes(9).toString("base64url");
+        const passwordHash = await hashPassword(temporaryPassword);
 
         batch.set(userRef, {
           userId,
@@ -408,7 +415,7 @@ export const importUsersBatch = functions.https.onCall(
           mobile: user.mobile?.trim() || null,
           branchId: user.branchId,
           role: user.role || "REP",
-          passwordHash: defaultHash,
+          passwordHash,
           mustChangePassword: true,
           isActive: true,
           failedLoginCount: 0,
@@ -430,6 +437,7 @@ export const importUsersBatch = functions.https.onCall(
         });
 
         existingUsernames.add(username);
+        results.temporaryPasswords.push({ username, password: temporaryPassword });
         results.created++;
       }
 
@@ -453,6 +461,7 @@ export const importUsersBatch = functions.https.onCall(
         created: results.created,
         skipped: results.skipped,
         errors: results.errors,
+        temporaryPasswords: results.temporaryPasswords,
         messageAr: `تم إنشاء ${results.created} مستخدم بنجاح.`,
         messageEn: `${results.created} users created successfully.`,
       };

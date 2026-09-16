@@ -921,7 +921,7 @@ export const AdminImportWizard: React.FC<Props> = ({ initialRequestId, onBack })
               {lang === 'ar' ? 'الرجوع لقائمة الطلبات' : 'Go to Requests'}
             </button>
 
-            <button
+            {import.meta.env.DEV && <button
               onClick={() => {
                 // Find a rep from the imported regions to switch into mobile view easily
                 const firstValidReg = validRows[0]?.[systemColMap.regionNo];
@@ -934,7 +934,7 @@ export const AdminImportWizard: React.FC<Props> = ({ initialRequestId, onBack })
             >
               <Smartphone className="w-4 h-4" />
               <span>{lang === 'ar' ? 'فتح واجهة الهاتف لمعاينة السجلات والمطابقة' : 'Preview in Mobile View'}</span>
-            </button>
+            </button>}
 
             <button
               onClick={() => {

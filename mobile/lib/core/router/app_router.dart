@@ -56,6 +56,7 @@ GoRouter appRouter(Ref ref) {
           final activityId = state.pathParameters['activityId']!;
           return DynamicFormScreen(
             requestId: requestId,
+            recordId: state.uri.queryParameters['recordId'] ?? requestId,
             activityId: activityId,
           );
         },

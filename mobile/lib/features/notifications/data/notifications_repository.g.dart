@@ -55,4 +55,4 @@ final class NotificationsRepositoryProvider
 }
 
 String _$notificationsRepositoryHash() =>
-    r'82bcb67c433ca4bbd3049162523f126e6ad454ec';
+    r'32b8c9b33429e48954844f004ed98b6de0b85cf6';

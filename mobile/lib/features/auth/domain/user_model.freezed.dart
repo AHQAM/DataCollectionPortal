@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserModel {
 
- String get uid; String get regionNo; List<String> get allowedRegionNos; String? get branchId; String get role; bool get mustChangePassword; DateTime get lastLoginAt; String get sessionVersion; bool get isActive;
+ String get uid; String get regionNo; List<String> get allowedRegionNos; String? get branchId; String get role; bool get mustChangePassword; DateTime? get lastLoginAt; String get sessionVersion; bool get isActive;
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -54,7 +54,7 @@ abstract mixin class $UserModelCopyWith<$Res>  {
   factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) _then) = _$UserModelCopyWithImpl;
 @useResult
 $Res call({
- String uid, String regionNo, List<String> allowedRegionNos, String? branchId, String role, bool mustChangePassword, DateTime lastLoginAt, String sessionVersion, bool isActive
+ String uid, String regionNo, List<String> allowedRegionNos, String? branchId, String role, bool mustChangePassword, DateTime? lastLoginAt, String sessionVersion, bool isActive
 });
 
 
@@ -71,7 +71,7 @@ class _$UserModelCopyWithImpl<$Res>
 
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? regionNo = null,Object? allowedRegionNos = null,Object? branchId = freezed,Object? role = null,Object? mustChangePassword = null,Object? lastLoginAt = null,Object? sessionVersion = null,Object? isActive = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? regionNo = null,Object? allowedRegionNos = null,Object? branchId = freezed,Object? role = null,Object? mustChangePassword = null,Object? lastLoginAt = freezed,Object? sessionVersion = null,Object? isActive = null,}) {
   return _then(UserModel(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,regionNo: null == regionNo ? _self.regionNo : regionNo // ignore: cast_nullable_to_non_nullable
@@ -79,8 +79,8 @@ as String,allowedRegionNos: null == allowedRegionNos ? _self.allowedRegionNos : 
 as List<String>,branchId: freezed == branchId ? _self.branchId : branchId // ignore: cast_nullable_to_non_nullable
 as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,mustChangePassword: null == mustChangePassword ? _self.mustChangePassword : mustChangePassword // ignore: cast_nullable_to_non_nullable
-as bool,lastLoginAt: null == lastLoginAt ? _self.lastLoginAt : lastLoginAt // ignore: cast_nullable_to_non_nullable
-as DateTime,sessionVersion: null == sessionVersion ? _self.sessionVersion : sessionVersion // ignore: cast_nullable_to_non_nullable
+as bool,lastLoginAt: freezed == lastLoginAt ? _self.lastLoginAt : lastLoginAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,sessionVersion: null == sessionVersion ? _self.sessionVersion : sessionVersion // ignore: cast_nullable_to_non_nullable
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
@@ -167,7 +167,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String uid,  String regionNo,  List<String> allowedRegionNos,  String? branchId,  String role,  bool mustChangePassword,  DateTime lastLoginAt,  String sessionVersion,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String uid,  String regionNo,  List<String> allowedRegionNos,  String? branchId,  String role,  bool mustChangePassword,  DateTime? lastLoginAt,  String sessionVersion,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
 return $default(_that.uid,_that.regionNo,_that.allowedRegionNos,_that.branchId,_that.role,_that.mustChangePassword,_that.lastLoginAt,_that.sessionVersion,_that.isActive);case _:
@@ -188,7 +188,7 @@ return $default(_that.uid,_that.regionNo,_that.allowedRegionNos,_that.branchId,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String uid,  String regionNo,  List<String> allowedRegionNos,  String? branchId,  String role,  bool mustChangePassword,  DateTime lastLoginAt,  String sessionVersion,  bool isActive)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String uid,  String regionNo,  List<String> allowedRegionNos,  String? branchId,  String role,  bool mustChangePassword,  DateTime? lastLoginAt,  String sessionVersion,  bool isActive)  $default,) {final _that = this;
 switch (_that) {
 case _UserModel():
 return $default(_that.uid,_that.regionNo,_that.allowedRegionNos,_that.branchId,_that.role,_that.mustChangePassword,_that.lastLoginAt,_that.sessionVersion,_that.isActive);case _:
@@ -208,7 +208,7 @@ return $default(_that.uid,_that.regionNo,_that.allowedRegionNos,_that.branchId,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String uid,  String regionNo,  List<String> allowedRegionNos,  String? branchId,  String role,  bool mustChangePassword,  DateTime lastLoginAt,  String sessionVersion,  bool isActive)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String uid,  String regionNo,  List<String> allowedRegionNos,  String? branchId,  String role,  bool mustChangePassword,  DateTime? lastLoginAt,  String sessionVersion,  bool isActive)?  $default,) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
 return $default(_that.uid,_that.regionNo,_that.allowedRegionNos,_that.branchId,_that.role,_that.mustChangePassword,_that.lastLoginAt,_that.sessionVersion,_that.isActive);case _:
@@ -223,7 +223,7 @@ return $default(_that.uid,_that.regionNo,_that.allowedRegionNos,_that.branchId,_
 @JsonSerializable()
 
 class _UserModel implements UserModel {
-  const _UserModel({required this.uid, required this.regionNo, required  List<String> allowedRegionNos, this.branchId, required this.role, this.mustChangePassword = false, required this.lastLoginAt, required this.sessionVersion, this.isActive = true}): _allowedRegionNos = allowedRegionNos;
+  const _UserModel({required this.uid, required this.regionNo, required  List<String> allowedRegionNos, this.branchId, required this.role, this.mustChangePassword = false, this.lastLoginAt, this.sessionVersion = '0', this.isActive = true}): _allowedRegionNos = allowedRegionNos;
   factory _UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 
 @override final  String uid;
@@ -238,8 +238,8 @@ class _UserModel implements UserModel {
 @override final  String? branchId;
 @override final  String role;
 @override@JsonKey() final  bool mustChangePassword;
-@override final  DateTime lastLoginAt;
-@override final  String sessionVersion;
+@override final  DateTime? lastLoginAt;
+@override@JsonKey() final  String sessionVersion;
 @override@JsonKey() final  bool isActive;
 
 /// Create a copy of UserModel
@@ -277,7 +277,7 @@ abstract mixin class _$UserModelCopyWith<$Res> implements $UserModelCopyWith<$Re
   factory _$UserModelCopyWith(_UserModel value, $Res Function(_UserModel) _then) = __$UserModelCopyWithImpl;
 @override @useResult
 $Res call({
- String uid, String regionNo, List<String> allowedRegionNos, String? branchId, String role, bool mustChangePassword, DateTime lastLoginAt, String sessionVersion, bool isActive
+ String uid, String regionNo, List<String> allowedRegionNos, String? branchId, String role, bool mustChangePassword, DateTime? lastLoginAt, String sessionVersion, bool isActive
 });
 
 
@@ -294,7 +294,7 @@ class __$UserModelCopyWithImpl<$Res>
 
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? regionNo = null,Object? allowedRegionNos = null,Object? branchId = freezed,Object? role = null,Object? mustChangePassword = null,Object? lastLoginAt = null,Object? sessionVersion = null,Object? isActive = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? regionNo = null,Object? allowedRegionNos = null,Object? branchId = freezed,Object? role = null,Object? mustChangePassword = null,Object? lastLoginAt = freezed,Object? sessionVersion = null,Object? isActive = null,}) {
   return _then(_UserModel(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,regionNo: null == regionNo ? _self.regionNo : regionNo // ignore: cast_nullable_to_non_nullable
@@ -302,8 +302,8 @@ as String,allowedRegionNos: null == allowedRegionNos ? _self._allowedRegionNos :
 as List<String>,branchId: freezed == branchId ? _self.branchId : branchId // ignore: cast_nullable_to_non_nullable
 as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,mustChangePassword: null == mustChangePassword ? _self.mustChangePassword : mustChangePassword // ignore: cast_nullable_to_non_nullable
-as bool,lastLoginAt: null == lastLoginAt ? _self.lastLoginAt : lastLoginAt // ignore: cast_nullable_to_non_nullable
-as DateTime,sessionVersion: null == sessionVersion ? _self.sessionVersion : sessionVersion // ignore: cast_nullable_to_non_nullable
+as bool,lastLoginAt: freezed == lastLoginAt ? _self.lastLoginAt : lastLoginAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,sessionVersion: null == sessionVersion ? _self.sessionVersion : sessionVersion // ignore: cast_nullable_to_non_nullable
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,
   ));

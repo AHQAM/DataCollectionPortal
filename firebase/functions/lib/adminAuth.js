@@ -36,13 +36,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAdminSupervisorUser = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const crypto_1 = require("crypto");
 const auditLogger_1 = require("./auditLogger");
 const auth_1 = require("./auth");
+const roles_1 = require("./roles");
 /**
  * Cloud Function: createAdminSupervisorUser
  *
  * Allows an existing ADMIN to create a new SUPERVISOR or ADMIN.
- * Creates the Firebase Auth account with a default password and custom claims,
+ * Creates the Firebase Auth account with a one-time temporary password and custom claims,
  * and creates the Firestore user document.
  */
 exports.createAdminSupervisorUser = functions.https.onCall(async (data, context) => {
@@ -51,7 +53,7 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
         throw new functions.https.HttpsError("unauthenticated", "يجب تسجيل الدخول لإجراء هذه العملية. | Must be logged in.");
     }
     // 2. Verify Caller Authorization (Must be an ADMIN)
-    if (context.auth.token.role !== "ADMIN") {
+    if (context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
         throw new functions.https.HttpsError("permission-denied", "ليس لديك الصلاحيات الكافية. | Insufficient permissions.");
     }
     const { email, role, branchId, repNameAr, repNameEn, mobileNo, allowedRegionNos } = data;
@@ -59,16 +61,16 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
     if (!email || !role || !repNameAr) {
         throw new functions.https.HttpsError("invalid-argument", "بيانات المستخدم غير مكتملة. | Missing required fields.");
     }
-    if (role !== "SUPERVISOR" && role !== "ADMIN") {
+    if (role !== roles_1.USER_ROLES.SUPERVISOR && role !== roles_1.USER_ROLES.ADMIN) {
         throw new functions.https.HttpsError("invalid-argument", "يمكن إنشاء حسابات مشرفين ومدراء فقط عبر هذه الدالة. | Can only create Supervisor/Admin.");
     }
-    const defaultPassword = "123456";
     const db = admin.firestore();
     try {
         // 4. Create Native Firebase Auth User
+        const temporaryPassword = (0, crypto_1.randomBytes)(9).toString("base64url");
         const userRecord = await admin.auth().createUser({
             email: email,
-            password: defaultPassword,
+            password: temporaryPassword,
             displayName: repNameAr,
         });
         const userId = userRecord.uid;
@@ -81,7 +83,7 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
         };
         await admin.auth().setCustomUserClaims(userId, customClaims);
         // 6. Hash Default Password for Firestore record (Consistency with reps)
-        const passwordHash = await (0, auth_1.hashPassword)(defaultPassword);
+        const passwordHash = await (0, auth_1.hashPassword)(temporaryPassword);
         // 7. Create Firestore Document
         const newUser = {
             userId: userId,
@@ -112,7 +114,7 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
             entityId: userId,
             details: { createdEmail: email, createdRole: role },
         });
-        return { success: true, userId: userId };
+        return { success: true, userId: userId, temporaryPassword };
     }
     catch (error) {
         console.error("Error creating user:", error);
