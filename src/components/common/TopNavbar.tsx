@@ -102,7 +102,7 @@ export const TopNavbar: React.FC = () => {
         {/* Right Controls: Connectivity, Share Link, Lang, User */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Share Rep Link Button - ONLY VISIBLE TO ADMIN */}
-          {currentUser?.role === 'ADMIN' && (
+          {import.meta.env.DEV && currentUser?.role === 'ADMIN' && (
             <button
               type="button"
               onClick={() => setShowShareModal(true)}
@@ -297,4 +297,3 @@ export const TopNavbar: React.FC = () => {
     </header>
   );
 };
-

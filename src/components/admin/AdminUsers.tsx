@@ -102,7 +102,7 @@ export const AdminUsers: React.FC = () => {
         permissions: newRole === 'SUPERVISOR' ? newPermissions : undefined,
       });
       setShowCreateModal(false);
-      showToast(lang === 'ar' ? 'تم إنشاء الحساب بنجاح (كلمة المرور الافتراضية: 1234)' : 'User created. Default password: 1234');
+      showToast(lang === 'ar' ? 'تم إنشاء الحساب بنجاح (سيتم إصدار كلمة مرور مؤقتة)' : 'User created. A temporary password will be issued.');
       // Reset form
       setNewRegionNo(''); setNewRepNo(''); setNewRepNameAr(''); setNewRepNameEn(''); setNewAllowedRegions([]); setNewRole('REP');
     } catch (err: any) {
@@ -282,18 +282,19 @@ export const AdminUsers: React.FC = () => {
 
                     <td className="px-4 py-3.5 text-center">
                       <div className="flex items-center justify-center gap-1.5">
-                        {/* Reset Password to 1234 */}
+                        {/* Generate a one-time temporary password */}
                         <button
                           onClick={() => {
-                            resetUserPassword(u.userId);
-                            showToast(
-                              lang === 'ar'
-                                ? `تمت إعادة تعيين رمز ${u.repNameAr} إلى 1234`
-                                : `Reset PIN for ${u.repNameAr} to 1234`
-                            );
+                            void resetUserPassword(u.userId).then((result) => {
+                              showToast(
+                                result.success
+                                  ? `${result.message}${result.temporaryPassword ? ` ${result.temporaryPassword}` : ''}`
+                                  : result.message
+                              );
+                            });
                           }}
                           className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
-                          title={lang === 'ar' ? 'إعادة تعيين كلمة المرور إلى 1234' : 'Reset PIN to 1234'}
+                          title={lang === 'ar' ? 'إنشاء كلمة مرور مؤقتة' : 'Generate temporary password'}
                         >
                           <KeyRound className="w-3.5 h-3.5" />
                         </button>
@@ -541,7 +542,7 @@ export const AdminUsers: React.FC = () => {
 
               <div className="p-3 bg-purple-50 rounded-xl text-[11px] text-purple-900 space-y-1">
                 <span className="font-bold">ملاحظات الأمان الإلزامية:</span>
-                <div>• كلمة المرور الأولية للحساب الجديد هي: <strong>1234</strong></div>
+                <div>• يتم إنشاء كلمة مرور مؤقتة وفريدة للحساب الجديد.</div>
                 <div>• الحساب مفروض عليه تغيير كلمة المرور فور أول تسجيل دخول.</div>
                 <div>• سيتم ربط الحساب تلقائياً بأول هاتف يتم تسجيل الدخول منه.</div>
               </div>
@@ -573,8 +574,8 @@ export const AdminUsers: React.FC = () => {
         onSuccess={(count) =>
           showToast(
             lang === 'ar'
-              ? `تم استيراد ${count} مندوب بنجاح (كلمة المرور الافتراضية 1234 مع إلزام التغيير فوراً)`
-              : `Imported ${count} representatives successfully (Default PIN 1234, change required)`
+              ? `تم استيراد ${count} مندوب بنجاح (كلمات مرور مؤقتة مع إلزام التغيير فوراً)`
+              : `Imported ${count} representatives successfully (temporary passwords, change required)`
           )
         }
       />

@@ -1,6 +1,7 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { USER_ROLES } from "./roles";
 
 const db = getFirestore('datacollectionportal');
 
@@ -9,7 +10,7 @@ const checkAdminOrSupervisor = (context: functions.https.CallableContext) => {
     throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
   }
   const role = context.auth.token.role;
-  if (role !== "admin" && role !== "supervisor") {
+  if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {
     throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
   }
 };

@@ -38,6 +38,7 @@ const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const auditLogger_1 = require("./auditLogger");
+const roles_1 = require("./roles");
 const auth_1 = require("./auth");
 /**
  * Cloud Function: changePassword
@@ -103,6 +104,7 @@ exports.changePassword = functions.https.onCall(async (data, context) => {
         const customClaims = {
             role: userData.role,
             branchId: userData.branchId || null,
+            regionNo: userData.regionNo || null,
             allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
             sessionVersion: newSessionVersion,
             mustChangePassword: false,
@@ -195,17 +197,22 @@ exports.requestPasswordReset = functions.https.onCall(async (data, _context) => 
  * Cloud Function: adminResetPassword
  *
  * Admin-only function to reset a user's password.
- * Resets to default PIN (1234) and sets mustChangePassword = true.
+ * Resets to a caller-provided temporary password and sets mustChangePassword = true.
  * Revokes existing refresh tokens.
  */
 exports.adminResetPassword = functions.https.onCall(async (data, context) => {
     // Admin-only check
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
         throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { targetUserId, resetRequestId, temporaryPassword } = data;
     if (!targetUserId) {
         throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
+    }
+    if (typeof temporaryPassword !== "string" ||
+        temporaryPassword.length < 12 ||
+        temporaryPassword.length > 128) {
+        throw new functions.https.HttpsError("invalid-argument", "كلمة المرور المؤقتة مطلوبة ويجب أن تكون 12 حرفاً على الأقل. | A temporary password of at least 12 characters is required.");
     }
     const db = (0, firestore_1.getFirestore)('datacollectionportal');
     const adminId = context.auth.uid;
@@ -216,9 +223,7 @@ exports.adminResetPassword = functions.https.onCall(async (data, context) => {
             throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
         }
         const userData = userDoc.data();
-        // Use temporary password or default 1234
-        const newPlainPassword = temporaryPassword || "1234";
-        const newHash = await (0, auth_1.hashPassword)(newPlainPassword);
+        const newHash = await (0, auth_1.hashPassword)(temporaryPassword);
         const newSessionVersion = (userData.sessionVersion || 0) + 1;
         await userRef.update({
             passwordHash: newHash,
@@ -241,6 +246,7 @@ exports.adminResetPassword = functions.https.onCall(async (data, context) => {
             await admin.auth().setCustomUserClaims(targetUserId, {
                 role: userData.role,
                 branchId: userData.branchId || null,
+                regionNo: userData.regionNo || null,
                 allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
                 sessionVersion: newSessionVersion,
                 mustChangePassword: true,
@@ -259,9 +265,7 @@ exports.adminResetPassword = functions.https.onCall(async (data, context) => {
                 reviewedBy: adminId,
                 reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
                 resetAt: admin.firestore.FieldValue.serverTimestamp(),
-                resetMethod: temporaryPassword
-                    ? "TEMPORARY_PASSWORD"
-                    : "DEFAULT_PIN_1234",
+                resetMethod: "TEMPORARY_PASSWORD",
                 updatedAt: admin.firestore.FieldValue.serverTimestamp(),
             });
         }
@@ -272,9 +276,7 @@ exports.adminResetPassword = functions.https.onCall(async (data, context) => {
             entityType: "USER",
             entityId: targetUserId,
             details: {
-                resetMethod: temporaryPassword
-                    ? "TEMPORARY_PASSWORD"
-                    : "DEFAULT_PIN_1234",
+                resetMethod: "TEMPORARY_PASSWORD",
                 resetRequestId: resetRequestId || null,
                 targetUserRegionNo: userData.regionNo,
             },
@@ -300,7 +302,7 @@ exports.adminResetPassword = functions.https.onCall(async (data, context) => {
  * Resets failed login count and clears lockout timer.
  */
 exports.adminUnlockAccount = functions.https.onCall(async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
         throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { targetUserId } = data;

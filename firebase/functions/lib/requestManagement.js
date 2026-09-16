@@ -38,13 +38,14 @@ const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const notificationService_1 = require("./notificationService");
+const roles_1 = require("./roles");
 const db = (0, firestore_1.getFirestore)('datacollectionportal');
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
     }
     const role = context.auth.token.role;
-    if (role !== "admin" && role !== "supervisor") {
+    if (role !== roles_1.USER_ROLES.ADMIN && role !== roles_1.USER_ROLES.SUPERVISOR) {
         throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
     }
 };

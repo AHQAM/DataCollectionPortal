@@ -1,4 +1,5 @@
 import { getFirestore } from 'firebase-admin/firestore';
+import { USER_ROLES } from "./roles";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 
@@ -36,8 +37,11 @@ export const sendNotificationInternal = async (
   const userDoc = await db.collection("users").doc(userId).get();
   if (userDoc.exists) {
     const userData = userDoc.data();
-    if (userData && userData.fcmTokens && Array.isArray(userData.fcmTokens) && userData.fcmTokens.length > 0) {
-      const messages = userData.fcmTokens.map((token: string) => ({
+    const tokens = userData?.fcmToken
+      ? [userData.fcmToken]
+      : [];
+    if (tokens.length > 0) {
+      const messages = tokens.map((token: string) => ({
         notification: {
           title: titleAr, // Defaulting to Arabic for push, but could be localized per user preference
           body: bodyAr,
@@ -57,7 +61,7 @@ export const sendNotificationInternal = async (
 
 // Callable for Admin to send manual broadcast
 export const sendBroadcastNotification = functions.https.onCall(async (data, context) => {
-  if (!context.auth || (context.auth.token.role !== "admin" && context.auth.token.role !== "supervisor")) {
+  if (!context.auth || (context.auth.token.role !== USER_ROLES.ADMIN && context.auth.token.role !== USER_ROLES.SUPERVISOR)) {
     throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can send broadcasts.");
   }
 
@@ -70,9 +74,9 @@ export const sendBroadcastNotification = functions.https.onCall(async (data, con
   let usersQuery: admin.firestore.Query = db.collection("users").where("isActive", "==", true);
   
   if (targetAudience === "REPRESENTATIVES") {
-    usersQuery = usersQuery.where("role", "==", "representative");
+    usersQuery = usersQuery.where("role", "==", USER_ROLES.REP);
   } else if (targetAudience === "SUPERVISORS") {
-    usersQuery = usersQuery.where("role", "==", "supervisor");
+    usersQuery = usersQuery.where("role", "==", USER_ROLES.SUPERVISOR);
   }
 
   const usersSnap = await usersQuery.get();

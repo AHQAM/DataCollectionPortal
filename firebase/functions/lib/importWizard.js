@@ -38,13 +38,16 @@ const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const notificationService_1 = require("./notificationService");
+const roles_1 = require("./roles");
 const db = (0, firestore_1.getFirestore)('datacollectionportal');
+const MAX_IMPORT_ROWS = 2000;
+const MAX_IMPORT_FILENAME_LENGTH = 255;
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
     }
     const role = context.auth.token.role;
-    if (role !== "admin" && role !== "supervisor") {
+    if (role !== roles_1.USER_ROLES.ADMIN && role !== roles_1.USER_ROLES.SUPERVISOR) {
         throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
     }
 };
@@ -57,8 +60,18 @@ exports.importDataPreview = functions.https.onCall(async (data, context) => {
 exports.commitImport = functions.https.onCall(async (data, context) => {
     checkAdminOrSupervisor(context);
     const { requestId, importedRows, mapping, fileName, lang } = data;
-    if (!requestId || !importedRows || !mapping) {
+    if (typeof requestId !== "string" ||
+        !Array.isArray(importedRows) ||
+        importedRows.length === 0 ||
+        importedRows.length > MAX_IMPORT_ROWS ||
+        !mapping ||
+        typeof mapping !== "object" ||
+        Array.isArray(mapping)) {
         throw new functions.https.HttpsError("invalid-argument", "Missing required fields.");
+    }
+    if (fileName !== undefined &&
+        (typeof fileName !== "string" || fileName.length === 0 || fileName.length > MAX_IMPORT_FILENAME_LENGTH)) {
+        throw new functions.https.HttpsError("invalid-argument", "Invalid import file name.");
     }
     const requestDoc = await db.collection("requests").doc(requestId).get();
     if (!requestDoc.exists) {
@@ -194,7 +207,7 @@ exports.commitImport = functions.https.onCall(async (data, context) => {
         }
     });
     const chunks = [];
-    const CHUNK_SIZE = 200;
+    const CHUNK_SIZE = 100;
     for (let i = 0; i < newRecords.length; i += CHUNK_SIZE) {
         chunks.push(newRecords.slice(i, i + CHUNK_SIZE));
     }

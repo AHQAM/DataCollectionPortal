@@ -155,8 +155,8 @@ export const ShareRepLinkModal: React.FC<ShareRepLinkModalProps> = ({ isOpen, on
           </div>
           <div className="text-[10px] text-slate-400">
             {lang === 'ar'
-              ? 'الرمز الافتراضي لجميع المناديب الجدد هو: 1234 (يطلب التطبيق تغييرها فور تسجيل الدخول الأول)'
-              : 'Default PIN for new reps is 1234 (App mandates PIN change on first login)'}
+              ? 'يحصل كل مندوب جديد على كلمة مرور مؤقتة لمرة واحدة ويطلب التطبيق تغييرها عند أول تسجيل دخول'
+              : 'Each new rep receives a one-time temporary password and must change it on first login'}
           </div>
         </div>
 

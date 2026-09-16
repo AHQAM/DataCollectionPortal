@@ -21,6 +21,7 @@ class FormSubmitController extends _$FormSubmitController {
 
   Future<void> save({
     required String requestId,
+    required String recordId,
     required String activityId,
     required Map<String, dynamic> formData,
   }) async {
@@ -37,6 +38,7 @@ class FormSubmitController extends _$FormSubmitController {
           .read(formFieldsRepositoryProvider)
           .saveFormRecord(
             requestId: requestId,
+            recordId: recordId,
             activityId: activityId,
             regionNo: user.regionNo,
             formData: formData,

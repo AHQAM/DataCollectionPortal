@@ -3,6 +3,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as bcrypt from "bcrypt";
 import { logAuditSafe } from "./auditLogger";
+import { USER_ROLES } from "./roles";
 import { hashPassword, verifyPassword } from "./auth";
 
 /**
@@ -114,6 +115,7 @@ export const changePassword = functions.https.onCall(
       const customClaims = {
         role: userData.role,
         branchId: userData.branchId || null,
+        regionNo: userData.regionNo || null,
         allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
         sessionVersion: newSessionVersion,
         mustChangePassword: false,
@@ -229,13 +231,13 @@ export const requestPasswordReset = functions.https.onCall(
  * Cloud Function: adminResetPassword
  *
  * Admin-only function to reset a user's password.
- * Resets to default PIN (1234) and sets mustChangePassword = true.
+ * Resets to a caller-provided temporary password and sets mustChangePassword = true.
  * Revokes existing refresh tokens.
  */
 export const adminResetPassword = functions.https.onCall(
   async (data, context) => {
     // Admin-only check
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required."
@@ -248,6 +250,17 @@ export const adminResetPassword = functions.https.onCall(
       throw new functions.https.HttpsError(
         "invalid-argument",
         "معرف المستخدم مطلوب. | User ID is required."
+      );
+    }
+
+    if (
+      typeof temporaryPassword !== "string" ||
+      temporaryPassword.length < 12 ||
+      temporaryPassword.length > 128
+    ) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "كلمة المرور المؤقتة مطلوبة ويجب أن تكون 12 حرفاً على الأقل. | A temporary password of at least 12 characters is required."
       );
     }
 
@@ -267,9 +280,7 @@ export const adminResetPassword = functions.https.onCall(
 
       const userData = userDoc.data()!;
 
-      // Use temporary password or default 1234
-      const newPlainPassword = temporaryPassword || "1234";
-      const newHash = await hashPassword(newPlainPassword);
+      const newHash = await hashPassword(temporaryPassword);
       const newSessionVersion = (userData.sessionVersion || 0) + 1;
 
       await userRef.update({
@@ -294,6 +305,7 @@ export const adminResetPassword = functions.https.onCall(
         await admin.auth().setCustomUserClaims(targetUserId, {
           role: userData.role,
           branchId: userData.branchId || null,
+          regionNo: userData.regionNo || null,
           allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
           sessionVersion: newSessionVersion,
           mustChangePassword: true,
@@ -312,9 +324,7 @@ export const adminResetPassword = functions.https.onCall(
           reviewedBy: adminId,
           reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
           resetAt: admin.firestore.FieldValue.serverTimestamp(),
-          resetMethod: temporaryPassword
-            ? "TEMPORARY_PASSWORD"
-            : "DEFAULT_PIN_1234",
+          resetMethod: "TEMPORARY_PASSWORD",
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
       }
@@ -326,9 +336,7 @@ export const adminResetPassword = functions.https.onCall(
         entityType: "USER",
         entityId: targetUserId,
         details: {
-          resetMethod: temporaryPassword
-            ? "TEMPORARY_PASSWORD"
-            : "DEFAULT_PIN_1234",
+          resetMethod: "TEMPORARY_PASSWORD",
           resetRequestId: resetRequestId || null,
           targetUserRegionNo: userData.regionNo,
         },
@@ -360,7 +368,7 @@ export const adminResetPassword = functions.https.onCall(
  */
 export const adminUnlockAccount = functions.https.onCall(
   async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required."

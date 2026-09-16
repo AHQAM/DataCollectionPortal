@@ -37,6 +37,7 @@ class FormFieldsRepository {
   /// so it works offline.
   Future<void> saveFormRecord({
     required String requestId,
+    required String recordId,
     required String activityId,
     required String regionNo,
     required Map<String, dynamic> formData,
@@ -48,17 +49,17 @@ class FormFieldsRepository {
       'docId': docId,
       'data': {
         'requestId': requestId,
+        'recordId': recordId,
         'activityId': activityId,
-        'regionNo': regionNo,
         'formData': formData,
+        'recordStatus': 'Submitted',
         'submittedAt': DateTime.now().toIso8601String(),
-        'status': 'SUBMITTED',
       },
     };
 
     final action = SyncAction(
       id: docId,
-      type: 'CREATE_RECORD',
+      type: 'SUBMIT_RESPONSE',
       payload: jsonEncode(payload),
       retryCount: 0,
       createdAt: DateTime.now(),

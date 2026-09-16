@@ -101,12 +101,12 @@ class AuthRepository {
         )),
       ],
       branchId: claims['branchId'] as String?,
-      role: claims['role'] as String? ?? 'sales_rep',
+      role: claims['role'] as String? ?? 'REP',
       mustChangePassword: claims['mustChangePassword'] as bool? ?? false,
-      lastLoginAt: DateTime.parse(
-        claims['lastLoginAt'] as String? ?? DateTime.now().toIso8601String(),
-      ),
-      sessionVersion: claims['sessionVersion'] as String? ?? '',
+      lastLoginAt: claims['lastLoginAt'] is String
+          ? DateTime.tryParse(claims['lastLoginAt'] as String)
+          : null,
+      sessionVersion: claims['sessionVersion']?.toString() ?? '0',
     );
   }
 }

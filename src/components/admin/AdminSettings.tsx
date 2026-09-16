@@ -186,9 +186,9 @@ export const AdminSettings: React.FC = () => {
 
           <div className="p-3 bg-purple-50/70 rounded-xl text-xs space-y-1 text-purple-950">
             <div className="font-bold">{lang === 'ar' ? 'القواعد الأمنية المطبقة إجبارياً:' : 'Enforced Security Rules:'}</div>
-            <div className="text-[11px] text-slate-600">• الرمز الافتراضي للحسابات الجديدة هو 1234.</div>
+            <div className="text-[11px] text-slate-600">• يتم إنشاء كلمة مرور مؤقتة وفريدة للحسابات الجديدة.</div>
             <div className="text-[11px] text-slate-600">• فرض تغيير كلمة المرور فور أول تسجيل دخول بنجاح.</div>
-            <div className="text-[11px] text-slate-600">• منع إعادة استخدام الرمز الافتراضي 1234.</div>
+            <div className="text-[11px] text-slate-600">• يجب تغيير كلمة المرور المؤقتة عند أول تسجيل دخول.</div>
             <div className="text-[11px] text-slate-600">• حصر الحساب على هاتف ذكي واحد معتمد (UUID).</div>
           </div>
         </div>

@@ -24,7 +24,7 @@ import {
   getNotificationPermissionStatus,
   isNotificationSupported,
 } from '../utils/webNotification';
-import { collection, onSnapshot, doc, getDoc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { collection, onSnapshot, doc, getDoc, setDoc, updateDoc, writeBatch, query, where } from 'firebase/firestore';
 import { signInWithCustomToken, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions, auth } from '../firebase';
@@ -78,12 +78,12 @@ interface AppContextType {
   login: (regionNo: string, passwordInput: string) => Promise<LoginResult>;
   logout: () => Promise<void>;
   quickSwitchUser: (userId: string) => void;
-  changePassword: (newPassword: string) => Promise<{ success: boolean; message: string }>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
   requestPasswordReset: (regionNo: string, notes: string) => void;
   adminResetPassword: (userId: string) => void;
   adminUnlockAccount: (userId: string) => void;
   releaseDeviceBinding: (userId: string, reason?: string) => void;
-  resetUserPassword: (userId: string) => void;
+  resetUserPassword: (userId: string) => Promise<{ success: boolean; temporaryPassword?: string; message: string }>;
   unlockUser: (userId: string) => void;
   releaseUserDevice: (userId: string, reason?: string) => void;
   updateUser: (user: User) => void;
@@ -190,15 +190,68 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Entities stored in local state with localStorage persistence
   const [users, setUsers] = useState<User[]>([]);
 
+  // Current session
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem(`${STORAGE_PREFIX}current_user`);
+    if (saved) {
+      try {
+        return JSON.parse(saved) as User;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
+
   // Sync users with Firestore real-time
   useEffect(() => {
-    const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
+    if (!currentUser) {
+      setUsers([]);
+      setRequests([]);
+      setFields([]);
+      setAssignments([]);
+      setRecords([]);
+      setRecordResponses({});
+      setNotifications([]);
+      return;
+    }
+
+    const isAdmin = currentUser.role === 'ADMIN';
+    const isSupervisor = currentUser.role === 'SUPERVISOR';
+    const usersQuery = isAdmin
+      ? collection(db, 'users')
+      : isSupervisor
+      ? query(collection(db, 'users'), where('branchId', '==', currentUser.branchId))
+      : query(collection(db, 'users'), where('userId', '==', currentUser.userId));
+    const requestsQuery = isAdmin
+      ? collection(db, 'requests')
+      : isSupervisor
+      ? query(collection(db, 'requests'), where('branchId', '==', currentUser.branchId))
+      : query(collection(db, 'requests'), where('assignedUserId', '==', currentUser.userId));
+    const assignmentsQuery = isAdmin
+      ? collection(db, 'assignments')
+      : isSupervisor
+      ? query(collection(db, 'assignments'), where('branchId', '==', currentUser.branchId))
+      : query(collection(db, 'assignments'), where('userId', '==', currentUser.userId));
+    const recordsQuery = isAdmin
+      ? collection(db, 'records')
+      : isSupervisor
+      ? query(collection(db, 'records'), where('branchId', '==', currentUser.branchId))
+      : query(collection(db, 'records'), where('assignedUserId', '==', currentUser.userId));
+    const responsesQuery = isAdmin
+      ? collection(db, 'responses')
+      : query(collection(db, 'responses'), where('submittedBy', '==', currentUser.userId));
+    const notificationsQuery = isAdmin
+      ? collection(db, 'notifications')
+      : query(collection(db, 'notifications'), where('userId', '==', currentUser.userId));
+
+    const unsubUsers = onSnapshot(usersQuery, (snapshot) => {
       const firestoreUsers: User[] = [];
       snapshot.forEach((docSnap) => firestoreUsers.push(docSnap.data() as User));
       if (firestoreUsers.length > 0) setUsers(firestoreUsers);
     }, (error) => console.error("Error listening to users:", error));
 
-    const unsubRequests = onSnapshot(collection(db, 'requests'), (snapshot) => {
+    const unsubRequests = onSnapshot(requestsQuery, (snapshot) => {
       const data: RequestItem[] = [];
       snapshot.forEach((docSnap) => data.push(docSnap.data() as RequestItem));
       setRequests(data);
@@ -210,19 +263,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setFields(data);
     }, (error) => console.error("Error listening to fields:", error));
 
-    const unsubAssignments = onSnapshot(collection(db, 'assignments'), (snapshot) => {
+    const unsubAssignments = onSnapshot(assignmentsQuery, (snapshot) => {
       const data: Assignment[] = [];
       snapshot.forEach((docSnap) => data.push(docSnap.data() as Assignment));
       setAssignments(data);
     }, (error) => console.error("Error listening to assignments:", error));
 
-    const unsubRecords = onSnapshot(collection(db, 'records'), (snapshot) => {
+    const unsubRecords = onSnapshot(recordsQuery, (snapshot) => {
       const data: RecordItem[] = [];
       snapshot.forEach((docSnap) => data.push(docSnap.data() as RecordItem));
       setRecords(data);
     }, (error) => console.error("Error listening to records:", error));
 
-    const unsubResponses = onSnapshot(collection(db, 'responses'), (snapshot) => {
+    const unsubResponses = onSnapshot(responsesQuery, (snapshot) => {
       const data: Record<string, Record<string, any>> = {};
       snapshot.forEach((docSnap) => {
         const resp = docSnap.data();
@@ -233,7 +286,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setRecordResponses(data);
     }, (error) => console.error("Error listening to responses:", error));
 
-    const unsubNotifications = onSnapshot(collection(db, 'notifications'), (snapshot) => {
+    const unsubNotifications = onSnapshot(notificationsQuery, (snapshot) => {
       const data: NotificationItem[] = [];
       snapshot.forEach((docSnap) => data.push(docSnap.data() as NotificationItem));
       setNotifications(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
@@ -262,7 +315,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unsubBranches();
       unsubRegions();
     };
-  }, []);
+  }, [currentUser]);
 
   const [branches, setBranches] = useState<Branch[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
@@ -284,19 +337,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [appSettings, setAppSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem(`${STORAGE_PREFIX}settings`);
     return saved ? JSON.parse(saved) : DEFAULT_APP_SETTINGS;
-  });
-
-  // Current session
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}current_user`);
-    if (saved) {
-      try {
-        return JSON.parse(saved) as User;
-      } catch {
-        return null;
-      }
-    }
-    return null;
   });
 
   // Selected region for representative with multi-region access
@@ -481,9 +521,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             // Use the custom token to sign in with Firebase Auth
             await signInWithCustomToken(auth, data.token);
 
-            // We also have data.user from the cloud function response
-            const loggedInUser = data.user as User;
-            
+            const loggedInUser: User = {
+              userId: data.userId || data.uid || trimmedInput,
+              username: trimmedInput,
+              regionNo: data.regionNo,
+              allowedRegionNos: data.allowedRegionNos || [data.regionNo],
+              repNo: data.repNo || data.regionNo,
+              repNameAr: data.repNameAr || trimmedInput,
+              repNameEn: data.repNameEn || undefined,
+              branchId: data.branchId,
+              role: data.role,
+              mustChangePassword: Boolean(data.mustChangePassword),
+              isActive: true,
+              failedLoginCount: 0,
+              sessionVersion: Number(data.sessionVersion || 0),
+              deviceBindingStatus: 'UNBOUND',
+              maxAllowedDevices: 1,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+
             setCurrentUser(loggedInUser);
             setSelectedRegionNo(loggedInUser.regionNo);
             
@@ -548,6 +605,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const quickSwitchUser = (userId: string) => {
+    if (!import.meta.env.DEV) {
+      console.warn('Quick user switching is available only in development builds.');
+      return;
+    }
     const found = users.find((u) => u.userId === userId);
     if (found) {
       // Sync simulated device ID if user is already bound
@@ -561,7 +622,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const changePassword = async (newPassword: string) => {
+  const changePassword = async (currentPassword: string, newPassword: string) => {
     if (!currentUser) return { success: false, message: 'Not logged in' };
     if (newPassword.length < appSettings.defaultPasswordPolicy.minLength) {
       return {
@@ -572,23 +633,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             : `Password must be at least ${appSettings.defaultPasswordPolicy.minLength} characters`,
       };
     }
-    if (newPassword === '1234') {
-      return {
-        success: false,
-        message:
-          lang === 'ar'
-            ? 'لا يمكن استخدام كلمة المرور الافتراضية 1234'
-            : 'Cannot use default password 1234',
-      };
-    }
-
     try {
-      const updatePasswordFn = httpsCallable(functions, 'updatePassword');
-      await updatePasswordFn({ userId: currentUser.userId, newPassword });
+      const changePasswordFn = httpsCallable(functions, 'changePassword');
+      await changePasswordFn({ currentPassword, newPassword });
       
       const updated: User = {
         ...currentUser,
-        passwordHash: newPassword, // This is just local state cache update, true hash is not in plain text in prod usually
         mustChangePassword: false,
         passwordChangedAt: new Date().toISOString(),
       };
@@ -629,35 +679,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     logAudit('PASSWORD_RESET_REQUESTED', 'PasswordReset', newReq.resetRequestId, { regionNo, notes });
   };
 
-  const adminResetPassword = (userId: string) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.userId === userId
-          ? {
-              ...u,
-              mustChangePassword: true,
-              failedLoginCount: 0,
-              lockedUntil: null,
-              sessionVersion: u.sessionVersion + 1,
-            }
-          : u
-      )
-    );
-    setPasswordResetRequests((prev) =>
-      prev.map((r) =>
-        r.userId === userId
-          ? {
-              ...r,
-              status: 'APPROVED',
-              reviewedBy: currentUser?.userId,
-              reviewedAt: new Date().toISOString(),
-              resetAt: new Date().toISOString(),
-              resetMethod: 'Default 1234',
-            }
-          : r
-      )
-    );
-    logAudit('PASSWORD_RESET_ADMIN', 'User', userId, { newDefault: '1234', mustChange: true });
+  const adminResetPassword = async (userId: string) => {
+    const temporaryPassword = `${crypto.randomUUID()}Aa1!`;
+    try {
+      const resetPasswordFn = httpsCallable(functions, 'adminResetPassword');
+      await resetPasswordFn({ targetUserId: userId, temporaryPassword });
+
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.userId === userId
+            ? { ...u, mustChangePassword: true, failedLoginCount: 0, lockedUntil: null, sessionVersion: u.sessionVersion + 1 }
+            : u
+        )
+      );
+
+      return {
+        success: true,
+        temporaryPassword,
+        message: lang === 'ar' ? 'تم إنشاء كلمة مرور مؤقتة لمرة واحدة.' : 'A one-time temporary password was created.',
+      };
+    } catch (error) {
+      console.error('Admin password reset failed:', error);
+      return {
+        success: false,
+        message: lang === 'ar' ? 'فشل إعادة تعيين كلمة المرور.' : 'Password reset failed.',
+      };
+    }
   };
 
   const adminUnlockAccount = (userId: string) => {
@@ -1188,8 +1235,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         bodyEn: string;
       }, { success: boolean; count: number }>(functions, 'sendBroadcastNotification');
 
-      const targetAudience = targetRole === 'representative' ? 'REPRESENTATIVES' :
-                             targetRole === 'supervisor' ? 'SUPERVISORS' : 'ALL';
+      const targetAudience = targetRole === 'REP' ? 'REPRESENTATIVES' :
+                             targetRole === 'SUPERVISOR' ? 'SUPERVISORS' : 'ALL';
 
       const result = await sendBroadcastFn({
         targetAudience,

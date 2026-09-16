@@ -2,15 +2,18 @@ import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { sendNotificationInternal } from "./notificationService";
+import { USER_ROLES } from "./roles";
 
 const db = getFirestore('datacollectionportal');
+const MAX_IMPORT_ROWS = 2000;
+const MAX_IMPORT_FILENAME_LENGTH = 255;
 
 const checkAdminOrSupervisor = (context: functions.https.CallableContext) => {
   if (!context.auth) {
     throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
   }
   const role = context.auth.token.role;
-  if (role !== "admin" && role !== "supervisor") {
+  if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {
     throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
   }
 };
@@ -27,8 +30,21 @@ export const commitImport = functions.https.onCall(async (data, context) => {
 
   const { requestId, importedRows, mapping, fileName, lang } = data;
 
-  if (!requestId || !importedRows || !mapping) {
+  if (
+    typeof requestId !== "string" ||
+    !Array.isArray(importedRows) ||
+    importedRows.length === 0 ||
+    importedRows.length > MAX_IMPORT_ROWS ||
+    !mapping ||
+    typeof mapping !== "object" ||
+    Array.isArray(mapping)
+  ) {
     throw new functions.https.HttpsError("invalid-argument", "Missing required fields.");
+  }
+
+  if (fileName !== undefined &&
+      (typeof fileName !== "string" || fileName.length === 0 || fileName.length > MAX_IMPORT_FILENAME_LENGTH)) {
+    throw new functions.https.HttpsError("invalid-argument", "Invalid import file name.");
   }
 
   const requestDoc = await db.collection("requests").doc(requestId).get();
@@ -196,7 +212,7 @@ export const commitImport = functions.https.onCall(async (data, context) => {
   });
 
   const chunks = [];
-  const CHUNK_SIZE = 200; 
+  const CHUNK_SIZE = 100;
   for (let i = 0; i < newRecords.length; i += CHUNK_SIZE) {
     chunks.push(newRecords.slice(i, i + CHUNK_SIZE));
   }

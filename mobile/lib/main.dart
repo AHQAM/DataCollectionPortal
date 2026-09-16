@@ -8,6 +8,7 @@ import 'package:mobile/l10n/app_localizations.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
+import 'core/storage/hive_service.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -37,6 +38,7 @@ void main() async {
 
   // Initialize local storage
   await Hive.initFlutter();
+  await HiveService().init();
 
   runApp(const ProviderScope(child: SalesCollectionApp()));
 }

@@ -372,7 +372,6 @@ export interface AppSettings {
   defaultPasswordPolicy: {
     minLength: number;
     preventImmediateReuse: boolean;
-    initialPin: string;
   };
   securityPolicy?: {
     maxFailedAttempts: number;

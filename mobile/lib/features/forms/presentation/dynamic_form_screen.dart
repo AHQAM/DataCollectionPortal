@@ -7,11 +7,13 @@ import '../domain/form_field_model.dart';
 
 class DynamicFormScreen extends ConsumerStatefulWidget {
   final String requestId;
+  final String recordId;
   final String activityId;
 
   const DynamicFormScreen({
     super.key,
     required this.requestId,
+    required this.recordId,
     required this.activityId,
   });
 
@@ -31,6 +33,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           .read(formSubmitControllerProvider.notifier)
           .save(
             requestId: widget.requestId,
+            recordId: widget.recordId,
             activityId: widget.activityId,
             formData: _formData,
           );

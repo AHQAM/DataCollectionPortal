@@ -33,14 +33,12 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSystemHealth = exports.exportReport = exports.sendBroadcastNotification = exports.exportDataToExternalSystem = exports.commitImport = exports.importDataPreview = exports.reassignRecords = exports.saveRequestFields = exports.archiveRequest = exports.publishRequest = exports.createRequest = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = exports.createAdminSupervisorUser = exports.bootstrapAdmin = exports.authenticateWithRegionPassword = void 0;
+exports.getSystemHealth = exports.submitResponse = exports.exportReport = exports.sendBroadcastNotification = exports.exportDataToExternalSystem = exports.commitImport = exports.importDataPreview = exports.reassignRecords = exports.saveRequestFields = exports.archiveRequest = exports.publishRequest = exports.createRequest = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = exports.createAdminSupervisorUser = exports.authenticateWithRegionPassword = void 0;
 const admin = __importStar(require("firebase-admin"));
 admin.initializeApp();
 // Authentication
 var auth_1 = require("./auth");
 Object.defineProperty(exports, "authenticateWithRegionPassword", { enumerable: true, get: function () { return auth_1.authenticateWithRegionPassword; } });
-var bootstrapAdmin_1 = require("./bootstrapAdmin");
-Object.defineProperty(exports, "bootstrapAdmin", { enumerable: true, get: function () { return bootstrapAdmin_1.bootstrapAdmin; } });
 var adminAuth_1 = require("./adminAuth");
 Object.defineProperty(exports, "createAdminSupervisorUser", { enumerable: true, get: function () { return adminAuth_1.createAdminSupervisorUser; } });
 // Password Management
@@ -84,6 +82,9 @@ Object.defineProperty(exports, "sendBroadcastNotification", { enumerable: true, 
 // Report Export
 var reportExport_1 = require("./reportExport");
 Object.defineProperty(exports, "exportReport", { enumerable: true, get: function () { return reportExport_1.exportReport; } });
+// Response submission
+var responseManagement_1 = require("./responseManagement");
+Object.defineProperty(exports, "submitResponse", { enumerable: true, get: function () { return responseManagement_1.submitResponse; } });
 // Monitoring
 var monitoring_1 = require("./monitoring");
 Object.defineProperty(exports, "getSystemHealth", { enumerable: true, get: function () { return monitoring_1.getSystemHealth; } });

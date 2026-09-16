@@ -286,6 +286,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
       const customClaims = {
         role: userData.role,
         branchId: userData.branchId || null,
+        regionNo: userData.regionNo || null,
         allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
         sessionVersion: (userData.sessionVersion || 0) + 0, // Keep current version
         mustChangePassword: userData.mustChangePassword || false,
@@ -327,14 +328,17 @@ export const authenticateWithRegionPassword = functions.https.onCall(
       });
 
       return {
+        userId,
         token,
         mustChangePassword: userData.mustChangePassword || false,
         repNameAr: userData.repNameAr,
         repNameEn: userData.repNameEn || null,
+        repNo: userData.repNo || userData.regionNo,
         role: userData.role,
         allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
         branchId: userData.branchId,
         regionNo: userData.regionNo,
+        sessionVersion: userData.sessionVersion || 0,
       };
     } catch (error: any) {
       if (error instanceof functions.https.HttpsError) {

@@ -346,7 +346,6 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
         branchNameEn: exactBranchName,
         role: 'REP',
         allowedRegionNos: r.assignedRegions && r.assignedRegions.length > 0 ? r.assignedRegions : [r.repNo],
-        passwordHash: '1234', // Default password 1234
         mustChangePassword: true, // Mandatory change on first login
         isActive: true,
         failedLoginCount: 0,
@@ -382,7 +381,7 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
               <h2 className="text-base font-extrabold flex items-center gap-2">
                 <span>{lang === 'ar' ? 'استيراد المستخدمين والمناديب عبر Excel' : 'Import Users via Excel'}</span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-                  {lang === 'ar' ? 'معرف المندوب + كلمة المرور 1234' : 'Rep No ID + PIN 1234'}
+                  {lang === 'ar' ? 'معرف المندوب + رمز دخول مؤقت' : 'Rep No ID + temporary password'}
                 </span>
               </h2>
               <p className="text-xs text-purple-200 mt-0.5">
@@ -414,7 +413,7 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
               </span>
               <span>
                 {lang === 'ar'
-                  ? 'يتم إنشاء حساب مستخدم واحد فقط للمندوب يربط جهازه بأمان، وتُدرج جميع أرقام مناطقه في قائمة صلاحياته. يستطيع المندوب تسجيل الدخول بأي من أرقام مناطقه بكلمة المرور الافتراضية 1234 والتبديل بينها بسلاسة من هاتفه!'
+                  ? 'يتم إنشاء حساب مستخدم واحد فقط للمندوب يربط جهازه بأمان، وتُدرج جميع أرقام مناطقه في قائمة صلاحياته. يحصل المندوب على رمز دخول مؤقت لمرة واحدة ويُطلب منه تغييره عند أول تسجيل دخول.'
                   : 'A single user account is created with all assigned regions linked. The rep can sign in using any of their region numbers and toggle between regions easily!'}
               </span>
             </div>
@@ -557,7 +556,7 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
                       <th className="px-3 py-2.5 text-start">{lang === 'ar' ? 'اسم المندوب' : 'Rep Name'}</th>
                       <th className="px-3 py-2.5 text-start">{lang === 'ar' ? 'المناطق المصرحة' : 'Assigned Regions'}</th>
                       <th className="px-3 py-2.5 text-start">{lang === 'ar' ? 'الفرع' : 'Branch'}</th>
-                      <th className="px-3 py-2.5 text-start">{lang === 'ar' ? 'كلمة المرور الافتراضية' : 'Default PIN'}</th>
+                      <th className="px-3 py-2.5 text-start">{lang === 'ar' ? 'كلمة المرور المؤقتة' : 'Temporary password'}</th>
                       <th className="px-3 py-2.5 text-center">{lang === 'ar' ? 'الحالة' : 'Status'}</th>
                     </tr>
                   </thead>
@@ -612,7 +611,7 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
                         <td className="px-3 py-2">
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]">
-                              1234
+                              رمز مؤقت لمرة واحدة
                             </span>
                             <span className="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                               {lang === 'ar' ? 'تغيير إلزامي' : 'Must Change'}
@@ -654,8 +653,8 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
               </div>
               <p className="text-[11px] text-amber-800 mt-0.5">
                 {lang === 'ar'
-                  ? 'سيتم منح جميع المناديب المستوردين رمز الدخول الافتراضي (1234) وسيلزم النظام المندوب بتعيين رمز سري جديد مكون من 4 إلى 6 أرقام فور تسجيل دخوله الأول، مع تفعيل قفل الحساب بعد 3 محاولات خاطئة وربط الهاتف تلقائياً.'
-                  : 'Imported representatives will be assigned default PIN (1234). The system enforces a mandatory PIN change upon first sign-in, with device-binding and 3-attempt account protection.'}
+                  ? 'سيتم إنشاء رمز دخول مؤقت وفريد لكل مندوب مستورد، وسيلزم النظام المندوب بتعيين كلمة مرور جديدة فور تسجيل دخوله الأول.'
+                  : 'Imported representatives receive a unique temporary password and must set a new password on first sign-in.'}
               </p>
             </div>
           </div>

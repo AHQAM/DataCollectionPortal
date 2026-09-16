@@ -81,7 +81,7 @@ describe("Request Management - publishRequest", () => {
     const context: any = {
       auth: {
         uid: "admin-uid",
-        token: { role: "admin" },
+        token: { role: "ADMIN" },
       },
     };
 
@@ -143,7 +143,7 @@ describe("Request Management - publishRequest", () => {
     });
 
     const context: any = {
-      auth: { uid: "admin-uid", token: { role: "admin" } },
+      auth: { uid: "admin-uid", token: { role: "ADMIN" } },
     };
 
     const data = { requestId };

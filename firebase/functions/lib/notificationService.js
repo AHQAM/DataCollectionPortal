@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendBroadcastNotification = exports.sendNotificationInternal = void 0;
 const firestore_1 = require("firebase-admin/firestore");
+const roles_1 = require("./roles");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const db = (0, firestore_1.getFirestore)('datacollectionportal');
@@ -60,8 +61,11 @@ const sendNotificationInternal = async (userId, titleAr, titleEn, bodyAr, bodyEn
     const userDoc = await db.collection("users").doc(userId).get();
     if (userDoc.exists) {
         const userData = userDoc.data();
-        if (userData && userData.fcmTokens && Array.isArray(userData.fcmTokens) && userData.fcmTokens.length > 0) {
-            const messages = userData.fcmTokens.map((token) => ({
+        const tokens = userData?.fcmToken
+            ? [userData.fcmToken]
+            : [];
+        if (tokens.length > 0) {
+            const messages = tokens.map((token) => ({
                 notification: {
                     title: titleAr, // Defaulting to Arabic for push, but could be localized per user preference
                     body: bodyAr,
@@ -81,7 +85,7 @@ const sendNotificationInternal = async (userId, titleAr, titleEn, bodyAr, bodyEn
 exports.sendNotificationInternal = sendNotificationInternal;
 // Callable for Admin to send manual broadcast
 exports.sendBroadcastNotification = functions.https.onCall(async (data, context) => {
-    if (!context.auth || (context.auth.token.role !== "admin" && context.auth.token.role !== "supervisor")) {
+    if (!context.auth || (context.auth.token.role !== roles_1.USER_ROLES.ADMIN && context.auth.token.role !== roles_1.USER_ROLES.SUPERVISOR)) {
         throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can send broadcasts.");
     }
     const { targetAudience, titleAr, titleEn, bodyAr, bodyEn, payload } = data;
@@ -90,10 +94,10 @@ exports.sendBroadcastNotification = functions.https.onCall(async (data, context)
     }
     let usersQuery = db.collection("users").where("isActive", "==", true);
     if (targetAudience === "REPRESENTATIVES") {
-        usersQuery = usersQuery.where("role", "==", "representative");
+        usersQuery = usersQuery.where("role", "==", roles_1.USER_ROLES.REP);
     }
     else if (targetAudience === "SUPERVISORS") {
-        usersQuery = usersQuery.where("role", "==", "supervisor");
+        usersQuery = usersQuery.where("role", "==", roles_1.USER_ROLES.SUPERVISOR);
     }
     const usersSnap = await usersQuery.get();
     const promises = [];

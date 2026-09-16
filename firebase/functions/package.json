@@ -9,7 +9,8 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "test": "jest --config jest.config.js"
+    "test": "jest --config jest.config.js --testPathIgnorePatterns='firestore.rules.test.ts'",
+    "test:rules": "jest --config jest.config.js --runInBand --runTestsByPath src/__tests__/firestore.rules.test.ts"
   },
   "engines": {
     "node": "20"
@@ -19,12 +20,15 @@
     "bcrypt": "^5.1.1",
     "firebase-admin": "^12.0.0",
     "firebase-functions": "^5.0.0",
+    "sales-collection-hub": "file:../..",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
     "@types/bcrypt": "^5.0.2",
     "@types/jest": "^30.0.0",
     "@types/uuid": "^10.0.0",
+    "firebase": "^10.14.1",
     "firebase-functions-test": "^3.1.0",
     "jest": "^30.5.1",
     "ts-jest": "^29.4.12",

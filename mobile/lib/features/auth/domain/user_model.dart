@@ -12,8 +12,8 @@ abstract class UserModel with _$UserModel {
     String? branchId,
     required String role,
     @Default(false) bool mustChangePassword,
-    required DateTime lastLoginAt,
-    required String sessionVersion,
+    DateTime? lastLoginAt,
+    @Default('0') String sessionVersion,
     @Default(true) bool isActive,
   }) = _UserModel;
 

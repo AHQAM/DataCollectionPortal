@@ -1,11 +1,12 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { USER_ROLES } from "./roles";
 
 const db = getFirestore('datacollectionportal');
 
 export const getSystemHealth = functions.https.onCall(async (data, context) => {
-  if (!context.auth || (context.auth.token.role !== "admin" && context.auth.token.role !== "supervisor")) {
+  if (!context.auth || (context.auth.token.role !== USER_ROLES.ADMIN && context.auth.token.role !== USER_ROLES.SUPERVISOR)) {
     throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can check system health.");
   }
 

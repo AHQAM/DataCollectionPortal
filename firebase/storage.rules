@@ -53,6 +53,13 @@ service firebase.storage {
       return isImage() || isDocument();
     }
 
+    function isValidImport() {
+      return isValidFileSize()
+        && request.resource.contentType.matches(
+          'text/csv|application/vnd.ms-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+    }
+
     // ============================================================
     // UPLOADS: /uploads/{requestId}/{recordId}/{userId}/{filename}
     // Representatives can upload to their own paths
@@ -77,7 +84,9 @@ service firebase.storage {
     // Admin only
     // ============================================================
     match /imports/{requestId}/{importId}/{fileName} {
-      allow read, write: if isAdmin();
+      allow read: if isAdmin();
+      allow create: if isAdmin() && isValidImport();
+      allow update, delete: if false;
     }
 
     // ============================================================
@@ -86,7 +95,8 @@ service firebase.storage {
     // ============================================================
     match /exports/{requestId}/{fileName} {
       allow read: if isAdmin() || isSupervisor();
-      allow write: if isAdmin();
+      allow create: if isAdmin() && isValidFileSize() && isAllowedType();
+      allow update, delete: if false;
     }
 
     // ============================================================
@@ -95,7 +105,8 @@ service firebase.storage {
     // ============================================================
     match /archive/{year}/{requestCode}/{fileName} {
       allow read: if isAdmin();
-      allow write: if isAdmin();
+      allow create: if isAdmin() && isValidFileSize() && isAllowedType();
+      allow update, delete: if false;
     }
 
     // ============================================================
@@ -104,7 +115,8 @@ service firebase.storage {
     // ============================================================
     match /covers/{requestId}/{fileName} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow create: if isAdmin() && isValidFileSize() && isImage();
+      allow update, delete: if false;
     }
   }
 }

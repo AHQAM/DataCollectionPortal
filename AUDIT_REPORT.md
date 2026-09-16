@@ -1,7 +1,23 @@
 # Security & System Audit Report - Data Collection Portal
 
-**Date:** 2026-09-10
-**Status:** Completed (Phase 0)
+**Date:** 2026-09-16
+**Status:** Remediation in progress
+
+## Current remediation status
+
+The following controls have been implemented since the original audit:
+
+- The unauthenticated bootstrap administrator endpoint was removed from production exports.
+- Temporary passwords are generated per user; fixed default credentials were removed from creation and reset Functions.
+- Roles are standardized as `ADMIN`, `SUPERVISOR`, and `REP`.
+- Firestore request, record, assignment, and response access is scoped and workflow writes are routed through trusted Functions.
+- Mobile Hive initialization and authenticated response submission are implemented.
+- Storage and import size/type limits are enforced.
+- Report exports are scoped, capped, audited through `auditLogs`, and protected against spreadsheet formula injection.
+- Admin QA account switching is development-only.
+- Web, Firebase Functions, and Flutter build/test checks pass locally.
+
+The remaining release blockers are emulator-based Rules tests, end-to-end authentication tests, production Firebase environment verification, and review of generated artifacts.
 
 ## 1. Scope of Audit
 The following files were reviewed to evaluate the current security posture, architecture, and overall health of the Firebase backend:

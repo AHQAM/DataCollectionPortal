@@ -55,7 +55,6 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   defaultPasswordPolicy: {
     minLength: 6,
     preventImmediateReuse: true,
-    initialPin: '1234',
   },
   maxLoginAttempts: 5,
   lockoutMinutes: 15,

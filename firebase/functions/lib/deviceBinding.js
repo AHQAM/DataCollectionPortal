@@ -38,6 +38,7 @@ const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const auditLogger_1 = require("./auditLogger");
+const roles_1 = require("./roles");
 /**
  * Cloud Function: releaseDevice
  *
@@ -46,7 +47,7 @@ const auditLogger_1 = require("./auditLogger");
  * Next successful login will bind the new device.
  */
 exports.releaseDevice = functions.https.onCall(async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
         throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Only administrators can release devices.");
     }
     const { targetUserId, reason } = data;
@@ -132,7 +133,7 @@ exports.releaseDevice = functions.https.onCall(async (data, context) => {
  * The next login from any device will be accepted and bound.
  */
 exports.replaceDevice = functions.https.onCall(async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
         throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { targetUserId, reason } = data;
@@ -209,7 +210,7 @@ exports.replaceDevice = functions.https.onCall(async (data, context) => {
  * forcing them to re-authenticate on next app launch.
  */
 exports.forceLogoutUser = functions.https.onCall(async (data, context) => {
-    if (!context.auth || context.auth.token.role !== "ADMIN") {
+    if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
         throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { targetUserId, reason } = data;
