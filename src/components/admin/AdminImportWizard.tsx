@@ -41,7 +41,6 @@ export const AdminImportWizard: React.FC<Props> = ({ initialRequestId, onBack })
     users,
     branches,
     commitImport,
-    setActiveView,
     quickSwitchUser,
   } = useApp();
 
@@ -930,7 +929,6 @@ export const AdminImportWizard: React.FC<Props> = ({ initialRequestId, onBack })
                 if (rep) {
                   quickSwitchUser(rep.userId);
                 }
-                setActiveView('mobile');
               }}
               className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md cursor-pointer transition-all flex items-center gap-1.5"
             >

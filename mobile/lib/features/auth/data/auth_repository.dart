@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -92,7 +93,11 @@ class AuthRepository {
     return UserModel(
       uid: user.uid,
       regionNo: claims['regionNo'] as String? ?? '',
-      allowedRegionNos: List<String>.from(claims['allowedRegionNos'] ?? []),
+      // Check allowed region numbers (if applicable, e.g. supervisors)
+      allowedRegionNos: [
+        ...?((claims['allowedRegionNos'] as List<dynamic>?)
+            ?.map((e) => e.toString())),
+      ],
       branchId: claims['branchId'] as String?,
       role: claims['role'] as String? ?? 'sales_rep',
       mustChangePassword: claims['mustChangePassword'] as bool? ?? false,

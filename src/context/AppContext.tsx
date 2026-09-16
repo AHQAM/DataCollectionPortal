@@ -24,8 +24,8 @@ import {
   getNotificationPermissionStatus,
   isNotificationSupported,
 } from '../utils/webNotification';
-import { collection, onSnapshot, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
-import { signInWithCustomToken, signOut, onAuthStateChanged } from 'firebase/auth';
+import { collection, onSnapshot, doc, getDoc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { signInWithCustomToken, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions, auth } from '../firebase';
 
@@ -87,8 +87,8 @@ interface AppContextType {
   unlockUser: (userId: string) => void;
   releaseUserDevice: (userId: string, reason?: string) => void;
   updateUser: (user: User) => void;
-  addUser: (user: Partial<User>) => void;
-  createUser: (user: Partial<User>) => void;
+  addUser: (user: Partial<User>) => Promise<void>;
+  createUser: (user: Partial<User>) => Promise<void>;
   importUsersBatch: (users: User[]) => void;
   approveDeviceReplacement: (bindingId: string) => void;
   rejectDeviceReplacement: (bindingId: string) => void;
@@ -113,13 +113,13 @@ interface AppContextType {
     importedRows: any[],
     mapping: Record<string, string>,
     fileName: string
-  ) => { total: number; created: number };
+  ) => Promise<{ total: number; created: number }>;
   importRecords: (
     requestId: string,
     rows: any[],
     mapping?: Record<string, string>,
     fileName?: string
-  ) => { success: boolean; count: number };
+  ) => Promise<{ success: boolean; count: number }>;
 
   // Notifications & Push
   markNotificationAsRead: (notificationId: string) => Promise<void>;
@@ -132,17 +132,17 @@ interface AppContextType {
   saveAsTemplate: (requestId: string, nameAr: string, nameEn: string, category: string) => void;
 
   // Branches & Regions Management
-  createBranch: (branch: { branchId: string; branchNameAr: string; branchNameEn: string }) => void;
-  updateBranch: (branchId: string, updates: Partial<Branch>) => void;
-  deleteBranch: (branchId: string) => { success: boolean; message?: string };
-  createRegion: (region: { regionId: string; regionNo: string; regionNameAr: string; regionNameEn: string; branchId: string }) => void;
-  updateRegion: (regionId: string, updates: Partial<Region>) => void;
-  deleteRegion: (regionId: string) => { success: boolean; message?: string };
+  createBranch: (branch: { branchId: string; branchNameAr: string; branchNameEn: string }) => Promise<void>;
+  updateBranch: (branchId: string, updates: Partial<Branch>) => Promise<void>;
+  deleteBranch: (branchId: string) => Promise<{ success: boolean; message?: string }>;
+  createRegion: (region: { regionId: string; regionNo: string; regionNameAr: string; regionNameEn: string; branchId: string }) => Promise<void>;
+  updateRegion: (regionId: string, updates: Partial<Region>) => Promise<void>;
+  deleteRegion: (regionId: string) => Promise<{ success: boolean; message?: string }>;
   importBranchesAndRegions: (
     branchesData: { branchId: string; branchNameAr: string; branchNameEn?: string }[],
     regionsData: { regionNo: string; regionNameAr: string; regionNameEn?: string; branchId: string }[],
     mode: 'append' | 'replace'
-  ) => { branchesCount: number; regionsCount: number };
+  ) => Promise<{ branchesCount: number; regionsCount: number }>;
 
   // Reset & Wipe demo data
   resetAllDataToDefaults: () => void;
@@ -175,7 +175,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [simulatedDeviceId, setSimulatedDeviceId] = useState<string>(() => {
     const stored = localStorage.getItem(`${STORAGE_PREFIX}device_id`);
     if (stored) return stored;
-    const initial = 'device-uuid-rep-101-pixel8';
+    // Generate a random UUID for this browser session
+    const initial = 'web-' + crypto.randomUUID();
     localStorage.setItem(`${STORAGE_PREFIX}device_id`, initial);
     return initial;
   });
@@ -290,12 +291,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const saved = localStorage.getItem(`${STORAGE_PREFIX}current_user`);
     if (saved) {
       try {
-        const parsed: User = JSON.parse(saved);
-        if (parsed.repNameAr && parsed.repNameAr.includes('القحطاني')) {
-          parsed.repNameAr = 'المهندس عبد الرحمن المجيدي (مدير النظام)';
-          parsed.repNameEn = 'Eng. Abdulrahman Al-Majeedi (System Admin)';
-        }
-        return parsed;
+        return JSON.parse(saved) as User;
       } catch {
         return null;
       }
@@ -337,6 +333,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Push notifications state
   const isPushSupported = isNotificationSupported();
+  // Online status tracking
+  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const [pushPermission, setPushPermission] = useState<NotificationPermission | 'unsupported'>(() =>
     getNotificationPermissionStatus()
   );
@@ -402,12 +411,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Find corresponding user in firestore/context by userId (uid in firebase Auth usually matches userId if set)
-        // Note: The custom token generation in our CF uses the Firestore userId as the uid.
+        // Try to find user in already-loaded state first
         const firestoreUser = users.find(u => u.userId === firebaseUser.uid);
         if (firestoreUser) {
           setCurrentUser(firestoreUser);
           setSelectedRegionNo(firestoreUser.regionNo);
+        } else {
+          // Fetch directly from Firestore if not yet in state (e.g., on first load)
+          try {
+            const userDocRef = doc(db, 'users', firebaseUser.uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+              const userData = userDocSnap.data() as User;
+              setCurrentUser(userData);
+              setSelectedRegionNo(userData.regionNo);
+            }
+          } catch (err) {
+            console.error('Error fetching user from Firestore:', err);
+          }
         }
       } else {
         // If not logged in on Firebase, clear context user
@@ -449,9 +470,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const response = await authFunction({
           regionNo: trimmedInput,
           password: passwordInput,
-          deviceId: simulatedDeviceId,
-          devicePlatform: 'Android', // Hardcoded as web client acts as device in simulation
-          appVersion: 'v2.4.0'
+          installationDeviceId: simulatedDeviceId,
+          platform: 'Web',
+          appVersion: import.meta.env.VITE_APP_VERSION || '1.0.0',
         });
 
         const data = response.data as any;
@@ -704,7 +725,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           branchId: user.branchId || defaultBranch?.branchId || null,
           repNameAr: user.repNameAr || 'مستخدم جديد',
           repNameEn: user.repNameEn || '',
-          mobileNo: user.mobileNo || '',
+          mobileNo: (user as any).mobileNo || (user as any).mobile || '',
           allowedRegionNos: user.allowedRegionNos || [user.regionNo],
         });
         
@@ -719,44 +740,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return;
     }
 
-    // For REP, just create the DB document directly
-    const newUser: User = {
-      userId: 'USER-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
-      username: user.regionNo || (user.repNo ? user.repNo.toLowerCase() : 'user_' + Math.floor(Math.random() * 900 + 100)),
-      regionNo: user.regionNo || '',
-      allowedRegionNos: user.allowedRegionNos || (user.regionNo ? [user.regionNo] : []),
-      repNo: user.repNo || 'REP-' + Math.floor(Math.random() * 900 + 100),
-      repNameAr: user.repNameAr || (lang === 'ar' ? 'مندوب جديد' : 'New Representative'),
-      repNameEn: user.repNameEn,
-      branchId: user.branchId || defaultBranch?.branchId || '',
-      branchNameAr: user.branchNameAr || defaultBranch?.branchNameAr || '',
-      role: 'REP',
-      permissions: {
-        canManageUsers: false,
-        canManageRequests: false,
-        canManageRegions: false,
-        canViewAllBranches: false
-      },
-      mustChangePassword: true,
-      isActive: true,
-      failedLoginCount: 0,
-      sessionVersion: 1,
-      deviceBindingStatus: 'UNBOUND',
-      maxAllowedDevices: 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    
-    // Optimistic UI Update (for reps)
-    setUsers((prev) => [...prev, newUser]);
-    
+    // For REP, use the Cloud Function (direct Firestore write is blocked by rules)
     try {
-      await setDoc(doc(db, 'users', newUser.userId), newUser);
-    } catch (err) {
-      console.error("Firestore add error:", err);
+      const createRepFn = httpsCallable(functions, 'createUser');
+      const response = await createRepFn({
+        username: user.regionNo || user.repNo || '',
+        regionNo: user.regionNo || '',
+        allowedRegionNos: user.allowedRegionNos || (user.regionNo ? [user.regionNo] : []),
+        repNo: user.repNo || 'REP-' + Math.floor(Math.random() * 900 + 100),
+        repNameAr: user.repNameAr || (lang === 'ar' ? 'مندوب جديد' : 'New Representative'),
+        repNameEn: user.repNameEn || '',
+        branchId: user.branchId || branches[0]?.branchId || '',
+        role: 'REP',
+      });
+      const data = response.data as any;
+      if (data.success) {
+        logAudit('USER_CREATED_VIA_CF', 'User', data.userId, { username: user.regionNo });
+      }
+    } catch (err: any) {
+      console.error('Cloud Function create REP error:', err);
+      throw err;
     }
-    
-    logAudit('USER_CREATED', 'User', newUser.userId, { username: newUser.username });
   };
 
   const importUsersBatch = async (importedUsers: User[]) => {
@@ -1408,19 +1412,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const resetAllDataToDefaults = () => {
     localStorage.clear();
-    setUsers(INITIAL_USERS);
-    setRequests(SAMPLE_REQUESTS);
-    setFields(ZERO_INVENTORY_FIELDS);
-    setAssignments(INITIAL_ASSIGNMENTS);
-    setRecords(INITIAL_RECORDS);
-    setNotifications(INITIAL_NOTIFICATIONS);
-    setDeviceBindings(INITIAL_DEVICE_BINDINGS);
+    setUsers([]);
+    setRequests([]);
+    setFields([]);
+    setAssignments([]);
+    setRecords([]);
+    setNotifications([]);
+    setDeviceBindings([]);
     setPasswordResetRequests([]);
-    setAuditLogs(INITIAL_AUDIT_LOGS);
-    setTemplates(INITIAL_TEMPLATES);
-      if (currentUser) {
-        logAudit('RESET_SYSTEM_DATA', 'System', 'ALL', {});
-      }
+    setAuditLogs([]);
+    setTemplates([]);
+    if (currentUser) {
+      logAudit('RESET_SYSTEM_DATA', 'System', 'ALL', {});
+    }
   };
 
   const clearAllDemoData = () => {
@@ -1447,7 +1451,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     // 3. Keep admin user active so session is never broken
-    const adminUser = users.find((u) => u.role === 'ADMIN') || INITIAL_USERS[0];
+    const adminUser = users.find((u) => u.role === 'ADMIN') || null;
     setCurrentUser(adminUser);
 
     // 4. Update localStorage immediately for clean blank slate
@@ -1497,13 +1501,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     logAudit('DEVICE_REPLACEMENT_REJECTED', 'DeviceBinding', bindingId, {});
   };
 
-  const importRecords = (
+  const importRecords = async (
     requestId: string,
     rows: any[],
     mapping?: Record<string, string>,
     fileName?: string
-  ): { success: boolean; count: number } => {
-    const res = commitImport(requestId, rows, mapping || {}, fileName || 'imported_dataset.xlsx');
+  ): Promise<{ success: boolean; count: number }> => {
+    const res = await commitImport(requestId, rows, mapping || {}, fileName || 'imported_dataset.xlsx');
     return { success: true, count: res.created };
   };
 
@@ -1514,6 +1518,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setLang,
         dir,
         t,
+        isOnline,
+        offlineQueue,
+        syncOfflineQueue,
         currentUser,
         users,
         branches,
@@ -1562,7 +1569,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         saveDraftRecord,
         submitRecord,
         reassignRecord,
-        syncOfflineQueue,
         commitImport,
         importRecords,
         markNotificationAsRead,

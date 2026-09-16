@@ -77,40 +77,38 @@ export const AdminUsers: React.FC = () => {
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const branch = branches.find((b) => b.branchId === newBranchId);
-
-    const newUser: User = {
-      userId: `usr_${Date.now()}`,
-      username: newRegionNo,
-      regionNo: newRegionNo, // Used as Email for admins/supervisors
-      repNo: newRepNo,
-      repNameAr: newRepNameAr,
-      repNameEn: newRepNameEn,
-      role: newRole,
-      branchId: newBranchId,
-      branchNameAr: branch?.branchNameAr || 'فرع الرياض',
-      branchNameEn: branch?.branchNameEn || 'Riyadh Branch',
-      allowedRegionNos: newAllowedRegions.length > 0 ? newAllowedRegions : [newRegionNo],
-      permissions: newRole === 'SUPERVISOR' ? newPermissions : undefined,
-      passwordHash: '1234',
-      mustChangePassword: true,
-      isActive: true,
-      failedLoginCount: 0,
-      failedLoginAttempts: 0,
-      sessionVersion: 1,
-      deviceBindingStatus: 'UNBOUND',
-      maxAllowedDevices: 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    if (!newRepNameAr.trim()) {
+      alert(lang === 'ar' ? 'يرجى إدخال الاسم بالعربية' : 'Arabic name is required');
+      return;
+    }
+    if (!newRegionNo.trim()) {
+      alert(lang === 'ar' ? 'يرجى إدخال رقم المنطقة / البريد الإلكتروني' : 'Region No. or Email is required');
+      return;
+    }
+    if (!newBranchId) {
+      alert(lang === 'ar' ? 'يرجى اختيار الفرع' : 'Please select a branch');
+      return;
+    }
 
     try {
-      await createUser(newUser);
+      await createUser({
+        role: newRole,
+        regionNo: newRegionNo.trim(), // For REP: region number (login). For Admin/Supervisor: email.
+        repNo: newRepNo.trim() || undefined,
+        repNameAr: newRepNameAr.trim(),
+        repNameEn: newRepNameEn.trim() || undefined,
+        branchId: newBranchId,
+        allowedRegionNos: newAllowedRegions.length > 0 ? newAllowedRegions : [newRegionNo.trim()],
+        permissions: newRole === 'SUPERVISOR' ? newPermissions : undefined,
+      });
       setShowCreateModal(false);
-      showToast(lang === 'ar' ? 'تم إنشاء الحساب بنجاح (الرمز الافتراضي 1234)' : 'User created with default PIN/Password 123456');
+      showToast(lang === 'ar' ? 'تم إنشاء الحساب بنجاح (كلمة المرور الافتراضية: 1234)' : 'User created. Default password: 1234');
+      // Reset form
+      setNewRegionNo(''); setNewRepNo(''); setNewRepNameAr(''); setNewRepNameEn(''); setNewAllowedRegions([]); setNewRole('REP');
     } catch (err: any) {
       console.error(err);
-      alert(err.message || 'حدث خطأ أثناء إنشاء المستخدم');
+      const msg = err?.details?.message || err?.message || (lang === 'ar' ? 'حدث خطأ أثناء إنشاء المستخدم' : 'Error creating user');
+      alert(msg);
     }
   };
 
