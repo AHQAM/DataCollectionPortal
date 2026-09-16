@@ -39,5 +39,11 @@ class NotificationsRepository {
 NotificationsRepository? notificationsRepository(Ref ref) {
   final user = ref.watch(authControllerProvider).value;
   if (user == null) return null;
-  return NotificationsRepository(FirebaseFirestore.instanceFor(app: Firebase.app(), databaseId: 'datacollectionportal'), user.uid);
+  return NotificationsRepository(
+    FirebaseFirestore.instanceFor(
+      app: Firebase.app(),
+      databaseId: 'datacollectionportal',
+    ),
+    user.uid,
+  );
 }

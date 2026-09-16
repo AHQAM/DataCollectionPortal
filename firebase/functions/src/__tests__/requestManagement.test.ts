@@ -4,15 +4,19 @@ import fft from "firebase-functions-test";
 
 const testEnv = fft();
 
-// Mock firebase-admin completely
-jest.mock("firebase-admin", () => {
-  const firestoreMock = {
-    collection: jest.fn(),
-  };
-  return {
-    firestore: jest.fn(() => firestoreMock),
-  };
-});
+const mockFirestore = {
+  collection: jest.fn(),
+};
+
+jest.mock("firebase-admin/firestore", () => ({
+  getFirestore: jest.fn(() => mockFirestore),
+}));
+
+jest.mock("firebase-admin", () => ({
+  apps: [{}],
+  initializeApp: jest.fn(),
+  firestore: jest.fn(() => mockFirestore),
+}));
 
 import { publishRequest } from "../requestManagement";
 
@@ -66,7 +70,11 @@ describe("Request Management - publishRequest", () => {
       if (path === "request_fields") {
         return requestFieldsQueryMock;
       }
-      return {};
+      return {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn().mockResolvedValue({ docs: [] }),
+        doc: jest.fn().mockReturnValue({ set: jest.fn().mockResolvedValue(true) }),
+      };
     });
 
     // Mock callable context
@@ -127,7 +135,11 @@ describe("Request Management - publishRequest", () => {
       if (path === "request_fields") {
         return requestFieldsQueryMock;
       }
-      return {};
+      return {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn().mockResolvedValue({ docs: [] }),
+        doc: jest.fn().mockReturnValue({ set: jest.fn().mockResolvedValue(true) }),
+      };
     });
 
     const context: any = {

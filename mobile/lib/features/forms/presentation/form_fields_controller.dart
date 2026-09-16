@@ -33,7 +33,9 @@ class FormSubmitController extends _$FormSubmitController {
     }
 
     state = await AsyncValue.guard(() async {
-      await ref.read(formFieldsRepositoryProvider).saveFormRecord(
+      await ref
+          .read(formFieldsRepositoryProvider)
+          .saveFormRecord(
             requestId: requestId,
             activityId: activityId,
             regionNo: user.regionNo,

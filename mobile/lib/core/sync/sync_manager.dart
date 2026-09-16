@@ -112,6 +112,9 @@ SyncManager syncManager(Ref ref) {
   return SyncManager(
     ref.watch(hiveServiceProvider),
     ref.watch(networkInfoProvider),
-    FirebaseFirestore.instanceFor(app: Firebase.app(), databaseId: 'datacollectionportal'),
+    FirebaseFirestore.instanceFor(
+      app: Firebase.app(),
+      databaseId: 'datacollectionportal',
+    ),
   );
 }

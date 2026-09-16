@@ -71,7 +71,10 @@ class FormFieldsRepository {
 @riverpod
 FormFieldsRepository formFieldsRepository(Ref ref) {
   return FormFieldsRepository(
-    FirebaseFirestore.instanceFor(app: Firebase.app(), databaseId: 'datacollectionportal'),
+    FirebaseFirestore.instanceFor(
+      app: Firebase.app(),
+      databaseId: 'datacollectionportal',
+    ),
     ref.watch(syncManagerProvider),
   );
 }

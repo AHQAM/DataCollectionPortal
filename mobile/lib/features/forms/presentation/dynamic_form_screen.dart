@@ -27,7 +27,9 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      await ref.read(formSubmitControllerProvider.notifier).save(
+      await ref
+          .read(formSubmitControllerProvider.notifier)
+          .save(
             requestId: widget.requestId,
             activityId: widget.activityId,
             formData: _formData,
@@ -55,8 +57,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final fieldsAsync =
-        ref.watch(formFieldsProvider(widget.activityId));
+    final fieldsAsync = ref.watch(formFieldsProvider(widget.activityId));
     final submitState = ref.watch(formSubmitControllerProvider);
 
     return Scaffold(
@@ -81,9 +82,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
         ),
         data: (fields) {
           if (fields.isEmpty) {
-            return const Center(
-              child: Text('لا توجد حقول لهذا النشاط'),
-            );
+            return const Center(child: Text('لا توجد حقول لهذا النشاط'));
           }
 
           // Sort fields by orderIndex
@@ -119,7 +118,9 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
                           height: 24,
                           width: 24,
                           child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2),
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
                       : Text(l10n.submit),
                 ),
@@ -138,8 +139,9 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case 'number':
         return TextFormField(
           decoration: InputDecoration(labelText: label, hintText: label),
-          keyboardType:
-              field.type == 'number' ? TextInputType.number : TextInputType.text,
+          keyboardType: field.type == 'number'
+              ? TextInputType.number
+              : TextInputType.text,
           readOnly: field.isReadOnly,
           validator: (value) {
             if (field.isRequired && (value == null || value.isEmpty)) {
@@ -155,9 +157,12 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case 'dropdown':
         return DropdownButtonFormField<String>(
           decoration: InputDecoration(labelText: label),
-          items: field.options
+          items:
+              field.options
                   ?.map(
-                      (option) => DropdownMenuItem(value: option, child: Text(option)))
+                    (option) =>
+                        DropdownMenuItem(value: option, child: Text(option)),
+                  )
                   .toList() ??
               [],
           validator: (value) {

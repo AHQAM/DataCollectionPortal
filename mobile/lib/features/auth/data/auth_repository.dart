@@ -46,15 +46,16 @@ class AuthRepository {
     }
 
     // Call the custom login Cloud Function
-    final HttpsCallable callable =
-        _functions.httpsCallable('authenticateWithRegionPassword');
+    final HttpsCallable callable = _functions.httpsCallable(
+      'authenticateWithRegionPassword',
+    );
     final response = await callable.call(<String, dynamic>{
       'regionNo': regionNo,
       'password': password,
       'installationDeviceId': deviceId,
       'platform': 'android',
       'appVersion': '1.0.0',
-      if (fcmToken != null) 'fcmToken': fcmToken,
+      'fcmToken': ?fcmToken,
     });
 
     final String customToken = response.data['token'];
@@ -95,8 +96,9 @@ class AuthRepository {
       regionNo: claims['regionNo'] as String? ?? '',
       // Check allowed region numbers (if applicable, e.g. supervisors)
       allowedRegionNos: [
-        ...?((claims['allowedRegionNos'] as List<dynamic>?)
-            ?.map((e) => e.toString())),
+        ...?((claims['allowedRegionNos'] as List<dynamic>?)?.map(
+          (e) => e.toString(),
+        )),
       ],
       branchId: claims['branchId'] as String?,
       role: claims['role'] as String? ?? 'sales_rep',

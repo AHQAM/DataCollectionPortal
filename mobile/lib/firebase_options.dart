@@ -52,7 +52,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '152016503421',
     projectId: 'landsurvey-ebb3b',
     storageBucket: 'landsurvey-ebb3b.firebasestorage.app',
-    iosClientId: '152016503421-do9bri81o4vs8dibe9kel8sh09djnaqr.apps.googleusercontent.com',
+    iosClientId:
+        '152016503421-do9bri81o4vs8dibe9kel8sh09djnaqr.apps.googleusercontent.com',
     iosBundleId: 'com.example.mobile',
   );
   static const FirebaseOptions macos = FirebaseOptions(
@@ -61,7 +62,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '152016503421',
     projectId: 'landsurvey-ebb3b',
     storageBucket: 'landsurvey-ebb3b.firebasestorage.app',
-    iosClientId: '152016503421-do9bri81o4vs8dibe9kel8sh09djnaqr.apps.googleusercontent.com',
+    iosClientId:
+        '152016503421-do9bri81o4vs8dibe9kel8sh09djnaqr.apps.googleusercontent.com',
     iosBundleId: 'com.example.mobile',
   );
 
