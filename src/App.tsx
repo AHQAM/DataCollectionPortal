@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { TopNavbar } from './components/common/TopNavbar';
+import { AuthPortal } from './components/common/AuthPortal';
 import { AdminLayout } from './components/admin/AdminLayout';
-import { MobileApp } from './components/mobile/MobileApp';
 
 const MainAppContent: React.FC = () => {
-  const { viewMode, lang, dir } = useApp();
+  const { lang, dir, currentUser } = useApp();
 
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
   }, [lang, dir]);
+  if (!currentUser) {
+    return <AuthPortal />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-100 text-slate-900 font-sans selection:bg-purple-900 selection:text-white">
@@ -19,7 +22,7 @@ const MainAppContent: React.FC = () => {
 
       {/* Main View Mode Container */}
       <div className="flex-1">
-        {viewMode === 'admin' ? <AdminLayout /> : <MobileApp />}
+        <AdminLayout />
       </div>
 
       {/* Global Brand & Security Compliance Footer */}

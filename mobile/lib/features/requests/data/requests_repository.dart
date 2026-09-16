@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -58,5 +59,5 @@ class RequestsRepository {
 
 @riverpod
 RequestsRepository requestsRepository(Ref ref) {
-  return RequestsRepository(FirebaseFirestore.instance);
+  return RequestsRepository(FirebaseFirestore.instanceFor(app: Firebase.app(), databaseId: 'datacollectionportal'));
 }

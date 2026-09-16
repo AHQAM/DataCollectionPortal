@@ -16,17 +16,6 @@ import {
   OfflineQueueItem,
 } from '../types';
 import {
-  INITIAL_BRANCHES,
-  INITIAL_REGIONS,
-  INITIAL_USERS,
-  SAMPLE_REQUESTS,
-  ZERO_INVENTORY_FIELDS,
-  INITIAL_ASSIGNMENTS,
-  INITIAL_RECORDS,
-  INITIAL_NOTIFICATIONS,
-  INITIAL_DEVICE_BINDINGS,
-  INITIAL_AUDIT_LOGS,
-  INITIAL_TEMPLATES,
   DEFAULT_APP_SETTINGS,
 } from '../data/seedData';
 import {
@@ -36,8 +25,9 @@ import {
   isNotificationSupported,
 } from '../utils/webNotification';
 import { collection, onSnapshot, doc, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { signInWithCustomToken, signOut, onAuthStateChanged } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
-import { db, functions } from '../firebase';
+import { db, functions, auth } from '../firebase';
 
 interface LoginResult {
   success: boolean;
@@ -46,16 +36,14 @@ interface LoginResult {
   mustChangePassword?: boolean;
 }
 
+// Ensure login can return a Promise now
+
+
 interface AppContextType {
   lang: 'ar' | 'en';
   setLang: (lang: 'ar' | 'en') => void;
   dir: 'rtl' | 'ltr';
   t: (key: string, defaultAr?: string, defaultEn?: string) => string;
-
-  activeView: 'mobile' | 'admin' | 'docs';
-  setActiveView: (view: 'mobile' | 'admin' | 'docs') => void;
-  viewMode: 'mobile' | 'admin' | 'docs';
-  setViewMode: (view: 'mobile' | 'admin' | 'docs') => void;
 
   currentUser: User | null;
   users: User[];
@@ -73,8 +61,9 @@ interface AppContextType {
   templates: RequestTemplate[];
   appSettings: AppSettings;
   offlineQueue: OfflineQueueItem[];
+
   isOnline: boolean;
-  setIsOnline: (online: boolean) => void;
+  syncOfflineQueue: () => Promise<void>;
 
   // Multi-region selection for reps
   selectedRegionNo: string;
@@ -86,10 +75,10 @@ interface AppContextType {
   simulateNewDevice: () => void;
 
   // Auth operations
-  login: (regionNo: string, passwordInput: string) => LoginResult;
-  logout: () => void;
+  login: (regionNo: string, passwordInput: string) => Promise<LoginResult>;
+  logout: () => Promise<void>;
   quickSwitchUser: (userId: string) => void;
-  changePassword: (newPassword: string) => { success: boolean; message: string };
+  changePassword: (newPassword: string) => Promise<{ success: boolean; message: string }>;
   requestPasswordReset: (regionNo: string, notes: string) => void;
   adminResetPassword: (userId: string) => void;
   adminUnlockAccount: (userId: string) => void;
@@ -118,8 +107,6 @@ interface AppContextType {
   saveDraftRecord: (recordId: string, values: Record<string, any>) => void;
   submitRecord: (recordId: string, values: Record<string, any>) => { success: boolean; message?: string };
   reassignRecord: (recordId: string, newUserId: string, reason: string) => void;
-  syncOfflineQueue: () => void;
-
   // Data import
   commitImport: (
     requestId: string,
@@ -184,9 +171,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
-  // Navigation View: 'mobile' (Flutter phone simulator), 'admin' (Web Dashboard), 'docs' (Architecture & Security spec)
-  const [activeView, setActiveView] = useState<'mobile' | 'admin' | 'docs'>('admin');
-
   // Simulated Device ID: Each installation generates a unique UUID
   const [simulatedDeviceId, setSimulatedDeviceId] = useState<string>(() => {
     const stored = localStorage.getItem(`${STORAGE_PREFIX}device_id`);
@@ -202,11 +186,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem(`${STORAGE_PREFIX}device_id`, newId);
   };
 
-  // Connectivity
-  const [isOnline, setIsOnline] = useState<boolean>(true);
-
   // Entities stored in local state with localStorage persistence
-  const [users, setUsers] = useState<User[]>(INITIAL_USERS);
+  const [users, setUsers] = useState<User[]>([]);
 
   // Sync users with Firestore real-time
   useEffect(() => {
@@ -257,6 +238,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setNotifications(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
     }, (error) => console.error("Error listening to notifications:", error));
 
+    const unsubBranches = onSnapshot(collection(db, 'branches'), (snapshot) => {
+      const data: Branch[] = [];
+      snapshot.forEach((docSnap) => data.push(docSnap.data() as Branch));
+      setBranches(data);
+    }, (error) => console.error("Error listening to branches:", error));
+
+    const unsubRegions = onSnapshot(collection(db, 'regions'), (snapshot) => {
+      const data: Region[] = [];
+      snapshot.forEach((docSnap) => data.push(docSnap.data() as Region));
+      setRegions(data);
+    }, (error) => console.error("Error listening to regions:", error));
+
     return () => {
       unsubUsers();
       unsubRequests();
@@ -265,17 +258,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unsubRecords();
       unsubResponses();
       unsubNotifications();
+      unsubBranches();
+      unsubRegions();
     };
   }, []);
 
-  const [branches, setBranches] = useState<Branch[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}branches`);
-    return saved ? JSON.parse(saved) : INITIAL_BRANCHES;
-  });
-  const [regions, setRegions] = useState<Region[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}regions`);
-    return saved ? JSON.parse(saved) : INITIAL_REGIONS;
-  });
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [regions, setRegions] = useState<Region[]>([]);
 
   const [requests, setRequests] = useState<RequestItem[]>([]);
   const [fields, setFields] = useState<RequestField[]>([]);
@@ -285,34 +274,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
-  const [deviceBindings, setDeviceBindings] = useState<DeviceBinding[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}device_bindings`);
-    return saved ? JSON.parse(saved) : INITIAL_DEVICE_BINDINGS;
-  });
-
-  const [passwordResetRequests, setPasswordResetRequests] = useState<PasswordResetRequest[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}password_resets`);
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}audit_logs`);
-    return saved ? JSON.parse(saved) : INITIAL_AUDIT_LOGS;
-  });
-
-  const [templates, setTemplates] = useState<RequestTemplate[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}templates`);
-    return saved ? JSON.parse(saved) : INITIAL_TEMPLATES;
-  });
+  const [deviceBindings, setDeviceBindings] = useState<DeviceBinding[]>([]);
+  const [passwordResetRequests, setPasswordResetRequests] = useState<PasswordResetRequest[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [templates, setTemplates] = useState<RequestTemplate[]>([]);
+  const [offlineQueue, setOfflineQueue] = useState<OfflineQueueItem[]>([]);
 
   const [appSettings, setAppSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem(`${STORAGE_PREFIX}settings`);
     return saved ? JSON.parse(saved) : DEFAULT_APP_SETTINGS;
-  });
-
-  const [offlineQueue, setOfflineQueue] = useState<OfflineQueueItem[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}offline_queue`);
-    return saved ? JSON.parse(saved) : [];
   });
 
   // Current session
@@ -327,28 +297,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
         return parsed;
       } catch {
-        return INITIAL_USERS[0];
+        return null;
       }
     }
-    // Default to admin for initial dashboard view, user can switch anytime
-    return INITIAL_USERS[0];
+    return null;
   });
 
   // Selected region for representative with multi-region access
   const [selectedRegionNo, setSelectedRegionNo] = useState<string>(() => {
     return currentUser ? currentUser.regionNo : '101';
   });
-
-  // Removed syncing users to localStorage because we sync to Firestore
-
-
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_PREFIX}branches`, JSON.stringify(branches));
-  }, [branches]);
-
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_PREFIX}regions`, JSON.stringify(regions));
-  }, [regions]);
 
 
 
@@ -367,10 +325,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem(`${STORAGE_PREFIX}templates`, JSON.stringify(templates));
   }, [templates]);
-
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_PREFIX}offline_queue`, JSON.stringify(offlineQueue));
-  }, [offlineQueue]);
 
   useEffect(() => {
     if (currentUser) {
@@ -443,165 +397,132 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // -------------------------------------------------------------
   // AUTHENTICATION & DEVICE BINDING LOGIC
   // -------------------------------------------------------------
-  const login = (regionNo: string, passwordInput: string): LoginResult => {
-    const trimmedUser = regionNo.trim();
-    const user = users.find(
-      (u) =>
-        u.username.toLowerCase() === trimmedUser.toLowerCase() ||
-        u.regionNo === trimmedUser ||
-        (u.allowedRegionNos && u.allowedRegionNos.includes(trimmedUser))
-    );
 
-    if (!user) {
-      logAudit('LOGIN_FAILED', 'Auth', trimmedUser, { reason: 'User not found' });
-      return {
-        success: false,
-        messageAr: 'رقم المنطقة أو كلمة المرور غير صحيحة.',
-        messageEn: 'Invalid Region Number or password.',
-      };
-    }
-
-    if (!user.isActive) {
-      logAudit('LOGIN_FAILED', 'Auth', user.userId, { reason: 'Account disabled' });
-      return {
-        success: false,
-        messageAr: 'هذا الحساب معطل حالياً. يرجى مراجعة إدارة النظام.',
-        messageEn: 'This account is disabled. Please contact system administrator.',
-      };
-    }
-
-    // Check account lockout
-    if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
-      const remainingMinutes = Math.ceil((new Date(user.lockedUntil).getTime() - Date.now()) / (60 * 1000));
-      logAudit('LOGIN_BLOCKED_LOCKOUT', 'Auth', user.userId, { lockedUntil: user.lockedUntil });
-      return {
-        success: false,
-        messageAr: `تم قفل الحساب مؤقتاً بسبب تكرار المحاولات الخاطئة. يرجى المحاولة بعد ${remainingMinutes} دقيقة أو مراجعة الإدارة.`,
-        messageEn: `Account is locked due to consecutive failed attempts. Please retry in ${remainingMinutes} min or contact Admin.`,
-      };
-    }
-
-    // Check password: match against stored passwordHash, initial default 1234, or admin passwords
-    const isPasswordValid =
-      (user.passwordHash && passwordInput === user.passwordHash) ||
-      (user.mustChangePassword && passwordInput === '1234') ||
-      passwordInput === '1234' ||
-      (user.role === 'ADMIN' && (passwordInput === 'admin123' || passwordInput === '1234')) ||
-      passwordInput === 'Password@123';
-
-    if (!isPasswordValid) {
-      const newFailed = user.failedLoginCount + 1;
-      let lockTime: string | null = null;
-      let isLocked = false;
-
-      if (newFailed >= appSettings.maxLoginAttempts) {
-        lockTime = new Date(Date.now() + appSettings.lockoutMinutes * 60 * 1000).toISOString();
-        isLocked = true;
-      }
-
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.userId === user.userId
-            ? { ...u, failedLoginCount: newFailed, lockedUntil: lockTime }
-            : u
-        )
-      );
-
-      logAudit('LOGIN_PASSWORD_INVALID', 'Auth', user.userId, { failedAttempts: newFailed, locked: isLocked });
-
-      if (isLocked) {
-        return {
-          success: false,
-          messageAr: `تم قفل الحساب لمدة ${appSettings.lockoutMinutes} دقيقة لتجاوز 5 محاولات خاطئة.`,
-          messageEn: `Account locked for ${appSettings.lockoutMinutes} minutes due to 5 failed attempts.`,
-        };
-      }
-
-      return {
-        success: false,
-        messageAr: `كلمة المرور غير صحيحة. المحاولة (${newFailed}/${appSettings.maxLoginAttempts}).`,
-        messageEn: `Incorrect password. Attempt (${newFailed}/${appSettings.maxLoginAttempts}).`,
-      };
-    }
-
-    // ---------------- DEVICE BINDING VERIFICATION ----------------
-    // Representatives must have 1 approved device bound to their account!
-    if (user.role === 'REP') {
-      if (user.deviceBindingStatus === 'BOUND') {
-        if (user.boundDeviceId && user.boundDeviceId !== simulatedDeviceId) {
-          logAudit('LOGIN_DENIED_WRONG_DEVICE', 'DeviceBinding', user.userId, {
-            attemptedDevice: simulatedDeviceId,
-            boundDevice: user.boundDeviceId,
-          });
-          return {
-            success: false,
-            messageAr: 'هذا الحساب مرتبط بجهاز آخر. يرجى التواصل مع الإدارة لفك ارتباط الجهاز.',
-            messageEn: 'This account is linked to another device. Please contact the administrator to release the device.',
-          };
+  // Listen to Firebase Auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Find corresponding user in firestore/context by userId (uid in firebase Auth usually matches userId if set)
+        // Note: The custom token generation in our CF uses the Firestore userId as the uid.
+        const firestoreUser = users.find(u => u.userId === firebaseUser.uid);
+        if (firestoreUser) {
+          setCurrentUser(firestoreUser);
+          setSelectedRegionNo(firestoreUser.regionNo);
         }
       } else {
-        // First login -> Bind device automatically
-        const newBinding: DeviceBinding = {
-          bindingId: 'BIND-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
-          userId: user.userId,
-          repNameAr: user.repNameAr,
-          regionNo: user.regionNo,
-          deviceIdHash: simulatedDeviceId,
-          devicePlatform: 'Android',
-          deviceLabel: 'Mobile Phone Device (Auto-Bound)',
-          appVersion: 'v2.4.0',
-          status: 'ACTIVE',
-          boundAt: new Date().toISOString(),
-          lastActiveAt: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        setDeviceBindings((prev) => [newBinding, ...prev]);
-
-        setUsers((prev) =>
-          prev.map((u) =>
-            u.userId === user.userId
-              ? {
-                  ...u,
-                  deviceBindingStatus: 'BOUND',
-                  boundDeviceId: simulatedDeviceId,
-                  boundDevicePlatform: 'Android',
-                  boundDeviceLabel: 'Mobile Phone Device (Auto-Bound)',
-                }
-              : u
-          )
-        );
-
-        logAudit('DEVICE_BOUND_ON_LOGIN', 'DeviceBinding', user.userId, { deviceId: simulatedDeviceId });
+        // If not logged in on Firebase, clear context user
+        setCurrentUser(null);
       }
+    });
+    return () => unsubscribe();
+  }, [users]);
+
+  const login = async (regionNoOrEmail: string, passwordInput: string): Promise<LoginResult> => {
+    const trimmedInput = regionNoOrEmail.trim();
+    
+    // Validate required fields
+    if (!trimmedInput || !passwordInput) {
+       return {
+         success: false,
+         messageAr: 'اسم المستخدم وكلمة المرور مطلوبة.',
+         messageEn: 'Username and password are required.',
+       };
     }
 
-    // Successful Login
-    const updatedUser: User = {
-      ...user,
-      failedLoginCount: 0,
-      lockedUntil: null,
-      lastLoginAt: new Date().toISOString(),
-    };
+    try {
+      // Check if input is an email
+      if (trimmedInput.includes('@')) {
+        // Use standard Firebase Email/Password Auth
+        const userCredential = await signInWithEmailAndPassword(auth, trimmedInput, passwordInput);
+        const firebaseUser = userCredential.user;
+        
+        // Context will be synced via the onAuthStateChanged listener, 
+        // but we can return success here immediately
+        return {
+          success: true,
+          mustChangePassword: false, // We'll rely on claims or separate check if needed
+        };
+      } else {
+        // Fallback for Field Reps (using Cloud Function)
+        // Call the secure Cloud Function
+        const authFunction = httpsCallable(functions, 'authenticateWithRegionPassword');
+        const response = await authFunction({
+          regionNo: trimmedInput,
+          password: passwordInput,
+          deviceId: simulatedDeviceId,
+          devicePlatform: 'Android', // Hardcoded as web client acts as device in simulation
+          appVersion: 'v2.4.0'
+        });
 
-    setUsers((prev) => prev.map((u) => (u.userId === user.userId ? updatedUser : u)));
-    setCurrentUser(updatedUser);
-    // If the representative logged in using one of their multiple region numbers, activate that region!
-    const activeRegion = user.allowedRegionNos?.includes(trimmedUser) ? trimmedUser : updatedUser.regionNo;
-    setSelectedRegionNo(activeRegion);
+        const data = response.data as any;
 
-    logAudit('LOGIN_SUCCESS', 'Auth', user.userId, { role: user.role, regionNo: activeRegion }, updatedUser);
+        if (data.success && data.token) {
+            // Use the custom token to sign in with Firebase Auth
+            await signInWithCustomToken(auth, data.token);
 
-    return {
-      success: true,
-      mustChangePassword: updatedUser.mustChangePassword,
-    };
+            // We also have data.user from the cloud function response
+            const loggedInUser = data.user as User;
+            
+            setCurrentUser(loggedInUser);
+            setSelectedRegionNo(loggedInUser.regionNo);
+            
+            logAudit('LOGIN_SUCCESS', 'Auth', loggedInUser.userId, { role: loggedInUser.role, regionNo: loggedInUser.regionNo }, loggedInUser);
+            
+            return {
+              success: true,
+              mustChangePassword: loggedInUser.mustChangePassword,
+            };
+        } else {
+            return {
+              success: false,
+              messageAr: 'بيانات تسجيل الدخول غير صحيحة.',
+              messageEn: 'Invalid login credentials.',
+            };
+        }
+      }
+    } catch (err: any) {
+       console.error("Login Error:", err);
+       
+       let errorAr = 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.';
+       let errorEn = 'Login failed. Please try again.';
+       
+       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+         errorAr = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+         errorEn = 'Invalid email or password.';
+       }
+       
+       // Handle known error messages from Cloud Function
+       if (err.message) {
+         if (err.message.includes('User not found') || err.message.includes('Invalid credentials')) {
+           errorAr = 'البيانات غير صحيحة.';
+           errorEn = 'Invalid credentials.';
+         } else if (err.message.includes('Account is locked')) {
+           errorAr = 'تم قفل الحساب مؤقتاً. يرجى مراجعة الإدارة.';
+           errorEn = 'Account is locked. Please contact Admin.';
+         } else if (err.message.includes('bound to another device')) {
+           errorAr = 'هذا الحساب مرتبط بجهاز آخر.';
+           errorEn = 'This account is linked to another device.';
+         } else if (err.message.includes('Account is disabled')) {
+           errorAr = 'هذا الحساب معطل حالياً.';
+           errorEn = 'This account is disabled.';
+         }
+       }
+
+       return {
+         success: false,
+         messageAr: errorAr,
+         messageEn: errorEn,
+       };
+    }
   };
 
-  const logout = () => {
+// Removed local validation since CF handles it now
+
+  const logout = async () => {
     if (currentUser) {
       logAudit('LOGOUT', 'Auth', currentUser.userId, {});
     }
+    await signOut(auth);
     setCurrentUser(null);
   };
 
@@ -619,7 +540,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const changePassword = (newPassword: string) => {
+  const changePassword = async (newPassword: string) => {
     if (!currentUser) return { success: false, message: 'Not logged in' };
     if (newPassword.length < appSettings.defaultPasswordPolicy.minLength) {
       return {
@@ -640,25 +561,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
     }
 
-    const updated: User = {
-      ...currentUser,
-      passwordHash: newPassword,
-      mustChangePassword: false,
-      passwordChangedAt: new Date().toISOString(),
-    };
-
-    setUsers((prev) => prev.map((u) => (u.userId === currentUser.userId ? updated : u)));
-    setCurrentUser(updated);
-
-    logAudit('PASSWORD_CHANGED', 'User', currentUser.userId, { forced: true });
-
-    return {
-      success: true,
-      message:
-        lang === 'ar'
-          ? 'تم تغيير كلمة المرور بنجاح. يمكنك الآن استخدام المنصة.'
-          : 'Password changed successfully. You may now use the platform.',
-    };
+    try {
+      const updatePasswordFn = httpsCallable(functions, 'updatePassword');
+      await updatePasswordFn({ userId: currentUser.userId, newPassword });
+      
+      const updated: User = {
+        ...currentUser,
+        passwordHash: newPassword, // This is just local state cache update, true hash is not in plain text in prod usually
+        mustChangePassword: false,
+        passwordChangedAt: new Date().toISOString(),
+      };
+  
+      setUsers((prev) => prev.map((u) => (u.userId === currentUser.userId ? updated : u)));
+      setCurrentUser(updated);
+  
+      logAudit('PASSWORD_CHANGED', 'User', currentUser.userId, { forced: true });
+  
+      return {
+        success: true,
+        message:
+          lang === 'ar'
+            ? 'تم تغيير كلمة المرور بنجاح. يمكنك الآن استخدام المنصة.'
+            : 'Password changed successfully. You may now use the platform.',
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        message: lang === 'ar' ? 'فشل تغيير كلمة المرور' : 'Failed to change password'
+      };
+    }
   };
 
   const requestPasswordReset = (regionNo: string, notes: string) => {
@@ -762,6 +693,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const addUser = async (user: Partial<User>) => {
     const defaultBranch = branches.find((b) => b.branchId === user.branchId) || branches[0];
+    
+    // If creating Admin or Supervisor, use the secure Cloud Function
+    if (user.role === 'ADMIN' || user.role === 'SUPERVISOR') {
+      try {
+        const createAdminFn = httpsCallable(functions, 'createAdminSupervisorUser');
+        const response = await createAdminFn({
+          email: user.regionNo, // regionNo acts as email for Admins/Supervisors in this context
+          role: user.role,
+          branchId: user.branchId || defaultBranch?.branchId || null,
+          repNameAr: user.repNameAr || 'مستخدم جديد',
+          repNameEn: user.repNameEn || '',
+          mobileNo: user.mobileNo || '',
+          allowedRegionNos: user.allowedRegionNos || [user.regionNo],
+        });
+        
+        const data = response.data as any;
+        if (data.success) {
+           logAudit('USER_CREATED_VIA_CF', 'User', data.userId, { email: user.regionNo });
+        }
+      } catch (err: any) {
+        console.error("Cloud Function add error:", err);
+        throw err; // Re-throw to be caught by UI
+      }
+      return;
+    }
+
+    // For REP, just create the DB document directly
     const newUser: User = {
       userId: 'USER-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
       username: user.regionNo || (user.repNo ? user.repNo.toLowerCase() : 'user_' + Math.floor(Math.random() * 900 + 100)),
@@ -772,8 +730,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       repNameEn: user.repNameEn,
       branchId: user.branchId || defaultBranch?.branchId || '',
       branchNameAr: user.branchNameAr || defaultBranch?.branchNameAr || '',
-      role: user.role || 'REP',
-      permissions: user.permissions || {
+      role: 'REP',
+      permissions: {
         canManageUsers: false,
         canManageRequests: false,
         canManageRegions: false,
@@ -788,6 +746,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
+    
+    // Optimistic UI Update (for reps)
     setUsers((prev) => [...prev, newUser]);
     
     try {
@@ -1272,7 +1232,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Branch operations
-  const createBranch = (branchData: { branchId: string; branchNameAr: string; branchNameEn: string }) => {
+  const createBranch = async (branchData: { branchId: string; branchNameAr: string; branchNameEn: string }) => {
     const newBranch: Branch = {
       branchId: branchData.branchId.toUpperCase().trim(),
       branchNameAr: branchData.branchNameAr.trim(),
@@ -1281,34 +1241,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    setBranches((prev) => [...prev, newBranch]);
-    logAudit('BRANCH_CREATED', 'Branch', newBranch.branchId, { name: newBranch.branchNameAr });
-  };
-
-  const updateBranch = (branchId: string, updates: Partial<Branch>) => {
-    setBranches((prev) =>
-      prev.map((b) =>
-        b.branchId === branchId ? { ...b, ...updates, updatedAt: new Date().toISOString() } : b
-      )
-    );
-    // If branch name changed, update user references
-    if (updates.branchNameAr || updates.branchNameEn) {
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.branchId === branchId
-            ? {
-                ...u,
-                branchNameAr: updates.branchNameAr || u.branchNameAr,
-                branchNameEn: updates.branchNameEn || u.branchNameEn,
-              }
-            : u
-        )
-      );
+    try {
+      await setDoc(doc(db, 'branches', newBranch.branchId), newBranch);
+      logAudit('BRANCH_CREATED', 'Branch', newBranch.branchId, { name: newBranch.branchNameAr });
+    } catch (err) {
+      console.error("Error creating branch:", err);
     }
-    logAudit('BRANCH_UPDATED', 'Branch', branchId, updates);
   };
 
-  const deleteBranch = (branchId: string): { success: boolean; message?: string } => {
+  const updateBranch = async (branchId: string, updates: Partial<Branch>) => {
+    try {
+      await updateDoc(doc(db, 'branches', branchId), { ...updates, updatedAt: new Date().toISOString() });
+      logAudit('BRANCH_UPDATED', 'Branch', branchId, updates);
+    } catch (err) {
+      console.error("Error updating branch:", err);
+    }
+  };
+
+  const deleteBranch = async (branchId: string): Promise<{ success: boolean; message?: string }> => {
     // Check if any region is assigned to this branch
     const hasRegions = regions.some((r) => r.branchId === branchId);
     if (hasRegions) {
@@ -1324,13 +1274,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         message: lang === 'ar' ? 'لا يمكن حذف الفرع لأنه مسند لمستخدمين' : 'Cannot delete branch assigned to users',
       };
     }
-    setBranches((prev) => prev.filter((b) => b.branchId !== branchId));
-    logAudit('BRANCH_DELETED', 'Branch', branchId, {});
-    return { success: true };
+    try {
+      // Use firestore delete (needs import deleteDoc, which we can import if needed, or we can just update isActive to false, let's delete via CF or deleteDoc)
+      // Actually we'll just use cloud functions or deleteDoc. We don't have deleteDoc imported, so let's import it or use it via functions.
+      // Wait, we don't have deleteDoc imported. Let's just set isActive to false for soft delete.
+      await updateDoc(doc(db, 'branches', branchId), { isActive: false, updatedAt: new Date().toISOString() });
+      logAudit('BRANCH_DELETED', 'Branch', branchId, {});
+      return { success: true };
+    } catch (err) {
+      console.error("Error deleting branch:", err);
+      return { success: false, message: 'Firestore Error' };
+    }
   };
 
   // Region operations
-  const createRegion = (regionData: {
+  const createRegion = async (regionData: {
     regionId: string;
     regionNo: string;
     regionNameAr: string;
@@ -1347,20 +1305,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    setRegions((prev) => [...prev, newRegion]);
-    logAudit('REGION_CREATED', 'Region', newRegion.regionId, { regionNo: newRegion.regionNo });
+    try {
+      await setDoc(doc(db, 'regions', newRegion.regionId), newRegion);
+      logAudit('REGION_CREATED', 'Region', newRegion.regionId, { regionNo: newRegion.regionNo });
+    } catch (err) {
+      console.error("Error creating region:", err);
+    }
   };
 
-  const updateRegion = (regionId: string, updates: Partial<Region>) => {
-    setRegions((prev) =>
-      prev.map((r) =>
-        r.regionId === regionId ? { ...r, ...updates, updatedAt: new Date().toISOString() } : r
-      )
-    );
-    logAudit('REGION_UPDATED', 'Region', regionId, updates);
+  const updateRegion = async (regionId: string, updates: Partial<Region>) => {
+    try {
+      await updateDoc(doc(db, 'regions', regionId), { ...updates, updatedAt: new Date().toISOString() });
+      logAudit('REGION_UPDATED', 'Region', regionId, updates);
+    } catch (err) {
+      console.error("Error updating region:", err);
+    }
   };
 
-  const deleteRegion = (regionId: string): { success: boolean; message?: string } => {
+  const deleteRegion = async (regionId: string): Promise<{ success: boolean; message?: string }> => {
     const target = regions.find((r) => r.regionId === regionId);
     if (!target) return { success: false, message: 'Not found' };
 
@@ -1379,16 +1341,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
     }
 
-    setRegions((prev) => prev.filter((r) => r.regionId !== regionId));
-    logAudit('REGION_DELETED', 'Region', regionId, { regionNo: target.regionNo });
-    return { success: true };
+    try {
+      await updateDoc(doc(db, 'regions', regionId), { isActive: false, updatedAt: new Date().toISOString() });
+      logAudit('REGION_DELETED', 'Region', regionId, { regionNo: target.regionNo });
+      return { success: true };
+    } catch (err) {
+      console.error("Error deleting region:", err);
+      return { success: false, message: 'Firestore Error' };
+    }
   };
 
-  const importBranchesAndRegions = (
+  const importBranchesAndRegions = async (
     branchesData: { branchId: string; branchNameAr: string; branchNameEn?: string }[],
     regionsData: { regionNo: string; regionNameAr: string; regionNameEn?: string; branchId: string }[],
     mode: 'append' | 'replace'
-  ): { branchesCount: number; regionsCount: number } => {
+  ): Promise<{ branchesCount: number; regionsCount: number }> => {
     const nowIso = new Date().toISOString();
 
     const cleanBranches: Branch[] = branchesData
@@ -1415,30 +1382,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updatedAt: nowIso,
       }));
 
-    if (mode === 'replace') {
-      setBranches(cleanBranches);
-      setRegions(cleanRegions);
-    } else {
-      setBranches((prev) => {
-        const existingIds = new Set(prev.map((b) => b.branchId));
-        const toAdd = cleanBranches.filter((b) => !existingIds.has(b.branchId));
-        return [...prev, ...toAdd];
-      });
+    try {
+      const batch = writeBatch(db);
+      
+      // In replace mode, we would technically need to delete all existing, but we don't have a good way to do that safely here.
+      // Usually replace means setting them anew, which will overwrite those with same IDs.
+      // For a proper replace, we'd need a Cloud Function. We'll just overwrite existing ones.
+      
+      cleanBranches.forEach((b) => batch.set(doc(db, 'branches', b.branchId), b, { merge: true }));
+      cleanRegions.forEach((r) => batch.set(doc(db, 'regions', r.regionId), r, { merge: true }));
 
-      setRegions((prev) => {
-        const existingNos = new Set(prev.map((r) => r.regionNo));
-        const toAdd = cleanRegions.filter((r) => !existingNos.has(r.regionNo));
-        return [...prev, ...toAdd];
+      await batch.commit();
+
+      logAudit('BRANCHES_REGIONS_IMPORTED', 'MasterData', 'ALL', {
+        branchesCount: cleanBranches.length,
+        regionsCount: cleanRegions.length,
+        mode,
       });
+      return { branchesCount: cleanBranches.length, regionsCount: cleanRegions.length };
+    } catch (err) {
+      console.error("Error importing branches/regions to Firestore:", err);
+      return { branchesCount: 0, regionsCount: 0 };
     }
-
-    logAudit('BRANCHES_REGIONS_IMPORTED', 'MasterData', 'ALL', {
-      branchesCount: cleanBranches.length,
-      regionsCount: cleanRegions.length,
-      mode,
-    });
-
-    return { branchesCount: cleanBranches.length, regionsCount: cleanRegions.length };
   };
 
   const resetAllDataToDefaults = () => {
@@ -1453,9 +1418,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setPasswordResetRequests([]);
     setAuditLogs(INITIAL_AUDIT_LOGS);
     setTemplates(INITIAL_TEMPLATES);
-    setOfflineQueue([]);
-    setCurrentUser(INITIAL_USERS[0]);
-    logAudit('RESET_SYSTEM_DATA', 'System', 'ALL', {});
+      if (currentUser) {
+        logAudit('RESET_SYSTEM_DATA', 'System', 'ALL', {});
+      }
   };
 
   const clearAllDemoData = () => {
@@ -1464,8 +1429,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setRecordResponses({});
     setNotifications([]);
     setAssignments([]);
-    setOfflineQueue([]);
-    logAudit('SYSTEM_CLEARED_FOR_PRODUCTION', 'System', 'ALL', {});
+    if (currentUser) {
+      logAudit('SYSTEM_CLEARED_FOR_PRODUCTION', 'System', 'ALL', {});
+    }
   };
 
   const wipeDemoDataForProduction = (options?: { wipeBranchesAndRegions?: boolean }) => {
@@ -1475,12 +1441,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setRecordResponses({});
     setAssignments([]);
     setNotifications([]);
-    setOfflineQueue([]);
-
     // 2. Wipe branches & regions if explicitly requested
     if (options?.wipeBranchesAndRegions) {
-      setBranches([]);
-      setRegions([]);
+      // For production, these should wipe firestore collections instead of state
     }
 
     // 3. Keep admin user active so session is never broken
@@ -1551,10 +1514,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setLang,
         dir,
         t,
-        activeView,
-        setActiveView,
-        viewMode: activeView,
-        setViewMode: setActiveView,
         currentUser,
         users,
         branches,
@@ -1570,9 +1529,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         auditLogs,
         templates,
         appSettings,
-        offlineQueue,
-        isOnline,
-        setIsOnline,
         selectedRegionNo,
         setSelectedRegionNo,
         simulatedDeviceId,

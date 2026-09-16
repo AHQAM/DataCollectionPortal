@@ -21,12 +21,12 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const db = getFirestore(app, import.meta.env.VITE_FIREBASE_DATABASE_ID || "datacollectionportal");
 export const functions = getFunctions(app);
 export const storage = getStorage(app);
 
-// Use Emulators if in development mode
-if (import.meta.env.DEV) {
+// Use Emulators if in development mode and VITE_USE_FIREBASE_EMULATOR is true
+if (import.meta.env.DEV && import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true') {
   try {
     connectAuthEmulator(auth, 'http://127.0.0.1:9099');
     connectFirestoreEmulator(db, '127.0.0.1', 8080);

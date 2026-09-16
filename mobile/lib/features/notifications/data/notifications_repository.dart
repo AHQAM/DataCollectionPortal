@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../domain/notification_model.dart';
@@ -38,5 +39,5 @@ class NotificationsRepository {
 NotificationsRepository? notificationsRepository(Ref ref) {
   final user = ref.watch(authControllerProvider).value;
   if (user == null) return null;
-  return NotificationsRepository(FirebaseFirestore.instance, user.uid);
+  return NotificationsRepository(FirebaseFirestore.instanceFor(app: Firebase.app(), databaseId: 'datacollectionportal'), user.uid);
 }

@@ -75,14 +75,14 @@ export const AdminUsers: React.FC = () => {
     return true;
   });
 
-  const handleCreateSubmit = (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const branch = branches.find((b) => b.branchId === newBranchId);
 
     const newUser: User = {
       userId: `usr_${Date.now()}`,
       username: newRegionNo,
-      regionNo: newRegionNo,
+      regionNo: newRegionNo, // Used as Email for admins/supervisors
       repNo: newRepNo,
       repNameAr: newRepNameAr,
       repNameEn: newRepNameEn,
@@ -104,9 +104,14 @@ export const AdminUsers: React.FC = () => {
       updatedAt: new Date().toISOString(),
     };
 
-    createUser(newUser);
-    setShowCreateModal(false);
-    showToast(lang === 'ar' ? 'تم إنشاء الحساب بنجاح (الرمز الافتراضي 1234)' : 'User created with default PIN 1234');
+    try {
+      await createUser(newUser);
+      setShowCreateModal(false);
+      showToast(lang === 'ar' ? 'تم إنشاء الحساب بنجاح (الرمز الافتراضي 1234)' : 'User created with default PIN/Password 123456');
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || 'حدث خطأ أثناء إنشاء المستخدم');
+    }
   };
 
   return (
@@ -390,34 +395,40 @@ export const AdminUsers: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    {lang === 'ar' ? 'رقم المنطقة الرئيسية (اسم الدخول)' : 'Primary Region No'}
+                    {lang === 'ar' 
+                      ? (newRole === 'REP' ? 'رقم المنطقة (اسم الدخول)' : 'البريد الإلكتروني (اسم الدخول)') 
+                      : (newRole === 'REP' ? 'Primary Region No' : 'Email Address')}
                   </label>
                   <input
-                    type="text"
+                    type={newRole === 'REP' ? 'text' : 'email'}
                     value={newRegionNo}
                     onChange={(e) => {
                       setNewRegionNo(e.target.value);
-                      setNewRepNo(`REP-${e.target.value}`);
-                      setNewAllowedRegions([e.target.value]);
+                      if (newRole === 'REP') {
+                        setNewRepNo(`REP-${e.target.value}`);
+                        setNewAllowedRegions([e.target.value]);
+                      }
                     }}
-                    placeholder="مثال: 109"
+                    placeholder={newRole === 'REP' ? 'مثال: 109' : 'email@example.com'}
                     className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono font-bold"
                     required
                   />
                 </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    {lang === 'ar' ? 'رقم المندوب الوظيفي' : 'Rep No'}
-                  </label>
-                  <input
-                    type="text"
-                    value={newRepNo}
-                    onChange={(e) => setNewRepNo(e.target.value)}
-                    className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono"
-                    required
-                  />
-                </div>
+                {newRole === 'REP' && (
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      {lang === 'ar' ? 'رقم المندوب الوظيفي' : 'Rep No'}
+                    </label>
+                    <input
+                      type="text"
+                      value={newRepNo}
+                      onChange={(e) => setNewRepNo(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono"
+                      required
+                    />
+                  </div>
+                )}
               </div>
 
               <div>

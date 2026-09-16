@@ -3,21 +3,15 @@ import { useApp } from '../../context/AppContext';
 import { PWAInstallBanner } from './PWAInstallBanner';
 import { ShareRepLinkModal } from './ShareRepLinkModal';
 import {
-  Smartphone,
-  LayoutDashboard,
-  FileCode,
   Globe,
-  Wifi,
-  WifiOff,
   UserCheck,
   Bell,
   LogOut,
   Shield,
   Key,
   Lock,
-  PhoneCall,
-  RefreshCw,
   Share2,
+  Smartphone,
 } from 'lucide-react';
 
 export const TopNavbar: React.FC = () => {
@@ -26,17 +20,11 @@ export const TopNavbar: React.FC = () => {
     setLang,
     dir,
     t,
-    activeView,
-    setActiveView,
+    notifications,
     currentUser,
     users,
     quickSwitchUser,
     logout,
-    isOnline,
-    setIsOnline,
-    notifications,
-    offlineQueue,
-    syncOfflineQueue,
   } = useApp();
 
   const [showRoleMenu, setShowRoleMenu] = useState(false);
@@ -109,69 +97,7 @@ export const TopNavbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Center View Selector Tabs - ONLY FOR ADMIN / SUPERVISOR */}
-        {isAdminOrSupervisor && (
-          <div className="hidden lg:flex items-center bg-purple-950/70 p-1 rounded-xl border border-purple-800/60">
-            <button
-              onClick={() => {
-                setActiveView('admin');
-                closeAllMenus();
-              }}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                activeView === 'admin'
-                  ? 'bg-purple-600 text-white shadow'
-                  : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
-              }`}
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>{lang === 'ar' ? 'لوحة تحكم الإدارة' : 'Admin Web'}</span>
-            </button>
-            <button
-              onClick={() => {
-                setActiveView('mobile');
-                closeAllMenus();
-              }}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                activeView === 'mobile'
-                  ? 'bg-purple-600 text-white shadow'
-                  : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
-              }`}
-            >
-              <Smartphone className="w-4 h-4" />
-              <span>{lang === 'ar' ? 'معاينة المندوب (موبايل)' : 'Rep Mobile Preview'}</span>
-            </button>
-            <button
-              onClick={() => {
-                setActiveView('docs');
-                closeAllMenus();
-              }}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                activeView === 'docs'
-                  ? 'bg-purple-600 text-white shadow'
-                  : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
-              }`}
-            >
-              <FileCode className="w-4 h-4" />
-              <span>{lang === 'ar' ? 'المعمارية والمواصفات' : 'Architecture & Specs'}</span>
-            </button>
-          </div>
-        )}
-
-        {/* Rep Identifier Badge if logged in as REP */}
-        {isRep && (
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-900/70 border border-purple-700/50 text-xs">
-            <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="font-bold text-white">
-              {lang === 'ar' ? 'المندوب الميداني:' : 'Field Rep:'}
-            </span>
-            <span className="text-purple-200 font-medium">
-              {currentUser?.repNameAr}
-            </span>
-            <span className="px-2 py-0.5 rounded-md bg-purple-800 text-purple-100 font-mono font-bold text-[10px]">
-              {lang === 'ar' ? `منطقة ${currentUser?.regionNo}` : `Region ${currentUser?.regionNo}`}
-            </span>
-          </div>
-        )}
+        {/* App Title Area */}
 
         {/* Right Controls: Connectivity, Share Link, Lang, User */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -187,42 +113,6 @@ export const TopNavbar: React.FC = () => {
               <span className="hidden sm:inline">
                 {lang === 'ar' ? 'مشاركة رابط المندوبين' : 'Share Rep Link'}
               </span>
-            </button>
-          )}
-
-          {/* Online/Offline Toggle for Testing */}
-          <button
-            onClick={() => {
-              setIsOnline(!isOnline);
-              closeAllMenus();
-            }}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all ${
-              isOnline
-                ? 'bg-emerald-900/40 border-emerald-500/40 text-emerald-300 hover:bg-emerald-800/50'
-                : 'bg-rose-900/50 border-rose-500/50 text-rose-300 hover:bg-rose-800/60 animate-pulse'
-            }`}
-            title={
-              isOnline
-                ? (lang === 'ar' ? 'متصل بالإنترنت - اضغط لمحاكاة انقطاع الاتصال' : 'Online - Click to simulate offline mode')
-                : (lang === 'ar' ? 'غير متصل (أوفلاين) - اضغط لإعادة الاتصال والمزامنة' : 'Offline - Click to reconnect and sync')
-            }
-          >
-            {isOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">{isOnline ? (lang === 'ar' ? 'متصل' : 'Online') : (lang === 'ar' ? 'أوفلاين' : 'Offline')}</span>
-          </button>
-
-          {/* Sync Trigger if offline queue has items */}
-          {offlineQueue.length > 0 && isOnline && (
-            <button
-              onClick={() => {
-                syncOfflineQueue();
-                closeAllMenus();
-              }}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white shadow transition-all animate-bounce"
-              title={lang === 'ar' ? 'مزامنة السجلات المحفوظة أوفلاين' : 'Sync offline records'}
-            >
-              <RefreshCw className="w-3 h-3 animate-spin" />
-              <span>{offlineQueue.length}</span>
             </button>
           )}
 

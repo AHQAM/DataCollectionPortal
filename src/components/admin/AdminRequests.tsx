@@ -76,28 +76,34 @@ export const AdminRequests: React.FC<Props> = ({ onOpenFormBuilder, onOpenImport
     return true;
   });
 
-  const handleCreateSubmit = (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const resolvedTitleEn = newTitleEn.trim() || newTitleAr.trim();
-    const newId = createRequest(
-      {
-        requestCode: newCode,
-        titleAr: newTitleAr.trim(),
-        titleEn: resolvedTitleEn,
-        descriptionAr: newDescAr,
-        descriptionEn: newDescEn || newDescAr,
-        priority: newPriority,
-        requestType: newType,
-        dueAt: new Date(newDueAt).toISOString(),
-        allowEditAfterSubmit: newAllowEdit,
-        requireSupervisorApproval: newRequireSupervisor,
-      },
-      []
-    );
+    
+    try {
+      const newId = await createRequest(
+        {
+          requestCode: newCode,
+          titleAr: newTitleAr.trim(),
+          titleEn: resolvedTitleEn,
+          descriptionAr: newDescAr,
+          descriptionEn: newDescEn || newDescAr,
+          priority: newPriority,
+          requestType: newType,
+          dueAt: new Date(newDueAt).toISOString(),
+          allowEditAfterSubmit: newAllowEdit,
+          requireSupervisorApproval: newRequireSupervisor,
+        },
+        []
+      );
 
-    setShowCreateModal(false);
-    // Open Form Builder directly for newly created draft request!
-    onOpenFormBuilder(newId);
+      setShowCreateModal(false);
+      // Open Form Builder directly for newly created draft request!
+      onOpenFormBuilder(newId);
+    } catch (err) {
+      console.error("Error creating request:", err);
+      alert(lang === 'ar' ? 'حدث خطأ أثناء إنشاء الطلب' : 'Error creating request');
+    }
   };
 
   const handleSaveTemplateSubmit = (e: React.FormEvent) => {

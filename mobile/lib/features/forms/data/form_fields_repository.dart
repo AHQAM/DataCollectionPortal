@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -70,7 +71,7 @@ class FormFieldsRepository {
 @riverpod
 FormFieldsRepository formFieldsRepository(Ref ref) {
   return FormFieldsRepository(
-    FirebaseFirestore.instance,
+    FirebaseFirestore.instanceFor(app: Firebase.app(), databaseId: 'datacollectionportal'),
     ref.watch(syncManagerProvider),
   );
 }

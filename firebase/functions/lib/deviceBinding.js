@@ -34,6 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = void 0;
+const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const auditLogger_1 = require("./auditLogger");
@@ -52,7 +53,7 @@ exports.releaseDevice = functions.https.onCall(async (data, context) => {
     if (!targetUserId) {
         throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | Missing targetUserId.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     try {
         const userRef = db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
@@ -138,7 +139,7 @@ exports.replaceDevice = functions.https.onCall(async (data, context) => {
     if (!targetUserId) {
         throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     try {
         const userRef = db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
@@ -219,7 +220,7 @@ exports.forceLogoutUser = functions.https.onCall(async (data, context) => {
         // Revoke all refresh tokens
         await admin.auth().revokeRefreshTokens(targetUserId);
         // Increment session version so old tokens become invalid at custom claim level too
-        const db = admin.firestore();
+        const db = (0, firestore_1.getFirestore)('datacollectionportal');
         const userRef = db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (userDoc.exists) {

@@ -1,3 +1,4 @@
+import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { logAuditSafe } from "./auditLogger";
@@ -27,7 +28,7 @@ export const releaseDevice = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore('datacollectionportal');
 
     try {
       const userRef = db.collection("users").doc(targetUserId);
@@ -142,7 +143,7 @@ export const replaceDevice = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore('datacollectionportal');
 
     try {
       const userRef = db.collection("users").doc(targetUserId);
@@ -248,7 +249,7 @@ export const forceLogoutUser = functions.https.onCall(
       await admin.auth().revokeRefreshTokens(targetUserId);
 
       // Increment session version so old tokens become invalid at custom claim level too
-      const db = admin.firestore();
+      const db = getFirestore('datacollectionportal');
       const userRef = db.collection("users").doc(targetUserId);
       const userDoc = await userRef.get();
 

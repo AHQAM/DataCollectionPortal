@@ -4,6 +4,8 @@ admin.initializeApp();
 
 // Authentication
 export { authenticateWithRegionPassword } from "./auth";
+export { bootstrapAdmin } from "./bootstrapAdmin";
+export { createAdminSupervisorUser } from "./adminAuth";
 
 // Password Management
 export {

@@ -1,7 +1,8 @@
+import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 
-const db = admin.firestore();
+const db = getFirestore('datacollectionportal');
 
 // Internal helper for pushing FCM notifications and saving to Firestore
 export const sendNotificationInternal = async (

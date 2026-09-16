@@ -1,3 +1,4 @@
+import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as bcrypt from "bcrypt";
@@ -45,7 +46,7 @@ export const changePassword = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore('datacollectionportal');
     const userId = context.auth.uid;
 
     try {
@@ -162,7 +163,7 @@ export const requestPasswordReset = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore('datacollectionportal');
 
     try {
       // Find the user (don't reveal if user exists via error message)
@@ -250,7 +251,7 @@ export const adminResetPassword = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore('datacollectionportal');
     const adminId = context.auth.uid;
 
     try {
@@ -375,7 +376,7 @@ export const adminUnlockAccount = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore('datacollectionportal');
 
     try {
       const userRef = db.collection("users").doc(targetUserId);

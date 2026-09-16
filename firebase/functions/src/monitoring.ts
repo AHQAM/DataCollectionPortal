@@ -1,7 +1,8 @@
+import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 
-const db = admin.firestore();
+const db = getFirestore('datacollectionportal');
 
 export const getSystemHealth = functions.https.onCall(async (data, context) => {
   if (!context.auth || (context.auth.token.role !== "admin" && context.auth.token.role !== "supervisor")) {

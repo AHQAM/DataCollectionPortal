@@ -34,10 +34,11 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reassignRecords = void 0;
+const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const notificationService_1 = require("./notificationService");
-const db = admin.firestore();
+const db = (0, firestore_1.getFirestore)('datacollectionportal');
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");

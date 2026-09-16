@@ -1,3 +1,4 @@
+import { getFirestore } from 'firebase-admin/firestore';
 import * as admin from "firebase-admin";
 import fft from "firebase-functions-test";
 
@@ -21,7 +22,7 @@ describe("Request Management - publishRequest", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    dbMock = admin.firestore();
+    dbMock = getFirestore('datacollectionportal');
     wrappedPublishRequest = testEnv.wrap(publishRequest);
   });
 

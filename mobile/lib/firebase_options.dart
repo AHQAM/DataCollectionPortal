@@ -14,15 +14,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -36,28 +30,48 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAR34u133uus3aE4QQCk9njGx5MY3vxjyk',
-    appId: '1:235369138965:web:7e717059f2fdcd0cf3371c',
-    messagingSenderId: '235369138965',
-    projectId: 'datacollectionportal-d8d63',
-    authDomain: 'datacollectionportal-d8d63.firebaseapp.com',
-    storageBucket: 'datacollectionportal-d8d63.firebasestorage.app',
+    apiKey: 'AIzaSyAYOf8Ayqjcq-Ew-UNGivcK0PXcj_pyXAw',
+    appId: '1:152016503421:web:4ce2e5e5caf7df08f46714',
+    messagingSenderId: '152016503421',
+    projectId: 'landsurvey-ebb3b',
+    authDomain: 'landsurvey-ebb3b.firebaseapp.com',
+    storageBucket: 'landsurvey-ebb3b.firebasestorage.app',
+    measurementId: 'G-8G6JSCZKZB',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAR34u133uus3aE4QQCk9njGx5MY3vxjyk',
-    appId: '1:235369138965:android:7e717059f2fdcd0cf3371c',
-    messagingSenderId: '235369138965',
-    projectId: 'datacollectionportal-d8d63',
-    storageBucket: 'datacollectionportal-d8d63.firebasestorage.app',
+    apiKey: 'AIzaSyAb2lZ9NbwMe3dfSpdVZuq8unf_mAG4hNM',
+    appId: '1:152016503421:android:a68344d3184cc126f46714',
+    messagingSenderId: '152016503421',
+    projectId: 'landsurvey-ebb3b',
+    storageBucket: 'landsurvey-ebb3b.firebasestorage.app',
+  );
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDHm8fLmZo4UgZZX_Kee53RbAJhrS648GQ',
+    appId: '1:152016503421:ios:37770b8da2e91b16f46714',
+    messagingSenderId: '152016503421',
+    projectId: 'landsurvey-ebb3b',
+    storageBucket: 'landsurvey-ebb3b.firebasestorage.app',
+    iosClientId: '152016503421-do9bri81o4vs8dibe9kel8sh09djnaqr.apps.googleusercontent.com',
+    iosBundleId: 'com.example.mobile',
+  );
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDHm8fLmZo4UgZZX_Kee53RbAJhrS648GQ',
+    appId: '1:152016503421:ios:37770b8da2e91b16f46714',
+    messagingSenderId: '152016503421',
+    projectId: 'landsurvey-ebb3b',
+    storageBucket: 'landsurvey-ebb3b.firebasestorage.app',
+    iosClientId: '152016503421-do9bri81o4vs8dibe9kel8sh09djnaqr.apps.googleusercontent.com',
+    iosBundleId: 'com.example.mobile',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAR34u133uus3aE4QQCk9njGx5MY3vxjyk',
-    appId: '1:235369138965:ios:7e717059f2fdcd0cf3371c',
-    messagingSenderId: '235369138965',
-    projectId: 'datacollectionportal-d8d63',
-    storageBucket: 'datacollectionportal-d8d63.firebasestorage.app',
-    iosBundleId: 'com.example.mobile',
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAYOf8Ayqjcq-Ew-UNGivcK0PXcj_pyXAw',
+    appId: '1:152016503421:web:2babed6e3703937df46714',
+    messagingSenderId: '152016503421',
+    projectId: 'landsurvey-ebb3b',
+    authDomain: 'landsurvey-ebb3b.firebaseapp.com',
+    storageBucket: 'landsurvey-ebb3b.firebasestorage.app',
+    measurementId: 'G-V40JPGD617',
   );
 }

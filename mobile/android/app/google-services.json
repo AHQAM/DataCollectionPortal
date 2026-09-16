@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "152016503421",
+    "project_id": "landsurvey-ebb3b",
+    "storage_bucket": "landsurvey-ebb3b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:152016503421:android:cfbdfa4d143fcb61f46714",
+        "android_client_info": {
+          "package_name": "com.example.mapformapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "152016503421-4ua2u9u4712pfsvj2ft828nl7dlm7j3j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAb2lZ9NbwMe3dfSpdVZuq8unf_mAG4hNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "152016503421-4ua2u9u4712pfsvj2ft828nl7dlm7j3j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:152016503421:android:a68344d3184cc126f46714",
+        "android_client_info": {
+          "package_name": "com.example.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "152016503421-4ua2u9u4712pfsvj2ft828nl7dlm7j3j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAb2lZ9NbwMe3dfSpdVZuq8unf_mAG4hNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "152016503421-4ua2u9u4712pfsvj2ft828nl7dlm7j3j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

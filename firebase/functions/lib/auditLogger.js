@@ -35,13 +35,14 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAuditLog = createAuditLog;
 exports.logAuditSafe = logAuditSafe;
+const firestore_1 = require("firebase-admin/firestore");
 const admin = __importStar(require("firebase-admin"));
 /**
  * Creates an immutable audit log entry with server timestamp.
  * This function is fire-and-forget — errors are logged but don't propagate.
  */
 async function createAuditLog(entry) {
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     // Sanitize details — strip any sensitive fields that may have leaked
     const sanitizedDetails = entry.details ? sanitizeDetails(entry.details) : undefined;
     const logRef = db.collection("auditLogs").doc();

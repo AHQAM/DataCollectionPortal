@@ -34,9 +34,10 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendBroadcastNotification = exports.sendNotificationInternal = void 0;
+const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
-const db = admin.firestore();
+const db = (0, firestore_1.getFirestore)('datacollectionportal');
 // Internal helper for pushing FCM notifications and saving to Firestore
 const sendNotificationInternal = async (userId, titleAr, titleEn, bodyAr, bodyEn, data) => {
     // 1. Save to Firestore

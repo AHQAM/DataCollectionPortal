@@ -34,6 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = void 0;
+const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const auditLogger_1 = require("./auditLogger");
@@ -61,7 +62,7 @@ exports.changePassword = functions.https.onCall(async (data, context) => {
     if (newPassword.length > 128) {
         throw new functions.https.HttpsError("invalid-argument", "كلمة المرور طويلة جداً. | Password is too long.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     const userId = context.auth.uid;
     try {
         const userRef = db.collection("users").doc(userId);
@@ -139,7 +140,7 @@ exports.requestPasswordReset = functions.https.onCall(async (data, _context) => 
     if (!regionNo) {
         throw new functions.https.HttpsError("invalid-argument", "رقم المنطقة مطلوب. | Region number is required.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     try {
         // Find the user (don't reveal if user exists via error message)
         const usersRef = db.collection("users");
@@ -206,7 +207,7 @@ exports.adminResetPassword = functions.https.onCall(async (data, context) => {
     if (!targetUserId) {
         throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     const adminId = context.auth.uid;
     try {
         const userRef = db.collection("users").doc(targetUserId);
@@ -306,7 +307,7 @@ exports.adminUnlockAccount = functions.https.onCall(async (data, context) => {
     if (!targetUserId) {
         throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     try {
         const userRef = db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();

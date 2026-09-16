@@ -76,7 +76,7 @@ exports.authenticateWithRegionPassword = functions.https.onCall(async (data, con
         const usersRef = db.collection("users");
         const snapshot = await usersRef
             .where("username", "==", String(regionNo).trim())
-            .where("role", "in", ["REP", "SUPERVISOR"])
+            .where("role", "in", ["REP", "SUPERVISOR", "ADMIN"])
             .limit(1)
             .get();
         if (snapshot.empty) {
