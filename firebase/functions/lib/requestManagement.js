@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const notificationService_1 = require("./notificationService");
 const db = admin.firestore();
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
@@ -115,12 +116,45 @@ exports.publishRequest = functions.https.onCall(async (data, context) => {
     if (!requestDoc.exists) {
         throw new functions.https.HttpsError("not-found", "Request not found.");
     }
-    await requestRef.update({
+    const requestData = requestDoc.data();
+    const updates = {
         status: "Published",
         publishedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         publishedBy: context.auth.uid,
-    });
+    };
+    if (!requestData.schemaSnapshot) {
+        const fieldsSnapshot = await db.collection("request_fields")
+            .where("requestId", "==", requestId)
+            .orderBy("orderIndex", "asc")
+            .get();
+        const fieldsArray = fieldsSnapshot.docs.map(doc => doc.data());
+        updates.schemaSnapshot = fieldsArray;
+        updates.formSchemaVersion = (requestData.formSchemaVersion || 0) + 1;
+    }
+    await requestRef.update(updates);
+    // Send notifications to all assigned users
+    try {
+        const assignmentsSnap = await db.collection("assignments")
+            .where("requestId", "==", requestId)
+            .where("assignmentStatus", "==", "Active")
+            .get();
+        const titleAr = `تم نشر الطلب: ${requestData.titleAr}`;
+        const titleEn = `Request Published: ${requestData.titleEn}`;
+        const bodyAr = `الطلب متاح الآن لجمع البيانات.`;
+        const bodyEn = `The request is now available for data collection.`;
+        const notificationPromises = assignmentsSnap.docs.map(doc => {
+            const assignmentData = doc.data();
+            if (assignmentData.userId) {
+                return (0, notificationService_1.sendNotificationInternal)(assignmentData.userId, titleAr, titleEn, bodyAr, bodyEn, { requestId, type: "REQUEST_PUBLISHED" });
+            }
+            return Promise.resolve();
+        });
+        await Promise.allSettled(notificationPromises);
+    }
+    catch (error) {
+        console.error(`Failed to send notifications for requestId ${requestId}`, error);
+    }
     return { success: true };
 });
 exports.closeRequest = functions.https.onCall(async (data, context) => {

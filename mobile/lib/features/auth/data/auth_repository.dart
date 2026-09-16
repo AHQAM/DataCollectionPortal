@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -34,15 +35,28 @@ class AuthRepository {
   Future<void> login(String regionNo, String password) async {
     final deviceId = await _getOrGenerateDeviceId();
 
+    // Get FCM token for push notifications (optional — may fail on devices without GMS)
+    String? fcmToken;
+    try {
+      fcmToken = await FirebaseMessaging.instance.getToken();
+    } catch (e) {
+      // FCM not available on this device — login will proceed without it
+      debugPrint('FCM token unavailable: $e');
+    }
+
     // Call the custom login Cloud Function
-    final HttpsCallable callable = _functions.httpsCallable('login');
+    final HttpsCallable callable =
+        _functions.httpsCallable('authenticateWithRegionPassword');
     final response = await callable.call(<String, dynamic>{
       'regionNo': regionNo,
       'password': password,
-      'deviceId': deviceId,
+      'installationDeviceId': deviceId,
+      'platform': 'android',
+      'appVersion': '1.0.0',
+      if (fcmToken != null) 'fcmToken': fcmToken,
     });
 
-    final String customToken = response.data['customToken'];
+    final String customToken = response.data['token'];
 
     // Sign in with the generated custom token
     await _auth.signInWithCustomToken(customToken);
@@ -53,13 +67,13 @@ class AuthRepository {
     String newPassword,
   ) async {
     final HttpsCallable callable = _functions.httpsCallable('changePassword');
-    final response = await callable.call(<String, dynamic>{
+    await callable.call(<String, dynamic>{
       'currentPassword': currentPassword,
       'newPassword': newPassword,
     });
 
-    final String newCustomToken = response.data['customToken'];
-    await _auth.signInWithCustomToken(newCustomToken);
+    // Force token refresh to pick up the new claims
+    await _auth.currentUser?.getIdTokenResult(true);
   }
 
   Future<void> logout() async {

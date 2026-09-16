@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.reassignRecords = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const notificationService_1 = require("./notificationService");
 const db = admin.firestore();
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
@@ -74,6 +75,17 @@ exports.reassignRecords = functions.https.onCall(async (data, context) => {
         }
     }
     await batch.commit();
+    // Send notification to the new assigned user
+    try {
+        const titleAr = "تحديث المهام: تعيين سجلات جديدة";
+        const titleEn = "Assignment Update: New Records Assigned";
+        const bodyAr = `تم تعيين ${recordIds.length} سجل جديد لك.`;
+        const bodyEn = `You have been assigned ${recordIds.length} new records.`;
+        await (0, notificationService_1.sendNotificationInternal)(newUserId, titleAr, titleEn, bodyAr, bodyEn, { count: recordIds.length.toString(), type: "RECORDS_REASSIGNED" });
+    }
+    catch (error) {
+        console.error(`Failed to send notification to user ${newUserId} after reassigning records.`, error);
+    }
     return { success: true, count: recordIds.length };
 });
 //# sourceMappingURL=assignmentManagement.js.map

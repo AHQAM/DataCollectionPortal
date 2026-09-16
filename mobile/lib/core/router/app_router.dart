@@ -54,11 +54,9 @@ GoRouter appRouter(Ref ref) {
         builder: (context, state) {
           final requestId = state.pathParameters['requestId']!;
           final activityId = state.pathParameters['activityId']!;
-          // TODO: Fetch actual fields from provider based on activityId
           return DynamicFormScreen(
             requestId: requestId,
             activityId: activityId,
-            fields: const [], // Placeholder empty fields
           );
         },
       ),

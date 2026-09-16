@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSystemHealth = exports.exportReport = exports.sendBroadcastNotification = exports.commitImport = exports.importDataPreview = exports.reassignRecords = exports.saveRequestFields = exports.archiveRequest = exports.publishRequest = exports.createRequest = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = exports.authenticateWithRegionPassword = void 0;
+exports.getSystemHealth = exports.exportReport = exports.sendBroadcastNotification = exports.exportDataToExternalSystem = exports.commitImport = exports.importDataPreview = exports.reassignRecords = exports.saveRequestFields = exports.archiveRequest = exports.publishRequest = exports.createRequest = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = exports.authenticateWithRegionPassword = void 0;
 const admin = __importStar(require("firebase-admin"));
 admin.initializeApp();
 // Authentication
@@ -71,6 +71,9 @@ Object.defineProperty(exports, "reassignRecords", { enumerable: true, get: funct
 var importWizard_1 = require("./importWizard");
 Object.defineProperty(exports, "importDataPreview", { enumerable: true, get: function () { return importWizard_1.importDataPreview; } });
 Object.defineProperty(exports, "commitImport", { enumerable: true, get: function () { return importWizard_1.commitImport; } });
+// External Integration Adapter
+var externalIntegrationAdapter_1 = require("./externalIntegrationAdapter");
+Object.defineProperty(exports, "exportDataToExternalSystem", { enumerable: true, get: function () { return externalIntegrationAdapter_1.exportDataToExternalSystem; } });
 // Notification Service
 var notificationService_1 = require("./notificationService");
 Object.defineProperty(exports, "sendBroadcastNotification", { enumerable: true, get: function () { return notificationService_1.sendBroadcastNotification; } });
