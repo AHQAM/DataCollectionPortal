@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { getFirestore } from "firebase-admin/firestore";
 import * as bcrypt from "bcrypt";
 import { logAuditSafe } from "./auditLogger";
 
@@ -48,14 +49,13 @@ export const authenticateWithRegionPassword = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore("datacollectionportal");
 
     try {
       // 1. Find user by regionNo (username field)
       const usersRef = db.collection("users");
       const snapshot = await usersRef
         .where("username", "==", String(regionNo).trim())
-        .where("role", "in", ["REP", "SUPERVISOR", "ADMIN"])
         .limit(1)
         .get();
 
@@ -79,6 +79,13 @@ export const authenticateWithRegionPassword = functions.https.onCall(
       const userDoc = snapshot.docs[0];
       const userData = userDoc.data();
       const userId = userDoc.id;
+
+      if (!["REP", "SUPERVISOR", "ADMIN"].includes(userData.role)) {
+        throw new functions.https.HttpsError(
+          "unauthenticated",
+          "بيانات الاعتماد غير صحيحة. | Invalid credentials."
+        );
+      }
 
       // 2. Check if account is active
       if (userData.isActive === false) {

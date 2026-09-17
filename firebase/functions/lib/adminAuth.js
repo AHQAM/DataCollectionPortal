@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAdminSupervisorUser = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const firestore_1 = require("firebase-admin/firestore");
 const crypto_1 = require("crypto");
 const auditLogger_1 = require("./auditLogger");
 const auth_1 = require("./auth");
@@ -64,7 +65,7 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
     if (role !== roles_1.USER_ROLES.SUPERVISOR && role !== roles_1.USER_ROLES.ADMIN) {
         throw new functions.https.HttpsError("invalid-argument", "يمكن إنشاء حسابات مشرفين ومدراء فقط عبر هذه الدالة. | Can only create Supervisor/Admin.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
         // 4. Create Native Firebase Auth User
         const temporaryPassword = (0, crypto_1.randomBytes)(9).toString("base64url");

@@ -12,12 +12,16 @@ class RequestsRepository {
 
   RequestsRepository(this._firestore);
 
-  Stream<List<RequestModel>> watchMyRequests(String regionNo) {
+  Stream<List<RequestModel>> watchMyRequests(String userId) {
     // We listen to Firestore, and simultaneously cache the results in Hive.
     // If we're offline, Firestore's own offline persistence works, but Hive gives us more control if needed.
     return _firestore
         .collection(AppConstants.requestsCollection)
-        .where('regionNo', isEqualTo: regionNo)
+        .where('assignedUserId', isEqualTo: userId)
+        .where(
+          'status',
+          whereIn: const ['Published', 'Closed', 'Archived'],
+        )
         .orderBy('assignedAt', descending: true)
         .snapshots()
         .map((snapshot) {

@@ -31,7 +31,7 @@ export const exportDataToExternalSystem = functions.https.onCall(async (data, co
   }
 
   // 2. Fetch the Data to be exported
-  const db = getFirestore();
+  const db = getFirestore("datacollectionportal");
   const requestDoc = await db.collection("requests").doc(requestId).get();
   
   if (!requestDoc.exists) {

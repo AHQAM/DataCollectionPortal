@@ -63,7 +63,7 @@ exports.exportDataToExternalSystem = functions.https.onCall(async (data, context
         throw new functions.https.HttpsError("invalid-argument", "requestId and targetSystem are required.");
     }
     // 2. Fetch the Data to be exported
-    const db = (0, firestore_1.getFirestore)();
+    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     const requestDoc = await db.collection("requests").doc(requestId).get();
     if (!requestDoc.exists) {
         throw new functions.https.HttpsError("not-found", "Request not found.");

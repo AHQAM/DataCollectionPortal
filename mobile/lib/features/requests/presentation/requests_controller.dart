@@ -15,5 +15,5 @@ Stream<List<RequestModel>> myRequests(Ref ref) {
   }
 
   final repository = ref.watch(requestsRepositoryProvider);
-  return repository.watchMyRequests(user.regionNo);
+  return repository.watchMyRequests(user.uid);
 }

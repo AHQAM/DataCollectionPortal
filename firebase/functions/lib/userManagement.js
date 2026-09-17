@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const firestore_1 = require("firebase-admin/firestore");
 const uuid_1 = require("uuid");
 const crypto_1 = require("crypto");
 const auditLogger_1 = require("./auditLogger");
@@ -59,7 +60,7 @@ exports.createUser = functions.https.onCall(async (data, context) => {
     if (![roles_1.USER_ROLES.REP, roles_1.USER_ROLES.SUPERVISOR].includes(role)) {
         throw new functions.https.HttpsError("invalid-argument", "الدور يجب أن يكون REP أو SUPERVISOR. | Role must be REP or SUPERVISOR.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
         // Check for duplicate username
         const existing = await db
@@ -156,7 +157,7 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
         "branchId", "regionNo", "allowedRegionNos",
         "repNo", "role", "isActive", "maxAllowedDevices",
     ];
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
         const userRef = db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
@@ -230,7 +231,7 @@ exports.deactivateUser = functions.https.onCall(async (data, context) => {
     if (targetUserId === context.auth.uid) {
         throw new functions.https.HttpsError("failed-precondition", "لا يمكنك تعطيل حسابك الخاص. | Cannot deactivate your own account.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
         const userRef = db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
@@ -289,7 +290,7 @@ exports.importUsersBatch = functions.https.onCall(async (data, context) => {
     if (users.length > 100) {
         throw new functions.https.HttpsError("invalid-argument", "الحد الأقصى 100 مستخدم في الدفعة الواحدة. | Maximum 100 users per batch.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
         // Check for duplicate usernames
         const existingUsers = await db.collection("users").get();

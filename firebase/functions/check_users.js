@@ -1,11 +1,11 @@
 const admin = require('firebase-admin');
+const { getFirestore } = require('firebase-admin/firestore');
 
 admin.initializeApp({
   projectId: "landsurvey-ebb3b",
 });
 
-const db = admin.firestore();
-db.settings({ databaseId: "datacollectionportal" });
+const db = getFirestore("datacollectionportal");
 
 async function checkUsers() {
   const usersRef = db.collection('users');
