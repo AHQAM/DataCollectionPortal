@@ -291,7 +291,17 @@ export const AdminRequests: React.FC<Props> = ({ onOpenFormBuilder, onOpenImport
                           {/* Status Actions */}
                           {req.status === 'Draft' && (
                             <button
-                              onClick={() => publishRequest(req.requestId)}
+                              onClick={() => {
+                                void publishRequest(req.requestId).catch((err) => {
+                                  const message =
+                                    err?.details?.message ||
+                                    err?.message ||
+                                    (lang === 'ar'
+                                      ? 'تعذر نشر الطلب. تحقق من حقول النموذج ثم حاول مرة أخرى.'
+                                      : 'The request could not be published. Check the form fields and try again.');
+                                  alert(message);
+                                });
+                              }}
                               className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] shadow-xs"
                             >
                               {lang === 'ar' ? 'نشر' : 'Publish'}

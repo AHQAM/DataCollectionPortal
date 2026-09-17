@@ -1,6 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -36,15 +34,6 @@ class AuthRepository {
   Future<void> login(String regionNo, String password) async {
     final deviceId = await _getOrGenerateDeviceId();
 
-    // Get FCM token for push notifications (optional — may fail on devices without GMS)
-    String? fcmToken;
-    try {
-      fcmToken = await FirebaseMessaging.instance.getToken();
-    } catch (e) {
-      // FCM not available on this device — login will proceed without it
-      debugPrint('FCM token unavailable: $e');
-    }
-
     // Call the custom login Cloud Function
     final HttpsCallable callable = _functions.httpsCallable(
       'authenticateWithRegionPassword',
@@ -55,7 +44,6 @@ class AuthRepository {
       'installationDeviceId': deviceId,
       'platform': 'android',
       'appVersion': '1.0.0',
-      'fcmToken': ?fcmToken,
     });
 
     final String customToken = response.data['token'];
@@ -86,7 +74,7 @@ class AuthRepository {
     final user = _auth.currentUser;
     if (user == null) return null;
 
-    final idTokenResult = await user.getIdTokenResult(true);
+    final idTokenResult = await user.getIdTokenResult();
     final claims = idTokenResult.claims;
 
     if (claims == null) return null;

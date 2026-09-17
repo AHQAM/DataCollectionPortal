@@ -8,6 +8,7 @@
  */
 
 const admin = require("firebase-admin");
+const { getFirestore } = require("firebase-admin/firestore");
 const bcrypt = require("bcrypt");
 const { v4: uuidv4 } = require("uuid");
 
@@ -17,7 +18,7 @@ admin.initializeApp({
   // Will auto-detect from firebase login credentials or GOOGLE_APPLICATION_CREDENTIALS env var
 });
 
-const db = admin.firestore();
+const db = getFirestore("datacollectionportal");
 
 async function seedTestUser() {
   const BCRYPT_SALT_ROUNDS = 12;

@@ -98,7 +98,7 @@ interface AppContextType {
   createRequest: (request: Partial<RequestItem>, fields: RequestField[]) => string;
   updateRequest: (requestId: string, updates: Partial<RequestItem>) => void;
   updateRequestFields: (requestId: string, fields: RequestField[]) => void;
-  publishRequest: (requestId: string) => void;
+  publishRequest: (requestId: string) => Promise<void>;
   closeRequest: (requestId: string) => void;
   archiveRequest: (requestId: string) => void;
   reopenRequest: (requestId: string) => void;
@@ -679,7 +679,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const adminResetPassword = async (userId: string) => {
-    const temporaryPassword = `${crypto.randomUUID()}Aa1!`;
+    const temporaryPassword = `${crypto.randomUUID().replace(/-/g, '').slice(0, 10)}Aa1!`;
     try {
       const resetPasswordFn = httpsCallable(functions, 'adminResetPassword');
       await resetPasswordFn({ targetUserId: userId, temporaryPassword });
@@ -941,6 +941,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     } catch (err) {
       console.error("Error publishing request:", err);
+      throw err;
     }
   };
 

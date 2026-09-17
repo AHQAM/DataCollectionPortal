@@ -38,6 +38,7 @@ exports.hashPassword = hashPassword;
 exports.verifyPassword = verifyPassword;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const firestore_1 = require("firebase-admin/firestore");
 const bcrypt = __importStar(require("bcrypt"));
 const auditLogger_1 = require("./auditLogger");
 const BCRYPT_SALT_ROUNDS = 12;
@@ -70,13 +71,12 @@ exports.authenticateWithRegionPassword = functions.https.onCall(async (data, con
     if (password.length > 128) {
         throw new functions.https.HttpsError("invalid-argument", "Password exceeds maximum length.");
     }
-    const db = admin.firestore();
+    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
         // 1. Find user by regionNo (username field)
         const usersRef = db.collection("users");
         const snapshot = await usersRef
             .where("username", "==", String(regionNo).trim())
-            .where("role", "in", ["REP", "SUPERVISOR", "ADMIN"])
             .limit(1)
             .get();
         if (snapshot.empty) {
@@ -94,6 +94,9 @@ exports.authenticateWithRegionPassword = functions.https.onCall(async (data, con
         const userDoc = snapshot.docs[0];
         const userData = userDoc.data();
         const userId = userDoc.id;
+        if (!["REP", "SUPERVISOR", "ADMIN"].includes(userData.role)) {
+            throw new functions.https.HttpsError("unauthenticated", "بيانات الاعتماد غير صحيحة. | Invalid credentials.");
+        }
         // 2. Check if account is active
         if (userData.isActive === false) {
             await (0, auditLogger_1.logAuditSafe)({

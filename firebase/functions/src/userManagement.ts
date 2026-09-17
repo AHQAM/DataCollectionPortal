@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { getFirestore } from "firebase-admin/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { randomBytes } from "crypto";
 import { logAuditSafe } from "./auditLogger";
@@ -49,7 +50,7 @@ export const createUser = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore("datacollectionportal");
 
     try {
       // Check for duplicate username
@@ -171,7 +172,7 @@ export const updateUser = functions.https.onCall(
       "repNo", "role", "isActive", "maxAllowedDevices",
     ];
 
-    const db = admin.firestore();
+    const db = getFirestore("datacollectionportal");
 
     try {
       const userRef = db.collection("users").doc(targetUserId);
@@ -276,7 +277,7 @@ export const deactivateUser = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore("datacollectionportal");
 
     try {
       const userRef = db.collection("users").doc(targetUserId);
@@ -361,7 +362,7 @@ export const importUsersBatch = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore("datacollectionportal");
 
     try {
       // Check for duplicate usernames

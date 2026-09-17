@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { getFirestore } from "firebase-admin/firestore";
 import { randomBytes } from "crypto";
 import { logAuditSafe } from "./auditLogger";
 import { hashPassword } from "./auth";
@@ -47,7 +48,7 @@ export const createAdminSupervisorUser = functions.https.onCall(
       );
     }
 
-    const db = admin.firestore();
+    const db = getFirestore("datacollectionportal");
 
     try {
       // 4. Create Native Firebase Auth User

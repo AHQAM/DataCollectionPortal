@@ -116,10 +116,11 @@ export const publishRequest = functions.https.onCall(async (data, context) => {
   if (!requestData.schemaSnapshot) {
     const fieldsSnapshot = await db.collection("request_fields")
       .where("requestId", "==", requestId)
-      .orderBy("orderIndex", "asc")
       .get();
       
-    const fieldsArray = fieldsSnapshot.docs.map(doc => doc.data());
+    const fieldsArray = fieldsSnapshot.docs
+      .map(doc => doc.data())
+      .sort((left, right) => (left.orderIndex ?? 0) - (right.orderIndex ?? 0));
     updates.schemaSnapshot = fieldsArray;
     updates.formSchemaVersion = (requestData.formSchemaVersion || 0) + 1;
   }
