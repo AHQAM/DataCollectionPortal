@@ -5,12 +5,20 @@ import { AuthPortal } from './components/common/AuthPortal';
 import { AdminLayout } from './components/admin/AdminLayout';
 
 const MainAppContent: React.FC = () => {
-  const { lang, dir, currentUser } = useApp();
+  const { lang, dir, currentUser, authReady } = useApp();
 
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
   }, [lang, dir]);
+  if (!authReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-100 text-slate-700">
+        جاري التحقق من جلسة الدخول...
+      </div>
+    );
+  }
+
   if (!currentUser) {
     return <AuthPortal />;
   }

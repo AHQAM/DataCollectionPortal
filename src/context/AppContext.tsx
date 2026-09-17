@@ -46,6 +46,7 @@ interface AppContextType {
   t: (key: string, defaultAr?: string, defaultEn?: string) => string;
 
   currentUser: User | null;
+  authReady: boolean;
   users: User[];
   branches: Branch[];
   regions: Region[];
@@ -191,17 +192,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [users, setUsers] = useState<User[]>([]);
 
   // Current session
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem(`${STORAGE_PREFIX}current_user`);
-    if (saved) {
-      try {
-        return JSON.parse(saved) as User;
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  });
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState(false);
 
   // Sync users with Firestore real-time
   useEffect(() => {
@@ -451,32 +443,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Try to find user in already-loaded state first
-        const firestoreUser = users.find(u => u.userId === firebaseUser.uid);
-        if (firestoreUser) {
-          setCurrentUser(firestoreUser);
-          setSelectedRegionNo(firestoreUser.regionNo);
-        } else {
-          // Fetch directly from Firestore if not yet in state (e.g., on first load)
-          try {
-            const userDocRef = doc(db, 'users', firebaseUser.uid);
-            const userDocSnap = await getDoc(userDocRef);
-            if (userDocSnap.exists()) {
-              const userData = userDocSnap.data() as User;
-              setCurrentUser(userData);
-              setSelectedRegionNo(userData.regionNo);
-            }
-          } catch (err) {
-            console.error('Error fetching user from Firestore:', err);
+        try {
+          await firebaseUser.getIdTokenResult(true);
+        } catch (err) {
+          console.error('Error refreshing Firebase Auth token:', err);
+          setCurrentUser(null);
+          setAuthReady(true);
+          return;
+        }
+
+        try {
+          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data() as User;
+            setCurrentUser(userData);
+            setSelectedRegionNo(userData.regionNo);
+          } else {
+            setCurrentUser(null);
           }
+        } catch (err) {
+          console.error('Error fetching user from Firestore:', err);
+          setCurrentUser(null);
         }
       } else {
         // If not logged in on Firebase, clear context user
         setCurrentUser(null);
+        localStorage.removeItem(`${STORAGE_PREFIX}current_user`);
       }
+      setAuthReady(true);
     });
     return () => unsubscribe();
-  }, [users]);
+  }, []);
 
   const login = async (regionNoOrEmail: string, passwordInput: string): Promise<LoginResult> => {
     const trimmedInput = regionNoOrEmail.trim();
@@ -602,6 +600,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     await signOut(auth);
     setCurrentUser(null);
+    localStorage.removeItem(`${STORAGE_PREFIX}current_user`);
   };
 
   const quickSwitchUser = (userId: string) => {
@@ -1569,6 +1568,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         offlineQueue,
         syncOfflineQueue,
         currentUser,
+        authReady,
         users,
         branches,
         regions,
