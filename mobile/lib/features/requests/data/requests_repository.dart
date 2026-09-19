@@ -15,10 +15,7 @@ class RequestsRepository {
   Stream<List<RequestModel>> watchMyRequests(String userId) {
     return _firestore
         .collection(AppConstants.requestsCollection)
-        .where(
-          'status',
-          whereIn: const ['Published', 'Closed', 'Archived'],
-        )
+        .where('status', whereIn: const ['Published', 'Closed', 'Archived'])
         .snapshots()
         .map((snapshot) {
           final requests = snapshot.docs.map((doc) {
@@ -26,21 +23,37 @@ class RequestsRepository {
             data['id'] = doc.id;
 
             DateTime parseDate(dynamic val) {
-              if (val is Timestamp) return val.toDate();
-              if (val is String) return DateTime.tryParse(val) ?? DateTime.now();
+              if (val is Timestamp) {
+                return val.toDate();
+              }
+              if (val is String) {
+                return DateTime.tryParse(val) ?? DateTime.now();
+              }
               return DateTime.now();
             }
 
-            data['assignedAt'] = parseDate(data['assignedAt'] ?? data['publishedAt'] ?? data['createdAt']).toIso8601String();
+            data['assignedAt'] = parseDate(
+              data['assignedAt'] ?? data['publishedAt'] ?? data['createdAt'],
+            ).toIso8601String();
             if (data['dueDate'] != null || data['dueAt'] != null) {
-              data['dueDate'] = parseDate(data['dueDate'] ?? data['dueAt']).toIso8601String();
+              data['dueDate'] = parseDate(
+                data['dueDate'] ?? data['dueAt'],
+              ).toIso8601String();
             }
             if (data['completedAt'] != null) {
-              data['completedAt'] = parseDate(data['completedAt']).toIso8601String();
+              data['completedAt'] = parseDate(
+                data['completedAt'],
+              ).toIso8601String();
             }
 
-            data['activityId'] = data['activityId'] ?? data['requestId'] ?? doc.id;
-            data['branchId'] = data['branchId'] ?? (data['targetBranches'] is List && (data['targetBranches'] as List).isNotEmpty ? (data['targetBranches'] as List)[0] : 'MAIN');
+            data['activityId'] =
+                data['activityId'] ?? data['requestId'] ?? doc.id;
+            data['branchId'] =
+                data['branchId'] ??
+                (data['targetBranches'] is List &&
+                        (data['targetBranches'] as List).isNotEmpty
+                    ? (data['targetBranches'] as List)[0]
+                    : 'MAIN');
             data['regionNo'] = data['regionNo'] ?? 'ALL';
             data['metadata'] = {
               'titleAr': data['titleAr'] ?? data['title'] ?? '',

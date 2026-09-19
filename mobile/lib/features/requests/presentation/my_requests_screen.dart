@@ -48,10 +48,14 @@ class MyRequestsScreen extends ConsumerWidget {
             itemCount: requests.length,
             itemBuilder: (context, index) {
               final request = requests[index];
-              final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-              final title = (isArabic
-                  ? request.metadata['titleAr']
-                  : request.metadata['titleEn']) ?? (request.metadata['titleAr'] ?? 'Activity: ${request.activityId}');
+              final isArabic =
+                  Localizations.localeOf(context).languageCode == 'ar';
+              final title =
+                  (isArabic
+                      ? request.metadata['titleAr']
+                      : request.metadata['titleEn']) ??
+                  (request.metadata['titleAr'] ??
+                      'Activity: ${request.activityId}');
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),

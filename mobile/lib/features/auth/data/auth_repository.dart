@@ -43,7 +43,9 @@ class AuthRepository {
       'regionNo': regionNo,
       'password': password,
       'installationDeviceId': deviceId,
-      'platform': Platform.isIOS ? 'ios' : (Platform.isAndroid ? 'android' : 'web'),
+      'platform': Platform.isIOS
+          ? 'ios'
+          : (Platform.isAndroid ? 'android' : 'web'),
       'appVersion': '1.0.0',
     });
 

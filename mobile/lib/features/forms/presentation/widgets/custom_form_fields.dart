@@ -155,7 +155,10 @@ class _LocationFormFieldState extends State<LocationFormField> {
                     if (widget.field.isRequired)
                       const Text(
                         ' *',
-                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                   ],
                 ),
@@ -170,7 +173,11 @@ class _LocationFormFieldState extends State<LocationFormField> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.check_circle, color: _emerald, size: 20),
+                        const Icon(
+                          Icons.check_circle,
+                          color: _emerald,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -221,8 +228,12 @@ class _LocationFormFieldState extends State<LocationFormField> {
                         : const Icon(Icons.my_location, size: 18),
                     label: Text(
                       _position == null
-                          ? (widget.isArabic ? 'تحديد الموقع الآن' : 'Get Current Location')
-                          : (widget.isArabic ? 'تحديث الموقع' : 'Update Location'),
+                          ? (widget.isArabic
+                                ? 'تحديد الموقع الآن'
+                                : 'Get Current Location')
+                          : (widget.isArabic
+                                ? 'تحديث الموقع'
+                                : 'Update Location'),
                     ),
                   ),
                 ),
@@ -328,7 +339,8 @@ class _PhotoFormFieldState extends State<PhotoFormField> {
       validator: (val) {
         if (widget.field.isRequired && _uploadedUrl == null) {
           return widget.isArabic
-              ? (widget.field.validationMessageAr ?? 'يرجى التقاط أو اختيار صورة')
+              ? (widget.field.validationMessageAr ??
+                    'يرجى التقاط أو اختيار صورة')
               : (widget.field.validationMessageEn ?? 'Photo is required');
         }
         return null;
@@ -368,7 +380,10 @@ class _PhotoFormFieldState extends State<PhotoFormField> {
                     if (widget.field.isRequired)
                       const Text(
                         ' *',
-                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                   ],
                 ),
@@ -408,10 +423,16 @@ class _PhotoFormFieldState extends State<PhotoFormField> {
                     padding: const EdgeInsets.only(top: 8),
                     child: Row(
                       children: [
-                        const Icon(Icons.check_circle, color: _emerald, size: 16),
+                        const Icon(
+                          Icons.check_circle,
+                          color: _emerald,
+                          size: 16,
+                        ),
                         const SizedBox(width: 4),
                         Text(
-                          widget.isArabic ? 'تم حفظ الصورة بنجاح' : 'Image saved successfully',
+                          widget.isArabic
+                              ? 'تم حفظ الصورة بنجاح'
+                              : 'Image saved successfully',
                           style: const TextStyle(color: _emerald, fontSize: 12),
                         ),
                       ],
@@ -433,7 +454,9 @@ class _PhotoFormFieldState extends State<PhotoFormField> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: _uploading ? null : () => _pickImage(ImageSource.camera),
+                        onPressed: _uploading
+                            ? null
+                            : () => _pickImage(ImageSource.camera),
                         icon: const Icon(Icons.camera_alt, size: 18),
                         label: Text(widget.isArabic ? 'الكاميرا' : 'Camera'),
                       ),
@@ -441,7 +464,9 @@ class _PhotoFormFieldState extends State<PhotoFormField> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: _uploading ? null : () => _pickImage(ImageSource.gallery),
+                        onPressed: _uploading
+                            ? null
+                            : () => _pickImage(ImageSource.gallery),
                         icon: const Icon(Icons.photo_library, size: 18),
                         label: Text(widget.isArabic ? 'المعرض' : 'Gallery'),
                       ),
@@ -607,7 +632,10 @@ class _SignatureFormFieldState extends State<SignatureFormField> {
                     if (widget.field.isRequired)
                       const Text(
                         ' *',
-                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                   ],
                 ),
@@ -635,7 +663,11 @@ class _SignatureFormFieldState extends State<SignatureFormField> {
                         SizedBox(width: 4),
                         Text(
                           'تم اعتماد التوقيع ✓',
-                          style: TextStyle(color: _emerald, fontSize: 12, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: _emerald,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -668,9 +700,14 @@ class _SignatureFormFieldState extends State<SignatureFormField> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
                               )
-                            : Text(widget.isArabic ? 'اعتماد التوقيع' : 'Confirm'),
+                            : Text(
+                                widget.isArabic ? 'اعتماد التوقيع' : 'Confirm',
+                              ),
                       ),
                     ),
                   ],
