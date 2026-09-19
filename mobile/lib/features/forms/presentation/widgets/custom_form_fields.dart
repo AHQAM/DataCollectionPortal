@@ -761,3 +761,336 @@ class BarcodeFormField extends StatelessWidget {
     );
   }
 }
+
+/// Multi-line text field
+class TextareaFormField extends StatelessWidget {
+  final FormFieldModel field;
+  final bool isArabic;
+  final ValueChanged<String> onChanged;
+  final FormFieldSetter<String> onSaved;
+
+  const TextareaFormField({
+    super.key,
+    required this.field,
+    required this.isArabic,
+    required this.onChanged,
+    required this.onSaved,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final label = isArabic ? field.labelAr : field.labelEn;
+
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: label,
+        alignLabelWithHint: true,
+        hintText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      maxLines: 4,
+      minLines: 2,
+      readOnly: field.isReadOnly,
+      validator: (value) {
+        if (field.isRequired && (value == null || value.trim().isEmpty)) {
+          return isArabic
+              ? (field.validationMessageAr ?? 'هذا الحقل مطلوب')
+              : (field.validationMessageEn ?? 'This field is required');
+        }
+        return null;
+      },
+      onChanged: onChanged,
+      onSaved: (val) => onSaved(val ?? ''),
+    );
+  }
+}
+
+/// Date picker form field
+class DateFormField extends StatefulWidget {
+  final FormFieldModel field;
+  final bool isArabic;
+  final ValueChanged<String> onChanged;
+  final FormFieldSetter<String> onSaved;
+
+  const DateFormField({
+    super.key,
+    required this.field,
+    required this.isArabic,
+    required this.onChanged,
+    required this.onSaved,
+  });
+
+  @override
+  State<DateFormField> createState() => _DateFormFieldState();
+}
+
+class _DateFormFieldState extends State<DateFormField> {
+  DateTime? _selectedDate;
+  final _controller = TextEditingController();
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+        _controller.text = picked.toIso8601String().split('T')[0];
+      });
+      widget.onChanged(_controller.text);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final label = widget.isArabic ? widget.field.labelAr : widget.field.labelEn;
+
+    return TextFormField(
+      controller: _controller,
+      readOnly: true,
+      onTap: widget.field.isReadOnly ? null : _pickDate,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: widget.isArabic ? 'اختر التاريخ' : 'Select Date',
+        prefixIcon: const Icon(Icons.calendar_today),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      validator: (value) {
+        if (widget.field.isRequired && (value == null || value.isEmpty)) {
+          return widget.isArabic
+              ? (widget.field.validationMessageAr ?? 'يرجى اختيار التاريخ')
+              : (widget.field.validationMessageEn ?? 'Date is required');
+        }
+        return null;
+      },
+      onSaved: (val) => widget.onSaved(val ?? ''),
+    );
+  }
+}
+
+/// Yes/No boolean toggle field
+class YesNoFormField extends StatefulWidget {
+  final FormFieldModel field;
+  final bool isArabic;
+  final ValueChanged<bool?> onChanged;
+  final FormFieldSetter<bool?> onSaved;
+
+  const YesNoFormField({
+    super.key,
+    required this.field,
+    required this.isArabic,
+    required this.onChanged,
+    required this.onSaved,
+  });
+
+  @override
+  State<YesNoFormField> createState() => _YesNoFormFieldState();
+}
+
+class _YesNoFormFieldState extends State<YesNoFormField> {
+  bool? _value;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = widget.isArabic ? widget.field.labelAr : widget.field.labelEn;
+
+    return FormField<bool>(
+      validator: (val) {
+        if (widget.field.isRequired && _value == null) {
+          return widget.isArabic
+              ? (widget.field.validationMessageAr ?? 'يرجى تحديد نعم أو لا')
+              : (widget.field.validationMessageEn ?? 'Please select Yes or No');
+        }
+        return null;
+      },
+      onSaved: (_) => widget.onSaved(_value),
+      builder: (state) {
+        return Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: BorderSide(
+              color: state.hasError
+                  ? Theme.of(context).colorScheme.error
+                  : Colors.grey.shade300,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    ),
+                    if (widget.field.isRequired)
+                      const Text(' *', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ChoiceChip(
+                        label: Center(child: Text(widget.isArabic ? 'نعم ✓' : 'Yes ✓')),
+                        selected: _value == true,
+                        selectedColor: Colors.green.withValues(alpha: 0.2),
+                        onSelected: widget.field.isReadOnly
+                            ? null
+                            : (selected) {
+                                setState(() {
+                                  _value = selected ? true : null;
+                                });
+                                widget.onChanged(_value);
+                                state.didChange(_value);
+                              },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ChoiceChip(
+                        label: Center(child: Text(widget.isArabic ? 'لا ✗' : 'No ✗')),
+                        selected: _value == false,
+                        selectedColor: Colors.red.withValues(alpha: 0.2),
+                        onSelected: widget.field.isReadOnly
+                            ? null
+                            : (selected) {
+                                setState(() {
+                                  _value = selected ? false : null;
+                                });
+                                widget.onChanged(_value);
+                                state.didChange(_value);
+                              },
+                      ),
+                    ),
+                  ],
+                ),
+                if (state.hasError)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      state.errorText ?? '',
+                      style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Star rating form field
+class RatingFormField extends StatefulWidget {
+  final FormFieldModel field;
+  final bool isArabic;
+  final ValueChanged<int> onChanged;
+  final FormFieldSetter<int> onSaved;
+
+  const RatingFormField({
+    super.key,
+    required this.field,
+    required this.isArabic,
+    required this.onChanged,
+    required this.onSaved,
+  });
+
+  @override
+  State<RatingFormField> createState() => _RatingFormFieldState();
+}
+
+class _RatingFormFieldState extends State<RatingFormField> {
+  int _rating = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = widget.isArabic ? widget.field.labelAr : widget.field.labelEn;
+
+    return FormField<int>(
+      validator: (val) {
+        if (widget.field.isRequired && _rating == 0) {
+          return widget.isArabic
+              ? (widget.field.validationMessageAr ?? 'يرجى تحديد التقييم')
+              : (widget.field.validationMessageEn ?? 'Rating is required');
+        }
+        return null;
+      },
+      onSaved: (_) => widget.onSaved(_rating),
+      builder: (state) {
+        return Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: BorderSide(
+              color: state.hasError
+                  ? Theme.of(context).colorScheme.error
+                  : Colors.grey.shade300,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    ),
+                    if (widget.field.isRequired)
+                      const Text(' *', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    final starValue = index + 1;
+                    return IconButton(
+                      icon: Icon(
+                        starValue <= _rating ? Icons.star : Icons.star_border,
+                        color: Colors.amber,
+                        size: 32,
+                      ),
+                      onPressed: widget.field.isReadOnly
+                          ? null
+                          : () {
+                              setState(() {
+                                _rating = starValue;
+                              });
+                              widget.onChanged(_rating);
+                              state.didChange(_rating);
+                            },
+                    );
+                  }),
+                ),
+                if (state.hasError)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      state.errorText ?? '',
+                      style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

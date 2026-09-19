@@ -17,20 +17,29 @@ class FormFieldsRepository {
 
   FormFieldsRepository(this._firestore, this._syncManager);
 
-  /// Fetches the list of [FormFieldModel] for a given [activityId].
+  /// Fetches the list of [FormFieldModel] for a given [activityId] or [requestId].
   Future<List<FormFieldModel>> getFieldsForActivity(String activityId) async {
-    final snapshot = await _firestore
+    QuerySnapshot snapshot = await _firestore
         .collection(AppConstants.requestFieldsCollection)
         .where('activityId', isEqualTo: activityId)
-        .where('isActive', isEqualTo: true)
-        .orderBy('orderIndex')
         .get();
 
-    return snapshot.docs.map((doc) {
-      final data = Map<String, dynamic>.from(doc.data());
+    if (snapshot.docs.isEmpty) {
+      snapshot = await _firestore
+          .collection(AppConstants.requestFieldsCollection)
+          .where('requestId', isEqualTo: activityId)
+          .get();
+    }
+
+    final fields = snapshot.docs.map((doc) {
+      final data = Map<String, dynamic>.from(doc.data() as Map);
       data['id'] = doc.id;
       return FormFieldModel.fromJson(data);
-    }).toList();
+    }).where((f) => f.id.isNotEmpty).toList();
+
+    // Sort by orderIndex ascending
+    fields.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
+    return fields;
   }
 
   /// Saves the filled form data for a request record, queued via [SyncManager]

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useUIStore } from '../../stores/uiStore';
+import { useDataStore } from '../../stores/dataStore';
 import { ShareRepLinkModal } from '../common/ShareRepLinkModal';
 import {
   FileText,
@@ -32,18 +33,8 @@ interface Props {
 }
 
 export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
-  const {
-    lang,
-    dir,
-    t,
-    requests,
-    records,
-    assignments,
-    users,
-    branches,
-    regions,
-    auditLogs,
-  } = useApp();
+  const { lang, dir, t } = useUIStore();
+  const { requests, records, assignments, users, branches, regions, auditLogs } = useDataStore();
 
   const [showShareModal, setShowShareModal] = useState(false);
 

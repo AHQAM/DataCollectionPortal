@@ -5,6 +5,7 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/change_password_screen.dart';
 import '../../features/auth/presentation/auth_controller.dart';
 import '../../features/requests/presentation/my_requests_screen.dart';
+import '../../features/requests/presentation/request_records_screen.dart';
 import '../../features/forms/presentation/dynamic_form_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
 
@@ -48,6 +49,19 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/requests',
         builder: (context, state) => const MyRequestsScreen(),
+      ),
+      GoRoute(
+        path: '/request/:requestId/records',
+        builder: (context, state) {
+          final requestId = state.pathParameters['requestId']!;
+          final activityId = state.uri.queryParameters['activityId'] ?? requestId;
+          final title = state.uri.queryParameters['title'] ?? 'Request Records';
+          return RequestRecordsScreen(
+            requestId: requestId,
+            activityId: activityId,
+            requestTitle: title,
+          );
+        },
       ),
       GoRoute(
         path: '/form/:requestId/:activityId',

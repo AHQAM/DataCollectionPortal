@@ -51,6 +51,10 @@ export type DynamicFieldType =
 
 export type FieldType = DynamicFieldType;
 export type AssignmentItem = Assignment;
+export type Request = RequestItem;
+export type Field = RequestField;
+export type Template = RequestTemplate;
+export type RecordResponse = ResponseValue;
 
 export interface FieldOption {
   id: string;

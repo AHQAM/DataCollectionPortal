@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,27 +21,32 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   debugPrint("Handling a background message: ${message.messageId}");
 }
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    // Initialize Firebase
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Initialize FCM
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // Initialize FCM
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // Request permission (iOS/Web mainly)
-  await FirebaseMessaging.instance.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
+    // Request permission (iOS/Web mainly)
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
 
-  // Initialize local storage
-  await Hive.initFlutter();
-  await HiveService().init();
+    // Initialize local storage
+    await Hive.initFlutter();
+    await HiveService().init();
 
-  runApp(const ProviderScope(child: SalesCollectionApp()));
+    runApp(const ProviderScope(child: SalesCollectionApp()));
+  }, (error, stack) {
+    debugPrint('Uncaught exception: $error\n$stack');
+    // TODO: Send to Firebase Crashlytics if available
+  });
 }
 
 class SalesCollectionApp extends ConsumerWidget {

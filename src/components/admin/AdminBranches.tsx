@@ -25,6 +25,9 @@ import {
   RefreshCw,
   Layers,
 } from 'lucide-react';
+import { BranchModal } from './modals/BranchModal';
+import { RegionModal } from './modals/RegionModal';
+import { ExcelImportModal } from './modals/ExcelImportModal';
 
 export const AdminBranches: React.FC = () => {
   const {
@@ -768,417 +771,67 @@ export const AdminBranches: React.FC = () => {
       )}
 
       {/* Modal: Add/Edit Branch */}
-      {showBranchModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-900 flex items-center justify-center font-bold">
-                  <Building2 className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-extrabold text-slate-900">
-                  {editingBranch
-                    ? lang === 'ar' ? 'تعديل بيانات الفرع' : 'Edit Branch'
-                    : lang === 'ar' ? 'إضافة فرع جديد' : 'New Branch'}
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowBranchModal(false)}
-                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {alertError && (
-              <div className="mt-3 p-2.5 bg-red-50 border border-red-200 rounded-xl text-xs font-bold text-red-700 flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 shrink-0" />
-                <span>{alertError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSaveBranch} className="space-y-3.5 mt-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'رمز الفرع (Branch ID)' : 'Branch ID'}
-                </label>
-                <input
-                  type="text"
-                  disabled={!!editingBranch}
-                  value={branchCode}
-                  onChange={(e) => setBranchCode(e.target.value)}
-                  placeholder="مثال: BR-RYD"
-                  className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono font-bold uppercase disabled:bg-slate-100"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'اسم الفرع (باللغة العربية)' : 'Branch Name (Arabic)'} *
-                </label>
-                <input
-                  type="text"
-                  value={branchNameAr}
-                  onChange={(e) => setBranchNameAr(e.target.value)}
-                  placeholder="مثال: فرع المنطقة الجنوبية (أبها وخميس مشيط)"
-                  className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'اسم الفرع (باللغة الإنجليزية)' : 'Branch Name (English)'}
-                </label>
-                <input
-                  type="text"
-                  value={branchNameEn}
-                  onChange={(e) => setBranchNameEn(e.target.value)}
-                  placeholder="e.g. Southern Region Branch (Abha)"
-                  className="w-full h-10 px-3 rounded-xl border border-slate-300"
-                />
-              </div>
-
-              <div className="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setShowBranchModal(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold cursor-pointer"
-                >
-                  {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-extrabold shadow-sm transition-all cursor-pointer"
-                >
-                  {lang === 'ar' ? 'حفظ الفرع' : 'Save Branch'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <BranchModal
+        lang={lang}
+        showModal={showBranchModal}
+        editingBranch={editingBranch}
+        branchCode={branchCode}
+        setBranchCode={setBranchCode}
+        branchNameAr={branchNameAr}
+        setBranchNameAr={setBranchNameAr}
+        branchNameEn={branchNameEn}
+        setBranchNameEn={setBranchNameEn}
+        alertError={alertError}
+        handleSaveBranch={handleSaveBranch}
+        onClose={() => setShowBranchModal(false)}
+      />
 
       {/* Modal: Add/Edit Region */}
-      {showRegionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-900 flex items-center justify-center font-bold">
-                  <MapPin className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-extrabold text-slate-900">
-                  {editingRegion
-                    ? lang === 'ar' ? 'تعديل بيانات المنطقة' : 'Edit Region'
-                    : lang === 'ar' ? 'إضافة منطقة ميدانية جديدة' : 'New Field Region'}
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowRegionModal(false)}
-                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {alertError && (
-              <div className="mt-3 p-2.5 bg-red-50 border border-red-200 rounded-xl text-xs font-bold text-red-700 flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 shrink-0" />
-                <span>{alertError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSaveRegion} className="space-y-3.5 mt-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'الفرع التابع له' : 'Parent Branch'} *
-                </label>
-                <select
-                  value={regionBranchId}
-                  onChange={(e) => setRegionBranchId(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
-                  required
-                >
-                  {branches.map((b) => (
-                    <option key={b.branchId} value={b.branchId}>
-                      {lang === 'ar' ? b.branchNameAr : b.branchNameEn} ({b.branchId})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'رقم المنطقة الميدانية (Region Number)' : 'Region Number'} *
-                </label>
-                <input
-                  type="text"
-                  value={regionNo}
-                  onChange={(e) => setRegionNo(e.target.value)}
-                  placeholder="مثال: 110 أو 201"
-                  className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono font-bold"
-                  required
-                />
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  {lang === 'ar'
-                    ? 'يُستخدم كرقم دخول للمندوب الميداني وكرمز للمنطقة في ملفات الإكسل'
-                    : 'Used by rep to login and matches Region No column in Excel'}
-                </span>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'اسم المنطقة والأحياء (بالعربية)' : 'Region Name (Arabic)'} *
-                </label>
-                <input
-                  type="text"
-                  value={regionNameAr}
-                  onChange={(e) => setRegionNameAr(e.target.value)}
-                  placeholder="مثال: شمال الرياض - النرجس والياسمين"
-                  className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'اسم المنطقة (بالإنجليزية)' : 'Region Name (English)'}
-                </label>
-                <input
-                  type="text"
-                  value={regionNameEn}
-                  onChange={(e) => setRegionNameEn(e.target.value)}
-                  placeholder="e.g. North Riyadh - Narjis & Yasmin"
-                  className="w-full h-10 px-3 rounded-xl border border-slate-300"
-                />
-              </div>
-
-              <div className="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setShowRegionModal(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold cursor-pointer"
-                >
-                  {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-extrabold shadow-sm transition-all cursor-pointer"
-                >
-                  {lang === 'ar' ? 'حفظ المنطقة' : 'Save Region'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <RegionModal
+        lang={lang}
+        showModal={showRegionModal}
+        editingRegion={editingRegion}
+        regionNo={regionNo}
+        setRegionNo={setRegionNo}
+        regionNameAr={regionNameAr}
+        setRegionNameAr={setRegionNameAr}
+        regionNameEn={regionNameEn}
+        setRegionNameEn={setRegionNameEn}
+        regionBranchId={regionBranchId}
+        setRegionBranchId={setRegionBranchId}
+        branches={branches}
+        alertError={alertError}
+        handleSaveRegion={handleSaveRegion}
+        onClose={() => setShowRegionModal(false)}
+      />
 
       {/* ========================================================================= */}
       {/* EXCEL IMPORT MODAL (Branches & Regions) */}
       {/* ========================================================================= */}
-      {showExcelModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 my-8">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
-                  <FileSpreadsheet className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-slate-900">
-                    {lang === 'ar' ? 'استيراد الفروع والمناطق من Excel' : 'Import Branches & Regions from Excel'}
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    {lang === 'ar'
-                      ? 'رفع ملف Excel (.xlsx) لإنشاء الفروع وتوزيع المناطق الميدانية تلقائياً'
-                      : 'Upload an Excel (.xlsx) file to auto-populate branches and regional sales zones'}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  setShowExcelModal(false);
-                  setParsedBranches([]);
-                  setParsedRegions([]);
-                  setExcelFileName('');
-                  setExcelParseError(null);
-                }}
-                className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-4 py-4">
-              {/* Template Download Card */}
-              <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <div className="text-xs font-black text-emerald-950 flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-emerald-600" />
-                    <span>{lang === 'ar' ? 'القالب النموذجي المعتمد' : 'Standard Excel Template'}</span>
-                  </div>
-                  <p className="text-[11px] text-emerald-800 mt-0.5">
-                    {lang === 'ar'
-                      ? 'حمّل ملف الإكسل المنسّق مسبقاً، عبّئ فروعك ومناطقك ثم ارفعه هنا.'
-                      : 'Download the pre-formatted template, fill in your branches and zones, then upload.'}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleDownloadTemplate}
-                  className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shrink-0 shadow-xs transition-all cursor-pointer"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>{lang === 'ar' ? 'تحميل قالب Excel (.xlsx)' : 'Download Template (.xlsx)'}</span>
-                </button>
-              </div>
-
-              {/* File Upload Drop Area */}
-              <div className="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl p-6 text-center transition-all bg-slate-50/50 hover:bg-emerald-50/20">
-                <UploadCloud className="w-10 h-10 text-slate-400 mx-auto mb-2" />
-                <label className="cursor-pointer">
-                  <span className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl inline-block shadow-xs transition-all">
-                    {lang === 'ar' ? 'اختر ملف الإكسل (.xlsx, .xls, .csv)' : 'Select Excel File (.xlsx, .xls, .csv)'}
-                  </span>
-                  <input
-                    type="file"
-                    accept=".xlsx, .xls, .csv"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
-                {excelFileName ? (
-                  <div className="mt-3 text-xs font-bold text-emerald-700 flex items-center justify-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>{excelFileName}</span>
-                  </div>
-                ) : (
-                  <p className="text-[11px] text-slate-400 mt-2">
-                    {lang === 'ar' ? 'يدعم ملفات .xlsx و .xls و .csv' : 'Supports .xlsx, .xls, and .csv files'}
-                  </p>
-                )}
-              </div>
-
-              {/* Parse Error */}
-              {excelParseError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 font-bold flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                  <span>{excelParseError}</span>
-                </div>
-              )}
-
-              {/* Preview of Parsed Data */}
-              {(parsedBranches.length > 0 || parsedRegions.length > 0) && (
-                <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-3">
-                      <span className="px-2.5 py-1 bg-purple-100 text-purple-900 rounded-lg text-xs font-black">
-                        {lang === 'ar' ? `الفروع المكتشفة: ${parsedBranches.length}` : `Branches: ${parsedBranches.length}`}
-                      </span>
-                      <span className="px-2.5 py-1 bg-emerald-100 text-emerald-900 rounded-lg text-xs font-black">
-                        {lang === 'ar' ? `المناطق المكتشفة: ${parsedRegions.length}` : `Regions: ${parsedRegions.length}`}
-                      </span>
-                    </div>
-
-                    {/* Mode selector */}
-                    <div className="flex items-center gap-3 text-xs font-bold text-slate-700">
-                      <label className="flex items-center gap-1.5 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="importMode"
-                          value="append"
-                          checked={importMode === 'append'}
-                          onChange={() => setImportMode('append')}
-                          className="text-emerald-600 focus:ring-emerald-500"
-                        />
-                        <span>{lang === 'ar' ? 'دمج مع الحالي (Merge)' : 'Merge with existing'}</span>
-                      </label>
-                      <label className="flex items-center gap-1.5 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="importMode"
-                          value="replace"
-                          checked={importMode === 'replace'}
-                          onChange={() => setImportMode('replace')}
-                          className="text-rose-600 focus:ring-rose-500"
-                        />
-                        <span>{lang === 'ar' ? 'استبدال بالكامل (Replace All)' : 'Replace all'}</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Sample rows preview table */}
-                  <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-200 bg-white">
-                    <table className="w-full text-start text-[11px]">
-                      <thead className="bg-slate-100 text-slate-700 font-bold sticky top-0">
-                        <tr>
-                          <th className="px-3 py-2 text-start">{lang === 'ar' ? 'رمز الفرع' : 'Branch ID'}</th>
-                          <th className="px-3 py-2 text-start">{lang === 'ar' ? 'اسم الفرع' : 'Branch Name'}</th>
-                          <th className="px-3 py-2 text-start">{lang === 'ar' ? 'رقم المنطقة' : 'Region No'}</th>
-                          <th className="px-3 py-2 text-start">{lang === 'ar' ? 'اسم المنطقة' : 'Region Name'}</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 font-medium">
-                        {parsedRegions.slice(0, 10).map((r, i) => {
-                          const branch = parsedBranches.find((b) => b.branchId === r.branchId);
-                          return (
-                            <tr key={i} className="hover:bg-slate-50">
-                              <td className="px-3 py-1.5 font-mono text-purple-900 font-bold">{r.branchId}</td>
-                              <td className="px-3 py-1.5 text-slate-800">{branch?.branchNameAr || r.branchId}</td>
-                              <td className="px-3 py-1.5 font-mono font-bold text-slate-900">{r.regionNo}</td>
-                              <td className="px-3 py-1.5 text-slate-600">{r.regionNameAr}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                  {parsedRegions.length > 10 && (
-                    <p className="text-[10px] text-slate-400 text-center">
-                      {lang === 'ar'
-                        ? `... ويوجد ${parsedRegions.length - 10} مناطق إضافية في الملف`
-                        : `... and ${parsedRegions.length - 10} more regions in file`}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowExcelModal(false);
-                  setParsedBranches([]);
-                  setParsedRegions([]);
-                  setExcelFileName('');
-                  setExcelParseError(null);
-                }}
-                className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer"
-              >
-                {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmImport}
-                disabled={parsedBranches.length === 0 && parsedRegions.length === 0}
-                className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-black shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <Check className="w-4 h-4" />
-                <span>
-                  {lang === 'ar'
-                    ? `تأكيد الاستيراد (${parsedBranches.length} فرع / ${parsedRegions.length} منطقة)`
-                    : `Confirm Import (${parsedBranches.length} Branches / ${parsedRegions.length} Regions)`}
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ExcelImportModal
+        lang={lang}
+        showModal={showExcelModal}
+        parsedBranches={parsedBranches}
+        setParsedBranches={setParsedBranches}
+        parsedRegions={parsedRegions}
+        setParsedRegions={setParsedRegions}
+        importMode={importMode}
+        setImportMode={setImportMode}
+        excelFileName={excelFileName}
+        setExcelFileName={setExcelFileName}
+        excelParseError={excelParseError}
+        setExcelParseError={setExcelParseError}
+        handleDownloadTemplate={handleDownloadTemplate}
+        handleFileUpload={handleFileUpload}
+        handleConfirmImport={handleConfirmImport}
+        onClose={() => {
+          setShowExcelModal(false);
+          setParsedBranches([]);
+          setParsedRegions([]);
+          setExcelFileName('');
+          setExcelParseError(null);
+        }}
+      />
     </div>
   );
 };
