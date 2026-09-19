@@ -6,6 +6,7 @@ import {
   signInWithCustomToken, 
   signInWithEmailAndPassword, 
   signOut,
+  onAuthStateChanged,
 } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
 import { doc, getDoc } from 'firebase/firestore';
@@ -46,8 +47,20 @@ export const useAuthStore = create<AuthStore>((set, get) => {
     return initial;
   };
 
+  const getInitialCurrentUser = (): User | null => {
+    const stored = localStorage.getItem(`${STORAGE_PREFIX}current_user`);
+    if (stored) {
+      try {
+        return JSON.parse(stored) as User;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
   return {
-    currentUser: null,
+    currentUser: getInitialCurrentUser(),
     setCurrentUser: (user) => {
       set({ currentUser: user });
       if (user) {
@@ -213,3 +226,67 @@ export const useAuthStore = create<AuthStore>((set, get) => {
     }
   };
 });
+
+// Initialize Firebase Auth listener and safety timeout
+if (typeof window !== 'undefined') {
+  onAuthStateChanged(auth, async (firebaseUser) => {
+    if (firebaseUser) {
+      try {
+        await firebaseUser.getIdTokenResult(true);
+      } catch (err) {
+        console.error('Error refreshing Firebase Auth token:', err);
+      }
+
+      const store = useAuthStore.getState();
+      if (store.currentUser && store.currentUser.userId === firebaseUser.uid) {
+        store.setAuthReady(true);
+        return;
+      }
+
+      try {
+        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+        if (userDoc.exists()) {
+          store.setCurrentUser(userDoc.data() as User);
+        } else {
+          const stored = localStorage.getItem(`${STORAGE_PREFIX}current_user`);
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored) as User;
+              if (parsed && (parsed.userId === firebaseUser.uid || parsed.username === firebaseUser.email)) {
+                store.setCurrentUser(parsed);
+              } else {
+                store.setCurrentUser(null);
+              }
+            } catch {
+              store.setCurrentUser(null);
+            }
+          } else {
+            store.setCurrentUser(null);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching user from Firestore:', err);
+        const stored = localStorage.getItem(`${STORAGE_PREFIX}current_user`);
+        if (stored) {
+          try {
+            store.setCurrentUser(JSON.parse(stored) as User);
+          } catch {
+            store.setCurrentUser(null);
+          }
+        }
+      }
+    } else {
+      useAuthStore.getState().setCurrentUser(null);
+    }
+    useAuthStore.getState().setAuthReady(true);
+  });
+
+  // Safety fallback: ensure authReady is set to true within 2.5s even if Firebase is unreachable
+  setTimeout(() => {
+    if (!useAuthStore.getState().authReady) {
+      console.warn('Auth check fallback triggered: setting authReady to true');
+      useAuthStore.getState().setAuthReady(true);
+    }
+  }, 2500);
+}
+
