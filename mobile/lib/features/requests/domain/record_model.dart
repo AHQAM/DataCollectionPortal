@@ -6,7 +6,8 @@ class RecordModel {
   final String assignedRegionNo;
   final String branchName;
   final String repName;
-  final String recordStatus; // 'Pending' | 'DraftSaved' | 'Submitted' | 'Completed'
+  final String
+  recordStatus; // 'Pending' | 'DraftSaved' | 'Submitted' | 'Completed'
   final int completionPercent;
   final double? inventoryValue;
   final String? area;
@@ -39,8 +40,10 @@ class RecordModel {
       recordId: id,
       requestId: (data['requestId'] ?? '').toString(),
       customerNo: (data['customerNo'] ?? '').toString(),
-      customerName: (data['customerName'] ?? data['customerNo'] ?? 'عميل').toString(),
-      assignedRegionNo: (data['assignedRegionNo'] ?? data['regionNo'] ?? '').toString(),
+      customerName: (data['customerName'] ?? data['customerNo'] ?? 'عميل')
+          .toString(),
+      assignedRegionNo: (data['assignedRegionNo'] ?? data['regionNo'] ?? '')
+          .toString(),
       branchName: (data['branchName'] ?? '').toString(),
       repName: (data['repName'] ?? '').toString(),
       recordStatus: (data['recordStatus'] ?? 'Pending').toString(),

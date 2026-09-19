@@ -76,7 +76,10 @@ class RequestsRepository {
         .update({'status': status});
   }
 
-  Stream<List<RecordModel>> watchRecordsForRequest(String requestId, String userId) {
+  Stream<List<RecordModel>> watchRecordsForRequest(
+    String requestId,
+    String userId,
+  ) {
     return _firestore
         .collection(AppConstants.recordsCollection)
         .where('requestId', isEqualTo: requestId)

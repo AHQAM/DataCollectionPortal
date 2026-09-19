@@ -196,7 +196,9 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
             if (value != null && value.trim().isNotEmpty) {
               final parsed = num.tryParse(value);
               if (parsed == null) {
-                return isArabic ? 'يرجى إدخال قيمة رقمية صحيحة' : 'Please enter a valid number';
+                return isArabic
+                    ? 'يرجى إدخال قيمة رقمية صحيحة'
+                    : 'Please enter a valid number';
               }
             }
             return null;
@@ -234,9 +236,11 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
             }
             return null;
           },
-          onChanged: field.isReadOnly ? null : (value) {
-            _formData[field.id] = value;
-          },
+          onChanged: field.isReadOnly
+              ? null
+              : (value) {
+                  _formData[field.id] = value;
+                },
           onSaved: (value) => _formData[field.id] = value,
         );
 

@@ -54,7 +54,8 @@ GoRouter appRouter(Ref ref) {
         path: '/request/:requestId/records',
         builder: (context, state) {
           final requestId = state.pathParameters['requestId']!;
-          final activityId = state.uri.queryParameters['activityId'] ?? requestId;
+          final activityId =
+              state.uri.queryParameters['activityId'] ?? requestId;
           final title = state.uri.queryParameters['title'] ?? 'Request Records';
           return RequestRecordsScreen(
             requestId: requestId,

@@ -929,11 +929,20 @@ class _YesNoFormFieldState extends State<YesNoFormField> {
                     Expanded(
                       child: Text(
                         label,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                     if (widget.field.isRequired)
-                      const Text(' *', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                      const Text(
+                        ' *',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -941,7 +950,9 @@ class _YesNoFormFieldState extends State<YesNoFormField> {
                   children: [
                     Expanded(
                       child: ChoiceChip(
-                        label: Center(child: Text(widget.isArabic ? 'نعم ✓' : 'Yes ✓')),
+                        label: Center(
+                          child: Text(widget.isArabic ? 'نعم ✓' : 'Yes ✓'),
+                        ),
                         selected: _value == true,
                         selectedColor: Colors.green.withValues(alpha: 0.2),
                         onSelected: widget.field.isReadOnly
@@ -958,7 +969,9 @@ class _YesNoFormFieldState extends State<YesNoFormField> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: ChoiceChip(
-                        label: Center(child: Text(widget.isArabic ? 'لا ✗' : 'No ✗')),
+                        label: Center(
+                          child: Text(widget.isArabic ? 'لا ✗' : 'No ✗'),
+                        ),
                         selected: _value == false,
                         selectedColor: Colors.red.withValues(alpha: 0.2),
                         onSelected: widget.field.isReadOnly
@@ -979,7 +992,10 @@ class _YesNoFormFieldState extends State<YesNoFormField> {
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
                       state.errorText ?? '',
-                      style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
               ],
@@ -1048,11 +1064,20 @@ class _RatingFormFieldState extends State<RatingFormField> {
                     Expanded(
                       child: Text(
                         label,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                     if (widget.field.isRequired)
-                      const Text(' *', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                      const Text(
+                        ' *',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -1083,7 +1108,10 @@ class _RatingFormFieldState extends State<RatingFormField> {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       state.errorText ?? '',
-                      style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
               ],

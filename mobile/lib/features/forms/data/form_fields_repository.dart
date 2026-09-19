@@ -31,11 +31,14 @@ class FormFieldsRepository {
           .get();
     }
 
-    final fields = snapshot.docs.map((doc) {
-      final data = Map<String, dynamic>.from(doc.data() as Map);
-      data['id'] = doc.id;
-      return FormFieldModel.fromJson(data);
-    }).where((f) => f.id.isNotEmpty).toList();
+    final fields = snapshot.docs
+        .map((doc) {
+          final data = Map<String, dynamic>.from(doc.data() as Map);
+          data['id'] = doc.id;
+          return FormFieldModel.fromJson(data);
+        })
+        .where((f) => f.id.isNotEmpty)
+        .toList();
 
     // Sort by orderIndex ascending
     fields.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));

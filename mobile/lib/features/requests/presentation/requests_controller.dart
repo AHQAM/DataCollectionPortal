@@ -20,11 +20,13 @@ Stream<List<RequestModel>> myRequests(Ref ref) {
   return repository.watchMyRequests(user.uid);
 }
 
-final requestRecordsProvider = StreamProvider.family<List<RecordModel>, String>((ref, requestId) {
-  final user = ref.watch(authControllerProvider).value;
-  if (user == null) {
-    return const Stream.empty();
-  }
-  final repository = ref.watch(requestsRepositoryProvider);
-  return repository.watchRecordsForRequest(requestId, user.uid);
-});
+final requestRecordsProvider = StreamProvider.family<List<RecordModel>, String>(
+  (ref, requestId) {
+    final user = ref.watch(authControllerProvider).value;
+    if (user == null) {
+      return const Stream.empty();
+    }
+    final repository = ref.watch(requestsRepositoryProvider);
+    return repository.watchRecordsForRequest(requestId, user.uid);
+  },
+);

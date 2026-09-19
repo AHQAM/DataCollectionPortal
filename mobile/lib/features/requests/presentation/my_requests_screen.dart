@@ -11,7 +11,11 @@ import '../../../core/network/network_info.dart';
 class MyRequestsScreen extends ConsumerWidget {
   const MyRequestsScreen({super.key});
 
-  void _showSyncStatusModal(BuildContext context, WidgetRef ref, bool isArabic) async {
+  void _showSyncStatusModal(
+    BuildContext context,
+    WidgetRef ref,
+    bool isArabic,
+  ) async {
     final hiveService = ref.read(hiveServiceProvider);
     final networkInfo = ref.read(networkInfoProvider);
     final isOnline = await networkInfo.isConnected;
@@ -40,8 +44,13 @@ class MyRequestsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    isArabic ? 'حالة الاتصال والمزامنة' : 'Connection & Sync Status',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    isArabic
+                        ? 'حالة الاتصال والمزامنة'
+                        : 'Connection & Sync Status',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),
@@ -56,24 +65,37 @@ class MyRequestsScreen extends ConsumerWidget {
                 subtitle: Text(
                   isOnline
                       ? (isArabic ? 'متصل بالإنترنت' : 'Online')
-                      : (isArabic ? 'غير متصل (العمل في وضع الأوفلاين)' : 'Offline mode active'),
+                      : (isArabic
+                            ? 'غير متصل (العمل في وضع الأوفلاين)'
+                            : 'Offline mode active'),
                 ),
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.sync_problem, color: Colors.blue),
-                title: Text(isArabic ? 'السجلات بانتظار الرفع' : 'Pending Offline Submissions'),
+                title: Text(
+                  isArabic
+                      ? 'السجلات بانتظار الرفع'
+                      : 'Pending Offline Submissions',
+                ),
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: queueCount > 0 ? Colors.orange.withValues(alpha: 0.2) : Colors.green.withValues(alpha: 0.2),
+                    color: queueCount > 0
+                        ? Colors.orange.withValues(alpha: 0.2)
+                        : Colors.green.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '$queueCount',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: queueCount > 0 ? Colors.orange.shade800 : Colors.green.shade800,
+                      color: queueCount > 0
+                          ? Colors.orange.shade800
+                          : Colors.green.shade800,
                     ),
                   ),
                 ),
@@ -157,7 +179,9 @@ class MyRequestsScreen extends ConsumerWidget {
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
                 child: ListTile(
                   title: Text(
                     title.toString(),

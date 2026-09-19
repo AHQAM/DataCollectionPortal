@@ -28,12 +28,16 @@ abstract class FormFieldModel with _$FormFieldModel {
     final rawOptions = json['options'];
     List<String>? options;
     if (rawOptions is List) {
-      options = rawOptions.map((opt) {
-        if (opt is Map) {
-          return (opt['labelAr'] ?? opt['value'] ?? opt['labelEn'] ?? '').toString();
-        }
-        return opt.toString();
-      }).where((s) => s.isNotEmpty).toList();
+      options = rawOptions
+          .map((opt) {
+            if (opt is Map) {
+              return (opt['labelAr'] ?? opt['value'] ?? opt['labelEn'] ?? '')
+                  .toString();
+            }
+            return opt.toString();
+          })
+          .where((s) => s.isNotEmpty)
+          .toList();
     }
 
     var type = (json['type'] ?? json['fieldType'] ?? 'text').toString();
@@ -45,18 +49,26 @@ abstract class FormFieldModel with _$FormFieldModel {
       id: (json['id'] ?? json['fieldId'] ?? json['fieldKey'] ?? '').toString(),
       type: type,
       labelAr: (json['labelAr'] ?? json['fieldLabelAr'] ?? '').toString(),
-      labelEn: (json['labelEn'] ?? json['fieldLabelEn'] ?? json['fieldLabelAr'] ?? '').toString(),
+      labelEn:
+          (json['labelEn'] ??
+                  json['fieldLabelEn'] ??
+                  json['fieldLabelAr'] ??
+                  '')
+              .toString(),
       isRequired: json['isRequired'] as bool? ?? true,
       options: options,
       validationRegex: json['validationRegex'] as String?,
-      validationMessageAr: (json['validationMessageAr'] ?? json['helpTextAr']) as String?,
-      validationMessageEn: (json['validationMessageEn'] ?? json['helpTextEn']) as String?,
+      validationMessageAr:
+          (json['validationMessageAr'] ?? json['helpTextAr']) as String?,
+      validationMessageEn:
+          (json['validationMessageEn'] ?? json['helpTextEn']) as String?,
       isReadOnly: json['isReadOnly'] as bool? ?? false,
       minLength: (json['minLength'] as num?)?.toInt(),
       maxLength: (json['maxLength'] as num?)?.toInt(),
       minValue: (json['minValue'] as num?)?.toDouble(),
       maxValue: (json['maxValue'] as num?)?.toDouble(),
-      orderIndex: ((json['orderIndex'] ?? json['sortOrder']) as num?)?.toInt() ?? 0,
+      orderIndex:
+          ((json['orderIndex'] ?? json['sortOrder']) as num?)?.toInt() ?? 0,
     );
   }
 }
