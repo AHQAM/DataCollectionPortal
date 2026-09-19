@@ -27,8 +27,20 @@ export {
   releaseDevice,
   releaseDevice as releaseDeviceBinding,
   replaceDevice,
+  rejectDeviceReplacement,
   forceLogoutUser,
 } from "./deviceBinding";
+
+// Branch & Region Management
+export {
+  createBranch,
+  updateBranch,
+  deleteBranch,
+  createRegion,
+  updateRegion,
+  deleteRegion,
+  importBranchesAndRegions,
+} from "./branchRegionManagement";
 
 // Request Management
 export {
@@ -73,9 +85,18 @@ export {
 } from "./reportExport";
 
 // Response submission
-export { submitResponse } from "./responseManagement";
+export {
+  submitResponse,
+  saveDraftResponse,
+} from "./responseManagement";
+
+// System Maintenance
+export {
+  wipeDemoData,
+} from "./systemMaintenance";
 
 // Monitoring
 export {
   getSystemHealth,
 } from "./monitoring";
+

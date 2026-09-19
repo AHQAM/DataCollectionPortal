@@ -1,0 +1,143 @@
+export type Language = 'ar' | 'en';
+
+export const translations = {
+  ar: {
+    common: {
+      save: 'حفظ',
+      cancel: 'إلغاء',
+      delete: 'حذف',
+      edit: 'تعديل',
+      confirm: 'تأكيد',
+      loading: 'جاري التحميل...',
+      search: 'بحث...',
+      actions: 'الإجراءات',
+      status: 'الحالة',
+      active: 'نشط',
+      inactive: 'غير نشط',
+      all: 'الكل',
+      yes: 'نعم',
+      no: 'لا',
+      back: 'رجوع',
+      close: 'إغلاق',
+      required: 'إلزامي',
+      optional: 'اختياري',
+      error: 'حدث خطأ',
+      success: 'تمت العملية بنجاح',
+    },
+    requests: {
+      title: 'إدارة الطلبات والأنشطة',
+      subtitle: 'إنشاء وتخصيص نماذج جمع البيانات وتوجيهها للمناديب',
+      createNew: 'إنشاء طلب جديد',
+      editRequest: 'تعديل الطلب والنطاق',
+      requestCode: 'رمز الطلب',
+      requestTitle: 'عنوان الطلب',
+      targetBranches: 'الفروع المستهدفة',
+      targetRegions: 'المناطق المستهدفة',
+      allBranches: 'كل الفروع والمناطق',
+      specificScope: 'تحديد فروع ومناطق معينة',
+      dueDate: 'الموعد النهائي',
+      priority: 'الأولوية',
+      assignments: 'استعراض الإسناد',
+      statusDraft: 'مسودة',
+      statusPublished: 'نشط / منشور',
+      statusClosed: 'مغلق',
+      statusArchived: 'مؤرشف',
+    },
+    records: {
+      customerName: 'اسم العميل',
+      customerNo: 'رقم العميل',
+      region: 'المنطقة',
+      area: 'الحي / المنطقة',
+      phone: 'رقم الهاتف',
+      statusPending: 'بانتظار البدء',
+      statusDraft: 'مسودة',
+      statusSubmitted: 'مكتمل',
+      call: 'اتصال',
+      openMaps: 'فتح الخريطة',
+      openForm: 'فتح الاستبيان',
+    },
+    devices: {
+      title: 'إدارة الأجهزة وبصمة النظام',
+      approve: 'موافقة',
+      reject: 'رفض',
+      release: 'فك الارتباط',
+      forceLogout: 'تسجيل خروج إجباري',
+    },
+  },
+  en: {
+    common: {
+      save: 'Save',
+      cancel: 'Cancel',
+      delete: 'Delete',
+      edit: 'Edit',
+      confirm: 'Confirm',
+      loading: 'Loading...',
+      search: 'Search...',
+      actions: 'Actions',
+      status: 'Status',
+      active: 'Active',
+      inactive: 'Inactive',
+      all: 'All',
+      yes: 'Yes',
+      no: 'No',
+      back: 'Back',
+      close: 'Close',
+      required: 'Required',
+      optional: 'Optional',
+      error: 'An error occurred',
+      success: 'Operation completed successfully',
+    },
+    requests: {
+      title: 'Requests & Activities Management',
+      subtitle: 'Create and configure data collection forms and target reps',
+      createNew: 'Create New Request',
+      editRequest: 'Edit Request & Scope',
+      requestCode: 'Request Code',
+      requestTitle: 'Request Title',
+      targetBranches: 'Target Branches',
+      targetRegions: 'Target Regions',
+      allBranches: 'All Branches & Regions',
+      specificScope: 'Target Specific Branches & Regions',
+      dueDate: 'Due Date',
+      priority: 'Priority',
+      assignments: 'Assignments Overview',
+      statusDraft: 'Draft',
+      statusPublished: 'Active / Published',
+      statusClosed: 'Closed',
+      statusArchived: 'Archived',
+    },
+    records: {
+      customerName: 'Customer Name',
+      customerNo: 'Customer No',
+      region: 'Region',
+      area: 'Area / Neighborhood',
+      phone: 'Phone Number',
+      statusPending: 'Pending',
+      statusDraft: 'Draft',
+      statusSubmitted: 'Completed',
+      call: 'Call',
+      openMaps: 'Open in Maps',
+      openForm: 'Open Form',
+    },
+    devices: {
+      title: 'Device Management & System Fingerprint',
+      approve: 'Approve',
+      reject: 'Reject',
+      release: 'Release Device',
+      forceLogout: 'Force Logout',
+    },
+  },
+} as const;
+
+export const t = (path: string, lang: Language = 'ar'): string => {
+  const parts = path.split('.');
+  let current: any = translations[lang] || translations.ar;
+  for (const part of parts) {
+    if (current && typeof current === 'object' && part in current) {
+      current = current[part];
+    } else {
+      return path;
+    }
+  }
+  return typeof current === 'string' ? current : path;
+};

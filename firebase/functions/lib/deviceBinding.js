@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = void 0;
+exports.rejectDeviceReplacement = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = void 0;
 const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
@@ -264,6 +264,69 @@ exports.forceLogoutUser = functions.https.onCall(async (data, context) => {
         }
         console.error("Force logout error:", error);
         throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+    }
+});
+/**
+ * Cloud Function: rejectDeviceReplacement
+ *
+ * Admin-only: Rejects a pending device replacement request.
+ */
+exports.rejectDeviceReplacement = functions.https.onCall(async (data, context) => {
+    if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
+        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+    }
+    const { bindingId, targetUserId, reason } = data || {};
+    if (!bindingId && !targetUserId) {
+        throw new functions.https.HttpsError("invalid-argument", "معرف الربط أو معرف المستخدم مطلوب. | bindingId or targetUserId required.");
+    }
+    const db = (0, firestore_1.getFirestore)('datacollectionportal');
+    try {
+        let targetDoc = null;
+        if (bindingId) {
+            const docRef = db.collection("deviceBindings").doc(bindingId);
+            const docSnap = await docRef.get();
+            if (docSnap.exists) {
+                targetDoc = docSnap;
+            }
+        }
+        if (!targetDoc && targetUserId) {
+            const snap = await db.collection("deviceBindings")
+                .where("userId", "==", targetUserId)
+                .where("status", "in", ["PENDING", "PENDING_APPROVAL", "ACTIVE"])
+                .limit(1)
+                .get();
+            if (!snap.empty) {
+                targetDoc = snap.docs[0];
+            }
+        }
+        if (targetDoc) {
+            await targetDoc.ref.update({
+                status: "REJECTED",
+                rejectedAt: admin.firestore.FieldValue.serverTimestamp(),
+                rejectedBy: context.auth.uid,
+                rejectionReason: reason || "Admin rejected replacement",
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+        }
+        await (0, auditLogger_1.logAuditSafe)({
+            userId: context.auth.uid,
+            userRole: "ADMIN",
+            action: "DEVICE_REPLACEMENT_REJECTED",
+            entityType: "DEVICE_BINDING",
+            entityId: bindingId || targetUserId || 'UNKNOWN',
+            details: { reason: reason || "Admin rejected replacement" },
+        });
+        return {
+            success: true,
+            messageAr: "تم رفض طلب استبدال الجهاز.",
+            messageEn: "Device replacement request rejected.",
+        };
+    }
+    catch (error) {
+        if (error instanceof functions.https.HttpsError)
+            throw error;
+        console.error("Reject device replacement error:", error);
+        throw new functions.https.HttpsError("internal", "Internal server error.");
     }
 });
 //# sourceMappingURL=deviceBinding.js.map

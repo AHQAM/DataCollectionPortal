@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSystemHealth = exports.submitResponse = exports.exportReport = exports.sendBroadcastNotification = exports.exportDataToExternalSystem = exports.commitImport = exports.importDataPreview = exports.reassignRecords = exports.saveRequestFields = exports.cloneRequest = exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDeviceBinding = exports.releaseDevice = exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = exports.createAdminSupervisorUser = exports.authenticateWithRegionPassword = void 0;
+exports.getSystemHealth = exports.wipeDemoData = exports.saveDraftResponse = exports.submitResponse = exports.exportReport = exports.sendBroadcastNotification = exports.exportDataToExternalSystem = exports.commitImport = exports.importDataPreview = exports.reassignRecords = exports.saveRequestFields = exports.cloneRequest = exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = exports.importBranchesAndRegions = exports.deleteRegion = exports.updateRegion = exports.createRegion = exports.deleteBranch = exports.updateBranch = exports.createBranch = exports.forceLogoutUser = exports.rejectDeviceReplacement = exports.replaceDevice = exports.releaseDeviceBinding = exports.releaseDevice = exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = exports.createAdminSupervisorUser = exports.authenticateWithRegionPassword = void 0;
 const admin = __importStar(require("firebase-admin"));
 admin.initializeApp();
 // Authentication
@@ -58,7 +58,17 @@ var deviceBinding_1 = require("./deviceBinding");
 Object.defineProperty(exports, "releaseDevice", { enumerable: true, get: function () { return deviceBinding_1.releaseDevice; } });
 Object.defineProperty(exports, "releaseDeviceBinding", { enumerable: true, get: function () { return deviceBinding_1.releaseDevice; } });
 Object.defineProperty(exports, "replaceDevice", { enumerable: true, get: function () { return deviceBinding_1.replaceDevice; } });
+Object.defineProperty(exports, "rejectDeviceReplacement", { enumerable: true, get: function () { return deviceBinding_1.rejectDeviceReplacement; } });
 Object.defineProperty(exports, "forceLogoutUser", { enumerable: true, get: function () { return deviceBinding_1.forceLogoutUser; } });
+// Branch & Region Management
+var branchRegionManagement_1 = require("./branchRegionManagement");
+Object.defineProperty(exports, "createBranch", { enumerable: true, get: function () { return branchRegionManagement_1.createBranch; } });
+Object.defineProperty(exports, "updateBranch", { enumerable: true, get: function () { return branchRegionManagement_1.updateBranch; } });
+Object.defineProperty(exports, "deleteBranch", { enumerable: true, get: function () { return branchRegionManagement_1.deleteBranch; } });
+Object.defineProperty(exports, "createRegion", { enumerable: true, get: function () { return branchRegionManagement_1.createRegion; } });
+Object.defineProperty(exports, "updateRegion", { enumerable: true, get: function () { return branchRegionManagement_1.updateRegion; } });
+Object.defineProperty(exports, "deleteRegion", { enumerable: true, get: function () { return branchRegionManagement_1.deleteRegion; } });
+Object.defineProperty(exports, "importBranchesAndRegions", { enumerable: true, get: function () { return branchRegionManagement_1.importBranchesAndRegions; } });
 // Request Management
 var requestManagement_1 = require("./requestManagement");
 Object.defineProperty(exports, "createRequest", { enumerable: true, get: function () { return requestManagement_1.createRequest; } });
@@ -90,6 +100,10 @@ Object.defineProperty(exports, "exportReport", { enumerable: true, get: function
 // Response submission
 var responseManagement_1 = require("./responseManagement");
 Object.defineProperty(exports, "submitResponse", { enumerable: true, get: function () { return responseManagement_1.submitResponse; } });
+Object.defineProperty(exports, "saveDraftResponse", { enumerable: true, get: function () { return responseManagement_1.saveDraftResponse; } });
+// System Maintenance
+var systemMaintenance_1 = require("./systemMaintenance");
+Object.defineProperty(exports, "wipeDemoData", { enumerable: true, get: function () { return systemMaintenance_1.wipeDemoData; } });
 // Monitoring
 var monitoring_1 = require("./monitoring");
 Object.defineProperty(exports, "getSystemHealth", { enumerable: true, get: function () { return monitoring_1.getSystemHealth; } });

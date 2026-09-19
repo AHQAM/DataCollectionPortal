@@ -1,11 +1,16 @@
-import { httpsCallable } from 'firebase/functions';
-import { doc, setDoc, updateDoc, writeBatch, collection } from 'firebase/firestore';
-import { auth, db, functions } from '../firebase';
 import { useAuthStore } from '../stores/authStore';
 import { useDataStore } from '../stores/dataStore';
 import { useUIStore } from '../stores/uiStore';
-import { User, Branch, Region, RequestItem, RequestField, RecordItem, PasswordResetRequest, AuditLog, RequestTemplate, OfflineQueueItem } from '../types';
-import { sendBrowserNotification } from '../utils/webNotification';
+import { User, Branch, Region, RequestItem, RequestField, AuditLog, RequestTemplate } from '../types';
+import {
+  userApi,
+  requestApi,
+  recordApi,
+  branchRegionApi,
+  deviceApi,
+  systemApi,
+  templateApi,
+} from '../services';
 
 // Helper to add audit logs
 export const logAudit = (
@@ -34,28 +39,25 @@ export const logAudit = (
 
 export const useAppOperations = () => {
   return {
+    // ==================== User Operations ====================
     updateUser: async (user: User) => {
       useDataStore.getState().updateUserLocal(user);
       try {
-        const updateFn = httpsCallable(functions, 'updateUser');
-        await updateFn({
-          targetUserId: user.userId,
-          updates: {
-            repNameAr: user.repNameAr,
-            repNameEn: user.repNameEn,
-            email: user.email,
-            mobile: user.mobile,
-            branchId: user.branchId,
-            regionNo: user.regionNo,
-            allowedRegionNos: user.allowedRegionNos,
-            repNo: user.repNo,
-            role: user.role,
-            isActive: user.isActive,
-            maxAllowedDevices: user.maxAllowedDevices,
-          },
+        await userApi.updateUser(user.userId, {
+          repNameAr: user.repNameAr,
+          repNameEn: user.repNameEn,
+          email: user.email,
+          mobile: user.mobile,
+          branchId: user.branchId,
+          regionNo: user.regionNo,
+          allowedRegionNos: user.allowedRegionNos,
+          repNo: user.repNo,
+          role: user.role,
+          isActive: user.isActive,
+          maxAllowedDevices: user.maxAllowedDevices,
         });
       } catch (err) {
-        console.error("Cloud function updateUser error:", err);
+        console.error("userApi updateUser error:", err);
       }
       logAudit('USER_UPDATED', 'User', user.userId, { role: user.role, active: user.isActive });
     },
@@ -64,12 +66,11 @@ export const useAppOperations = () => {
       const branches = useDataStore.getState().branches;
       const lang = useUIStore.getState().lang;
       const defaultBranch = branches.find((b) => b.branchId === user.branchId) || branches[0];
-      
+
       if (user.role === 'ADMIN' || user.role === 'SUPERVISOR') {
         try {
-          const createAdminFn = httpsCallable(functions, 'createAdminSupervisorUser');
-          const response = await createAdminFn({
-            email: user.regionNo, 
+          const res = await userApi.createAdminSupervisorUser({
+            email: user.regionNo,
             role: user.role,
             branchId: user.branchId || defaultBranch?.branchId || null,
             repNameAr: user.repNameAr || 'مستخدم جديد',
@@ -77,393 +78,367 @@ export const useAppOperations = () => {
             mobileNo: (user as any).mobileNo || (user as any).mobile || '',
             allowedRegionNos: user.allowedRegionNos || [user.regionNo],
           });
-          
-          const data = response.data as any;
-          if (data.success) {
-             logAudit('USER_CREATED_VIA_CF', 'User', data.userId, { email: user.regionNo });
+
+          if (res.success) {
+            logAudit('USER_CREATED_VIA_CF', 'User', res.userId, { email: user.regionNo });
           }
         } catch (err: any) {
-          console.error("Cloud Function add error:", err);
-          throw err; 
+          console.error("userApi add admin error:", err);
+          throw err;
         }
         return;
       }
 
       try {
-        const createRepFn = httpsCallable(functions, 'createUser');
-        const response = await createRepFn({
+        const res = await userApi.createUser({
           username: user.regionNo || user.repNo || '',
           regionNo: user.regionNo || '',
           allowedRegionNos: user.allowedRegionNos || (user.regionNo ? [user.regionNo] : []),
-          repNo: user.repNo || 'REP-' + Math.floor(Math.random() * 900 + 100),
+          repNo: user.repNo || `REP-${Date.now().toString().slice(-4)}`,
           repNameAr: user.repNameAr || (lang === 'ar' ? 'مندوب جديد' : 'New Representative'),
           repNameEn: user.repNameEn || '',
-          branchId: user.branchId || branches[0]?.branchId || '',
+          branchId: user.branchId || defaultBranch?.branchId || '',
           role: 'REP',
+          mobileNo: (user as any).mobileNo || (user as any).mobile || '',
+          isActive: true,
+          mustChangePassword: true,
         });
-        const data = response.data as any;
-        if (data.success) {
-          logAudit('USER_CREATED_VIA_CF', 'User', data.userId, { username: user.regionNo });
+
+        if (res.success) {
+          logAudit('USER_CREATED_VIA_CF', 'User', res.userId, { repNo: user.repNo });
         }
       } catch (err: any) {
-        console.error('Cloud Function create REP error:', err);
+        console.error("userApi add rep error:", err);
         throw err;
       }
     },
 
-    importUsersBatch: async (importedUsers: User[]) => {
+    deactivateUser: async (userId: string) => {
       try {
-        const importFn = httpsCallable(functions, 'importUsersBatch');
-        const payload = importedUsers.map((u) => ({
-          username: u.username || u.regionNo,
-          regionNo: u.regionNo || u.username,
-          allowedRegionNos: u.allowedRegionNos || [u.regionNo || u.username],
-          repNo: u.repNo || u.username,
-          repNameAr: u.repNameAr,
-          repNameEn: u.repNameEn || u.repNameAr,
-          email: u.email || null,
-          mobile: u.mobile || null,
-          branchId: u.branchId,
-          branchNameAr: u.branchNameAr,
-          role: u.role || 'REP',
-        }));
-
-        const res = await importFn({ users: payload });
-        const resultData = res.data as any;
-
-        // In the original code we registered imported branches. Skipping for brevity as listeners handle it or we can add it.
-        logAudit('USERS_IMPORTED_EXCEL', 'User', 'BATCH', { count: importedUsers.length, created: resultData.created });
-        return resultData;
+        await userApi.deactivateUser(userId);
+        logAudit('USER_DEACTIVATED_CF', 'User', userId, {});
       } catch (err) {
-        console.error("Error importing users via Cloud Function:", err);
+        console.error("userApi deactivate error:", err);
+      }
+    },
+
+    importUsers: async (users: any[]) => {
+      const lang = useUIStore.getState().lang;
+      try {
+        const res = await userApi.importUsersBatch(users, lang);
+        logAudit('USERS_IMPORTED_EXCEL', 'User', 'BATCH', {
+          count: users.length,
+          created: res.createdCount,
+          updated: res.updatedCount,
+        });
+        return {
+          total: users.length,
+          created: res.createdCount,
+          updated: res.updatedCount,
+        };
+      } catch (err) {
+        console.error("userApi import users error:", err);
         throw err;
       }
     },
 
+    importUsersBatch: async (users: any[]) => {
+      const lang = useUIStore.getState().lang;
+      return await userApi.importUsersBatch(users, lang);
+    },
+
+    // ==================== Request Operations ====================
     createRequest: async (newReq: Partial<RequestItem>, newFields: RequestField[]): Promise<string> => {
       try {
-        const createReqFn = httpsCallable(functions, 'createRequest');
-        const response = await createReqFn({ ...newReq });
-        const data = response.data as any;
-        const newActivityId = data.activityId;
-        
-        if (newFields.length > 0) {
-          const saveFieldsFn = httpsCallable(functions, 'saveRequestFields');
-          await saveFieldsFn({ requestId: newActivityId, fields: newFields });
-        }
-        
-        logAudit('REQUEST_CREATED', 'Request', newActivityId, { code: newReq.requestCode, fieldsCount: newFields.length });
-        return newActivityId;
+        const newId = await requestApi.createRequest(newReq, newFields);
+        logAudit('REQUEST_CREATED_VIA_CF', 'Request', newId, {
+          titleAr: newReq.titleAr,
+          code: newReq.requestCode,
+          fieldsCount: newFields.length,
+        });
+        return newId;
       } catch (err) {
-        console.error("Error creating request via CF:", err);
-        return '';
+        console.error("requestApi createRequest error:", err);
+        throw err;
       }
     },
 
     updateRequest: async (requestId: string, updates: Partial<RequestItem>) => {
       try {
-        const updateReqFn = httpsCallable(functions, 'updateDraftRequest');
-        await updateReqFn({ requestId, updates });
+        await requestApi.updateDraftRequest(requestId, updates);
         logAudit('REQUEST_UPDATED', 'Request', requestId, updates);
       } catch (err) {
-        console.error("Error updating request:", err);
-      }
-    },
-
-    updateRequestFields: async (requestId: string, newFields: RequestField[]) => {
-      try {
-        const saveFieldsFn = httpsCallable(functions, 'saveRequestFields');
-        await saveFieldsFn({ requestId, fields: newFields });
-        logAudit('FIELDS_UPDATED', 'Request', requestId, { fieldsCount: newFields.length });
-      } catch (err) {
-        console.error("Error updating fields in Firestore:", err);
+        console.error("requestApi updateDraftRequest error:", err);
       }
     },
 
     publishRequest: async (requestId: string) => {
       try {
-        const publishReqFn = httpsCallable(functions, 'publishRequest');
-        await publishReqFn({ requestId });
-        const req = useDataStore.getState().requests.find((r) => r.requestId === requestId);
-        if (req) {
-          logAudit('REQUEST_PUBLISHED', 'Request', requestId, { titleAr: req.titleAr });
-        }
+        await requestApi.publishRequest(requestId);
+        logAudit('REQUEST_PUBLISHED', 'Request', requestId, {});
       } catch (err) {
-        console.error("Error publishing request:", err);
-        throw err;
+        console.error("requestApi publishRequest error:", err);
       }
     },
 
     closeRequest: async (requestId: string) => {
       try {
-        const closeReqFn = httpsCallable(functions, 'closeRequest');
-        await closeReqFn({ requestId });
+        await requestApi.closeRequest(requestId);
         logAudit('REQUEST_CLOSED', 'Request', requestId, {});
       } catch (err) {
-        console.error("Error closing request:", err);
+        console.error("requestApi closeRequest error:", err);
       }
     },
 
     archiveRequest: async (requestId: string) => {
       try {
-        const archiveReqFn = httpsCallable(functions, 'archiveRequest');
-        await archiveReqFn({ requestId });
+        await requestApi.archiveRequest(requestId);
         logAudit('REQUEST_ARCHIVED', 'Request', requestId, {});
       } catch (err) {
-        console.error("Error archiving request:", err);
+        console.error("requestApi archiveRequest error:", err);
       }
     },
 
     reopenRequest: async (requestId: string) => {
       try {
-        const reopenReqFn = httpsCallable(functions, 'reopenRequest');
-        await reopenReqFn({ requestId });
+        await requestApi.reopenRequest(requestId);
         logAudit('REQUEST_REOPENED', 'Request', requestId, {});
       } catch (err) {
-        console.error("Error reopening request:", err);
+        console.error("requestApi reopenRequest error:", err);
       }
     },
 
     cloneRequest: async (requestId: string): Promise<string> => {
       try {
-        const cloneReqFn = httpsCallable(functions, 'cloneRequest');
-        const response = await cloneReqFn({ requestId });
-        const data = response.data as any;
-        const newId = data.requestId;
+        const newId = await requestApi.cloneRequest(requestId);
         logAudit('REQUEST_CLONED', 'Request', newId, { sourceRequestId: requestId });
         return newId;
       } catch (err) {
-        console.error("Error cloning request via Cloud Function:", err);
+        console.error("requestApi cloneRequest error:", err);
         return '';
       }
     },
 
+    updateRequestFields: async (requestId: string, fields: RequestField[]) => {
+      try {
+        await requestApi.saveRequestFields(requestId, fields);
+        logAudit('REQUEST_FIELDS_UPDATED', 'Request', requestId, { fieldsCount: fields.length });
+      } catch (err) {
+        console.error("requestApi saveRequestFields error:", err);
+      }
+    },
+
+    // ==================== Record Operations ====================
     saveDraftRecord: async (recordId: string, values: Record<string, any>) => {
       const isOnline = useUIStore.getState().isOnline;
       if (!isOnline) {
-        // Queue offline logic would go here.
         return;
       }
       try {
-        const batch = writeBatch(db);
-        batch.set(doc(db, 'responses', recordId), values, { merge: true });
-        batch.update(doc(db, 'records', recordId), {
-          recordStatus: 'DraftSaved',
-          completionPercent: 50,
-          draftSavedAt: new Date().toISOString(),
-          lastSavedAt: new Date().toISOString(),
-          lastSavedBy: useAuthStore.getState().currentUser?.userId,
-          updatedAt: new Date().toISOString(),
-        });
-        await batch.commit();
+        const { records } = useDataStore.getState();
+        const rec = records.find((r) => r.recordId === recordId);
+        const reqId = rec?.requestId || '';
+        await recordApi.saveDraftRecord(reqId, recordId, values, (rec as any)?.activityId || reqId);
         logAudit('RECORD_DRAFT_SAVED', 'Record', recordId, { isOffline: false });
       } catch (err) {
-        console.error('Error saving draft:', err);
+        console.error('Error saving draft via recordApi:', err);
       }
     },
 
     submitRecord: async (recordId: string, values: Record<string, any>) => {
-      const { currentUser } = useAuthStore.getState();
-      const { records, assignments } = useDataStore.getState();
+      const { records } = useDataStore.getState();
       const { lang } = useUIStore.getState();
-
       const targetRecord = records.find((r) => r.recordId === recordId);
-      try {
-        const batch = writeBatch(db);
-        batch.set(doc(db, 'responses', recordId), values, { merge: true });
-        batch.update(doc(db, 'records', recordId), {
-          recordStatus: 'Submitted',
-          completionPercent: 100,
-          submittedAt: new Date().toISOString(),
-          completedAt: new Date().toISOString(),
-          lastSavedAt: new Date().toISOString(),
-          lastSavedBy: currentUser?.userId,
-          updatedAt: new Date().toISOString(),
-        });
+      const reqId = targetRecord?.requestId || '';
 
-        if (targetRecord && targetRecord.assignmentId !== 'UNASSIGNED') {
-          const asg = assignments.find((a) => a.assignmentId === targetRecord.assignmentId);
-          if (asg) {
-            const completed = asg.completedRecords + 1;
-            const pending = Math.max(0, asg.totalRecords - completed);
-            const progressPercent = Math.round((completed / asg.totalRecords) * 100);
-            batch.update(doc(db, 'assignments', targetRecord.assignmentId), {
-              completedRecords: completed,
-              pendingRecords: pending,
-              progressPercent,
-              completedAt: completed >= asg.totalRecords ? new Date().toISOString() : null,
-              lastActivityAt: new Date().toISOString(),
-            });
-          }
+      try {
+        const res = await recordApi.submitRecord(reqId, recordId, values, (targetRecord as any)?.activityId || reqId);
+        if (res.success) {
+          logAudit('RECORD_COMPLETED', 'Record', recordId, {
+            customerNo: targetRecord?.customerNo,
+            values,
+          });
+          return {
+            success: true,
+            message: lang === 'ar' ? 'تم الحفظ والاعتماد بنجاح.' : 'Saved and submitted successfully.',
+          };
         }
-
-        await batch.commit();
-        logAudit('RECORD_COMPLETED', 'Record', recordId, {
-          customerNo: targetRecord?.customerNo,
-          values,
-        });
-
-        return {
-          success: true,
-          message: lang === 'ar' ? 'تم الحفظ والاعتماد بنجاح.' : 'Saved and submitted successfully.',
-        };
+        return { success: false, message: res.message || 'Error submitting record' };
       } catch (err) {
-        console.error('Error submitting record:', err);
-        return { success: false, message: 'Error submitting record to Firestore' };
+        console.error('Error submitting record via recordApi:', err);
+        return { success: false, message: 'Error submitting record' };
       }
     },
 
-    createBranch: async (branchData: { branchId: string; branchNameAr: string; branchNameEn: string }) => {
-      const newBranch: Branch = {
-        branchId: branchData.branchId.toUpperCase().trim(),
-        branchNameAr: branchData.branchNameAr.trim(),
-        branchNameEn: branchData.branchNameEn.trim(),
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      try {
-        await setDoc(doc(db, 'branches', newBranch.branchId), newBranch);
-        logAudit('BRANCH_CREATED', 'Branch', newBranch.branchId, { name: newBranch.branchNameAr });
-      } catch (err) {
-        console.error("Error creating branch:", err);
-      }
-    },
-
-    updateBranch: async (branchId: string, updates: Partial<Branch>) => {
-      try {
-        await updateDoc(doc(db, 'branches', branchId), { ...updates, updatedAt: new Date().toISOString() });
-        logAudit('BRANCH_UPDATED', 'Branch', branchId, updates);
-      } catch (err) {
-        console.error("Error updating branch:", err);
-      }
-    },
-
-    deleteBranch: async (branchId: string): Promise<{ success: boolean; message?: string }> => {
-      const { regions, users } = useDataStore.getState();
-      const { lang } = useUIStore.getState();
-      const hasRegions = regions.some((r) => r.branchId === branchId);
-      if (hasRegions) return { success: false, message: lang === 'ar' ? 'لا يمكن حذف الفرع لأنه مرتبط بمناطق حالية' : 'Cannot delete branch linked to existing regions' };
-      const hasUsers = users.some((u) => u.branchId === branchId);
-      if (hasUsers) return { success: false, message: lang === 'ar' ? 'لا يمكن حذف الفرع لأنه مسند لمستخدمين' : 'Cannot delete branch assigned to users' };
-      try {
-        await updateDoc(doc(db, 'branches', branchId), { isActive: false, updatedAt: new Date().toISOString() });
-        logAudit('BRANCH_DELETED', 'Branch', branchId, {});
-        return { success: true };
-      } catch (err) {
-        return { success: false, message: 'Firestore Error' };
-      }
-    },
-
-    createRegion: async (regionData: { regionId: string; regionNo: string; regionNameAr: string; regionNameEn: string; branchId: string }) => {
-      const newRegion: Region = {
-        regionId: regionData.regionId || `REG-${regionData.regionNo}`,
-        regionNo: regionData.regionNo.trim(),
-        regionNameAr: regionData.regionNameAr.trim(),
-        regionNameEn: regionData.regionNameEn.trim(),
-        branchId: regionData.branchId,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      try {
-        await setDoc(doc(db, 'regions', newRegion.regionId), newRegion);
-        logAudit('REGION_CREATED', 'Region', newRegion.regionId, { regionNo: newRegion.regionNo });
-      } catch (err) {
-        console.error("Error creating region:", err);
-      }
-    },
-
-    updateRegion: async (regionId: string, updates: Partial<Region>) => {
-      try {
-        await updateDoc(doc(db, 'regions', regionId), { ...updates, updatedAt: new Date().toISOString() });
-        logAudit('REGION_UPDATED', 'Region', regionId, updates);
-      } catch (err) {
-        console.error("Error updating region:", err);
-      }
-    },
-
-    deleteRegion: async (regionId: string): Promise<{ success: boolean; message?: string }> => {
-      const { regions, records, users } = useDataStore.getState();
-      const { lang } = useUIStore.getState();
-      const target = regions.find((r) => r.regionId === regionId);
-      if (!target) return { success: false, message: 'Not found' };
-
-      const hasRecords = records.some((rec) => rec.regionNo === target.regionNo);
-      if (hasRecords) return { success: false, message: lang === 'ar' ? 'لا يمكن حذف المنطقة لوجود سجلات' : 'Cannot delete region with customer records' };
-      const hasUsers = users.some((u) => u.regionNo === target.regionNo || (u.allowedRegionNos && u.allowedRegionNos.includes(target.regionNo)));
-      if (hasUsers) return { success: false, message: lang === 'ar' ? 'لا يمكن حذف المنطقة' : 'Cannot delete region' };
-
-      try {
-        await updateDoc(doc(db, 'regions', regionId), { isActive: false, updatedAt: new Date().toISOString() });
-        logAudit('REGION_DELETED', 'Region', regionId, { regionNo: target.regionNo });
-        return { success: true };
-      } catch (err) {
-        return { success: false, message: 'Firestore Error' };
-      }
-    },
-    
-    // Device replacement & security
-    approveDeviceReplacement: async (userId: string, reason?: string) => {
-      try {
-        const replaceFn = httpsCallable(functions, 'replaceDevice');
-        await replaceFn({ targetUserId: userId, reason: reason || 'Approved by admin' });
-        logAudit('DEVICE_REPLACEMENT_APPROVED', 'DeviceBinding', userId, { reason });
-      } catch (err) {
-        console.error('Error approving device replacement:', err);
-      }
-    },
-    releaseDeviceBinding: async (userId: string, reason?: string) => {
-      try {
-        const releaseFn = httpsCallable(functions, 'releaseDevice');
-        await releaseFn({ targetUserId: userId, reason: reason || 'Released by admin' });
-        logAudit('DEVICE_RELEASED', 'DeviceBinding', userId, { reason });
-      } catch (err) {
-        console.error('Error releasing device binding:', err);
-      }
-    },
-    rejectDeviceReplacement: async (userId: string, reason?: string) => {
-      logAudit('DEVICE_REPLACEMENT_REJECTED', 'DeviceBinding', userId, { reason });
-    },
-
-    // Record reassignment
     reassignRecord: async (recordId: string, newUserId: string, reason?: string) => {
       try {
-        const reassignFn = httpsCallable(functions, 'reassignRecords');
-        await reassignFn({ recordIds: [recordId], newUserId });
+        await recordApi.reassignRecord(recordId, newUserId);
         logAudit('RECORD_REASSIGNED', 'Record', recordId, { newUserId, reason });
       } catch (err) {
         console.error('Error reassigning record:', err);
       }
     },
 
-    // Excel import
     commitImport: async (requestId: string, importedRows: any[], mapping: any, fileName?: string) => {
       try {
-        const commitFn = httpsCallable(functions, 'commitImport');
         const lang = useUIStore.getState().lang;
-        const res = await commitFn({
-          requestId,
-          importedRows,
-          mapping,
-          fileName: fileName || 'imported_file.xlsx',
-          lang,
-        });
-        const resultData = res.data as any;
+        const res = await recordApi.commitImport(requestId, importedRows, mapping, fileName, lang);
         logAudit('RECORDS_IMPORTED_EXCEL', 'Import', requestId, {
-          total: importedRows.length,
-          created: resultData?.created || importedRows.length,
+          total: res.total,
+          created: res.created,
         });
-        return {
-          total: importedRows.length,
-          created: resultData?.created || importedRows.length,
-        };
+        return res;
       } catch (err) {
-        console.error('Error committing import via Cloud Function:', err);
+        console.error('Error committing import via recordApi:', err);
         throw err;
       }
     },
 
+    // ==================== Branch & Region Operations ====================
+    createBranch: async (branchData: { branchId: string; branchNameAr: string; branchNameEn: string }) => {
+      try {
+        await branchRegionApi.createBranch(branchData);
+        logAudit('BRANCH_CREATED', 'Branch', branchData.branchId, { name: branchData.branchNameAr });
+      } catch (err) {
+        console.error("branchRegionApi createBranch error:", err);
+      }
+    },
+
+    updateBranch: async (branchId: string, updates: Partial<Branch>) => {
+      try {
+        await branchRegionApi.updateBranch(branchId, updates);
+        logAudit('BRANCH_UPDATED', 'Branch', branchId, updates);
+      } catch (err) {
+        console.error("branchRegionApi updateBranch error:", err);
+      }
+    },
+
+    deleteBranch: async (branchId: string): Promise<{ success: boolean; message?: string }> => {
+      const { lang } = useUIStore.getState();
+      try {
+        const res = await branchRegionApi.deleteBranch(branchId);
+        if (!res.success) {
+          return { success: false, message: res.message || (lang === 'ar' ? 'تعذر حذف الفرع' : 'Cannot delete branch') };
+        }
+        logAudit('BRANCH_DELETED', 'Branch', branchId, {});
+        return { success: true };
+      } catch (err: any) {
+        console.error("branchRegionApi deleteBranch error:", err);
+        return { success: false, message: err.message };
+      }
+    },
+
+    createRegion: async (regionData: { regionId?: string; regionNo: string; regionNameAr: string; regionNameEn?: string; branchId: string }) => {
+      try {
+        await branchRegionApi.createRegion(regionData);
+        logAudit('REGION_CREATED', 'Region', regionData.regionNo, { name: regionData.regionNameAr });
+      } catch (err) {
+        console.error("branchRegionApi createRegion error:", err);
+      }
+    },
+
+    updateRegion: async (regionNo: string, updates: Partial<Region>) => {
+      try {
+        await branchRegionApi.updateRegion(regionNo, updates);
+        logAudit('REGION_UPDATED', 'Region', regionNo, updates);
+      } catch (err) {
+        console.error("branchRegionApi updateRegion error:", err);
+      }
+    },
+
+    deleteRegion: async (regionNo: string): Promise<{ success: boolean; message?: string }> => {
+      const { lang } = useUIStore.getState();
+      try {
+        const res = await branchRegionApi.deleteRegion(regionNo);
+        if (!res.success) {
+          return { success: false, message: res.message || (lang === 'ar' ? 'تعذر حذف المنطقة' : 'Cannot delete region') };
+        }
+        logAudit('REGION_DELETED', 'Region', regionNo, {});
+        return { success: true };
+      } catch (err: any) {
+        console.error("branchRegionApi deleteRegion error:", err);
+        return { success: false, message: err.message };
+      }
+    },
+
+    importBranchesAndRegions: async (
+      branches: Partial<Branch>[] = [],
+      regions: Partial<Region>[] = [],
+      _mode?: 'append' | 'replace'
+    ) => {
+      try {
+        const res = await branchRegionApi.importBranchesAndRegions(branches, regions);
+        logAudit('BRANCHES_REGIONS_IMPORTED', 'BranchRegion', 'BATCH', res);
+        return res;
+      } catch (err) {
+        console.error("branchRegionApi importBranchesAndRegions error:", err);
+        throw err;
+      }
+    },
+
+    // ==================== Device Operations ====================
+    approveDeviceReplacement: async (userId: string, reason?: string) => {
+      try {
+        await deviceApi.replaceDevice(userId, reason);
+        logAudit('DEVICE_REPLACEMENT_APPROVED', 'DeviceBinding', userId, { reason });
+      } catch (err) {
+        console.error('Error approving device replacement:', err);
+      }
+    },
+
+    releaseDeviceBinding: async (userId: string, reason?: string) => {
+      try {
+        await deviceApi.releaseDevice(userId, reason);
+        logAudit('DEVICE_RELEASED', 'DeviceBinding', userId, { reason });
+      } catch (err) {
+        console.error('Error releasing device binding:', err);
+      }
+    },
+
+    rejectDeviceReplacement: async (bindingId: string, reason?: string) => {
+      try {
+        await deviceApi.rejectDeviceReplacement(bindingId, reason);
+        logAudit('DEVICE_REPLACEMENT_REJECTED', 'DeviceBinding', bindingId, { reason });
+      } catch (err) {
+        console.error('Error rejecting device replacement:', err);
+      }
+    },
+
+    // ==================== Password & Auth Operations ====================
+    requestPasswordReset: async (regionNo: string) => {
+      try {
+        const res = await userApi.requestPasswordReset(regionNo);
+        logAudit('PASSWORD_RESET_REQUESTED', 'User', regionNo, {});
+        return res;
+      } catch (err) {
+        console.error('Error requesting password reset:', err);
+        throw err;
+      }
+    },
+
+    adminResetPassword: async (userId: string, newPassword?: string) => {
+      try {
+        const res = await userApi.adminResetPassword(userId, newPassword);
+        logAudit('PASSWORD_RESET_ADMIN', 'User', userId, {});
+        return res;
+      } catch (err) {
+        console.error('Error admin reset password:', err);
+        throw err;
+      }
+    },
+
+    adminUnlockAccount: async (userId: string) => {
+      try {
+        const res = await userApi.adminUnlockAccount(userId);
+        logAudit('ACCOUNT_UNLOCKED_ADMIN', 'User', userId, {});
+        return res;
+      } catch (err) {
+        console.error('Error admin unlock account:', err);
+        throw err;
+      }
+    },
+
+    // ==================== Template Operations ====================
     saveAsTemplate: (requestId: string, nameAr: string, nameEn: string, category: string) => {
       const { requests, fields } = useDataStore.getState();
       const req = requests.find((r) => r.requestId === requestId);
@@ -471,7 +446,7 @@ export const useAppOperations = () => {
       if (!req) return;
 
       const newTemplate: RequestTemplate = {
-        templateId: `tpl_${Date.now()}`,
+        templateId: `tpl_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         templateNameAr: nameAr,
         templateNameEn: nameEn,
         category: category || 'General',
@@ -480,65 +455,35 @@ export const useAppOperations = () => {
           request: req,
           fields: reqFields,
         },
-        createdBy: useAuthStore.getState().currentUser?.userId || 'ADMIN',
+        createdBy: useAuthStore.getState().currentUser?.userId || 'SYSTEM',
         createdAt: new Date().toISOString(),
         isActive: true,
       };
 
-      setDoc(doc(db, 'requestTemplates', newTemplate.templateId), newTemplate).catch((err) => {
+      templateApi.saveTemplate(newTemplate).catch((err) => {
         console.error('Error saving template:', err);
       });
       logAudit('TEMPLATE_CREATED', 'RequestTemplate', newTemplate.templateId, { nameAr });
     },
 
+    // ==================== System Maintenance ====================
     wipeDemoDataForProduction: async (options?: { wipeBranchesAndRegions?: boolean }) => {
-      logAudit('SYSTEM_WIPE_INITIATED', 'System', 'PROD_WIPE', options || {});
-    },
-    
-    // Additional helpers
-    requestPasswordReset: () => {},
-    importRecords: async () => ({ success: false, count: 0 }),
-    sendBroadcastNotification: async () => {},
-    importBranchesAndRegions: async (
-      branches: Partial<Branch>[] = [],
-      regions: Partial<Region>[] = [],
-      _mode?: 'append' | 'replace'
-    ) => {
-      let branchesCount = 0;
-      let regionsCount = 0;
-      const batch = writeBatch(db);
-      for (const b of branches) {
-        const branchRef = doc(collection(db, 'branches'));
-        batch.set(branchRef, {
-          branchId: b.branchId || branchRef.id,
-          branchNameAr: b.branchNameAr || '',
-          branchNameEn: b.branchNameEn || '',
-          isActive: b.isActive ?? true,
-          createdAt: b.createdAt || new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-        branchesCount++;
+      try {
+        const res = await systemApi.wipeDemoData('CONFIRM_WIPE_DEMO_DATA', options?.wipeBranchesAndRegions);
+        logAudit('SYSTEM_WIPE_INITIATED', 'System', 'PROD_WIPE', options || {});
+        return res;
+      } catch (err) {
+        console.error('Error wiping demo data via systemApi:', err);
+        throw err;
       }
-      for (const r of regions) {
-        const regionRef = doc(collection(db, 'regions'));
-        batch.set(regionRef, {
-          regionId: r.regionId || regionRef.id,
-          regionNo: r.regionNo || '',
-          regionNameAr: r.regionNameAr || '',
-          regionNameEn: r.regionNameEn || '',
-          branchId: r.branchId || '',
-          isActive: r.isActive ?? true,
-          createdAt: r.createdAt || new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-        regionsCount++;
-      }
-      await batch.commit();
-      return { branchesCount, regionsCount };
     },
-    resetAllDataToDefaults: () => {},
-    resetAllData: () => {},
-    clearAllDemoData: () => {},
-    syncOfflineQueue: async () => {},
+
+    resetAllData: async () => {
+      try {
+        await systemApi.wipeDemoData('CONFIRM_WIPE_DEMO_DATA');
+      } catch (err) {
+        console.error('Error resetting all data:', err);
+      }
+    },
   };
 };
