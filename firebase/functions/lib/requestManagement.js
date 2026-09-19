@@ -81,6 +81,7 @@ exports.createRequest = functions.https.onCall(async (data, context) => {
         totalRecords: 0,
         totalAssignments: 0,
         targetBranches: targetBranches || [],
+        targetRegions: data.targetRegions || [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         createdBy: context.auth.uid,

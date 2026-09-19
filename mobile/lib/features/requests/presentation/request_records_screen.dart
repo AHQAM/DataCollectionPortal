@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../domain/record_model.dart';
 import 'requests_controller.dart';
@@ -240,6 +241,78 @@ class _RequestRecordsScreenState extends ConsumerState<RequestRecordsScreen> {
     );
   }
 
+  Future<void> _makePhoneCall(
+    BuildContext context,
+    String phone,
+    bool isArabic,
+  ) async {
+    final uri = Uri.parse('tel:$phone');
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      } else {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isArabic
+                  ? 'تعذر فتح الاتصال بالرقم: $phone'
+                  : 'Could not launch phone call to: $phone',
+            ),
+          ),
+        );
+      }
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'حدث خطأ أثناء محاولة الاتصال'
+                : 'Error launching phone call',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _openMapLocation(
+    BuildContext context,
+    String query,
+    bool isArabic,
+  ) async {
+    final uri = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(query)}',
+    );
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isArabic
+                  ? 'تعذر فتح الخرائط للموقع المحدد'
+                  : 'Could not open maps for location',
+            ),
+          ),
+        );
+      }
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'حدث خطأ أثناء محاولة فتح الخريطة'
+                : 'Error opening maps',
+          ),
+        ),
+      );
+    }
+  }
+
   Widget _buildRecordCard(
     BuildContext context,
     RecordModel record,
@@ -268,9 +341,13 @@ class _RequestRecordsScreenState extends ConsumerState<RequestRecordsScreen> {
         break;
     }
 
+    final hasPhone = record.phone != null && record.phone!.trim().isNotEmpty;
+    final hasArea = record.area != null && record.area!.trim().isNotEmpty;
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      elevation: 1.5,
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: () {
@@ -352,20 +429,84 @@ class _RequestRecordsScreenState extends ConsumerState<RequestRecordsScreen> {
                     '${isArabic ? "المنطقة" : "Region"}: ${record.assignedRegionNo}',
                     style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
                   ),
-                  if (record.area != null && record.area!.isNotEmpty) ...[
+                  if (hasArea) ...[
                     const SizedBox(width: 8),
                     Text('•', style: TextStyle(color: Colors.grey.shade400)),
                     const SizedBox(width: 8),
-                    Text(
-                      record.area!,
-                      style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontSize: 12,
+                    Flexible(
+                      child: Text(
+                        record.area!,
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 12,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
+                ],
+              ),
+              if (hasPhone) ...[
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.phone_outlined,
+                      size: 14,
+                      color: Colors.grey.shade500,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      record.phone!,
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontSize: 12,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              const SizedBox(height: 10),
+              const Divider(height: 1),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  if (hasPhone) ...[
+                    IconButton.filledTonal(
+                      icon: const Icon(Icons.phone, size: 16),
+                      tooltip: isArabic ? 'اتصال بالعميل' : 'Call Customer',
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () =>
+                          _makePhoneCall(context, record.phone!, isArabic),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  if (hasArea) ...[
+                    IconButton.filledTonal(
+                      icon: const Icon(Icons.directions, size: 16),
+                      tooltip: isArabic ? 'فتح الخريطة' : 'Open in Maps',
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () =>
+                          _openMapLocation(context, record.area!, isArabic),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
                   const Spacer(),
-                  const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
+                  Text(
+                    isArabic ? 'فتح الاستبيان' : 'Open Form',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  Icon(
+                    isArabic ? Icons.chevron_left : Icons.chevron_right,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ],
               ),
             ],

@@ -173,6 +173,7 @@ export interface RequestItem {
   tags: string[];
   startAt: string;
   dueAt: string;
+  dueDate?: string;
   allowEditAfterSubmit: boolean;
   allowEditAfterDueDate: boolean;
   requireSupervisorApproval: boolean;

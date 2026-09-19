@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { PWAInstallBanner } from './PWAInstallBanner';
-import { ShareRepLinkModal } from './ShareRepLinkModal';
 import {
   Globe,
   UserCheck,
@@ -29,7 +28,6 @@ export const TopNavbar: React.FC = () => {
 
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
 
   const roleMenuRef = useRef<HTMLDivElement>(null);
   const notifMenuRef = useRef<HTMLDivElement>(null);
@@ -101,20 +99,7 @@ export const TopNavbar: React.FC = () => {
 
         {/* Right Controls: Connectivity, Share Link, Lang, User */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Share Rep Link Button - ONLY VISIBLE TO ADMIN */}
-          {import.meta.env.DEV && currentUser?.role === 'ADMIN' && (
-            <button
-              type="button"
-              onClick={() => setShowShareModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black shadow-md border border-emerald-400/40 transition-all cursor-pointer shrink-0 animate-in fade-in"
-              title={lang === 'ar' ? 'مشاركة رابط التطبيق للمناديب' : 'Share link for field reps'}
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">
-                {lang === 'ar' ? 'مشاركة رابط المندوبين' : 'Share Rep Link'}
-              </span>
-            </button>
-          )}
+
 
           {/* Language Switcher */}
           <button
@@ -289,11 +274,6 @@ export const TopNavbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Share Rep Link Modal */}
-      <ShareRepLinkModal
-        isOpen={showShareModal}
-        onClose={() => setShowShareModal(false)}
-      />
     </header>
   );
 };

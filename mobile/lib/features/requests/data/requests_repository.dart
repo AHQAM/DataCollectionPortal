@@ -60,6 +60,10 @@ class RequestsRepository {
               'titleAr': data['titleAr'] ?? data['title'] ?? '',
               'titleEn': data['titleEn'] ?? data['title'] ?? '',
               'requestCode': data['requestCode'] ?? '',
+              'targetBranches': data['targetBranches'] ?? [],
+              'targetRegions': data['targetRegions'] ?? [],
+              'totalRecordsCount': data['totalRecordsCount'] ?? 0,
+              'completedRecordsCount': data['completedRecordsCount'] ?? 0,
             };
 
             return RequestModel.fromJson(data);

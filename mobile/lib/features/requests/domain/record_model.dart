@@ -11,6 +11,8 @@ class RecordModel {
   final int completionPercent;
   final double? inventoryValue;
   final String? area;
+  final String? phone;
+  final Map<String, dynamic> rawData;
   final DateTime? updatedAt;
 
   const RecordModel({
@@ -25,6 +27,8 @@ class RecordModel {
     this.completionPercent = 0,
     this.inventoryValue,
     this.area,
+    this.phone,
+    this.rawData = const {},
     this.updatedAt,
   });
 
@@ -33,6 +37,36 @@ class RecordModel {
       if (val == null) return null;
       if (val is DateTime) return val;
       if (val is String) return DateTime.tryParse(val);
+      return null;
+    }
+
+    final raw = data['rawData'] is Map
+        ? Map<String, dynamic>.from(data['rawData'] as Map)
+        : <String, dynamic>{};
+
+    String? extractPhone() {
+      if (data['phone'] != null && data['phone'].toString().trim().isNotEmpty) {
+        return data['phone'].toString().trim();
+      }
+      if (data['mobile'] != null &&
+          data['mobile'].toString().trim().isNotEmpty) {
+        return data['mobile'].toString().trim();
+      }
+      const candidates = [
+        'phone',
+        'mobile',
+        'tel',
+        'phone_number',
+        'جوال',
+        'هاتف',
+        'رقم الجوال',
+        'رقم الهاتف',
+      ];
+      for (final key in candidates) {
+        if (raw[key] != null && raw[key].toString().trim().isNotEmpty) {
+          return raw[key].toString().trim();
+        }
+      }
       return null;
     }
 
@@ -50,6 +84,8 @@ class RecordModel {
       completionPercent: (data['completionPercent'] as num?)?.toInt() ?? 0,
       inventoryValue: (data['inventoryValue'] as num?)?.toDouble(),
       area: data['area']?.toString(),
+      phone: extractPhone(),
+      rawData: raw,
       updatedAt: parseDate(data['updatedAt']),
     );
   }

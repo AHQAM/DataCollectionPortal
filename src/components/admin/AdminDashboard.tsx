@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useUIStore } from '../../stores/uiStore';
 import { useDataStore } from '../../stores/dataStore';
-import { ShareRepLinkModal } from '../common/ShareRepLinkModal';
 import {
   FileText,
   CheckCircle2,
@@ -35,8 +34,6 @@ interface Props {
 export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
   const { lang, dir, t } = useUIStore();
   const { requests, records, assignments, users, branches, regions, auditLogs } = useDataStore();
-
-  const [showShareModal, setShowShareModal] = useState(false);
 
   // Calculations
   const activeRequests = requests.filter((r) => r.status === 'Published').length;
@@ -84,16 +81,6 @@ export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 shrink-0 relative z-10">
-          {/* Share Rep Link Button */}
-          <button
-            type="button"
-            onClick={() => setShowShareModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-lg transition-all cursor-pointer"
-            title={lang === 'ar' ? 'مشاركة رابط التطبيق المباشر للمناديب الميدانيين' : 'Share direct field app link for reps'}
-          >
-            <Share2 className="w-4 h-4" />
-            <span>{lang === 'ar' ? 'مشاركة رابط المندوبين' : 'Share Rep Link'}</span>
-          </button>
 
           <button
             type="button"
@@ -125,34 +112,7 @@ export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Demo Mode Notice Banner - pointing to Settings */}
-      {records.length > 0 && (
-        <div className="p-4 bg-amber-50/90 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="font-black text-amber-950">
-                {lang === 'ar' ? 'وضع البيانات التجريبية الفعّال (Demo Mode)' : 'Active Demo Mode'}
-              </span>
-              <p className="text-amber-800 text-[11px] mt-0.5">
-                {lang === 'ar'
-                  ? `يحتوي النظام حالياً على ${records.length} سجل تجريبي و ${requests.length} طلبات نموذجية. يمكنك تفريغها بالكامل من تبويب إعدادات النظام للبدء بصفحة بيضاء.`
-                  : `System contains ${records.length} demo records. You can purge them cleanly from System Settings to start with a blank slate.`}
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => onNavigate('settings')}
-            className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer shadow-xs"
-          >
-            <Settings className="w-4 h-4" />
-            <span>{lang === 'ar' ? 'الانتقال لإعدادات النظام وتفريغ البيانات' : 'Go to Settings & Data Management'}</span>
-          </button>
-        </div>
-      )}
+
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -368,11 +328,6 @@ export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Share Rep Link Modal */}
-      <ShareRepLinkModal
-        isOpen={showShareModal}
-        onClose={() => setShowShareModal(false)}
-      />
     </div>
   );
 };

@@ -364,49 +364,51 @@ export const AdminSettings: React.FC = () => {
         </div>
       </div>
 
-      {/* Dangerous Zone / QA Reset */}
-      <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3">
-        <div className="flex items-center gap-2 text-xs font-extrabold text-slate-800">
-          <RefreshCw className="w-4 h-4 text-slate-600" />
-          <span>{lang === 'ar' ? 'استعادة البيانات النموذجية للتجربة (QA Demo Seed Data)' : 'Restore Default Seed Data'}</span>
-        </div>
-        <p className="text-xs text-slate-600 leading-relaxed">
-          {lang === 'ar'
-            ? 'في حال رغبت في إعادة السجلات والطلبات النموذجية لاختبار دورة العمل والتجربة من جديد.'
-            : 'Restore mock records, requests, and sample branch data for demo testing.'}
-        </p>
-
-        {showResetConfirm ? (
-          <div className="flex items-center gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => {
-                resetAllData();
-                setShowResetConfirm(false);
-              }}
-              className="px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md cursor-pointer"
-            >
-              {lang === 'ar' ? 'نعم، استعادة البيانات النموذجية' : 'Yes, Restore Seed Data'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowResetConfirm(false)}
-              className="px-3 py-2 rounded-xl bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
-            >
-              {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-            </button>
+      {/* Dangerous Zone / QA Reset - ONLY visible in Local Development (DEV) */}
+      {import.meta.env.DEV && (
+        <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3">
+          <div className="flex items-center gap-2 text-xs font-extrabold text-slate-800">
+            <RefreshCw className="w-4 h-4 text-slate-600" />
+            <span>{lang === 'ar' ? 'استعادة البيانات النموذجية للتجربة (QA Demo Seed Data)' : 'Restore Default Seed Data'}</span>
           </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setShowResetConfirm(true)}
-            className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>{lang === 'ar' ? 'استعادة البيانات النموذجية الأولية' : 'Restore Initial Demo Data'}</span>
-          </button>
-        )}
-      </div>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            {lang === 'ar'
+              ? 'أداة تطوير محلية: في حال رغبت في إعادة السجلات والطلبات النموذجية لاختبار دورة العمل والتجربة من جديد.'
+              : 'Development Tool: Restore mock records, requests, and sample branch data for demo testing.'}
+          </p>
+
+          {showResetConfirm ? (
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  resetAllData();
+                  setShowResetConfirm(false);
+                }}
+                className="px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md cursor-pointer"
+              >
+                {lang === 'ar' ? 'نعم، استعادة البيانات النموذجية' : 'Yes, Restore Seed Data'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowResetConfirm(false)}
+                className="px-3 py-2 rounded-xl bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
+              >
+                {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowResetConfirm(true)}
+              className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>{lang === 'ar' ? 'استعادة البيانات النموذجية الأولية' : 'Restore Initial Demo Data'}</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* WIPE DEMO DATA CONFIRMATION MODAL */}
