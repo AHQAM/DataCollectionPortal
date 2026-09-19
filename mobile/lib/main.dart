@@ -7,6 +7,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
@@ -31,11 +33,21 @@ void main() {
     debugPrint(
       'FlutterError.onError: ${details.exceptionAsString()}\n${details.stack}',
     );
+    try {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    } catch (_) {
+      // Firebase not initialized yet
+    }
   };
 
   // 2. Capture asynchronous Platform errors
   PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
     debugPrint('PlatformDispatcher.onError: $error\n$stack');
+    try {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    } catch (_) {
+      // Firebase not initialized yet
+    }
     return true; // handled
   };
 
@@ -49,6 +61,11 @@ void main() {
           options: DefaultFirebaseOptions.currentPlatform,
         );
         firebaseInitialized = true;
+
+        // Configure Crashlytics (disabled in debug mode, active in release/production)
+        await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+          !kDebugMode,
+        );
 
         // Initialize FCM
         FirebaseMessaging.onBackgroundMessage(
@@ -82,6 +99,11 @@ void main() {
     },
     (error, stack) {
       debugPrint('Uncaught exception in runZonedGuarded: $error\n$stack');
+      try {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      } catch (_) {
+        // Firebase not initialized yet
+      }
     },
   );
 }
