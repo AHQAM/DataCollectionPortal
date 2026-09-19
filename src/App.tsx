@@ -3,6 +3,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { TopNavbar } from './components/common/TopNavbar';
 import { AuthPortal } from './components/common/AuthPortal';
 import { AdminLayout } from './components/admin/AdminLayout';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const MainAppContent: React.FC = () => {
   const { lang, dir, currentUser, authReady } = useApp();
@@ -56,7 +57,9 @@ const MainAppContent: React.FC = () => {
 export default function App() {
   return (
     <AppProvider>
-      <MainAppContent />
+      <ErrorBoundary>
+        <MainAppContent />
+      </ErrorBoundary>
     </AppProvider>
   );
 }

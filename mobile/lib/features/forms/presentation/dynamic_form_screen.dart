@@ -147,19 +147,16 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
 
     switch (field.type) {
       case 'text':
-      case 'number':
         return TextFormField(
           decoration: InputDecoration(
             labelText: label,
             hintText: label,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          keyboardType: field.type == 'number'
-              ? TextInputType.number
-              : TextInputType.text,
+          keyboardType: TextInputType.text,
           readOnly: field.isReadOnly,
           validator: (value) {
-            if (field.isRequired && (value == null || value.isEmpty)) {
+            if (field.isRequired && (value == null || value.trim().isEmpty)) {
               return isArabic
                   ? (field.validationMessageAr ?? l10n.requiredField)
                   : (field.validationMessageEn ?? l10n.requiredField);
@@ -169,7 +166,53 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           onSaved: (value) => _formData[field.id] = value,
         );
 
+      case 'textarea':
+        return TextareaFormField(
+          field: field,
+          isArabic: isArabic,
+          onChanged: (val) => _formData[field.id] = val,
+          onSaved: (val) => _formData[field.id] = val,
+        );
+
+      case 'number':
+      case 'integer':
+      case 'decimal':
+      case 'currency':
+      case 'percentage':
+        return TextFormField(
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          readOnly: field.isReadOnly,
+          validator: (value) {
+            if (field.isRequired && (value == null || value.trim().isEmpty)) {
+              return isArabic
+                  ? (field.validationMessageAr ?? l10n.requiredField)
+                  : (field.validationMessageEn ?? l10n.requiredField);
+            }
+            if (value != null && value.trim().isNotEmpty) {
+              final parsed = num.tryParse(value);
+              if (parsed == null) {
+                return isArabic ? 'يرجى إدخال قيمة رقمية صحيحة' : 'Please enter a valid number';
+              }
+            }
+            return null;
+          },
+          onSaved: (value) {
+            if (value != null && value.trim().isNotEmpty) {
+              _formData[field.id] = num.tryParse(value) ?? value;
+            } else {
+              _formData[field.id] = null;
+            }
+          },
+        );
+
       case 'dropdown':
+      case 'select':
+      case 'single_choice':
         return DropdownButtonFormField<String>(
           decoration: InputDecoration(
             labelText: label,
@@ -191,11 +234,39 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
             }
             return null;
           },
-          onChanged: field.isReadOnly ? null : (value) {},
+          onChanged: field.isReadOnly ? null : (value) {
+            _formData[field.id] = value;
+          },
           onSaved: (value) => _formData[field.id] = value,
         );
 
+      case 'date':
+        return DateFormField(
+          field: field,
+          isArabic: isArabic,
+          onChanged: (val) => _formData[field.id] = val,
+          onSaved: (val) => _formData[field.id] = val,
+        );
+
+      case 'yes_no':
+      case 'boolean':
+        return YesNoFormField(
+          field: field,
+          isArabic: isArabic,
+          onChanged: (val) => _formData[field.id] = val,
+          onSaved: (val) => _formData[field.id] = val,
+        );
+
+      case 'rating':
+        return RatingFormField(
+          field: field,
+          isArabic: isArabic,
+          onChanged: (val) => _formData[field.id] = val,
+          onSaved: (val) => _formData[field.id] = val,
+        );
+
       case 'location':
+      case 'gps':
         return LocationFormField(
           field: field,
           isArabic: isArabic,
@@ -203,6 +274,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
         );
 
       case 'photo':
+      case 'image':
         return PhotoFormField(
           field: field,
           isArabic: isArabic,
@@ -221,6 +293,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
         );
 
       case 'barcode':
+      case 'qr_code':
         return BarcodeFormField(
           field: field,
           isArabic: isArabic,

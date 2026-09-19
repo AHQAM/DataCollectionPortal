@@ -1,0 +1,53 @@
+class RecordModel {
+  final String recordId;
+  final String requestId;
+  final String customerNo;
+  final String customerName;
+  final String assignedRegionNo;
+  final String branchName;
+  final String repName;
+  final String recordStatus; // 'Pending' | 'DraftSaved' | 'Submitted' | 'Completed'
+  final int completionPercent;
+  final double? inventoryValue;
+  final String? area;
+  final DateTime? updatedAt;
+
+  const RecordModel({
+    required this.recordId,
+    required this.requestId,
+    required this.customerNo,
+    required this.customerName,
+    required this.assignedRegionNo,
+    this.branchName = '',
+    this.repName = '',
+    this.recordStatus = 'Pending',
+    this.completionPercent = 0,
+    this.inventoryValue,
+    this.area,
+    this.updatedAt,
+  });
+
+  factory RecordModel.fromFirestore(String id, Map<String, dynamic> data) {
+    DateTime? parseDate(dynamic val) {
+      if (val == null) return null;
+      if (val is DateTime) return val;
+      if (val is String) return DateTime.tryParse(val);
+      return null;
+    }
+
+    return RecordModel(
+      recordId: id,
+      requestId: (data['requestId'] ?? '').toString(),
+      customerNo: (data['customerNo'] ?? '').toString(),
+      customerName: (data['customerName'] ?? data['customerNo'] ?? 'عميل').toString(),
+      assignedRegionNo: (data['assignedRegionNo'] ?? data['regionNo'] ?? '').toString(),
+      branchName: (data['branchName'] ?? '').toString(),
+      repName: (data['repName'] ?? '').toString(),
+      recordStatus: (data['recordStatus'] ?? 'Pending').toString(),
+      completionPercent: (data['completionPercent'] as num?)?.toInt() ?? 0,
+      inventoryValue: (data['inventoryValue'] as num?)?.toDouble(),
+      area: data['area']?.toString(),
+      updatedAt: parseDate(data['updatedAt']),
+    );
+  }
+}

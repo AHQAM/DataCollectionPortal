@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../domain/request_model.dart';
+import '../domain/record_model.dart';
 
 part 'requests_repository.g.dart';
 
@@ -73,6 +74,20 @@ class RequestsRepository {
         .collection(AppConstants.requestsCollection)
         .doc(requestId)
         .update({'status': status});
+  }
+
+  Stream<List<RecordModel>> watchRecordsForRequest(String requestId, String userId) {
+    return _firestore
+        .collection(AppConstants.recordsCollection)
+        .where('requestId', isEqualTo: requestId)
+        .where('assignedUserId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final data = Map<String, dynamic>.from(doc.data());
+            return RecordModel.fromFirestore(doc.id, data);
+          }).toList();
+        });
   }
 }
 
