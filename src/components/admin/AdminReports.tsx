@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import * as XLSX from 'xlsx';
+import { getXLSX } from '../../utils/excel';
 import {
   FileSpreadsheet,
   Download,
@@ -55,7 +55,8 @@ export const AdminReports: React.FC = () => {
   };
 
   // Export full Excel sheet with both customer info and field responses!
-  const handleExportFullExcel = () => {
+  const handleExportFullExcel = async () => {
+    const XLSX = await getXLSX();
     const exportData = filteredRecords.map((r) => {
       const resp = recordResponses[r.recordId] || {};
       const row: Record<string, any> = {
@@ -87,7 +88,8 @@ export const AdminReports: React.FC = () => {
     XLSX.writeFile(wb, filename);
   };
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
+    const XLSX = await getXLSX();
     const exportData = filteredRecords.map((r) => {
       const resp = recordResponses[r.recordId] || {};
       return {

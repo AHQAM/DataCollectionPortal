@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
+import 'dart:ui';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
@@ -22,38 +23,122 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 1. Capture Flutter Framework errors (layout overflows, widget build errors, etc.)
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint(
+      'FlutterError.onError: ${details.exceptionAsString()}\n${details.stack}',
+    );
+  };
+
+  // 2. Capture asynchronous Platform errors
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    debugPrint('PlatformDispatcher.onError: $error\n$stack');
+    return true; // handled
+  };
+
   runZonedGuarded(
     () async {
-      WidgetsFlutterBinding.ensureInitialized();
+      bool firebaseInitialized = false;
 
-      // Initialize Firebase
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      // Initialize Firebase with fallback error handling
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        firebaseInitialized = true;
 
-      // Initialize FCM
-      FirebaseMessaging.onBackgroundMessage(
-        _firebaseMessagingBackgroundHandler,
-      );
+        // Initialize FCM
+        FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler,
+        );
 
-      // Request permission (iOS/Web mainly)
-      await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+        // Request permission (iOS/Web mainly)
+        await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      } catch (e, stack) {
+        debugPrint('Firebase initialization failed: $e\n$stack');
+      }
 
       // Initialize local storage
-      await Hive.initFlutter();
-      await HiveService().init();
+      try {
+        await Hive.initFlutter();
+        await HiveService().init();
+      } catch (e, stack) {
+        debugPrint('Hive initialization failed: $e\n$stack');
+      }
+
+      if (!firebaseInitialized) {
+        runApp(const FirebaseErrorApp());
+        return;
+      }
 
       runApp(const ProviderScope(child: SalesCollectionApp()));
     },
     (error, stack) {
-      debugPrint('Uncaught exception: $error\n$stack');
-      // TODO: Send to Firebase Crashlytics if available
+      debugPrint('Uncaught exception in runZonedGuarded: $error\n$stack');
     },
   );
+}
+
+class FirebaseErrorApp extends StatelessWidget {
+  const FirebaseErrorApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: const Color(0xFFF8FAFC),
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.cloud_off_rounded,
+                      size: 40,
+                      color: Colors.red.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'فشل الاتصال بالخادم',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'تعذر تهيئة خدمات النظام الأساسية. يرجى التحقق من اتصالك بالإنترنت ثم إعادة تشغيل التطبيق.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Color(0xFF64748B)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class SalesCollectionApp extends ConsumerWidget {

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { User } from '../../types';
-import * as XLSX from 'xlsx';
+import { getXLSX } from '../../utils/excel';
 import {
   FileSpreadsheet,
   UploadCloud,
@@ -79,7 +79,8 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
   ];
 
   // 1. Download Sample Excel Template
-  const handleDownloadTemplate = () => {
+  const handleDownloadTemplate = async () => {
+    const XLSX = await getXLSX();
     const sampleData = realSampleDataset.map((item) => ({
       'رقم_المندوب (المعرف)': item.repNo,
       'اسم_المندوب': item.repName,
@@ -94,8 +95,9 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
   };
 
   // Download Generated Credentials Sheet
-  const handleDownloadCredentialsExcel = () => {
+  const handleDownloadCredentialsExcel = async () => {
     if (!importedCredentials || importedCredentials.length === 0) return;
+    const XLSX = await getXLSX();
 
     const data = importedCredentials.map((c) => ({
       'اسم المندوب': c.repNameAr,
@@ -211,8 +213,9 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
     setSwappedDetected(false);
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
+        const XLSX = await getXLSX();
         const data = e.target?.result;
         const workbook = XLSX.read(data, { type: 'binary' });
         const firstSheetName = workbook.SheetNames[0];

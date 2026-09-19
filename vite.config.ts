@@ -92,14 +92,15 @@ export default defineConfig(() => {
       },
     },
     build: {
-      chunkSizeWarningLimit: 1000,
+      chunkSizeWarningLimit: 550, // Accommodates Firestore SDK (~512KB minified) without suppressing warnings for large application chunks
       rollupOptions: {
         output: {
           manualChunks: {
             'vendor-react': ['react', 'react-dom'],
-            'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/functions', 'firebase/storage'],
+            'vendor-firestore': ['firebase/firestore'],
+            'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/functions', 'firebase/storage'],
             'vendor-icons': ['lucide-react'],
-            'vendor-utils': ['xlsx', 'zustand'],
+            'vendor-utils': ['zustand'],
           },
         },
       },

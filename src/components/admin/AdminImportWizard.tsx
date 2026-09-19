@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { RecordItem, RequestField } from '../../types';
-import * as XLSX from 'xlsx';
+import { getXLSX } from '../../utils/excel';
 import {
   UploadCloud,
   FileSpreadsheet,
@@ -94,8 +94,9 @@ export const AdminImportWizard: React.FC<Props> = ({ initialRequestId, onBack })
     setFileName(file.name);
     const reader = new FileReader();
 
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
       try {
+        const XLSX = await getXLSX();
         const bstr = evt.target?.result;
         const wb = XLSX.read(bstr, { type: 'binary' });
         const wsname = wb.SheetNames[0];
@@ -189,8 +190,9 @@ export const AdminImportWizard: React.FC<Props> = ({ initialRequestId, onBack })
   };
 
   // Generate and Download Request-Specific Excel Template
-  const handleDownloadCustomTemplate = () => {
+  const handleDownloadCustomTemplate = async () => {
     if (!currentRequest) return;
+    const XLSX = await getXLSX();
 
     // Headers array: Core assignment columns + ALL request fields
     const headers: string[] = [

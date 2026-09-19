@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import * as XLSX from 'xlsx';
+import { getXLSX } from '../../utils/excel';
 import { useApp } from '../../context/AppContext';
 import { Branch, Region } from '../../types';
 import {
@@ -218,7 +218,7 @@ export const AdminBranches: React.FC = () => {
   };
 
   // Excel Template Download Handler
-  const handleDownloadTemplate = () => {
+  const handleDownloadTemplate = async () => {
     const templateData = [
       {
         'رمز الفرع (Branch ID)': 'BR-RYD',
@@ -254,6 +254,7 @@ export const AdminBranches: React.FC = () => {
       },
     ];
 
+    const XLSX = await getXLSX();
     const ws = XLSX.utils.json_to_sheet(templateData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'الفروع والمناطق');
@@ -269,8 +270,9 @@ export const AdminBranches: React.FC = () => {
     setExcelParseError(null);
 
     const reader = new FileReader();
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
       try {
+        const XLSX = await getXLSX();
         const bstr = evt.target?.result;
         const wb = XLSX.read(bstr, { type: 'binary' });
         const firstSheetName = wb.SheetNames[0];

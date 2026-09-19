@@ -23,19 +23,8 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.token.role == 'REP';
     }
 
-    function isAdminOrSupervisor() {
-      return isAdmin() || isSupervisor();
-    }
-
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
-    }
-
-    // Check if the authenticated user has access to a specific region
-    function hasRegionAccess(regionNo) {
-      return isAuthenticated()
-        && request.auth.token.allowedRegionNos is list
-        && regionNo in request.auth.token.allowedRegionNos;
     }
 
     // Check if supervisor has branch access
@@ -194,7 +183,7 @@ service cloud.firestore {
       // Admin can update any record
       allow update: if isAdmin();
 
-      // Only Cloud Functions create records (via import)
+      // Admin or Cloud Functions can create records (via import)
       allow create: if isAdmin();
       allow delete: if false;
     }

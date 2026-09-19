@@ -12,7 +12,6 @@ import {
   Cloud,
   FileSpreadsheet,
 } from 'lucide-react';
-import * as XLSX from 'xlsx';
 
 export const AdminArchive: React.FC = () => {
   const { lang, t, requests, records, reopenRequest } = useApp();
