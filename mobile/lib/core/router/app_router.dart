@@ -58,6 +58,7 @@ GoRouter appRouter(Ref ref) {
             requestId: requestId,
             recordId: state.uri.queryParameters['recordId'] ?? requestId,
             activityId: activityId,
+            title: state.uri.queryParameters['title'],
           );
         },
       ),

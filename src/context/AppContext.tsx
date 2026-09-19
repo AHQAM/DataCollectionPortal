@@ -90,7 +90,7 @@ interface AppContextType {
   updateUser: (user: User) => void;
   addUser: (user: Partial<User>) => Promise<void>;
   createUser: (user: Partial<User>) => Promise<void>;
-  importUsersBatch: (users: User[]) => void;
+  importUsersBatch: (users: User[]) => Promise<any>;
   approveDeviceReplacement: (bindingId: string) => void;
   rejectDeviceReplacement: (bindingId: string) => void;
 
@@ -102,7 +102,7 @@ interface AppContextType {
   closeRequest: (requestId: string) => void;
   archiveRequest: (requestId: string) => void;
   reopenRequest: (requestId: string) => void;
-  cloneRequest: (requestId: string) => string;
+  cloneRequest: (requestId: string) => Promise<string>;
 
   // Record submission & offline
   saveDraftRecord: (recordId: string, values: Record<string, any>) => void;
@@ -271,8 +271,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const data: Record<string, Record<string, any>> = {};
       snapshot.forEach((docSnap) => {
         const resp = docSnap.data();
-        if (resp.recordId && resp.answers) {
-          data[resp.recordId] = resp.answers;
+        const recordId = resp.recordId || docSnap.id;
+        const answers = resp.data || resp.answers;
+        if (recordId && answers) {
+          data[recordId] = answers;
         }
       });
       setRecordResponses(data);
@@ -662,20 +664,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const requestPasswordReset = (regionNo: string, notes: string) => {
-    const user = users.find((u) => u.regionNo === regionNo || u.username === regionNo);
-    const newReq: PasswordResetRequest = {
-      resetRequestId: 'RST-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
-      userId: user?.userId || 'UNKNOWN',
-      regionNo,
-      repNameAr: user?.repNameAr || 'مندوب غير محدد',
-      requestNotes: notes,
-      status: 'PENDING',
-      requestedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-    };
-    setPasswordResetRequests((prev) => [newReq, ...prev]);
-    logAudit('PASSWORD_RESET_REQUESTED', 'PasswordReset', newReq.resetRequestId, { regionNo, notes });
+  const requestPasswordReset = async (regionNo: string, notes: string) => {
+    try {
+      const reqFn = httpsCallable(functions, 'requestPasswordReset');
+      await reqFn({ regionNo, notes });
+      logAudit('PASSWORD_RESET_REQUESTED', 'PasswordReset', regionNo, { notes });
+    } catch (err) {
+      console.error('Password reset request CF error, falling back locally:', err);
+      const user = users.find((u) => u.regionNo === regionNo || u.username === regionNo);
+      const newReq: PasswordResetRequest = {
+        resetRequestId: 'RST-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
+        userId: user?.userId || 'UNKNOWN',
+        regionNo,
+        repNameAr: user?.repNameAr || 'مندوب غير محدد',
+        requestNotes: notes,
+        status: 'PENDING',
+        requestedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      };
+      setPasswordResetRequests((prev) => [newReq, ...prev]);
+      logAudit('PASSWORD_RESET_REQUESTED', 'PasswordReset', newReq.resetRequestId, { regionNo, notes });
+    }
   };
 
   const adminResetPassword = async (userId: string) => {
@@ -706,7 +715,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const adminUnlockAccount = (userId: string) => {
+  const adminUnlockAccount = async (userId: string) => {
     setUsers((prev) =>
       prev.map((u) =>
         u.userId === userId
@@ -714,10 +723,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           : u
       )
     );
+    try {
+      const unlockFn = httpsCallable(functions, 'adminUnlockAccount');
+      await unlockFn({ targetUserId: userId });
+    } catch (err) {
+      console.error('Error unlocking account via Cloud Function:', err);
+    }
     logAudit('ACCOUNT_UNLOCKED', 'User', userId, {});
   };
 
-  const releaseDeviceBinding = (userId: string, reason?: string) => {
+  const releaseDeviceBinding = async (userId: string, reason?: string) => {
     setUsers((prev) =>
       prev.map((u) =>
         u.userId === userId
@@ -745,15 +760,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       )
     );
 
+    try {
+      const releaseFn = httpsCallable(functions, 'releaseDevice');
+      await releaseFn({ targetUserId: userId, reason });
+    } catch (err) {
+      console.error('Error releasing device via Cloud Function:', err);
+    }
+
     logAudit('DEVICE_RELEASED', 'DeviceBinding', userId, { reason });
   };
 
   const updateUser = async (user: User) => {
     setUsers((prev) => prev.map((u) => (u.userId === user.userId ? user : u)));
     try {
-      await updateDoc(doc(db, 'users', user.userId), { ...user });
+      const updateFn = httpsCallable(functions, 'updateUser');
+      await updateFn({
+        targetUserId: user.userId,
+        updates: {
+          repNameAr: user.repNameAr,
+          repNameEn: user.repNameEn,
+          email: user.email,
+          mobile: user.mobile,
+          branchId: user.branchId,
+          regionNo: user.regionNo,
+          allowedRegionNos: user.allowedRegionNos,
+          repNo: user.repNo,
+          role: user.role,
+          isActive: user.isActive,
+          maxAllowedDevices: user.maxAllowedDevices,
+        },
+      });
     } catch (err) {
-      console.error("Firestore update error:", err);
+      console.error("Cloud function updateUser error:", err);
     }
     logAudit('USER_UPDATED', 'User', user.userId, { role: user.role, active: user.isActive });
   };
@@ -810,56 +848,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const importUsersBatch = async (importedUsers: User[]) => {
-    // Save to Firestore using a batch
     try {
-      const batch = writeBatch(db);
-      
-      setUsers((prev) => {
-        const updated = [...prev];
-        importedUsers.forEach((newUser) => {
-          const existingIdx = updated.findIndex(
-            (u) =>
-              u.username === newUser.username ||
-              u.regionNo === newUser.regionNo ||
-              u.userId === newUser.userId ||
-              (u.repNameAr && newUser.repNameAr && u.repNameAr.trim() === newUser.repNameAr.trim())
-          );
-          if (existingIdx >= 0) {
-            const existing = updated[existingIdx];
-            const mergedRegions = Array.from(
-              new Set([
-                ...(existing.allowedRegionNos || [existing.regionNo]),
-                ...(newUser.allowedRegionNos || [newUser.regionNo]),
-              ])
-            );
-            const mergedUser = {
-              ...existing,
-              allowedRegionNos: mergedRegions,
-              branchNameAr: newUser.branchNameAr || existing.branchNameAr,
-              branchId: newUser.branchId || existing.branchId,
-              repNo: existing.repNo || newUser.repNo,
-              updatedAt: new Date().toISOString(),
-            };
-            updated[existingIdx] = mergedUser;
-            batch.set(doc(db, 'users', existing.userId), mergedUser, { merge: true });
-          } else {
-            const userToInsert = {
-              ...newUser,
-              permissions: {
-                canManageUsers: false,
-                canManageRequests: false,
-                canManageRegions: false,
-                canViewAllBranches: false
-              },
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            };
-            updated.push(userToInsert);
-            batch.set(doc(db, 'users', newUser.userId), userToInsert);
-          }
-        });
-        return updated;
-      });
+      const importFn = httpsCallable(functions, 'importUsersBatch');
+      const payload = importedUsers.map((u) => ({
+        username: u.username || u.regionNo,
+        regionNo: u.regionNo || u.username,
+        allowedRegionNos: u.allowedRegionNos || [u.regionNo || u.username],
+        repNo: u.repNo || u.username,
+        repNameAr: u.repNameAr,
+        repNameEn: u.repNameEn || u.repNameAr,
+        email: u.email || null,
+        mobile: u.mobile || null,
+        branchId: u.branchId,
+        branchNameAr: u.branchNameAr,
+        role: u.role || 'REP',
+      }));
+
+      const res = await importFn({ users: payload });
+      const resultData = res.data as {
+        success: boolean;
+        created: number;
+        updated?: number;
+        skipped: number;
+        errors: string[];
+        temporaryPasswords: Array<{
+          username: string;
+          repNameAr: string;
+          branchName?: string;
+          allowedRegionNos: string[];
+          password: string;
+        }>;
+      };
 
       // Register any newly imported branches
       setBranches((prev) => {
@@ -880,10 +899,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return updated;
       });
 
-      await batch.commit();
-      logAudit('USERS_IMPORTED_EXCEL', 'User', 'BATCH', { count: importedUsers.length });
+      logAudit('USERS_IMPORTED_EXCEL', 'User', 'BATCH', { count: importedUsers.length, created: resultData.created });
+      return resultData;
     } catch (err) {
-      console.error("Error committing batch to Firestore:", err);
+      console.error("Error importing users via Cloud Function:", err);
+      throw err;
     }
   };
 
@@ -976,46 +996,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const cloneRequest = async (requestId: string): Promise<string> => {
-    const src = requests.find((r) => r.requestId === requestId);
-    if (!src) return '';
-    const newId = 'REQ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-    const clonedReq: RequestItem = {
-      ...src,
-      requestId: newId,
-      requestCode: src.requestCode + '-COPY',
-      titleAr: src.titleAr + ' (نسخة)',
-      titleEn: src.titleEn + ' (Copy)',
-      status: 'Draft',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      publishedAt: undefined,
-      closedAt: undefined,
-      archivedAt: undefined,
-      totalRecords: 0,
-      totalAssignments: 0,
-    };
-
-    const srcFields = fields.filter((f) => f.requestId === requestId);
-    
     try {
-      const batch = writeBatch(db);
-      batch.set(doc(db, 'requests', newId), clonedReq);
-
-      srcFields.forEach((f) => {
-        const fieldId = 'FLD-' + Math.random().toString(36).substring(2, 8);
-        batch.set(doc(db, 'request_fields', fieldId), {
-          ...f,
-          fieldId,
-          requestId: newId,
-        });
-      });
-
-      await batch.commit();
+      const cloneReqFn = httpsCallable(functions, 'cloneRequest');
+      const response = await cloneReqFn({ requestId });
+      const data = response.data as any;
+      const newId = data.requestId;
       logAudit('REQUEST_CLONED', 'Request', newId, { sourceRequestId: requestId });
+      return newId;
     } catch (err) {
-      console.error("Error cloning request:", err);
+      console.error("Error cloning request via Cloud Function:", err);
+      return '';
     }
-    return newId;
   };
 
   // -------------------------------------------------------------
@@ -1077,7 +1068,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const batch = writeBatch(db);
       batch.set(doc(db, 'responses', recordId), values, { merge: true });
       batch.update(doc(db, 'records', recordId), {
-        recordStatus: 'Completed',
+        recordStatus: 'Submitted',
         completionPercent: 100,
         submittedAt: new Date().toISOString(),
         completedAt: new Date().toISOString(),

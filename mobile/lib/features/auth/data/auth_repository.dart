@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -42,7 +43,7 @@ class AuthRepository {
       'regionNo': regionNo,
       'password': password,
       'installationDeviceId': deviceId,
-      'platform': 'android',
+      'platform': Platform.isIOS ? 'ios' : (Platform.isAndroid ? 'android' : 'web'),
       'appVersion': '1.0.0',
     });
 

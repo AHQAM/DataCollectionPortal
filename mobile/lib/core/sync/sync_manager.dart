@@ -41,6 +41,8 @@ class SyncManager {
     }
   }
 
+  static const int maxRetries = 5;
+
   Future<void> _processQueue() async {
     if (_isSyncing) return;
     _isSyncing = true;
@@ -55,16 +57,27 @@ class SyncManager {
 
         final action = SyncAction.fromJson(jsonDecode(jsonString));
 
+        if (action.retryCount >= maxRetries) {
+          debugPrint('Action ${action.id} exceeded max retries. Removing from active queue.');
+          await box.delete(key);
+          continue;
+        }
+
         bool success = await _executeAction(action);
 
         if (success) {
           await box.delete(key);
         } else {
-          // Increment retry count
-          final updatedAction = action.copyWith(
-            retryCount: action.retryCount + 1,
-          );
-          await box.put(key, jsonEncode(updatedAction.toJson()));
+          final nextRetry = action.retryCount + 1;
+          if (nextRetry >= maxRetries) {
+            debugPrint('Action ${action.id} reached max retries ($maxRetries). Removing from active queue.');
+            await box.delete(key);
+          } else {
+            final updatedAction = action.copyWith(
+              retryCount: nextRetry,
+            );
+            await box.put(key, jsonEncode(updatedAction.toJson()));
+          }
         }
       }
     } finally {

@@ -13,41 +13,43 @@ class RequestsRepository {
   RequestsRepository(this._firestore);
 
   Stream<List<RequestModel>> watchMyRequests(String userId) {
-    // We listen to Firestore, and simultaneously cache the results in Hive.
-    // If we're offline, Firestore's own offline persistence works, but Hive gives us more control if needed.
     return _firestore
         .collection(AppConstants.requestsCollection)
-        .where('assignedUserId', isEqualTo: userId)
         .where(
           'status',
           whereIn: const ['Published', 'Closed', 'Archived'],
         )
-        .orderBy('assignedAt', descending: true)
         .snapshots()
         .map((snapshot) {
           final requests = snapshot.docs.map((doc) {
-            final data = doc.data();
+            final data = Map<String, dynamic>.from(doc.data());
             data['id'] = doc.id;
-            // Handle Firestore Timestamp conversions
-            data['assignedAt'] = (data['assignedAt'] as Timestamp)
-                .toDate()
-                .toIso8601String();
-            if (data['dueDate'] != null) {
-              data['dueDate'] = (data['dueDate'] as Timestamp)
-                  .toDate()
-                  .toIso8601String();
+
+            DateTime parseDate(dynamic val) {
+              if (val is Timestamp) return val.toDate();
+              if (val is String) return DateTime.tryParse(val) ?? DateTime.now();
+              return DateTime.now();
+            }
+
+            data['assignedAt'] = parseDate(data['assignedAt'] ?? data['publishedAt'] ?? data['createdAt']).toIso8601String();
+            if (data['dueDate'] != null || data['dueAt'] != null) {
+              data['dueDate'] = parseDate(data['dueDate'] ?? data['dueAt']).toIso8601String();
             }
             if (data['completedAt'] != null) {
-              data['completedAt'] = (data['completedAt'] as Timestamp)
-                  .toDate()
-                  .toIso8601String();
+              data['completedAt'] = parseDate(data['completedAt']).toIso8601String();
             }
+
+            data['activityId'] = data['activityId'] ?? data['requestId'] ?? doc.id;
+            data['branchId'] = data['branchId'] ?? (data['targetBranches'] is List && (data['targetBranches'] as List).isNotEmpty ? (data['targetBranches'] as List)[0] : 'MAIN');
+            data['regionNo'] = data['regionNo'] ?? 'ALL';
+            data['metadata'] = {
+              'titleAr': data['titleAr'] ?? data['title'] ?? '',
+              'titleEn': data['titleEn'] ?? data['title'] ?? '',
+              'requestCode': data['requestCode'] ?? '',
+            };
+
             return RequestModel.fromJson(data);
           }).toList();
-
-          // Cache locally
-          // For simplicity, we can store them in Hive, but Firestore already has a local cache.
-          // We will rely on Firestore's cache for reads, and SyncManager for offline writes.
 
           return requests;
         });

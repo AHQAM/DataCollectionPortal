@@ -263,6 +263,8 @@ exports.authenticateWithRegionPassword = functions.https.onCall(async (data, con
             allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
             sessionVersion: (userData.sessionVersion || 0) + 0, // Keep current version
             mustChangePassword: userData.mustChangePassword || false,
+            repNameAr: userData.repNameAr || null,
+            repNameEn: userData.repNameEn || null,
         };
         // 9. Ensure Firebase Auth user exists with correct claims
         try {

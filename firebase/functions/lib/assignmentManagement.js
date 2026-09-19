@@ -67,11 +67,12 @@ exports.reassignRecords = functions.https.onCall(async (data, context) => {
     const batch = db.batch();
     // Load records and verify they can be reassigned
     for (const recordId of recordIds) {
-        const recordRef = db.collection("assignments").doc(recordId); // assuming we assign records via 'assignments' collection
+        const recordRef = db.collection("records").doc(recordId);
         const recordDoc = await recordRef.get();
         if (recordDoc.exists) {
             batch.update(recordRef, {
-                assignedTo: newUserId,
+                assignedUserId: newUserId,
+                assignedRegionNo: userDoc.data()?.regionNo || userDoc.data()?.username || "",
                 updatedAt: admin.firestore.FieldValue.serverTimestamp(),
             });
         }

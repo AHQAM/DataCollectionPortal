@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = void 0;
+exports.cloneRequest = exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = void 0;
 const firestore_1 = require("firebase-admin/firestore");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
@@ -197,5 +197,63 @@ exports.reopenRequest = functions.https.onCall(async (data, context) => {
         updatedAt: new Date().toISOString(),
     });
     return { success: true };
+});
+exports.cloneRequest = functions.https.onCall(async (data, context) => {
+    checkAdminOrSupervisor(context);
+    const { requestId } = data;
+    if (!requestId) {
+        throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
+    }
+    const srcRef = db.collection("requests").doc(requestId);
+    const srcDoc = await srcRef.get();
+    if (!srcDoc.exists) {
+        throw new functions.https.HttpsError("not-found", "Source request not found.");
+    }
+    const srcData = srcDoc.data();
+    const newRequestId = 'REQ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const finalRequestCode = (srcData.requestCode || 'REQ') + '-COPY';
+    const newRequestRef = db.collection("requests").doc(newRequestId);
+    const newRequestData = {
+        ...srcData,
+        requestId: newRequestId,
+        activityId: newRequestId,
+        requestCode: finalRequestCode,
+        titleAr: `${srcData.titleAr || ''} (نسخة)`.trim(),
+        titleEn: `${srcData.titleEn || ''} (Copy)`.trim(),
+        status: "Draft",
+        totalRecords: 0,
+        totalAssignments: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        createdBy: context.auth.uid,
+        publishedAt: null,
+        closedAt: null,
+        archivedAt: null,
+    };
+    const batch = db.batch();
+    batch.set(newRequestRef, newRequestData);
+    // Copy request fields
+    const fieldsSnapshot = await db.collection("request_fields")
+        .where("requestId", "==", requestId)
+        .get();
+    fieldsSnapshot.docs.forEach((doc) => {
+        const fData = doc.data();
+        const newFieldRef = db.collection("request_fields").doc();
+        batch.set(newFieldRef, {
+            ...fData,
+            fieldId: newFieldRef.id,
+            requestId: newRequestId,
+            activityId: newRequestId,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+    });
+    await batch.commit();
+    return {
+        success: true,
+        requestId: newRequestId,
+        activityId: newRequestId,
+        messageAr: "تم نسخ الطلب بنجاح كمسودة جديدة.",
+        messageEn: "Request cloned successfully as a new draft.",
+    };
 });
 //# sourceMappingURL=requestManagement.js.map

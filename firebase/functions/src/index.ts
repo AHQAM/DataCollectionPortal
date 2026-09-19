@@ -25,6 +25,7 @@ export {
 // Device Binding
 export {
   releaseDevice,
+  releaseDevice as releaseDeviceBinding,
   replaceDevice,
   forceLogoutUser,
 } from "./deviceBinding";
@@ -32,8 +33,12 @@ export {
 // Request Management
 export {
   createRequest,
+  updateDraftRequest,
   publishRequest,
+  closeRequest,
   archiveRequest,
+  reopenRequest,
+  cloneRequest,
 } from "./requestManagement";
 
 // Form Management

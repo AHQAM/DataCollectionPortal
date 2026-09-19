@@ -373,9 +373,16 @@ export const importUsersBatch = functions.https.onCall(
 
       const results = {
         created: 0,
+        updated: 0,
         skipped: 0,
         errors: [] as string[],
-        temporaryPasswords: [] as Array<{ username: string; password: string }>,
+        temporaryPasswords: [] as Array<{
+          username: string;
+          repNameAr: string;
+          branchName?: string;
+          allowedRegionNos: string[];
+          password: string;
+        }>,
       };
 
       const batch = db.batch();
@@ -392,8 +399,21 @@ export const importUsersBatch = functions.https.onCall(
         }
 
         if (existingUsernames.has(username)) {
-          results.errors.push(`Skipped: Username ${username} already exists`);
-          results.skipped++;
+          const existingDoc = existingUsers.docs.find(
+            (d) => d.data().username === username || d.data().regionNo === username
+          );
+          if (existingDoc) {
+            const existingData = existingDoc.data();
+            const currentAllowed = existingData.allowedRegionNos || [existingData.regionNo];
+            const newAllowed = user.allowedRegionNos || [user.regionNo || username];
+            const merged = Array.from(new Set([...currentAllowed, ...newAllowed]));
+            batch.update(existingDoc.ref, {
+              allowedRegionNos: merged,
+              branchId: user.branchId || existingData.branchId,
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+            results.updated++;
+          }
           continue;
         }
 
@@ -402,13 +422,15 @@ export const importUsersBatch = functions.https.onCall(
         const temporaryPassword = randomBytes(9).toString("base64url");
         const passwordHash = await hashPassword(temporaryPassword);
 
+        const allowedRegions = user.allowedRegionNos || [
+          String(user.regionNo || username).trim(),
+        ];
+
         batch.set(userRef, {
           userId,
           username,
           regionNo: String(user.regionNo || username).trim(),
-          allowedRegionNos: user.allowedRegionNos || [
-            String(user.regionNo || username).trim(),
-          ],
+          allowedRegionNos: allowedRegions,
           repNo: user.repNo || username,
           repNameAr: user.repNameAr.trim(),
           repNameEn: user.repNameEn?.trim() || null,
@@ -438,7 +460,13 @@ export const importUsersBatch = functions.https.onCall(
         });
 
         existingUsernames.add(username);
-        results.temporaryPasswords.push({ username, password: temporaryPassword });
+        results.temporaryPasswords.push({
+          username,
+          repNameAr: user.repNameAr.trim(),
+          branchName: user.branchNameAr || user.branchId,
+          allowedRegionNos: allowedRegions,
+          password: temporaryPassword,
+        });
         results.created++;
       }
 

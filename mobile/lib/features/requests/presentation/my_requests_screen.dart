@@ -48,18 +48,26 @@ class MyRequestsScreen extends ConsumerWidget {
             itemCount: requests.length,
             itemBuilder: (context, index) {
               final request = requests[index];
+              final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+              final title = (isArabic
+                  ? request.metadata['titleAr']
+                  : request.metadata['titleEn']) ?? (request.metadata['titleAr'] ?? 'Activity: ${request.activityId}');
+
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
-                  title: Text('Activity: ${request.activityId}'),
+                  title: Text(
+                    title.toString(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text(
-                    'Status: ${request.status}\nAssigned: ${request.assignedAt}',
+                    '${isArabic ? "الحالة" : "Status"}: ${request.status}\n${isArabic ? "المعرف" : "ID"}: ${request.activityId}',
                   ),
                   isThreeLine: true,
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     context.push(
-                      '/form/${request.id}/${request.activityId}?recordId=${Uri.encodeComponent(request.id)}',
+                      '/form/${request.id}/${request.activityId}?recordId=${Uri.encodeComponent(request.id)}&title=${Uri.encodeComponent(title.toString())}',
                     );
                   },
                 ),

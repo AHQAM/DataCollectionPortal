@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSystemHealth = exports.submitResponse = exports.exportReport = exports.sendBroadcastNotification = exports.exportDataToExternalSystem = exports.commitImport = exports.importDataPreview = exports.reassignRecords = exports.saveRequestFields = exports.archiveRequest = exports.publishRequest = exports.createRequest = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = exports.createAdminSupervisorUser = exports.authenticateWithRegionPassword = void 0;
+exports.getSystemHealth = exports.submitResponse = exports.exportReport = exports.sendBroadcastNotification = exports.exportDataToExternalSystem = exports.commitImport = exports.importDataPreview = exports.reassignRecords = exports.saveRequestFields = exports.cloneRequest = exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDeviceBinding = exports.releaseDevice = exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = exports.createAdminSupervisorUser = exports.authenticateWithRegionPassword = void 0;
 const admin = __importStar(require("firebase-admin"));
 admin.initializeApp();
 // Authentication
@@ -56,13 +56,18 @@ Object.defineProperty(exports, "importUsersBatch", { enumerable: true, get: func
 // Device Binding
 var deviceBinding_1 = require("./deviceBinding");
 Object.defineProperty(exports, "releaseDevice", { enumerable: true, get: function () { return deviceBinding_1.releaseDevice; } });
+Object.defineProperty(exports, "releaseDeviceBinding", { enumerable: true, get: function () { return deviceBinding_1.releaseDevice; } });
 Object.defineProperty(exports, "replaceDevice", { enumerable: true, get: function () { return deviceBinding_1.replaceDevice; } });
 Object.defineProperty(exports, "forceLogoutUser", { enumerable: true, get: function () { return deviceBinding_1.forceLogoutUser; } });
 // Request Management
 var requestManagement_1 = require("./requestManagement");
 Object.defineProperty(exports, "createRequest", { enumerable: true, get: function () { return requestManagement_1.createRequest; } });
+Object.defineProperty(exports, "updateDraftRequest", { enumerable: true, get: function () { return requestManagement_1.updateDraftRequest; } });
 Object.defineProperty(exports, "publishRequest", { enumerable: true, get: function () { return requestManagement_1.publishRequest; } });
+Object.defineProperty(exports, "closeRequest", { enumerable: true, get: function () { return requestManagement_1.closeRequest; } });
 Object.defineProperty(exports, "archiveRequest", { enumerable: true, get: function () { return requestManagement_1.archiveRequest; } });
+Object.defineProperty(exports, "reopenRequest", { enumerable: true, get: function () { return requestManagement_1.reopenRequest; } });
+Object.defineProperty(exports, "cloneRequest", { enumerable: true, get: function () { return requestManagement_1.cloneRequest; } });
 // Form Management
 var formManagement_1 = require("./formManagement");
 Object.defineProperty(exports, "saveRequestFields", { enumerable: true, get: function () { return formManagement_1.saveRequestFields; } });

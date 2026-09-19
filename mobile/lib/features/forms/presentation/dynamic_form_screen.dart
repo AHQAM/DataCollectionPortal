@@ -4,17 +4,20 @@ import 'package:mobile/l10n/app_localizations.dart';
 
 import 'form_fields_controller.dart';
 import '../domain/form_field_model.dart';
+import 'widgets/custom_form_fields.dart';
 
 class DynamicFormScreen extends ConsumerStatefulWidget {
   final String requestId;
   final String recordId;
   final String activityId;
+  final String? title;
 
   const DynamicFormScreen({
     super.key,
     required this.requestId,
     required this.recordId,
     required this.activityId,
+    this.title,
   });
 
   @override
@@ -60,11 +63,16 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final fieldsAsync = ref.watch(formFieldsProvider(widget.activityId));
     final submitState = ref.watch(formSubmitControllerProvider);
 
+    final displayTitle = widget.title?.isNotEmpty == true
+        ? widget.title!
+        : (isArabic ? 'تفاصيل النشاط' : 'Activity Details');
+
     return Scaffold(
-      appBar: AppBar(title: Text('Activity: ${widget.activityId}')),
+      appBar: AppBar(title: Text(displayTitle)),
       body: fieldsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(
@@ -141,7 +149,11 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case 'text':
       case 'number':
         return TextFormField(
-          decoration: InputDecoration(labelText: label, hintText: label),
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
           keyboardType: field.type == 'number'
               ? TextInputType.number
               : TextInputType.text,
@@ -159,7 +171,10 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
 
       case 'dropdown':
         return DropdownButtonFormField<String>(
-          decoration: InputDecoration(labelText: label),
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
           items:
               field.options
                   ?.map(
@@ -181,16 +196,37 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
         );
 
       case 'location':
-        return _UnimplementedField(label: label, icon: Icons.location_on);
+        return LocationFormField(
+          field: field,
+          isArabic: isArabic,
+          onChanged: (val) => _formData[field.id] = val,
+        );
 
       case 'photo':
-        return _UnimplementedField(label: label, icon: Icons.camera_alt);
+        return PhotoFormField(
+          field: field,
+          isArabic: isArabic,
+          requestId: widget.requestId,
+          recordId: widget.recordId,
+          onChanged: (val) => _formData[field.id] = val,
+        );
 
       case 'signature':
-        return _UnimplementedField(label: label, icon: Icons.draw);
+        return SignatureFormField(
+          field: field,
+          isArabic: isArabic,
+          requestId: widget.requestId,
+          recordId: widget.recordId,
+          onChanged: (val) => _formData[field.id] = val,
+        );
 
       case 'barcode':
-        return _UnimplementedField(label: label, icon: Icons.qr_code_scanner);
+        return BarcodeFormField(
+          field: field,
+          isArabic: isArabic,
+          onChanged: (val) => _formData[field.id] = val,
+          onSaved: (val) => _formData[field.id] = val,
+        );
 
       default:
         return _UnimplementedField(label: label, icon: Icons.help_outline);
@@ -216,3 +252,4 @@ class _UnimplementedField extends StatelessWidget {
     );
   }
 }
+

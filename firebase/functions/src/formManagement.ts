@@ -50,6 +50,7 @@ export const saveRequestFields = functions.https.onCall(async (data, context) =>
     batch.set(fieldRef, {
       ...field,
       requestId,
+      activityId: requestId,
       orderIndex: index,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
