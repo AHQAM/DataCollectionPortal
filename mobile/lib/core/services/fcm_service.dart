@@ -131,6 +131,9 @@ class FcmService {
       return;
     }
     _foregroundMessageSubscription?.cancel();
+    // Capture ScaffoldMessengerState synchronously before the async listener
+    // to satisfy use_build_context_synchronously lint rule.
+    final messenger = ScaffoldMessenger.of(context);
     _foregroundMessageSubscription = FirebaseMessaging.onMessage.listen((
       RemoteMessage message,
     ) {
@@ -142,7 +145,7 @@ class FcmService {
       final body = notification.body ?? '';
       final requestId = message.data['requestId'];
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
