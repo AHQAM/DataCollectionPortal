@@ -1,25 +1,18 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { RequestField, FieldType, FieldOption } from '../../types';
+import { RequestField, FieldType } from '../../types';
 import {
   ArrowLeft,
   ArrowRight,
-  Plus,
-  Trash2,
-  Copy,
-  ChevronUp,
-  ChevronDown,
   Save,
-  Eye,
   Sliders,
   Sparkles,
-  Info,
   CheckCircle2,
-  AlertCircle,
-  HelpCircle,
-  Lock,
   FileSpreadsheet,
 } from 'lucide-react';
+import { FieldListSidebar } from './form-builder/FieldListSidebar';
+import { FieldPropertiesEditor } from './form-builder/FieldPropertiesEditor';
+import { FormMobilePreview } from './form-builder/FormMobilePreview';
 
 interface Props {
   requestId: string;
@@ -27,35 +20,8 @@ interface Props {
   onOpenImportWizard?: (requestId: string) => void;
 }
 
-const ALL_FIELD_TYPES: { type: FieldType; labelAr: string; labelEn: string; icon: string }[] = [
-  { type: 'text', labelAr: 'نص قصير', labelEn: 'Short Text', icon: 'Aa' },
-  { type: 'textarea', labelAr: 'نص طويل / ملاحظات', labelEn: 'Long Text / Notes', icon: '¶' },
-  { type: 'select', labelAr: 'قائمة منسدلة', labelEn: 'Dropdown Select', icon: '▼' },
-  { type: 'yes_no', labelAr: 'نعم / لا', labelEn: 'Yes / No', icon: '✓✗' },
-  { type: 'currency', labelAr: 'مبلغ مالي (ر.س)', labelEn: 'Currency (SAR)', icon: '﷼' },
-  { type: 'integer', labelAr: 'عدد صحيح (كميات)', labelEn: 'Integer Quantity', icon: '123' },
-  { type: 'decimal', labelAr: 'عدد عشري', labelEn: 'Decimal Number', icon: '0.0' },
-  { type: 'percentage', labelAr: 'نسبة مئوية %', labelEn: 'Percentage', icon: '%' },
-  { type: 'date', labelAr: 'تاريخ الزيارة/المسح', labelEn: 'Date Picker', icon: '📅' },
-  { type: 'time', labelAr: 'وقت محدد', labelEn: 'Time Picker', icon: '⏰' },
-  { type: 'datetime', labelAr: 'تاريخ ووقت', labelEn: 'Date & Time', icon: '📆' },
-  { type: 'single_choice', labelAr: 'اختيار أحادي (Radio)', labelEn: 'Single Choice', icon: '🔘' },
-  { type: 'multi_choice', labelAr: 'اختيار متعدد (Checkbox)', labelEn: 'Multi Choice', icon: '☑' },
-  { type: 'searchable_dropdown', labelAr: 'قائمة قابلة للبحث', labelEn: 'Searchable Select', icon: '🔍' },
-  { type: 'photo', labelAr: 'صورة واحدة للرف', labelEn: 'Single Photo', icon: '📷' },
-  { type: 'multi_photo', labelAr: 'صور متعددة', labelEn: 'Multiple Photos', icon: '🖼️' },
-  { type: 'barcode_scan', labelAr: 'مسح باركود الصنف', labelEn: 'Barcode Scanner', icon: '||||' },
-  { type: 'qr_scan', labelAr: 'مسح رمز QR', labelEn: 'QR Code Scanner', icon: '🏁' },
-  { type: 'gps', labelAr: 'إحداثيات الموقع (GPS)', labelEn: 'GPS Location', icon: '📍' },
-  { type: 'signature', labelAr: 'توقيع العميل الإلكتروني', labelEn: 'Customer Signature', icon: '✍️' },
-  { type: 'file_attachment', labelAr: 'ملف مرفق (PDF/Doc)', labelEn: 'File Attachment', icon: '📎' },
-  { type: 'rating', labelAr: 'تقييم نجوم (1-5)', labelEn: 'Rating Stars', icon: '★' },
-  { type: 'calculated_field', labelAr: 'حقل محسوب تلقائياً', labelEn: 'Calculated Field', icon: 'fx' },
-  { type: 'static_instruction', labelAr: 'نص إرشادي ثابت', labelEn: 'Static Guidance', icon: 'ℹ' },
-];
-
 export const AdminFormBuilder: React.FC<Props> = ({ requestId, onBack, onOpenImportWizard }) => {
-  const { lang, dir, t, requests, fields, updateRequestFields } = useApp();
+  const { lang, dir, requests, fields, updateRequestFields } = useApp();
 
   const currentRequest = requests.find((r) => r.requestId === requestId);
   const initialFields = fields.filter((f) => f.requestId === requestId);
@@ -130,7 +96,6 @@ export const AdminFormBuilder: React.FC<Props> = ({ requestId, onBack, onOpenImp
     next[index] = next[targetIndex];
     next[targetIndex] = temp;
 
-    // re-assign sortOrder
     next.forEach((f, i) => {
       f.sortOrder = i + 1;
     });
@@ -149,16 +114,6 @@ export const AdminFormBuilder: React.FC<Props> = ({ requestId, onBack, onOpenImp
     updateRequestFields(requestId, formFields);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 2500);
-  };
-
-  // Check conditional visibility in live preview
-  const isPreviewFieldVisible = (field: RequestField): boolean => {
-    if (!field.visibilityRule) return true;
-    const targetVal = previewValues[field.visibilityRule.targetFieldKey];
-    const ruleVal = field.visibilityRule.value;
-    if (field.visibilityRule.operator === 'equals') return String(targetVal) === String(ruleVal);
-    if (field.visibilityRule.operator === 'not_equals') return String(targetVal) !== String(ruleVal);
-    return true;
   };
 
   const handleLoadInactiveCustomersPreset = () => {
@@ -328,7 +283,7 @@ export const AdminFormBuilder: React.FC<Props> = ({ requestId, onBack, onOpenImp
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-all flex items-center gap-1.5 text-xs"
+            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-all flex items-center gap-1.5 text-xs cursor-pointer"
           >
             {dir === 'rtl' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
             <span>{lang === 'ar' ? 'الرجوع لقائمة الطلبات' : 'Back'}</span>
@@ -432,544 +387,32 @@ export const AdminFormBuilder: React.FC<Props> = ({ requestId, onBack, onOpenImp
         </div>
       )}
 
-      {/* 3-Column Layout: Fields List (Col 1), Field Configuration (Col 2), Live Interactive Preview (Col 3) */}
+      {/* 3-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Col 1: Fields Tree / Order (3 cols) */}
-        <div className="lg:col-span-3 bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between max-h-[750px]">
-          <div>
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
-              <span className="font-extrabold text-xs text-slate-800">
-                {lang === 'ar' ? `حقول النموذج (${formFields.length})` : `Form Fields (${formFields.length})`}
-              </span>
-              <button
-                onClick={() => handleAddField('select')}
-                className="text-xs font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 bg-purple-50 px-2 py-1 rounded-lg"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>{lang === 'ar' ? 'إضافة حقل' : 'Add'}</span>
-              </button>
-            </div>
+        <FieldListSidebar
+          lang={lang}
+          formFields={formFields}
+          selectedFieldId={selectedFieldId}
+          onSelectField={setSelectedFieldId}
+          onAddField={handleAddField}
+          onMoveField={handleMove}
+        />
 
-            <div className="space-y-1.5 overflow-y-auto max-h-[620px] pe-1">
-              {formFields.map((field, idx) => {
-                const isSelected = field.fieldId === selectedFieldId;
-                return (
-                  <div
-                    key={field.fieldId}
-                    onClick={() => setSelectedFieldId(field.fieldId)}
-                    className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-center justify-between gap-1.5 ${
-                      isSelected
-                        ? 'bg-purple-900 text-white border-purple-900 shadow-xs'
-                        : 'bg-slate-50 text-slate-700 border-slate-200/80 hover:bg-slate-100'
-                    }`}
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] font-mono opacity-70">#{idx + 1}</span>
-                        <span className="font-bold truncate">
-                          {lang === 'ar' ? field.fieldLabelAr : field.fieldLabelEn}
-                        </span>
-                        {(field.readOnlyRule || field.isReadOnly) && (
-                          <span
-                            className={`text-[9px] px-1.5 py-0.2 rounded font-bold flex items-center gap-0.5 shrink-0 ${
-                              isSelected
-                                ? 'bg-amber-400/30 text-amber-200 border border-amber-300/40'
-                                : 'bg-amber-100 text-amber-900 border border-amber-300'
-                            }`}
-                          >
-                            <Lock className="w-2.5 h-2.5" />
-                            <span>{lang === 'ar' ? 'للعرض فقط' : 'Read-only'}</span>
-                          </span>
-                        )}
-                      </div>
-                      <div className={`text-[10px] font-mono truncate ${isSelected ? 'text-purple-200' : 'text-slate-400'}`}>
-                        {field.fieldType} • {field.fieldKey}
-                      </div>
-                    </div>
+        <FieldPropertiesEditor
+          lang={lang}
+          selectedField={selectedField}
+          formFields={formFields}
+          onUpdateField={updateSelectedField}
+          onDuplicateField={handleDuplicateField}
+          onDeleteField={handleDeleteField}
+        />
 
-                    <div className="flex items-center gap-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        onClick={() => handleMove(idx, 'up')}
-                        disabled={idx === 0}
-                        className={`p-1 rounded hover:bg-black/10 disabled:opacity-20 ${isSelected ? 'text-white' : 'text-slate-500'}`}
-                      >
-                        <ChevronUp className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleMove(idx, 'down')}
-                        disabled={idx === formFields.length - 1}
-                        className={`p-1 rounded hover:bg-black/10 disabled:opacity-20 ${isSelected ? 'text-white' : 'text-slate-500'}`}
-                      >
-                        <ChevronDown className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="pt-3 border-t border-slate-100 mt-2">
-            <span className="text-[10px] text-slate-400 block text-center">
-              {lang === 'ar' ? 'يدعم 24 نوع حقل وقواعد شرطية' : 'Supports 24 field types & conditions'}
-            </span>
-          </div>
-        </div>
-
-        {/* Col 2: Field Details & Rules Editor (5 cols) */}
-        <div className="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs overflow-y-auto max-h-[750px]">
-          {selectedField ? (
-            <div className="space-y-4 text-xs">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <span className="font-extrabold text-sm text-slate-900">
-                  {lang === 'ar' ? 'خصائص الحقل وقواعد الإلزام والشرطية' : 'Field Settings & Rules'}
-                </span>
-
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handleDuplicateField(selectedField)}
-                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700"
-                    title={lang === 'ar' ? 'استنساخ الحقل' : 'Duplicate'}
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteField(selectedField.fieldId)}
-                    className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600"
-                    title={lang === 'ar' ? 'حذف الحقل' : 'Delete'}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Field Type Selector */}
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'نوع الحقل (24 نوعاً متاحاً)' : 'Field Type'}
-                </label>
-                <select
-                  value={selectedField.fieldType}
-                  onChange={(e) => updateSelectedField({ fieldType: e.target.value as FieldType })}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white font-bold text-purple-950"
-                >
-                  {ALL_FIELD_TYPES.map((t) => (
-                    <option key={t.type} value={t.type}>
-                      {t.icon} {lang === 'ar' ? t.labelAr : t.labelEn} ({t.type})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Field Key & Required */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    {lang === 'ar' ? 'مفتاح الحقل البرمجي' : 'Field Key (Unique)'}
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedField.fieldKey}
-                    onChange={(e) => updateSelectedField({ fieldKey: e.target.value.trim() })}
-                    className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono"
-                  />
-                </div>
-
-                <div className="flex items-center pt-6">
-                  <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800">
-                    <input
-                      type="checkbox"
-                      checked={selectedField.isRequired && !(selectedField.readOnlyRule || selectedField.isReadOnly)}
-                      disabled={!!selectedField.readOnlyRule || !!selectedField.isReadOnly}
-                      onChange={(e) => updateSelectedField({ isRequired: e.target.checked })}
-                      className="rounded text-purple-900 w-4 h-4 disabled:opacity-40"
-                    />
-                    <span className={selectedField.readOnlyRule || selectedField.isReadOnly ? 'text-slate-400' : ''}>
-                      {lang === 'ar' ? 'حقل إلزامي من المندوب' : 'Required from Rep'}
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Read-Only Mode Toggle (Excel Pre-filled) */}
-              <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200/90 space-y-1.5">
-                <label className="flex items-center gap-2 cursor-pointer font-bold text-amber-950 text-xs">
-                  <input
-                    type="checkbox"
-                    checked={!!selectedField.readOnlyRule || !!selectedField.isReadOnly}
-                    onChange={(e) =>
-                      updateSelectedField({
-                        readOnlyRule: e.target.checked,
-                        isReadOnly: e.target.checked,
-                        isRequired: e.target.checked ? false : selectedField.isRequired,
-                      })
-                    }
-                    className="rounded text-amber-700 w-4 h-4"
-                  />
-                  <div className="flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-amber-700" />
-                    <span>
-                      {lang === 'ar'
-                        ? 'حقل للعرض فقط (بيانات مستوردة عبر الإكسل - غير قابلة للتعديل من المندوب)'
-                        : 'Read-Only Field (Imported via Excel - Non-editable by rep)'}
-                    </span>
-                  </div>
-                </label>
-                <p className="text-[11px] text-amber-800/90 leading-relaxed ps-6">
-                  {lang === 'ar'
-                    ? 'عند تفعيل هذا الخيار، يتم استيراد القيمة (مثل: رقم العميل، اسم العميل، الفرع، الموقع، المديونية، تاريخ آخر تعامل) من ملف الإكسل وتظهر للمندوب كمرجع ثابت بدون إمكانية التعديل، بينما يقوم بتعبأة الحقول الأخرى مثل سبب عدم الشراء.'
-                    : 'When enabled, this value is imported from Excel (e.g. Customer No, Name, Branch, Location, Debt, Last Deal Date) and shown to the rep as read-only, allowing them to fill other fields like Reason for No Purchase.'}
-                </p>
-              </div>
-
-              {/* Labels AR & EN */}
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'تسمية الحقل بالعربية' : 'Label (Arabic)'}
-                </label>
-                <input
-                  type="text"
-                  value={selectedField.fieldLabelAr}
-                  onChange={(e) => updateSelectedField({ fieldLabelAr: e.target.value })}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'تسمية الحقل بالإنجليزية' : 'Label (English)'}
-                </label>
-                <input
-                  type="text"
-                  value={selectedField.fieldLabelEn}
-                  onChange={(e) => updateSelectedField({ fieldLabelEn: e.target.value })}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
-                />
-              </div>
-
-              {/* Placeholders / Help Text */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    {lang === 'ar' ? 'نص إرشادي بالعربية' : 'Help Text (Arabic)'}
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedField.helpTextAr || ''}
-                    onChange={(e) => updateSelectedField({ helpTextAr: e.target.value })}
-                    className="w-full h-9 px-3 rounded-xl border border-slate-300"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    {lang === 'ar' ? 'نص إرشادي بالإنجليزية' : 'Help Text (English)'}
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedField.helpTextEn || ''}
-                    onChange={(e) => updateSelectedField({ helpTextEn: e.target.value })}
-                    className="w-full h-9 px-3 rounded-xl border border-slate-300"
-                  />
-                </div>
-              </div>
-
-              {/* Options Manager (if select, single_choice, multi_choice) */}
-              {['select', 'single_choice', 'multi_choice', 'searchable_dropdown'].includes(
-                selectedField.fieldType
-              ) && (
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-800">
-                      {lang === 'ar' ? 'خيارات القائمة المتاحة للمندوب' : 'Dropdown Options'}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const currentOpts = selectedField.options || [];
-                        const newOpt: FieldOption = {
-                          id: `opt_${Date.now()}`,
-                          value: `val_${currentOpts.length + 1}`,
-                          labelAr: `خيار جديد ${currentOpts.length + 1}`,
-                          labelEn: `New Option ${currentOpts.length + 1}`,
-                        };
-                        updateSelectedField({ options: [...currentOpts, newOpt] });
-                      }}
-                      className="text-[10px] font-bold text-purple-700 bg-purple-100 hover:bg-purple-200 px-2 py-0.5 rounded"
-                    >
-                      + {lang === 'ar' ? 'إضافة خيار' : 'Add Option'}
-                    </button>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    {(selectedField.options || []).map((opt, i) => (
-                      <div key={opt.id} className="flex gap-1.5 items-center">
-                        <input
-                          type="text"
-                          value={opt.value}
-                          onChange={(e) => {
-                            const next = [...(selectedField.options || [])];
-                            next[i].value = e.target.value;
-                            updateSelectedField({ options: next });
-                          }}
-                          className="w-24 h-8 px-2 rounded border border-slate-300 font-mono text-[10px]"
-                          placeholder="value"
-                        />
-                        <input
-                          type="text"
-                          value={opt.labelAr}
-                          onChange={(e) => {
-                            const next = [...(selectedField.options || [])];
-                            next[i].labelAr = e.target.value;
-                            updateSelectedField({ options: next });
-                          }}
-                          className="flex-1 h-8 px-2 rounded border border-slate-300 text-xs"
-                          placeholder="عربي"
-                        />
-                        <input
-                          type="text"
-                          value={opt.labelEn}
-                          onChange={(e) => {
-                            const next = [...(selectedField.options || [])];
-                            next[i].labelEn = e.target.value;
-                            updateSelectedField({ options: next });
-                          }}
-                          className="flex-1 h-8 px-2 rounded border border-slate-300 text-xs"
-                          placeholder="English"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const next = (selectedField.options || []).filter((_, idx) => idx !== i);
-                            updateSelectedField({ options: next });
-                          }}
-                          className="p-1 text-rose-500 hover:text-rose-700"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Conditional Visibility Rule Builder */}
-              <div className="p-3 bg-purple-50/50 rounded-xl border border-purple-100 space-y-2">
-                <span className="font-bold text-purple-950 block">
-                  {lang === 'ar' ? 'قاعدة الظهور الشرطي (Conditional Visibility)' : 'Conditional Visibility Rule'}
-                </span>
-                <p className="text-[11px] text-slate-500">
-                  {lang === 'ar'
-                    ? 'إظهار هذا الحقل فقط إذا تحققت قيمة معينة في حقل آخر'
-                    : 'Show this field only when target field equals value'}
-                </p>
-
-                <div className="grid grid-cols-3 gap-2">
-                  <select
-                    value={selectedField.visibilityRule?.targetFieldKey || ''}
-                    onChange={(e) => {
-                      if (!e.target.value) {
-                        updateSelectedField({ visibilityRule: undefined });
-                      } else {
-                        updateSelectedField({
-                          visibilityRule: {
-                            targetFieldKey: e.target.value,
-                            operator: 'equals',
-                            value: 'other_reason',
-                          },
-                        });
-                      }
-                    }}
-                    className="h-8 px-2 rounded border border-slate-300 text-[11px]"
-                  >
-                    <option value="">{lang === 'ar' ? '-- بدون شرط --' : '-- No Condition --'}</option>
-                    {formFields
-                      .filter((f) => f.fieldId !== selectedField.fieldId)
-                      .map((f) => (
-                        <option key={f.fieldId} value={f.fieldKey}>
-                          {f.fieldLabelAr} ({f.fieldKey})
-                        </option>
-                      ))}
-                  </select>
-
-                  <select
-                    value={selectedField.visibilityRule?.operator || 'equals'}
-                    onChange={(e) => {
-                      if (selectedField.visibilityRule) {
-                        updateSelectedField({
-                          visibilityRule: { ...selectedField.visibilityRule, operator: e.target.value as any },
-                        });
-                      }
-                    }}
-                    disabled={!selectedField.visibilityRule}
-                    className="h-8 px-2 rounded border border-slate-300 text-[11px]"
-                  >
-                    <option value="equals">يساوي / Equals</option>
-                    <option value="not_equals">لا يساوي / Not Equals</option>
-                    <option value="is_not_empty">ليس فارغاً / Not Empty</option>
-                  </select>
-
-                  <input
-                    type="text"
-                    value={selectedField.visibilityRule?.value || ''}
-                    onChange={(e) => {
-                      if (selectedField.visibilityRule) {
-                        updateSelectedField({
-                          visibilityRule: { ...selectedField.visibilityRule, value: e.target.value },
-                        });
-                      }
-                    }}
-                    disabled={!selectedField.visibilityRule}
-                    placeholder="القيمة المطلوبة (Value)"
-                    className="h-8 px-2 rounded border border-slate-300 text-[11px]"
-                  />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="p-8 text-center text-slate-400">
-              {lang === 'ar' ? 'اختر حقلاً من القائمة الجانبية لتعديله' : 'Select a field to edit'}
-            </div>
-          )}
-        </div>
-
-        {/* Col 3: Live Interactive Form Preview (4 cols) */}
-        <div className="lg:col-span-4 bg-slate-50 rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col max-h-[750px]">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
-            <span className="font-extrabold text-xs text-slate-800 flex items-center gap-1.5">
-              <Eye className="w-4 h-4 text-purple-700" />
-              <span>{lang === 'ar' ? 'المعاينة التفاعلية الحية' : 'Live Interactive Preview'}</span>
-            </span>
-            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-              {lang === 'ar' ? 'مباشر' : 'Live'}
-            </span>
-          </div>
-
-          <div className="flex-1 overflow-y-auto space-y-3 pe-1">
-            {formFields.length === 0 ? (
-              <div className="p-8 text-center text-slate-400 text-xs">
-                {lang === 'ar' ? 'النموذج فارغ. أضف حقولاً للبدء.' : 'Form is empty. Add fields to start.'}
-              </div>
-            ) : (
-              formFields.map((f) => {
-                if (!isPreviewFieldVisible(f)) return null;
-
-                const val = previewValues[f.fieldKey];
-
-                const isReadOnly = !!f.readOnlyRule || !!f.isReadOnly;
-
-                return (
-                  <div
-                    key={f.fieldId}
-                    className={`p-3 rounded-xl border text-xs shadow-2xs transition-all ${
-                      isReadOnly ? 'bg-amber-50/40 border-amber-200/90' : 'bg-white border-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="font-bold text-slate-800 flex items-center gap-1">
-                        <span>{lang === 'ar' ? f.fieldLabelAr : f.fieldLabelEn}</span>
-                        {f.isRequired && !isReadOnly && <span className="text-rose-600 font-bold mx-1">*</span>}
-                      </label>
-                      {isReadOnly && (
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 font-bold border border-amber-300 flex items-center gap-0.5">
-                          <Lock className="w-2.5 h-2.5" />
-                          <span>{lang === 'ar' ? 'للعرض فقط' : 'Read-only'}</span>
-                        </span>
-                      )}
-                    </div>
-
-                    {isReadOnly ? (
-                      <div className="w-full h-8 px-2.5 rounded-lg border border-amber-200 bg-white text-xs font-bold text-slate-800 flex items-center justify-between">
-                        <span>
-                          {f.defaultValue !== undefined && f.defaultValue !== null && String(f.defaultValue).trim() !== ''
-                            ? String(f.defaultValue)
-                            : f.fieldType === 'currency'
-                            ? (lang === 'ar' ? '15,000 ر.س' : '15,000 SAR')
-                            : f.fieldType === 'date'
-                            ? '2026-06-01'
-                            : (lang === 'ar' ? `[بيانات ${f.fieldLabelAr} من ملف الإكسل]` : `[${f.fieldLabelEn || f.fieldKey} from Excel]`)}
-                        </span>
-                        <span className="text-[9px] text-amber-700 font-medium">
-                          {lang === 'ar' ? 'مستورد من الإكسل' : 'Excel Imported'}
-                        </span>
-                      </div>
-                    ) : (
-                      <>
-                        {f.fieldType === 'select' && (
-                          <select
-                            value={val || ''}
-                            onChange={(e) => setPreviewValues({ ...previewValues, [f.fieldKey]: e.target.value })}
-                            className="w-full h-8 px-2 rounded-lg border border-slate-300 text-xs"
-                          >
-                            <option value="">-- اختر --</option>
-                            {(f.options || []).map((opt) => (
-                              <option key={opt.id} value={opt.value}>
-                                {lang === 'ar' ? opt.labelAr : opt.labelEn}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-
-                    {f.fieldType === 'yes_no' && (
-                      <div className="flex gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setPreviewValues({ ...previewValues, [f.fieldKey]: true })}
-                          className={`flex-1 py-1 rounded-lg border text-xs font-bold ${
-                            val === true ? 'bg-purple-900 text-white' : 'bg-slate-100 text-slate-700'
-                          }`}
-                        >
-                          {lang === 'ar' ? 'نعم' : 'Yes'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPreviewValues({ ...previewValues, [f.fieldKey]: false })}
-                          className={`flex-1 py-1 rounded-lg border text-xs font-bold ${
-                            val === false ? 'bg-purple-900 text-white' : 'bg-slate-100 text-slate-700'
-                          }`}
-                        >
-                          {lang === 'ar' ? 'لا' : 'No'}
-                        </button>
-                      </div>
-                    )}
-
-                    {f.fieldType === 'textarea' && (
-                      <textarea
-                        rows={2}
-                        value={val || ''}
-                        onChange={(e) => setPreviewValues({ ...previewValues, [f.fieldKey]: e.target.value })}
-                        className="w-full p-2 rounded-lg border border-slate-300 text-xs"
-                      />
-                    )}
-
-                    {f.fieldType === 'currency' && (
-                      <div className="relative">
-                        <input
-                          type="number"
-                          value={val || ''}
-                          onChange={(e) => setPreviewValues({ ...previewValues, [f.fieldKey]: e.target.value })}
-                          className="w-full h-8 px-2 rounded-lg border border-slate-300 text-xs"
-                        />
-                        <span className="absolute top-1.5 end-2 text-[10px] text-slate-400 font-bold">ر.س</span>
-                      </div>
-                    )}
-
-                    {!['select', 'yes_no', 'textarea', 'currency'].includes(f.fieldType) && (
-                      <input
-                        type="text"
-                        value={val || ''}
-                        onChange={(e) => setPreviewValues({ ...previewValues, [f.fieldKey]: e.target.value })}
-                        className="w-full h-8 px-2 rounded-lg border border-slate-300 text-xs"
-                        placeholder={f.fieldType}
-                      />
-                    )}
-                    </>
-                  )}
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
+        <FormMobilePreview
+          lang={lang}
+          formFields={formFields}
+          previewValues={previewValues}
+          onPreviewValueChange={(key, val) => setPreviewValues((prev) => ({ ...prev, [key]: val }))}
+        />
       </div>
     </div>
   );

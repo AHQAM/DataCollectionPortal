@@ -6,28 +6,17 @@ import {
   Building2,
   MapPin,
   Plus,
-  Edit2,
-  Trash2,
   CheckCircle2,
-  AlertTriangle,
-  X,
-  Users,
   Search,
   Filter,
-  ArrowRight,
   FileSpreadsheet,
-  UploadCloud,
-  Download,
-  AlertOctagon,
-  Sparkles,
-  Check,
-  FileDown,
-  RefreshCw,
-  Layers,
 } from 'lucide-react';
 import { BranchModal } from './modals/BranchModal';
 import { RegionModal } from './modals/RegionModal';
 import { ExcelImportModal } from './modals/ExcelImportModal';
+import { BranchStatsHeader } from './branches/BranchStatsHeader';
+import { BranchesListView } from './branches/BranchesListView';
+import { RegionsListView } from './branches/RegionsListView';
 
 export const AdminBranches: React.FC = () => {
   const {
@@ -437,7 +426,6 @@ export const AdminBranches: React.FC = () => {
 
         {/* Action Buttons Toolbar */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Import from Excel button */}
           <button
             onClick={() => {
               setShowExcelModal(true);
@@ -449,7 +437,6 @@ export const AdminBranches: React.FC = () => {
             <span>{lang === 'ar' ? 'استيراد الفروع والمناطق من Excel' : 'Import from Excel'}</span>
           </button>
 
-          {/* Add Branch / Region button */}
           {activeTab === 'branches' ? (
             <button
               onClick={handleOpenAddBranch}
@@ -479,31 +466,13 @@ export const AdminBranches: React.FC = () => {
       )}
 
       {/* Quick Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-          <div className="text-[11px] text-slate-500 font-bold">{lang === 'ar' ? 'إجمالي الفروع' : 'Total Branches'}</div>
-          <div className="text-2xl font-black text-slate-900 mt-1">{branches.length}</div>
-          <div className="text-[10px] text-purple-700 font-semibold mt-1">{branches.filter(b => b.isActive).length} {lang === 'ar' ? 'فرع نشط' : 'Active'}</div>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-          <div className="text-[11px] text-slate-500 font-bold">{lang === 'ar' ? 'المناطق الميدانية' : 'Field Regions'}</div>
-          <div className="text-2xl font-black text-slate-900 mt-1">{regions.length}</div>
-          <div className="text-[10px] text-emerald-700 font-semibold mt-1">{regions.filter(r => r.isActive).length} {lang === 'ar' ? 'منطقة مغطاة' : 'Covered'}</div>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-          <div className="text-[11px] text-slate-500 font-bold">{lang === 'ar' ? 'المشرفين والمندوبين' : 'Supervisors & Reps'}</div>
-          <div className="text-2xl font-black text-slate-900 mt-1">{users.length}</div>
-          <div className="text-[10px] text-slate-400 font-semibold mt-1">{users.filter(u => u.role === 'REP').length} {lang === 'ar' ? 'مندوب ميداني' : 'Reps'}</div>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-          <div className="text-[11px] text-slate-500 font-bold">{lang === 'ar' ? 'سجلات العملاء' : 'Customer Records'}</div>
-          <div className="text-2xl font-black text-slate-900 mt-1">{records.length}</div>
-          <div className="text-[10px] text-blue-700 font-semibold mt-1">{records.filter(r => r.recordStatus === 'Completed').length} {lang === 'ar' ? 'زيارة مكتملة' : 'Completed'}</div>
-        </div>
-      </div>
+      <BranchStatsHeader
+        lang={lang}
+        branches={branches}
+        regions={regions}
+        users={users}
+        records={records}
+      />
 
       {/* Tabs & Search Filter Bar */}
       <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -563,213 +532,29 @@ export const AdminBranches: React.FC = () => {
 
       {/* Main Content Area */}
       {activeTab === 'branches' ? (
-        /* Branches View */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredBranches.map((b) => {
-            const branchRegions = regions.filter((r) => r.branchId === b.branchId);
-            const branchUsers = users.filter((u) => u.branchId === b.branchId);
-            const branchSupervisors = branchUsers.filter((u) => u.role === 'SUPERVISOR');
-            const branchReps = branchUsers.filter((u) => u.role === 'REP');
-
-            return (
-              <div
-                key={b.branchId}
-                className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:border-purple-300 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-900 font-bold flex items-center justify-center shrink-0 border border-purple-100">
-                        <Building2 className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="font-extrabold text-sm text-slate-900">
-                          {lang === 'ar' ? b.branchNameAr : b.branchNameEn}
-                        </h3>
-                        <span className="text-[10px] text-purple-700 font-mono font-bold bg-purple-50 px-1.5 py-0.5 rounded">
-                          {b.branchId}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => handleOpenEditBranch(b)}
-                        className="p-1.5 text-slate-400 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-all"
-                        title={lang === 'ar' ? 'تعديل' : 'Edit'}
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteBranch(b)}
-                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                        title={lang === 'ar' ? 'حذف' : 'Delete'}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Branch Metrics */}
-                  <div className="mt-4 grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-center">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-bold">{lang === 'ar' ? 'المناطق' : 'Regions'}</span>
-                      <span className="text-xs font-black text-slate-800">{branchRegions.length}</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-bold">{lang === 'ar' ? 'المشرفين' : 'Supervisors'}</span>
-                      <span className="text-xs font-black text-purple-900">{branchSupervisors.length}</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-bold">{lang === 'ar' ? 'المناديب' : 'Reps'}</span>
-                      <span className="text-xs font-black text-slate-800">{branchReps.length}</span>
-                    </div>
-                  </div>
-
-                  {/* Region badges inside branch */}
-                  <div className="mt-3">
-                    <span className="text-[10px] text-slate-400 font-bold block mb-1">
-                      {lang === 'ar' ? 'المناطق الميدانية التابعة:' : 'Assigned Zones:'}
-                    </span>
-                    <div className="flex flex-wrap gap-1">
-                      {branchRegions.length === 0 ? (
-                        <span className="text-[10px] text-slate-400 italic">
-                          {lang === 'ar' ? 'لا توجد مناطق مضافة بعد' : 'No regions yet'}
-                        </span>
-                      ) : (
-                        branchRegions.slice(0, 4).map((r) => (
-                          <span
-                            key={r.regionId}
-                            className="text-[10px] font-bold bg-white border border-slate-200 px-2 py-0.5 rounded-md text-slate-700"
-                          >
-                            #{r.regionNo} {lang === 'ar' ? r.regionNameAr : r.regionNameEn}
-                          </span>
-                        ))
-                      )}
-                      {branchRegions.length > 4 && (
-                        <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">
-                          +{branchRegions.length - 4} {lang === 'ar' ? 'المزيد' : 'more'}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <button
-                    onClick={() => {
-                      setSelectedBranchId(b.branchId);
-                      setActiveTab('regions');
-                    }}
-                    className="text-xs font-bold text-purple-900 hover:text-purple-700 flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>{lang === 'ar' ? 'استعراض وإضافة مناطق الفرع' : 'View & Add Zones'}</span>
-                    <ArrowRight className={`w-3.5 h-3.5 ${lang === 'ar' ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  <button
-                    onClick={() => handleOpenAddRegion(b.branchId)}
-                    className="text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer"
-                  >
-                    <Plus className="w-3 h-3" />
-                    <span>{lang === 'ar' ? 'منطقة' : 'Add Zone'}</span>
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <BranchesListView
+          lang={lang}
+          branches={filteredBranches}
+          regions={regions}
+          users={users}
+          onOpenEditBranch={handleOpenEditBranch}
+          onDeleteBranch={handleDeleteBranch}
+          onSelectBranchAndSwitchToRegions={(bId) => {
+            setSelectedBranchId(bId);
+            setActiveTab('regions');
+          }}
+          onOpenAddRegion={handleOpenAddRegion}
+        />
       ) : (
-        /* Regions View */
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-start text-xs">
-              <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
-                <tr>
-                  <th className="px-4 py-3 text-start">{lang === 'ar' ? 'رقم المنطقة' : 'Region No'}</th>
-                  <th className="px-4 py-3 text-start">{lang === 'ar' ? 'اسم المنطقة والحي' : 'Region Name'}</th>
-                  <th className="px-4 py-3 text-start">{lang === 'ar' ? 'الفرع التابع له' : 'Parent Branch'}</th>
-                  <th className="px-4 py-3 text-start">{lang === 'ar' ? 'المندوب المعين' : 'Assigned Rep'}</th>
-                  <th className="px-4 py-3 text-start">{lang === 'ar' ? 'سجلات العملاء' : 'Customer Records'}</th>
-                  <th className="px-4 py-3 text-center">{lang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredRegions.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-10 text-center text-slate-400">
-                      {lang === 'ar' ? 'لا توجد مناطق مطابقة لمعايير البحث' : 'No matching regions found'}
-                    </td>
-                  </tr>
-                ) : (
-                  filteredRegions.map((r) => {
-                    const branch = branches.find((b) => b.branchId === r.branchId);
-                    const assignedRep = users.find(
-                      (u) => u.regionNo === r.regionNo || (u.allowedRegionNos && u.allowedRegionNos.includes(r.regionNo))
-                    );
-                    const regRecords = records.filter((rec) => rec.regionNo === r.regionNo);
-
-                    return (
-                      <tr key={r.regionId} className="hover:bg-slate-50/80 transition-all">
-                        <td className="px-4 py-3.5 font-mono font-extrabold text-purple-900">
-                          #{r.regionNo}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <div className="font-extrabold text-slate-900">
-                            {lang === 'ar' ? r.regionNameAr : r.regionNameEn}
-                          </div>
-                          {r.regionNameEn && (
-                            <div className="text-[10px] text-slate-400 font-mono">{r.regionNameEn}</div>
-                          )}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-bold text-[11px]">
-                            <Building2 className="w-3.5 h-3.5 text-purple-700" />
-                            <span>{branch ? (lang === 'ar' ? branch.branchNameAr : branch.branchNameEn) : r.branchId}</span>
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5">
-                          {assignedRep ? (
-                            <div className="flex items-center gap-1.5">
-                              <Users className="w-3.5 h-3.5 text-slate-400" />
-                              <span className="font-bold text-slate-800">{assignedRep.repNameAr}</span>
-                            </div>
-                          ) : (
-                            <span className="text-slate-400 italic text-[11px]">
-                              {lang === 'ar' ? 'غير مسند لمندوب' : 'Unassigned'}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <span className="font-extrabold text-slate-800">{regRecords.length}</span>{' '}
-                          <span className="text-[10px] text-slate-400">{lang === 'ar' ? 'عميل' : 'clients'}</span>
-                        </td>
-                        <td className="px-4 py-3.5 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <button
-                              onClick={() => handleOpenEditRegion(r)}
-                              className="p-1.5 text-slate-400 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-all"
-                              title={lang === 'ar' ? 'تعديل' : 'Edit'}
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteRegion(r)}
-                              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                              title={lang === 'ar' ? 'حذف' : 'Delete'}
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <RegionsListView
+          lang={lang}
+          filteredRegions={filteredRegions}
+          branches={branches}
+          users={users}
+          records={records}
+          onOpenEditRegion={handleOpenEditRegion}
+          onDeleteRegion={handleDeleteRegion}
+        />
       )}
 
       {/* Modal: Add/Edit Branch */}
@@ -807,9 +592,7 @@ export const AdminBranches: React.FC = () => {
         onClose={() => setShowRegionModal(false)}
       />
 
-      {/* ========================================================================= */}
-      {/* EXCEL IMPORT MODAL (Branches & Regions) */}
-      {/* ========================================================================= */}
+      {/* Modal: Excel Import */}
       <ExcelImportModal
         lang={lang}
         showModal={showExcelModal}
