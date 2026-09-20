@@ -94,6 +94,7 @@ export default defineConfig(() => {
     build: {
       outDir: 'firebase/public',
       emptyOutDir: true,
+      modulePreload: false,
       chunkSizeWarningLimit: 550, // Accommodates Firestore SDK (~512KB minified) without suppressing warnings for large application chunks
       rollupOptions: {
         output: {
