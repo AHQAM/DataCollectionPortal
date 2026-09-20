@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { PWAInstallBanner } from './PWAInstallBanner';
+import { BroadcastNotificationModal } from '../admin/BroadcastNotificationModal';
 import {
   Globe,
   UserCheck,
@@ -11,6 +12,7 @@ import {
   Lock,
   Share2,
   Smartphone,
+  Radio,
 } from 'lucide-react';
 
 export const TopNavbar: React.FC = () => {
@@ -28,6 +30,7 @@ export const TopNavbar: React.FC = () => {
 
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false);
 
   const roleMenuRef = useRef<HTMLDivElement>(null);
   const notifMenuRef = useRef<HTMLDivElement>(null);
@@ -212,6 +215,17 @@ export const TopNavbar: React.FC = () => {
             </div>
           )}
 
+          {/* Broadcast Notification Button - ADMIN & SUPERVISOR */}
+          {isAdminOrSupervisor && (
+            <button
+              onClick={() => setShowBroadcastModal(true)}
+              className="p-2 rounded-lg bg-purple-900/60 hover:bg-purple-800/80 border border-purple-700/50 text-amber-300 hover:text-amber-200 transition-all cursor-pointer"
+              title={lang === 'ar' ? 'إرسال إشعار عام (FCM)' : 'Broadcast Push Notification'}
+            >
+              <Radio className="w-4 h-4" />
+            </button>
+          )}
+
           {/* Notifications Icon with unread badge */}
           {currentUser && (
             <div className="relative" ref={notifMenuRef}>
@@ -274,6 +288,11 @@ export const TopNavbar: React.FC = () => {
         </div>
       </div>
 
+      {/* Broadcast Push Notification Modal */}
+      <BroadcastNotificationModal
+        isOpen={showBroadcastModal}
+        onClose={() => setShowBroadcastModal(false)}
+      />
     </header>
   );
 };

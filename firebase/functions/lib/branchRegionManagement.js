@@ -34,12 +34,12 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.importBranchesAndRegions = exports.deleteRegion = exports.updateRegion = exports.createRegion = exports.deleteBranch = exports.updateBranch = exports.createBranch = void 0;
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const auditLogger_1 = require("./auditLogger");
 const roles_1 = require("./roles");
-const db = () => (0, firestore_1.getFirestore)('datacollectionportal');
+const db = () => db_1.db;
 const checkAdmin = (context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
         throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");

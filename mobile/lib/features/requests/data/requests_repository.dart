@@ -103,7 +103,7 @@ RequestsRepository requestsRepository(Ref ref) {
   return RequestsRepository(
     FirebaseFirestore.instanceFor(
       app: Firebase.app(),
-      databaseId: 'datacollectionportal',
+      databaseId: AppConstants.databaseId,
     ),
   );
 }

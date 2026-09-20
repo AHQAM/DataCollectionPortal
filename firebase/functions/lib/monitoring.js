@@ -34,22 +34,21 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSystemHealth = void 0;
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const roles_1 = require("./roles");
-const db = (0, firestore_1.getFirestore)('datacollectionportal');
 exports.getSystemHealth = functions.https.onCall(async (data, context) => {
     if (!context.auth || (context.auth.token.role !== roles_1.USER_ROLES.ADMIN && context.auth.token.role !== roles_1.USER_ROLES.SUPERVISOR)) {
         throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can check system health.");
     }
     try {
-        const usersSnap = await db.collection("users").count().get();
-        const requestsSnap = await db.collection("requests").count().get();
-        const assignmentsSnap = await db.collection("assignments").count().get();
-        const recordsSnap = await db.collection("records").count().get();
-        const responsesSnap = await db.collection("responses").count().get();
+        const usersSnap = await db_1.db.collection("users").count().get();
+        const requestsSnap = await db_1.db.collection("requests").count().get();
+        const assignmentsSnap = await db_1.db.collection("assignments").count().get();
+        const recordsSnap = await db_1.db.collection("records").count().get();
+        const responsesSnap = await db_1.db.collection("responses").count().get();
         // Check pending operations
-        const offlineQueueSnap = await db.collection("offline_sync_queue").where("status", "==", "PENDING").count().get();
+        const offlineQueueSnap = await db_1.db.collection("offline_sync_queue").where("status", "==", "PENDING").count().get();
         return {
             status: "HEALTHY",
             metrics: {

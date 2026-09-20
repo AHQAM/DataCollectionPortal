@@ -34,12 +34,11 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commitImport = exports.importDataPreview = void 0;
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const notificationService_1 = require("./notificationService");
 const roles_1 = require("./roles");
-const db = (0, firestore_1.getFirestore)('datacollectionportal');
 const MAX_IMPORT_ROWS = 2000;
 const MAX_IMPORT_FILENAME_LENGTH = 255;
 const checkAdminOrSupervisor = (context) => {
@@ -73,18 +72,18 @@ exports.commitImport = functions.https.onCall(async (data, context) => {
         (typeof fileName !== "string" || fileName.length === 0 || fileName.length > MAX_IMPORT_FILENAME_LENGTH)) {
         throw new functions.https.HttpsError("invalid-argument", "Invalid import file name.");
     }
-    const requestDoc = await db.collection("requests").doc(requestId).get();
+    const requestDoc = await db_1.db.collection("requests").doc(requestId).get();
     if (!requestDoc.exists) {
         throw new functions.https.HttpsError("not-found", "Request not found.");
     }
     // Fetch all dependencies
-    const usersSnap = await db.collection("users").get();
+    const usersSnap = await db_1.db.collection("users").get();
     const users = usersSnap.docs.map(d => d.data());
-    const branchesSnap = await db.collection("branches").get();
+    const branchesSnap = await db_1.db.collection("branches").get();
     const branches = branchesSnap.docs.map(d => d.data());
-    const fieldsSnap = await db.collection("request_fields").where("requestId", "==", requestId).get();
+    const fieldsSnap = await db_1.db.collection("request_fields").where("requestId", "==", requestId).get();
     const reqFields = fieldsSnap.docs.map(d => d.data());
-    const existingAssignmentsSnap = await db.collection("assignments").where("requestId", "==", requestId).get();
+    const existingAssignmentsSnap = await db_1.db.collection("assignments").where("requestId", "==", requestId).get();
     const existingAssignments = existingAssignmentsSnap.docs.map(d => d.data());
     let createdCount = 0;
     let skippedCount = 0;
@@ -213,16 +212,16 @@ exports.commitImport = functions.https.onCall(async (data, context) => {
     }
     for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
-        const batch = db.batch();
+        const batch = db_1.db.batch();
         chunk.forEach(rec => {
-            batch.set(db.collection("records").doc(rec.recordId), rec);
-            batch.set(db.collection("responses").doc(rec.recordId), newResponses[rec.recordId]);
+            batch.set(db_1.db.collection("records").doc(rec.recordId), rec);
+            batch.set(db_1.db.collection("responses").doc(rec.recordId), newResponses[rec.recordId]);
         });
         if (i === 0) {
             newAssignments.forEach(asg => {
-                batch.set(db.collection("assignments").doc(asg.assignmentId), asg);
+                batch.set(db_1.db.collection("assignments").doc(asg.assignmentId), asg);
             });
-            batch.update(db.collection("requests").doc(requestId), {
+            batch.update(db_1.db.collection("requests").doc(requestId), {
                 totalRecords: admin.firestore.FieldValue.increment(createdCount),
                 updatedAt: new Date().toISOString(),
             });
@@ -231,12 +230,12 @@ exports.commitImport = functions.https.onCall(async (data, context) => {
     }
     // Also need to recalculate total records per assignment if we added to existing ones
     // We can do this asynchronously using another function or loop over assignments here
-    const assignmentsBatch = db.batch();
+    const assignmentsBatch = db_1.db.batch();
     touchedRegionNos.forEach((regNo) => {
         const addedCount = newRecords.filter(r => r.assignedRegionNo === regNo).length;
         if (addedCount > 0) {
             const asgId = `ASG-${regNo}-${requestId}`;
-            assignmentsBatch.update(db.collection("assignments").doc(asgId), {
+            assignmentsBatch.update(db_1.db.collection("assignments").doc(asgId), {
                 totalRecords: admin.firestore.FieldValue.increment(addedCount),
                 pendingRecords: admin.firestore.FieldValue.increment(addedCount),
                 updatedAt: new Date().toISOString()

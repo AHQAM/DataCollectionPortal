@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppConstants {
+  // Database
+  static const String databaseId = 'datacollectionportal';
+
   // Collections
   static const String usersCollection = 'users';
   static const String requestsCollection = 'requests';

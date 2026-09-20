@@ -32,3 +32,12 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Deploy to Firebase Hosting
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LANDSURVEY_EBB3B }}'
+          channelId: live
+          projectId: landsurvey-ebb3b

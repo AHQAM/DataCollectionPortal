@@ -1,23 +1,22 @@
-import { getFirestore } from 'firebase-admin/firestore';
 import * as admin from "firebase-admin";
 import fft from "firebase-functions-test";
 
 const testEnv = fft();
 
-const mockFirestore = {
-  collection: jest.fn(),
-};
-
-jest.mock("firebase-admin/firestore", () => ({
-  getFirestore: jest.fn(() => mockFirestore),
+jest.mock("../config/db", () => ({
+  DATABASE_ID: 'datacollectionportal',
+  db: {
+    collection: jest.fn(),
+  },
 }));
 
 jest.mock("firebase-admin", () => ({
   apps: [{}],
   initializeApp: jest.fn(),
-  firestore: jest.fn(() => mockFirestore),
+  firestore: jest.fn(),
 }));
 
+import { db } from "../config/db";
 import { publishRequest } from "../requestManagement";
 
 describe("Request Management - publishRequest", () => {
@@ -26,7 +25,7 @@ describe("Request Management - publishRequest", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    dbMock = getFirestore('datacollectionportal');
+    dbMock = db;
     wrappedPublishRequest = testEnv.wrap(publishRequest);
   });
 

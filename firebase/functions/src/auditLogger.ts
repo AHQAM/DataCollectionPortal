@@ -1,4 +1,4 @@
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from "./config/db";
 import * as admin from "firebase-admin";
 
 /**
@@ -25,8 +25,6 @@ export interface AuditLogEntry {
  * This function is fire-and-forget — errors are logged but don't propagate.
  */
 export async function createAuditLog(entry: AuditLogEntry): Promise<string> {
-  const db = getFirestore('datacollectionportal');
-
   // Sanitize details — strip any sensitive fields that may have leaked
   const sanitizedDetails = entry.details ? sanitizeDetails(entry.details) : undefined;
 

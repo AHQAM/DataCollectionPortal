@@ -1,9 +1,7 @@
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from "./config/db";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { USER_ROLES } from "./roles";
-
-const db = getFirestore('datacollectionportal');
 
 const checkAdminOrSupervisor = (context: functions.https.CallableContext) => {
   if (!context.auth) {

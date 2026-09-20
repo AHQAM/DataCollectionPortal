@@ -1,9 +1,7 @@
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from "./config/db";
 import { USER_ROLES } from "./roles";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-
-const db = getFirestore('datacollectionportal');
 
 // Internal helper for pushing FCM notifications and saving to Firestore
 export const sendNotificationInternal = async (
@@ -12,8 +10,18 @@ export const sendNotificationInternal = async (
   titleEn: string,
   bodyAr: string,
   bodyEn: string,
-  data?: Record<string, string>
+  data?: Record<string, any>
 ) => {
+  // Sanitize data values to strings (FCM data payload requirement)
+  const sanitizedData: Record<string, string> = {};
+  if (data) {
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined && value !== null) {
+        sanitizedData[key] = String(value);
+      }
+    }
+  }
+
   // 1. Save to Firestore
   const notificationRef = db.collection("notifications").doc();
   const notificationId = notificationRef.id;
@@ -25,7 +33,7 @@ export const sendNotificationInternal = async (
     titleEn,
     bodyAr,
     bodyEn,
-    data: data || null,
+    data: Object.keys(sanitizedData).length > 0 ? sanitizedData : null,
     status: "SENT",
     sentAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
@@ -37,21 +45,61 @@ export const sendNotificationInternal = async (
   const userDoc = await db.collection("users").doc(userId).get();
   if (userDoc.exists) {
     const userData = userDoc.data();
-    const tokens = userData?.fcmToken
-      ? [userData.fcmToken]
-      : [];
+
+    // Multi-token support: aggregate fcmToken (string) and fcmTokens (array)
+    const rawTokens: string[] = [];
+    if (Array.isArray(userData?.fcmTokens)) {
+      rawTokens.push(...userData.fcmTokens);
+    }
+    if (typeof userData?.fcmToken === "string" && !rawTokens.includes(userData.fcmToken)) {
+      rawTokens.push(userData.fcmToken);
+    }
+
+    const tokens = rawTokens.filter((t) => typeof t === "string" && t.trim().length > 0);
+
     if (tokens.length > 0) {
+      // Localize push notification based on user's preferredLanguage
+      const userLang = userData?.preferredLanguage === "en" ? "en" : "ar";
+      const pushTitle = userLang === "en" ? (titleEn || titleAr) : (titleAr || titleEn);
+      const pushBody = userLang === "en" ? (bodyEn || bodyAr) : (bodyAr || bodyEn);
+
       const messages = tokens.map((token: string) => ({
         notification: {
-          title: titleAr, // Defaulting to Arabic for push, but could be localized per user preference
-          body: bodyAr,
+          title: pushTitle,
+          body: pushBody,
         },
-        data: data || {},
+        data: sanitizedData,
         token: token,
       }));
 
       try {
-        await admin.messaging().sendEach(messages);
+        const response = await admin.messaging().sendEach(messages);
+        
+        // Check for expired/unregistered tokens and prune them
+        const invalidTokens: string[] = [];
+        response.responses.forEach((resp, idx) => {
+          if (!resp.success && resp.error) {
+            const errorCode = resp.error.code;
+            if (
+              errorCode === "messaging/registration-token-not-registered" ||
+              errorCode === "messaging/invalid-registration-token"
+            ) {
+              invalidTokens.push(tokens[idx]);
+            }
+          }
+        });
+
+        if (invalidTokens.length > 0) {
+          const userUpdate: Record<string, any> = {};
+          if (invalidTokens.includes(userData?.fcmToken)) {
+            userUpdate.fcmToken = admin.firestore.FieldValue.delete();
+          }
+          if (Array.isArray(userData?.fcmTokens)) {
+            userUpdate.fcmTokens = admin.firestore.FieldValue.arrayRemove(...invalidTokens);
+          }
+          await db.collection("users").doc(userId).update(userUpdate);
+          console.log(`Pruned ${invalidTokens.length} invalid FCM tokens for user ${userId}`);
+        }
       } catch (err) {
         console.error(`Failed to send FCM to user ${userId}`, err);
       }
@@ -95,7 +143,7 @@ export const sendBroadcastNotification = functions.https.onCall(async (data, con
     );
   });
 
-  await Promise.all(promises);
+  await Promise.allSettled(promises);
 
   return { success: true, count: usersSnap.size };
 });

@@ -3,27 +3,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const firestore_1 = require("firebase-admin/firestore");
 const firebase_functions_test_1 = __importDefault(require("firebase-functions-test"));
 const testEnv = (0, firebase_functions_test_1.default)();
-const mockFirestore = {
-    collection: jest.fn(),
-};
-jest.mock("firebase-admin/firestore", () => ({
-    getFirestore: jest.fn(() => mockFirestore),
+jest.mock("../config/db", () => ({
+    DATABASE_ID: 'datacollectionportal',
+    db: {
+        collection: jest.fn(),
+    },
 }));
 jest.mock("firebase-admin", () => ({
     apps: [{}],
     initializeApp: jest.fn(),
-    firestore: jest.fn(() => mockFirestore),
+    firestore: jest.fn(),
 }));
+const db_1 = require("../config/db");
 const requestManagement_1 = require("../requestManagement");
 describe("Request Management - publishRequest", () => {
     let dbMock;
     let wrappedPublishRequest;
     beforeEach(() => {
         jest.clearAllMocks();
-        dbMock = (0, firestore_1.getFirestore)('datacollectionportal');
+        dbMock = db_1.db;
         wrappedPublishRequest = testEnv.wrap(requestManagement_1.publishRequest);
     });
     afterAll(() => {

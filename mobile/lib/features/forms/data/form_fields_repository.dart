@@ -86,7 +86,7 @@ FormFieldsRepository formFieldsRepository(Ref ref) {
   return FormFieldsRepository(
     FirebaseFirestore.instanceFor(
       app: Firebase.app(),
-      databaseId: 'datacollectionportal',
+      databaseId: AppConstants.databaseId,
     ),
     ref.watch(syncManagerProvider),
   );

@@ -38,7 +38,7 @@ exports.hashPassword = hashPassword;
 exports.verifyPassword = verifyPassword;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const bcrypt = __importStar(require("bcrypt"));
 const auditLogger_1 = require("./auditLogger");
 const BCRYPT_SALT_ROUNDS = 12;
@@ -71,10 +71,9 @@ exports.authenticateWithRegionPassword = functions.https.onCall(async (data, con
     if (password.length > 128) {
         throw new functions.https.HttpsError("invalid-argument", "Password exceeds maximum length.");
     }
-    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
         // 1. Find user by regionNo (username field)
-        const usersRef = db.collection("users");
+        const usersRef = db_1.db.collection("users");
         const snapshot = await usersRef
             .where("username", "==", String(regionNo).trim())
             .limit(1)
@@ -199,7 +198,7 @@ exports.authenticateWithRegionPassword = functions.https.onCall(async (data, con
                 updatedAt: admin.firestore.FieldValue.serverTimestamp(),
             });
             // Create device binding record
-            const bindingRef = db.collection("deviceBindings").doc();
+            const bindingRef = db_1.db.collection("deviceBindings").doc();
             await bindingRef.set({
                 bindingId: bindingRef.id,
                 userId,
@@ -242,7 +241,7 @@ exports.authenticateWithRegionPassword = functions.https.onCall(async (data, con
         }
         await userDoc.ref.update(loginUpdates);
         // 7. Update device binding last active
-        const activeBindings = await db
+        const activeBindings = await db_1.db
             .collection("deviceBindings")
             .where("userId", "==", userId)
             .where("status", "==", "ACTIVE")

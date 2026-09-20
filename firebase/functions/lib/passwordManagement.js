@@ -34,7 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = void 0;
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const auditLogger_1 = require("./auditLogger");
@@ -63,10 +63,9 @@ exports.changePassword = functions.https.onCall(async (data, context) => {
     if (newPassword.length > 128) {
         throw new functions.https.HttpsError("invalid-argument", "كلمة المرور طويلة جداً. | Password is too long.");
     }
-    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     const userId = context.auth.uid;
     try {
-        const userRef = db.collection("users").doc(userId);
+        const userRef = db_1.db.collection("users").doc(userId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
             throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
@@ -142,10 +141,9 @@ exports.requestPasswordReset = functions.https.onCall(async (data, _context) => 
     if (!regionNo) {
         throw new functions.https.HttpsError("invalid-argument", "رقم المنطقة مطلوب. | Region number is required.");
     }
-    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     try {
         // Find the user (don't reveal if user exists via error message)
-        const usersRef = db.collection("users");
+        const usersRef = db_1.db.collection("users");
         const snapshot = await usersRef
             .where("username", "==", String(regionNo).trim())
             .limit(1)
@@ -153,7 +151,7 @@ exports.requestPasswordReset = functions.https.onCall(async (data, _context) => 
         // Always create a request — even if user not found
         // This prevents username enumeration
         const userId = snapshot.empty ? null : snapshot.docs[0].id;
-        const resetRef = db.collection("passwordResetRequests").doc();
+        const resetRef = db_1.db.collection("passwordResetRequests").doc();
         await resetRef.set({
             resetRequestId: resetRef.id,
             userId: userId || null,
@@ -214,10 +212,9 @@ exports.adminResetPassword = functions.https.onCall(async (data, context) => {
         temporaryPassword.length > 128) {
         throw new functions.https.HttpsError("invalid-argument", "كلمة المرور المؤقتة مطلوبة ويجب أن تكون 12 حرفاً على الأقل. | A temporary password of at least 12 characters is required.");
     }
-    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     const adminId = context.auth.uid;
     try {
-        const userRef = db.collection("users").doc(targetUserId);
+        const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
             throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
@@ -257,7 +254,7 @@ exports.adminResetPassword = functions.https.onCall(async (data, context) => {
         }
         // If there's a corresponding reset request, mark it as actioned
         if (resetRequestId) {
-            const resetRef = db
+            const resetRef = db_1.db
                 .collection("passwordResetRequests")
                 .doc(resetRequestId);
             await resetRef.update({
@@ -309,9 +306,8 @@ exports.adminUnlockAccount = functions.https.onCall(async (data, context) => {
     if (!targetUserId) {
         throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
-    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     try {
-        const userRef = db.collection("users").doc(targetUserId);
+        const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
             throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");

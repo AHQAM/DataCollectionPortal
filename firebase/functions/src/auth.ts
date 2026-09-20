@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import { getFirestore } from "firebase-admin/firestore";
+import { db } from "./config/db";
 import * as bcrypt from "bcrypt";
 import { logAuditSafe } from "./auditLogger";
 
@@ -48,8 +48,6 @@ export const authenticateWithRegionPassword = functions.https.onCall(
         "Password exceeds maximum length."
       );
     }
-
-    const db = getFirestore("datacollectionportal");
 
     try {
       // 1. Find user by regionNo (username field)

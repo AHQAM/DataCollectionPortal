@@ -34,7 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.rejectDeviceReplacement = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = void 0;
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const auditLogger_1 = require("./auditLogger");
@@ -54,9 +54,8 @@ exports.releaseDevice = functions.https.onCall(async (data, context) => {
     if (!targetUserId) {
         throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | Missing targetUserId.");
     }
-    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     try {
-        const userRef = db.collection("users").doc(targetUserId);
+        const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
             throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
@@ -76,13 +75,13 @@ exports.releaseDevice = functions.https.onCall(async (data, context) => {
             updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
         // Update deviceBindings log
-        const bindingsRef = db.collection("deviceBindings");
+        const bindingsRef = db_1.db.collection("deviceBindings");
         const snapshot = await bindingsRef
             .where("userId", "==", targetUserId)
             .where("status", "==", "ACTIVE")
             .get();
         if (!snapshot.empty) {
-            const batch = db.batch();
+            const batch = db_1.db.batch();
             snapshot.docs.forEach((doc) => {
                 batch.update(doc.ref, {
                     status: "RELEASED",
@@ -140,9 +139,8 @@ exports.replaceDevice = functions.https.onCall(async (data, context) => {
     if (!targetUserId) {
         throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
-    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     try {
-        const userRef = db.collection("users").doc(targetUserId);
+        const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
             throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
@@ -156,13 +154,13 @@ exports.replaceDevice = functions.https.onCall(async (data, context) => {
             updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
         // Mark existing bindings as replaced
-        const snapshot = await db
+        const snapshot = await db_1.db
             .collection("deviceBindings")
             .where("userId", "==", targetUserId)
             .where("status", "==", "ACTIVE")
             .get();
         if (!snapshot.empty) {
-            const batch = db.batch();
+            const batch = db_1.db.batch();
             snapshot.docs.forEach((doc) => {
                 batch.update(doc.ref, {
                     status: "REPLACED",
@@ -221,8 +219,7 @@ exports.forceLogoutUser = functions.https.onCall(async (data, context) => {
         // Revoke all refresh tokens
         await admin.auth().revokeRefreshTokens(targetUserId);
         // Increment session version so old tokens become invalid at custom claim level too
-        const db = (0, firestore_1.getFirestore)('datacollectionportal');
-        const userRef = db.collection("users").doc(targetUserId);
+        const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (userDoc.exists) {
             const userData = userDoc.data();
@@ -279,18 +276,17 @@ exports.rejectDeviceReplacement = functions.https.onCall(async (data, context) =
     if (!bindingId && !targetUserId) {
         throw new functions.https.HttpsError("invalid-argument", "معرف الربط أو معرف المستخدم مطلوب. | bindingId or targetUserId required.");
     }
-    const db = (0, firestore_1.getFirestore)('datacollectionportal');
     try {
         let targetDoc = null;
         if (bindingId) {
-            const docRef = db.collection("deviceBindings").doc(bindingId);
+            const docRef = db_1.db.collection("deviceBindings").doc(bindingId);
             const docSnap = await docRef.get();
             if (docSnap.exists) {
                 targetDoc = docSnap;
             }
         }
         if (!targetDoc && targetUserId) {
-            const snap = await db.collection("deviceBindings")
+            const snap = await db_1.db.collection("deviceBindings")
                 .where("userId", "==", targetUserId)
                 .where("status", "in", ["PENDING", "PENDING_APPROVAL", "ACTIVE"])
                 .limit(1)

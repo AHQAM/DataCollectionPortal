@@ -15,6 +15,7 @@ import 'core/router/app_router.dart';
 import 'core/storage/hive_service.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'core/services/fcm_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -163,12 +164,28 @@ class FirebaseErrorApp extends StatelessWidget {
   }
 }
 
-class SalesCollectionApp extends ConsumerWidget {
+class SalesCollectionApp extends ConsumerStatefulWidget {
   const SalesCollectionApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SalesCollectionApp> createState() => _SalesCollectionAppState();
+}
+
+class _SalesCollectionAppState extends ConsumerState<SalesCollectionApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final fcmService = ref.read(fcmServiceProvider);
+      final router = ref.read(appRouterProvider);
+      fcmService.setupNotificationTapHandlers(router);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
+    final fcmService = ref.watch(fcmServiceProvider);
 
     return MaterialApp.router(
       title: 'Sales Collection Hub',
@@ -186,6 +203,10 @@ class SalesCollectionApp extends ConsumerWidget {
       locale: const Locale('ar', ''), // Default to Arabic
       // Router setup
       routerConfig: router,
+      builder: (context, child) {
+        fcmService.setupForegroundNotificationHandler(context);
+        return child ?? const SizedBox.shrink();
+      },
     );
   }
 }

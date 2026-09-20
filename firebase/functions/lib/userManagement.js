@@ -36,7 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const uuid_1 = require("uuid");
 const crypto_1 = require("crypto");
 const auditLogger_1 = require("./auditLogger");
@@ -60,10 +60,9 @@ exports.createUser = functions.https.onCall(async (data, context) => {
     if (![roles_1.USER_ROLES.REP, roles_1.USER_ROLES.SUPERVISOR].includes(role)) {
         throw new functions.https.HttpsError("invalid-argument", "الدور يجب أن يكون REP أو SUPERVISOR. | Role must be REP or SUPERVISOR.");
     }
-    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
         // Check for duplicate username
-        const existing = await db
+        const existing = await db_1.db
             .collection("users")
             .where("username", "==", String(username).trim())
             .limit(1)
@@ -106,7 +105,7 @@ exports.createUser = functions.https.onCall(async (data, context) => {
             deletedAt: null,
             deletedBy: null,
         };
-        await db.collection("users").doc(userId).set(newUser);
+        await db_1.db.collection("users").doc(userId).set(newUser);
         await (0, auditLogger_1.logAuditSafe)({
             userId: context.auth.uid,
             userRole: "ADMIN",
@@ -157,9 +156,8 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
         "branchId", "regionNo", "allowedRegionNos",
         "repNo", "role", "isActive", "maxAllowedDevices",
     ];
-    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
-        const userRef = db.collection("users").doc(targetUserId);
+        const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
             throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
@@ -231,9 +229,8 @@ exports.deactivateUser = functions.https.onCall(async (data, context) => {
     if (targetUserId === context.auth.uid) {
         throw new functions.https.HttpsError("failed-precondition", "لا يمكنك تعطيل حسابك الخاص. | Cannot deactivate your own account.");
     }
-    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
-        const userRef = db.collection("users").doc(targetUserId);
+        const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
             throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
@@ -290,10 +287,9 @@ exports.importUsersBatch = functions.https.onCall(async (data, context) => {
     if (users.length > 100) {
         throw new functions.https.HttpsError("invalid-argument", "الحد الأقصى 100 مستخدم في الدفعة الواحدة. | Maximum 100 users per batch.");
     }
-    const db = (0, firestore_1.getFirestore)("datacollectionportal");
     try {
         // Check for duplicate usernames
-        const existingUsers = await db.collection("users").get();
+        const existingUsers = await db_1.db.collection("users").get();
         const existingUsernames = new Set(existingUsers.docs.map((d) => d.data().username));
         const results = {
             created: 0,
@@ -302,7 +298,7 @@ exports.importUsersBatch = functions.https.onCall(async (data, context) => {
             errors: [],
             temporaryPasswords: [],
         };
-        const batch = db.batch();
+        const batch = db_1.db.batch();
         for (const user of users) {
             const username = String(user.username || user.regionNo).trim();
             if (!username || !user.repNameAr || !user.branchId) {
@@ -327,7 +323,7 @@ exports.importUsersBatch = functions.https.onCall(async (data, context) => {
                 continue;
             }
             const userId = `USER-${(0, uuid_1.v4)().substring(0, 8).toUpperCase()}`;
-            const userRef = db.collection("users").doc(userId);
+            const userRef = db_1.db.collection("users").doc(userId);
             const temporaryPassword = (0, crypto_1.randomBytes)(9).toString("base64url");
             const passwordHash = await (0, auth_1.hashPassword)(temporaryPassword);
             const allowedRegions = user.allowedRegionNos || [

@@ -1,4 +1,4 @@
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from "./config/db";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { logAuditSafe } from "./auditLogger";
@@ -27,8 +27,6 @@ export const wipeDemoData = functions.https.onCall(
         "رمز التأكيد غير صحيح. | Invalid confirmation token."
       );
     }
-
-    const db = getFirestore('datacollectionportal');
 
     try {
       // 1. Delete all responses

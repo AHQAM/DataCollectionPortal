@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import { getFirestore } from "firebase-admin/firestore";
+import { db } from "./config/db";
 import { v4 as uuidv4 } from "uuid";
 import { randomBytes } from "crypto";
 import { logAuditSafe } from "./auditLogger";
@@ -49,8 +49,6 @@ export const createUser = functions.https.onCall(
         "الدور يجب أن يكون REP أو SUPERVISOR. | Role must be REP or SUPERVISOR."
       );
     }
-
-    const db = getFirestore("datacollectionportal");
 
     try {
       // Check for duplicate username
@@ -172,8 +170,6 @@ export const updateUser = functions.https.onCall(
       "repNo", "role", "isActive", "maxAllowedDevices",
     ];
 
-    const db = getFirestore("datacollectionportal");
-
     try {
       const userRef = db.collection("users").doc(targetUserId);
       const userDoc = await userRef.get();
@@ -277,8 +273,6 @@ export const deactivateUser = functions.https.onCall(
       );
     }
 
-    const db = getFirestore("datacollectionportal");
-
     try {
       const userRef = db.collection("users").doc(targetUserId);
       const userDoc = await userRef.get();
@@ -361,8 +355,6 @@ export const importUsersBatch = functions.https.onCall(
         "الحد الأقصى 100 مستخدم في الدفعة الواحدة. | Maximum 100 users per batch."
       );
     }
-
-    const db = getFirestore("datacollectionportal");
 
     try {
       // Check for duplicate usernames

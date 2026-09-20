@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import { getFirestore } from "firebase-admin/firestore";
+import { db } from "./config/db";
 import { randomBytes } from "crypto";
 import { logAuditSafe } from "./auditLogger";
 import { hashPassword } from "./auth";
@@ -47,8 +47,6 @@ export const createAdminSupervisorUser = functions.https.onCall(
         "يمكن إنشاء حسابات مشرفين ومدراء فقط عبر هذه الدالة. | Can only create Supervisor/Admin."
       );
     }
-
-    const db = getFirestore("datacollectionportal");
 
     try {
       // 4. Create Native Firebase Auth User

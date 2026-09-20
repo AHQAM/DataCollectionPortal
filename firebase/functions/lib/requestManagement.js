@@ -34,12 +34,11 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cloneRequest = exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = void 0;
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const notificationService_1 = require("./notificationService");
 const roles_1 = require("./roles");
-const db = (0, firestore_1.getFirestore)('datacollectionportal');
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
@@ -57,7 +56,7 @@ exports.createRequest = functions.https.onCall(async (data, context) => {
     }
     const requestId = 'REQ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
     const finalRequestCode = requestCode || 'REQ-' + Math.floor(100 + Math.random() * 900);
-    const requestRef = db.collection("requests").doc(requestId);
+    const requestRef = db_1.db.collection("requests").doc(requestId);
     await requestRef.set({
         requestId: requestId,
         activityId: requestId,
@@ -94,7 +93,7 @@ exports.updateDraftRequest = functions.https.onCall(async (data, context) => {
     if (!requestId || !updates) {
         throw new functions.https.HttpsError("invalid-argument", "requestId and updates are required.");
     }
-    const requestRef = db.collection("requests").doc(requestId);
+    const requestRef = db_1.db.collection("requests").doc(requestId);
     const requestDoc = await requestRef.get();
     if (!requestDoc.exists) {
         throw new functions.https.HttpsError("not-found", "Request not found.");
@@ -114,7 +113,7 @@ exports.publishRequest = functions.https.onCall(async (data, context) => {
     if (!requestId) {
         throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
     }
-    const requestRef = db.collection("requests").doc(requestId);
+    const requestRef = db_1.db.collection("requests").doc(requestId);
     const requestDoc = await requestRef.get();
     if (!requestDoc.exists) {
         throw new functions.https.HttpsError("not-found", "Request not found.");
@@ -127,7 +126,7 @@ exports.publishRequest = functions.https.onCall(async (data, context) => {
         publishedBy: context.auth.uid,
     };
     if (!requestData.schemaSnapshot) {
-        const fieldsSnapshot = await db.collection("request_fields")
+        const fieldsSnapshot = await db_1.db.collection("request_fields")
             .where("requestId", "==", requestId)
             .get();
         const fieldsArray = fieldsSnapshot.docs
@@ -139,7 +138,7 @@ exports.publishRequest = functions.https.onCall(async (data, context) => {
     await requestRef.update(updates);
     // Send notifications to all assigned users
     try {
-        const assignmentsSnap = await db.collection("assignments")
+        const assignmentsSnap = await db_1.db.collection("assignments")
             .where("requestId", "==", requestId)
             .where("assignmentStatus", "==", "Active")
             .get();
@@ -167,7 +166,7 @@ exports.closeRequest = functions.https.onCall(async (data, context) => {
     if (!requestId) {
         throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
     }
-    await db.collection("requests").doc(requestId).update({
+    await db_1.db.collection("requests").doc(requestId).update({
         status: "Closed",
         closedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -180,7 +179,7 @@ exports.archiveRequest = functions.https.onCall(async (data, context) => {
     if (!requestId) {
         throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
     }
-    await db.collection("requests").doc(requestId).update({
+    await db_1.db.collection("requests").doc(requestId).update({
         status: "Archived",
         archivedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -193,7 +192,7 @@ exports.reopenRequest = functions.https.onCall(async (data, context) => {
     if (!requestId) {
         throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
     }
-    await db.collection("requests").doc(requestId).update({
+    await db_1.db.collection("requests").doc(requestId).update({
         status: "Published",
         updatedAt: new Date().toISOString(),
     });
@@ -205,7 +204,7 @@ exports.cloneRequest = functions.https.onCall(async (data, context) => {
     if (!requestId) {
         throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
     }
-    const srcRef = db.collection("requests").doc(requestId);
+    const srcRef = db_1.db.collection("requests").doc(requestId);
     const srcDoc = await srcRef.get();
     if (!srcDoc.exists) {
         throw new functions.https.HttpsError("not-found", "Source request not found.");
@@ -213,7 +212,7 @@ exports.cloneRequest = functions.https.onCall(async (data, context) => {
     const srcData = srcDoc.data();
     const newRequestId = 'REQ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
     const finalRequestCode = (srcData.requestCode || 'REQ') + '-COPY';
-    const newRequestRef = db.collection("requests").doc(newRequestId);
+    const newRequestRef = db_1.db.collection("requests").doc(newRequestId);
     const newRequestData = {
         ...srcData,
         requestId: newRequestId,
@@ -231,15 +230,15 @@ exports.cloneRequest = functions.https.onCall(async (data, context) => {
         closedAt: null,
         archivedAt: null,
     };
-    const batch = db.batch();
+    const batch = db_1.db.batch();
     batch.set(newRequestRef, newRequestData);
     // Copy request fields
-    const fieldsSnapshot = await db.collection("request_fields")
+    const fieldsSnapshot = await db_1.db.collection("request_fields")
         .where("requestId", "==", requestId)
         .get();
     fieldsSnapshot.docs.forEach((doc) => {
         const fData = doc.data();
-        const newFieldRef = db.collection("request_fields").doc();
+        const newFieldRef = db_1.db.collection("request_fields").doc();
         batch.set(newFieldRef, {
             ...fData,
             fieldId: newFieldRef.id,

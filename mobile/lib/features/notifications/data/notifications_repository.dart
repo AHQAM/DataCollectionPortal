@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../core/constants/app_constants.dart';
 import '../domain/notification_model.dart';
 import '../../auth/presentation/auth_controller.dart';
 
@@ -42,7 +43,7 @@ NotificationsRepository? notificationsRepository(Ref ref) {
   return NotificationsRepository(
     FirebaseFirestore.instanceFor(
       app: Firebase.app(),
-      databaseId: 'datacollectionportal',
+      databaseId: AppConstants.databaseId,
     ),
     user.uid,
   );

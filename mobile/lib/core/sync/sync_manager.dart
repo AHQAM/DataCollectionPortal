@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:flutter/foundation.dart';
 
+import '../constants/app_constants.dart';
 import '../network/network_info.dart';
 import '../storage/hive_service.dart';
 import 'sync_action.dart';
@@ -151,7 +152,7 @@ SyncManager syncManager(Ref ref) {
     ref.watch(networkInfoProvider),
     FirebaseFirestore.instanceFor(
       app: Firebase.app(),
-      databaseId: 'datacollectionportal',
+      databaseId: AppConstants.databaseId,
     ),
   );
 }

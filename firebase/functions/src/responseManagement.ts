@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import { getFirestore } from "firebase-admin/firestore";
+import { db } from "./config/db";
 import { USER_ROLES } from "./roles";
 import { logAuditSafe } from "./auditLogger";
 
@@ -20,7 +20,6 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError("invalid-argument", "Invalid response payload.");
   }
 
-  const db = getFirestore("datacollectionportal");
   const recordRef = db.collection("records").doc(recordId);
   const record = await recordRef.get();
 
@@ -117,7 +116,6 @@ export const saveDraftResponse = functions.https.onCall(async (data, context) =>
     throw new functions.https.HttpsError("invalid-argument", "Invalid draft payload.");
   }
 
-  const db = getFirestore("datacollectionportal");
   const recordRef = db.collection("records").doc(recordId);
   const record = await recordRef.get();
 

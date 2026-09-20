@@ -36,7 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.saveDraftResponse = exports.submitResponse = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const roles_1 = require("./roles");
 const auditLogger_1 = require("./auditLogger");
 exports.submitResponse = functions.https.onCall(async (data, context) => {
@@ -51,8 +51,7 @@ exports.submitResponse = functions.https.onCall(async (data, context) => {
         Array.isArray(formData)) {
         throw new functions.https.HttpsError("invalid-argument", "Invalid response payload.");
     }
-    const db = (0, firestore_1.getFirestore)("datacollectionportal");
-    const recordRef = db.collection("records").doc(recordId);
+    const recordRef = db_1.db.collection("records").doc(recordId);
     const record = await recordRef.get();
     if (!record.exists) {
         throw new functions.https.HttpsError("not-found", "No record was found.");
@@ -65,9 +64,9 @@ exports.submitResponse = functions.https.onCall(async (data, context) => {
             throw new functions.https.HttpsError("permission-denied", "Record is not assigned to this user.");
         }
     }
-    const responseRef = db.collection("responses").doc(recordId);
+    const responseRef = db_1.db.collection("responses").doc(recordId);
     const now = admin.firestore.FieldValue.serverTimestamp();
-    await db.runTransaction(async (transaction) => {
+    await db_1.db.runTransaction(async (transaction) => {
         // 1. Save response data
         transaction.set(responseRef, {
             responseId: responseRef.id,
@@ -92,7 +91,7 @@ exports.submitResponse = functions.https.onCall(async (data, context) => {
         // 3. Atomically update assignment progress if assigned
         const assignmentId = recData.assignmentId;
         if (assignmentId && assignmentId !== 'UNASSIGNED') {
-            const asgRef = db.collection("assignments").doc(assignmentId);
+            const asgRef = db_1.db.collection("assignments").doc(assignmentId);
             const asgDoc = await transaction.get(asgRef);
             if (asgDoc.exists) {
                 const asgData = asgDoc.data();
@@ -132,15 +131,14 @@ exports.saveDraftResponse = functions.https.onCall(async (data, context) => {
     if (!recordId || !formData || typeof formData !== "object") {
         throw new functions.https.HttpsError("invalid-argument", "Invalid draft payload.");
     }
-    const db = (0, firestore_1.getFirestore)("datacollectionportal");
-    const recordRef = db.collection("records").doc(recordId);
+    const recordRef = db_1.db.collection("records").doc(recordId);
     const record = await recordRef.get();
     if (!record.exists) {
         throw new functions.https.HttpsError("not-found", "Record not found.");
     }
-    const responseRef = db.collection("responses").doc(recordId);
+    const responseRef = db_1.db.collection("responses").doc(recordId);
     const now = admin.firestore.FieldValue.serverTimestamp();
-    await db.runTransaction(async (transaction) => {
+    await db_1.db.runTransaction(async (transaction) => {
         transaction.set(responseRef, {
             responseId: responseRef.id,
             requestId: requestId || record.data()?.requestId || '',

@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import { getFirestore } from "firebase-admin/firestore";
+import { db } from "./config/db";
 
 /**
  * externalIntegrationAdapter
@@ -31,7 +31,6 @@ export const exportDataToExternalSystem = functions.https.onCall(async (data, co
   }
 
   // 2. Fetch the Data to be exported
-  const db = getFirestore("datacollectionportal");
   const requestDoc = await db.collection("requests").doc(requestId).get();
   
   if (!requestDoc.exists) {

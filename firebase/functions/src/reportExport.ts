@@ -1,10 +1,8 @@
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from "./config/db";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { USER_ROLES } from "./roles";
 import { logAuditSafe } from "./auditLogger";
-
-const db = getFirestore('datacollectionportal');
 
 export const exportReport = functions.https.onCall(async (data, context) => {
   if (!context.auth || (context.auth.token.role !== USER_ROLES.ADMIN && context.auth.token.role !== USER_ROLES.SUPERVISOR)) {

@@ -34,12 +34,11 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reassignRecords = void 0;
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const notificationService_1 = require("./notificationService");
 const roles_1 = require("./roles");
-const db = (0, firestore_1.getFirestore)('datacollectionportal');
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
@@ -56,7 +55,7 @@ exports.reassignRecords = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError("invalid-argument", "recordIds array and newUserId are required.");
     }
     // Check if new user exists and is a representative
-    const userRef = db.collection("users").doc(newUserId);
+    const userRef = db_1.db.collection("users").doc(newUserId);
     const userDoc = await userRef.get();
     if (!userDoc.exists) {
         throw new functions.https.HttpsError("not-found", "Target user not found.");
@@ -64,10 +63,10 @@ exports.reassignRecords = functions.https.onCall(async (data, context) => {
     if (userDoc.data()?.role !== roles_1.USER_ROLES.REP) {
         throw new functions.https.HttpsError("invalid-argument", "Target user must be a representative.");
     }
-    const batch = db.batch();
+    const batch = db_1.db.batch();
     // Load records and verify they can be reassigned
     for (const recordId of recordIds) {
-        const recordRef = db.collection("records").doc(recordId);
+        const recordRef = db_1.db.collection("records").doc(recordId);
         const recordDoc = await recordRef.get();
         if (recordDoc.exists) {
             batch.update(recordRef, {

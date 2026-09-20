@@ -34,11 +34,10 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.saveRequestFields = void 0;
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const roles_1 = require("./roles");
-const db = (0, firestore_1.getFirestore)('datacollectionportal');
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
@@ -55,7 +54,7 @@ exports.saveRequestFields = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError("invalid-argument", "requestId and a fields array are required.");
     }
     // Validate the request exists and is in draft state
-    const requestRef = db.collection("requests").doc(requestId);
+    const requestRef = db_1.db.collection("requests").doc(requestId);
     const requestDoc = await requestRef.get();
     if (!requestDoc.exists) {
         throw new functions.https.HttpsError("not-found", "Request not found.");
@@ -63,15 +62,15 @@ exports.saveRequestFields = functions.https.onCall(async (data, context) => {
     if (requestDoc.data()?.status !== "draft" && requestDoc.data()?.status !== "Draft") {
         throw new functions.https.HttpsError("failed-precondition", "Can only edit fields for draft requests.");
     }
-    const batch = db.batch();
+    const batch = db_1.db.batch();
     // Delete existing fields first to avoid orphans
-    const existingFields = await db.collection("request_fields").where("requestId", "==", requestId).get();
+    const existingFields = await db_1.db.collection("request_fields").where("requestId", "==", requestId).get();
     existingFields.forEach(doc => {
         batch.delete(doc.ref);
     });
     // Add new fields
     fields.forEach((field, index) => {
-        const fieldRef = db.collection("request_fields").doc();
+        const fieldRef = db_1.db.collection("request_fields").doc();
         batch.set(fieldRef, {
             ...field,
             requestId,

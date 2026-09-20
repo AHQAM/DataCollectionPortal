@@ -34,11 +34,10 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.exportReport = void 0;
-const firestore_1 = require("firebase-admin/firestore");
+const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const roles_1 = require("./roles");
 const auditLogger_1 = require("./auditLogger");
-const db = (0, firestore_1.getFirestore)('datacollectionportal');
 exports.exportReport = functions.https.onCall(async (data, context) => {
     if (!context.auth || (context.auth.token.role !== roles_1.USER_ROLES.ADMIN && context.auth.token.role !== roles_1.USER_ROLES.SUPERVISOR)) {
         throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can export reports.");
@@ -55,7 +54,7 @@ exports.exportReport = functions.https.onCall(async (data, context) => {
     if (!requestId) {
         throw new functions.https.HttpsError("invalid-argument", "Missing requestId.");
     }
-    let recordsQuery = db.collection("records").where("requestId", "==", requestId);
+    let recordsQuery = db_1.db.collection("records").where("requestId", "==", requestId);
     if (branchId && branchId !== "ALL") {
         recordsQuery = recordsQuery.where("branchId", "==", branchId);
     }
@@ -68,7 +67,7 @@ exports.exportReport = functions.https.onCall(async (data, context) => {
     const recordsSnap = await recordsQuery.limit(5000).get();
     const records = recordsSnap.docs.map(d => d.data());
     // Fetch responses
-    const responsesSnap = await db
+    const responsesSnap = await db_1.db
         .collection("responses")
         .where("requestId", "==", requestId)
         .limit(5000)
