@@ -17,15 +17,45 @@ class NotificationsRepository {
     return _firestore
         .collection('notifications')
         .where('userId', isEqualTo: userId)
-        .orderBy('sentAt', descending: true)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((doc) {
-            return NotificationModel.fromJson({
-              ...doc.data(),
-              'notificationId': doc.id,
-            });
-          }).toList();
+          final list = <NotificationModel>[];
+          for (final doc in snapshot.docs) {
+            try {
+              final data = doc.data();
+              final rawSentAt = data['sentAt'];
+              String sentAtStr;
+              if (rawSentAt is Timestamp) {
+                sentAtStr = rawSentAt.toDate().toIso8601String();
+              } else if (rawSentAt is String) {
+                sentAtStr = rawSentAt;
+              } else {
+                sentAtStr = DateTime.now().toIso8601String();
+              }
+
+              final rawCreatedAt = data['createdAt'];
+              String createdAtStr;
+              if (rawCreatedAt is Timestamp) {
+                createdAtStr = rawCreatedAt.toDate().toIso8601String();
+              } else if (rawCreatedAt is String) {
+                createdAtStr = rawCreatedAt;
+              } else {
+                createdAtStr = sentAtStr;
+              }
+
+              final model = NotificationModel.fromJson({
+                ...data,
+                'notificationId': doc.id,
+                'sentAt': sentAtStr,
+                'createdAt': createdAtStr,
+              });
+              list.add(model);
+            } catch (e) {
+              // Ignore single malformed doc to prevent breaking the notification screen
+            }
+          }
+          list.sort((a, b) => b.sentAt.compareTo(a.sentAt));
+          return list;
         });
   }
 

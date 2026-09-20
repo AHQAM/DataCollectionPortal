@@ -4,6 +4,7 @@ import * as admin from "firebase-admin";
 import { v4 as uuidv4 } from "uuid";
 import { sendNotificationInternal } from "./notificationService";
 import { USER_ROLES } from "./roles";
+import { logAuditSafe } from "./auditLogger";
 
 const checkAdminOrSupervisor = (context: functions.https.CallableContext) => {
   if (!context.auth) {
@@ -126,32 +127,59 @@ export const publishRequest = functions.https.onCall(async (data, context) => {
 
   await requestRef.update(updates);
 
-  // Send notifications to all assigned users
+  // Send notifications to all assigned users or matching target users
   try {
+    const userIdsToNotify = new Set<string>();
+
     const assignmentsSnap = await db.collection("assignments")
       .where("requestId", "==", requestId)
       .where("assignmentStatus", "==", "Active")
       .get();
+
+    assignmentsSnap.docs.forEach((doc) => {
+      const data = doc.data();
+      if (data.userId) userIdsToNotify.add(data.userId);
+    });
+
+    // If no direct assignments, notify active reps in target branches / regions
+    if (userIdsToNotify.size === 0) {
+      const targetBranches: string[] = requestData.targetBranches || [];
+      const targetRegions: string[] = requestData.targetRegions || [];
+
+      let usersQuery = db.collection("users").where("isActive", "==", true).where("role", "==", "REP");
+
+      if (targetBranches.length > 0 && targetBranches.length <= 30) {
+        usersQuery = usersQuery.where("branchId", "in", targetBranches);
+      }
+
+      const usersSnap = await usersQuery.get();
+      usersSnap.docs.forEach((uDoc) => {
+        const uData = uDoc.data();
+        if (targetRegions.length > 0) {
+          if (uData.regionNo && targetRegions.includes(uData.regionNo)) {
+            userIdsToNotify.add(uDoc.id);
+          }
+        } else {
+          userIdsToNotify.add(uDoc.id);
+        }
+      });
+    }
 
     const titleAr = `تم نشر الطلب: ${requestData.titleAr}`;
     const titleEn = `Request Published: ${requestData.titleEn}`;
     const bodyAr = `الطلب متاح الآن لجمع البيانات.`;
     const bodyEn = `The request is now available for data collection.`;
 
-    const notificationPromises = assignmentsSnap.docs.map(doc => {
-      const assignmentData = doc.data();
-      if (assignmentData.userId) {
-        return sendNotificationInternal(
-          assignmentData.userId,
-          titleAr,
-          titleEn,
-          bodyAr,
-          bodyEn,
-          { requestId, type: "REQUEST_PUBLISHED" }
-        );
-      }
-      return Promise.resolve();
-    });
+    const notificationPromises = Array.from(userIdsToNotify).map((uid) =>
+      sendNotificationInternal(
+        uid,
+        titleAr,
+        titleEn,
+        bodyAr,
+        bodyEn,
+        { requestId, type: "REQUEST_PUBLISHED" }
+      )
+    );
 
     await Promise.allSettled(notificationPromises);
   } catch (error) {
@@ -279,5 +307,49 @@ export const cloneRequest = functions.https.onCall(async (data, context) => {
     messageAr: "تم نسخ الطلب بنجاح كمسودة جديدة.",
     messageEn: "Request cloned successfully as a new draft.",
   };
+});
+
+export const deleteRequest = functions.https.onCall(async (data, context) => {
+  checkAdminOrSupervisor(context);
+  const { requestId } = data || {};
+  if (!requestId || typeof requestId !== "string") {
+    throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
+  }
+
+  const requestRef = db.collection("requests").doc(requestId);
+  const requestDoc = await requestRef.get();
+  if (!requestDoc.exists) {
+    throw new functions.https.HttpsError("not-found", "Request not found.");
+  }
+
+  // Batch delete fields, assignments, records, and the request itself
+  const batch = db.batch();
+
+  // 1. Delete request fields
+  const fieldsSnap = await db.collection("request_fields").where("requestId", "==", requestId).get();
+  fieldsSnap.docs.forEach((doc) => batch.delete(doc.ref));
+
+  // 2. Delete assignments
+  const asgSnap = await db.collection("assignments").where("requestId", "==", requestId).get();
+  asgSnap.docs.forEach((doc) => batch.delete(doc.ref));
+
+  // 3. Delete records
+  const recSnap = await db.collection("records").where("requestId", "==", requestId).get();
+  recSnap.docs.forEach((doc) => batch.delete(doc.ref));
+
+  // 4. Delete the request document
+  batch.delete(requestRef);
+
+  await batch.commit();
+
+  await logAuditSafe({
+    userId: context.auth!.uid,
+    userRole: context.auth!.token.role || "ADMIN",
+    action: "REQUEST_DELETED",
+    entityType: "REQUEST",
+    entityId: requestId,
+  });
+
+  return { success: true };
 });
 

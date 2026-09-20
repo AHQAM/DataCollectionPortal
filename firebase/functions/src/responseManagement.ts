@@ -23,17 +23,49 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
   const recordRef = db.collection("records").doc(recordId);
   const record = await recordRef.get();
 
-  if (!record.exists) {
-    throw new functions.https.HttpsError("not-found", "No record was found.");
-  }
+  let recData: FirebaseFirestore.DocumentData;
+  const isNewRecord = !record.exists;
 
-  const recData = record.data()!;
-  const userRole = context.auth.token.role;
+  if (isNewRecord) {
+    const requestDoc = await db.collection("requests").doc(requestId).get();
+    if (!requestDoc.exists) {
+      throw new functions.https.HttpsError("not-found", "Request not found.");
+    }
+    const reqData = requestDoc.data()!;
+    const userDoc = await db.collection("users").doc(context.auth.uid).get();
+    const userData = userDoc.exists ? userDoc.data() : null;
 
-  // Allow Rep assigned to record, or Supervisor/Admin
-  if (userRole !== USER_ROLES.ADMIN && userRole !== USER_ROLES.SUPERVISOR) {
-    if (recData.assignedUserId && recData.assignedUserId !== context.auth.uid) {
-      throw new functions.https.HttpsError("permission-denied", "Record is not assigned to this user.");
+    recData = {
+      recordId,
+      requestId,
+      assignmentId: "UNASSIGNED",
+      assignedUserId: context.auth.uid,
+      assignedRegionNo: userData?.regionNo || context.auth.token.regionNo || "",
+      customerNo: formData.customerNo || formData.storeNo || recordId,
+      customerName: formData.customerName || formData.storeName || formData.clientName || "عميل ميداني",
+      branchId: userData?.branchId || context.auth.token.branchId || reqData.targetBranches?.[0] || "",
+      branchName: userData?.branchNameAr || "",
+      regionNo: userData?.regionNo || context.auth.token.regionNo || "",
+      repNo: userData?.repNo || userData?.username || "",
+      repName: userData?.repNameAr || userData?.repNameEn || context.auth.token.name || "",
+      rawData: formData,
+      recordStatus: "Submitted",
+      completionPercent: 100,
+      startedAt: submittedAt || new Date().toISOString(),
+      submittedAt: submittedAt || new Date().toISOString(),
+      completedAt: submittedAt || new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  } else {
+    recData = record.data()!;
+    const userRole = context.auth.token.role;
+
+    // Allow Rep assigned to record, or Supervisor/Admin
+    if (userRole !== USER_ROLES.ADMIN && userRole !== USER_ROLES.SUPERVISOR) {
+      if (recData.assignedUserId && recData.assignedUserId !== context.auth.uid) {
+        throw new functions.https.HttpsError("permission-denied", "Record is not assigned to this user.");
+      }
     }
   }
 
@@ -48,7 +80,7 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
         responseId: responseRef.id,
         requestId,
         activityId: activityId || recData.activityId || requestId,
-        recordId: record.id,
+        recordId,
         submittedBy: context.auth!.uid,
         data: formData,
         submittedAt: submittedAt || now,
@@ -57,16 +89,25 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
       { merge: true }
     );
 
-    // 2. Update record status and completion percent
-    transaction.update(recordRef, {
-      recordStatus: "Submitted",
-      completionPercent: 100,
-      submittedAt: submittedAt || now,
-      completedAt: submittedAt || now,
-      lastSavedAt: now,
-      lastSavedBy: context.auth!.uid,
-      updatedAt: now,
-    });
+    // 2. Update or create record
+    if (isNewRecord) {
+      transaction.set(recordRef, {
+        ...recData,
+        lastSavedAt: now,
+        lastSavedBy: context.auth!.uid,
+        updatedAt: now,
+      });
+    } else {
+      transaction.update(recordRef, {
+        recordStatus: "Submitted",
+        completionPercent: 100,
+        submittedAt: submittedAt || now,
+        completedAt: submittedAt || now,
+        lastSavedAt: now,
+        lastSavedBy: context.auth!.uid,
+        updatedAt: now,
+      });
+    }
 
     // 3. Atomically update assignment progress if assigned
     const assignmentId = recData.assignmentId;
@@ -96,11 +137,11 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
 
   await logAuditSafe({
     userId: context.auth.uid,
-    userRole: userRole || "REP",
+    userRole: context.auth.token.role || "REP",
     action: "RECORD_SUBMITTED",
     entityType: "RECORD",
     entityId: recordId,
-    details: { customerNo: recData.customerNo },
+    details: { requestId, activityId, isNewRecord },
   });
 
   return { success: true, responseId: responseRef.id };
@@ -119,8 +160,32 @@ export const saveDraftResponse = functions.https.onCall(async (data, context) =>
   const recordRef = db.collection("records").doc(recordId);
   const record = await recordRef.get();
 
-  if (!record.exists) {
-    throw new functions.https.HttpsError("not-found", "Record not found.");
+  let isNewRecord = !record.exists;
+  let recData: FirebaseFirestore.DocumentData | null = null;
+
+  if (isNewRecord && requestId) {
+    const userDoc = await db.collection("users").doc(context.auth.uid).get();
+    const userData = userDoc.exists ? userDoc.data() : null;
+
+    recData = {
+      recordId,
+      requestId,
+      assignmentId: "UNASSIGNED",
+      assignedUserId: context.auth.uid,
+      assignedRegionNo: userData?.regionNo || context.auth.token.regionNo || "",
+      customerNo: formData.customerNo || formData.storeNo || recordId,
+      customerName: formData.customerName || formData.storeName || formData.clientName || "مسودة عميل",
+      branchId: userData?.branchId || context.auth.token.branchId || "",
+      branchName: userData?.branchNameAr || "",
+      regionNo: userData?.regionNo || context.auth.token.regionNo || "",
+      repNo: userData?.repNo || userData?.username || "",
+      repName: userData?.repNameAr || userData?.repNameEn || context.auth.token.name || "",
+      rawData: formData,
+      recordStatus: "DraftSaved",
+      completionPercent: 50,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
   }
 
   const responseRef = db.collection("responses").doc(recordId);
@@ -141,14 +206,24 @@ export const saveDraftResponse = functions.https.onCall(async (data, context) =>
       { merge: true }
     );
 
-    transaction.update(recordRef, {
-      recordStatus: "DraftSaved",
-      completionPercent: 50,
-      draftSavedAt: now,
-      lastSavedAt: now,
-      lastSavedBy: context.auth!.uid,
-      updatedAt: now,
-    });
+    if (isNewRecord && recData) {
+      transaction.set(recordRef, {
+        ...recData,
+        draftSavedAt: now,
+        lastSavedAt: now,
+        lastSavedBy: context.auth!.uid,
+        updatedAt: now,
+      });
+    } else if (record.exists) {
+      transaction.update(recordRef, {
+        recordStatus: "DraftSaved",
+        completionPercent: 50,
+        draftSavedAt: now,
+        lastSavedAt: now,
+        lastSavedBy: context.auth!.uid,
+        updatedAt: now,
+      });
+    }
   });
 
   return { success: true };

@@ -186,7 +186,7 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
                 value={titleAr}
                 onChange={(e) => setTitleAr(e.target.value)}
                 placeholder="مثال: تنبيه هام لجميع المندوبين"
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
               />
             </div>
             <div>
@@ -199,7 +199,7 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
                 value={titleEn}
                 onChange={(e) => setTitleEn(e.target.value)}
                 placeholder="e.g. Important Alert for all Reps"
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
               />
             </div>
           </div>
@@ -216,7 +216,7 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
                 value={bodyAr}
                 onChange={(e) => setBodyAr(e.target.value)}
                 placeholder="اكتب نص الإشعار هنا..."
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none"
               />
             </div>
             <div>
@@ -229,7 +229,7 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
                 value={bodyEn}
                 onChange={(e) => setBodyEn(e.target.value)}
                 placeholder="Write notification message here..."
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none"
               />
             </div>
           </div>
@@ -244,7 +244,7 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
               value={requestId}
               onChange={(e) => setRequestId(e.target.value)}
               placeholder="e.g. REQ-2026-001"
-              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent font-mono"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent font-mono"
             />
           </div>
 

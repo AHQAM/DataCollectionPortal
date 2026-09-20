@@ -51,6 +51,7 @@ export {
   archiveRequest,
   reopenRequest,
   cloneRequest,
+  deleteRequest,
 } from "./requestManagement";
 
 // Form Management

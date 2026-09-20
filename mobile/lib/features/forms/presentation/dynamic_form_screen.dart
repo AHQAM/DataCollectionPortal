@@ -28,9 +28,90 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> _formData = {};
 
+  void _setFieldValue(FormFieldModel field, dynamic val) {
+    setState(() {
+      _formData[field.key] = val;
+      _formData[field.id] = val;
+      if (field.fieldKey != null && field.fieldKey!.isNotEmpty) {
+        _formData[field.fieldKey!] = val;
+      }
+    });
+  }
+
+  bool _isFieldVisible(FormFieldModel field) {
+    final rule = field.visibilityRule;
+    if (rule == null || rule.isEmpty) return true;
+
+    final targetFieldKey = rule['targetFieldKey']?.toString();
+    if (targetFieldKey == null || targetFieldKey.isEmpty) return true;
+
+    final targetVal = _formData[targetFieldKey];
+    final operator = rule['operator']?.toString() ?? 'equals';
+    final ruleVal = rule['value']?.toString() ?? '';
+
+    return _isConditionMet(targetVal, operator, ruleVal);
+  }
+
+  bool _isConditionMet(dynamic targetVal, String operator, String ruleVal) {
+    final tStr = targetVal?.toString().toLowerCase().trim();
+    final rStr = ruleVal.toLowerCase().trim();
+
+    switch (operator) {
+      case 'equals':
+        if (tStr == rStr) return true;
+        // Boolean / Yes-No normalization
+        if ((tStr == 'true' || tStr == 'yes' || tStr == 'نعم' || tStr == '1') &&
+            (rStr == 'true' || rStr == 'yes' || rStr == 'نعم' || rStr == '1')) {
+          return true;
+        }
+        if ((tStr == 'false' || tStr == 'no' || tStr == 'لا' || tStr == '0') &&
+            (rStr == 'false' || rStr == 'no' || rStr == 'لا' || rStr == '0')) {
+          return true;
+        }
+        return false;
+      case 'not_equals':
+        return !_isConditionMet(targetVal, 'equals', ruleVal);
+      case 'contains':
+        if (targetVal == null) return false;
+        return targetVal.toString().toLowerCase().contains(rStr);
+      case 'greater_than':
+        if (targetVal == null) return false;
+        final tNum = num.tryParse(targetVal.toString());
+        final rNum = num.tryParse(ruleVal);
+        if (tNum == null || rNum == null) return false;
+        return tNum > rNum;
+      case 'less_than':
+        if (targetVal == null) return false;
+        final tNum = num.tryParse(targetVal.toString());
+        final rNum = num.tryParse(ruleVal);
+        if (tNum == null || rNum == null) return false;
+        return tNum < rNum;
+      case 'is_empty':
+        if (targetVal == null) return true;
+        return targetVal.toString().trim().isEmpty;
+      case 'is_not_empty':
+        if (targetVal == null) return false;
+        return targetVal.toString().trim().isNotEmpty;
+      default:
+        return true;
+    }
+  }
+
   Future<void> _saveForm(List<FormFieldModel> fields) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      // Filter out hidden fields so they don't submit invalid or stale data
+      final cleanData = Map<String, dynamic>.from(_formData);
+      for (final field in fields) {
+        if (!_isFieldVisible(field)) {
+          cleanData.remove(field.key);
+          cleanData.remove(field.id);
+          if (field.fieldKey != null && field.fieldKey!.isNotEmpty) {
+            cleanData.remove(field.fieldKey!);
+          }
+        }
+      }
 
       await ref
           .read(formSubmitControllerProvider.notifier)
@@ -38,7 +119,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
             requestId: widget.requestId,
             recordId: widget.recordId,
             activityId: widget.activityId,
-            formData: _formData,
+            formData: cleanData,
           );
 
       final submitState = ref.read(formSubmitControllerProvider);
@@ -100,13 +181,16 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           final sortedFields = List<FormFieldModel>.from(fields)
             ..sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
 
+          // Filter by conditional visibility
+          final visibleFields = sortedFields.where(_isFieldVisible).toList();
+
           return Form(
             key: _formKey,
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: sortedFields.length,
+              itemCount: visibleFields.length,
               itemBuilder: (context, index) {
-                final field = sortedFields[index];
+                final field = visibleFields[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: _buildFieldWidget(field, l10n),
@@ -144,10 +228,12 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
   Widget _buildFieldWidget(FormFieldModel field, AppLocalizations l10n) {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final label = isArabic ? field.labelAr : field.labelEn;
+    final currentValue = _formData[field.key] ?? _formData[field.id];
 
     switch (field.type) {
       case 'text':
         return TextFormField(
+          initialValue: currentValue?.toString(),
           decoration: InputDecoration(
             labelText: label,
             hintText: label,
@@ -155,6 +241,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           ),
           keyboardType: TextInputType.text,
           readOnly: field.isReadOnly,
+          onChanged: (val) => _setFieldValue(field, val),
           validator: (value) {
             if (field.isRequired && (value == null || value.trim().isEmpty)) {
               return isArabic
@@ -163,15 +250,15 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
             }
             return null;
           },
-          onSaved: (value) => _formData[field.id] = value,
+          onSaved: (value) => _setFieldValue(field, value),
         );
 
       case 'textarea':
         return TextareaFormField(
           field: field,
           isArabic: isArabic,
-          onChanged: (val) => _formData[field.id] = val,
-          onSaved: (val) => _formData[field.id] = val,
+          onChanged: (val) => _setFieldValue(field, val),
+          onSaved: (val) => _setFieldValue(field, val),
         );
 
       case 'number':
@@ -180,6 +267,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case 'currency':
       case 'percentage':
         return TextFormField(
+          initialValue: currentValue?.toString(),
           decoration: InputDecoration(
             labelText: label,
             hintText: label,
@@ -187,6 +275,13 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           readOnly: field.isReadOnly,
+          onChanged: (val) {
+            if (val.trim().isNotEmpty) {
+              _setFieldValue(field, num.tryParse(val) ?? val);
+            } else {
+              _setFieldValue(field, null);
+            }
+          },
           validator: (value) {
             if (field.isRequired && (value == null || value.trim().isEmpty)) {
               return isArabic
@@ -205,9 +300,9 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           },
           onSaved: (value) {
             if (value != null && value.trim().isNotEmpty) {
-              _formData[field.id] = num.tryParse(value) ?? value;
+              _setFieldValue(field, num.tryParse(value) ?? value);
             } else {
-              _formData[field.id] = null;
+              _setFieldValue(field, null);
             }
           },
         );
@@ -216,6 +311,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case 'select':
       case 'single_choice':
         return DropdownButtonFormField<String>(
+          initialValue: currentValue?.toString(),
           decoration: InputDecoration(
             labelText: label,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -236,20 +332,16 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
             }
             return null;
           },
-          onChanged: field.isReadOnly
-              ? null
-              : (value) {
-                  _formData[field.id] = value;
-                },
-          onSaved: (value) => _formData[field.id] = value,
+          onChanged: field.isReadOnly ? null : (value) => _setFieldValue(field, value),
+          onSaved: (value) => _setFieldValue(field, value),
         );
 
       case 'date':
         return DateFormField(
           field: field,
           isArabic: isArabic,
-          onChanged: (val) => _formData[field.id] = val,
-          onSaved: (val) => _formData[field.id] = val,
+          onChanged: (val) => _setFieldValue(field, val),
+          onSaved: (val) => _setFieldValue(field, val),
         );
 
       case 'yes_no':
@@ -257,16 +349,16 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
         return YesNoFormField(
           field: field,
           isArabic: isArabic,
-          onChanged: (val) => _formData[field.id] = val,
-          onSaved: (val) => _formData[field.id] = val,
+          onChanged: (val) => _setFieldValue(field, val),
+          onSaved: (val) => _setFieldValue(field, val),
         );
 
       case 'rating':
         return RatingFormField(
           field: field,
           isArabic: isArabic,
-          onChanged: (val) => _formData[field.id] = val,
-          onSaved: (val) => _formData[field.id] = val,
+          onChanged: (val) => _setFieldValue(field, val),
+          onSaved: (val) => _setFieldValue(field, val),
         );
 
       case 'location':
@@ -274,7 +366,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
         return LocationFormField(
           field: field,
           isArabic: isArabic,
-          onChanged: (val) => _formData[field.id] = val,
+          onChanged: (val) => _setFieldValue(field, val),
         );
 
       case 'photo':
@@ -284,7 +376,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           isArabic: isArabic,
           requestId: widget.requestId,
           recordId: widget.recordId,
-          onChanged: (val) => _formData[field.id] = val,
+          onChanged: (val) => _setFieldValue(field, val),
         );
 
       case 'signature':
@@ -293,7 +385,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           isArabic: isArabic,
           requestId: widget.requestId,
           recordId: widget.recordId,
-          onChanged: (val) => _formData[field.id] = val,
+          onChanged: (val) => _setFieldValue(field, val),
         );
 
       case 'barcode':
@@ -301,9 +393,14 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
         return BarcodeFormField(
           field: field,
           isArabic: isArabic,
-          onChanged: (val) => _formData[field.id] = val,
-          onSaved: (val) => _formData[field.id] = val,
+          onChanged: (val) => _setFieldValue(field, val),
+          onSaved: (val) => _setFieldValue(field, val),
         );
+
+      default:
+        return _UnimplementedField(label: label, icon: Icons.help_outline);
+    }
+  }
 
       default:
         return _UnimplementedField(label: label, icon: Icons.help_outline);

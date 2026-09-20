@@ -33,12 +33,13 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cloneRequest = exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = void 0;
+exports.deleteRequest = exports.cloneRequest = exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = void 0;
 const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const notificationService_1 = require("./notificationService");
 const roles_1 = require("./roles");
+const auditLogger_1 = require("./auditLogger");
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
@@ -136,23 +137,44 @@ exports.publishRequest = functions.https.onCall(async (data, context) => {
         updates.formSchemaVersion = (requestData.formSchemaVersion || 0) + 1;
     }
     await requestRef.update(updates);
-    // Send notifications to all assigned users
+    // Send notifications to all assigned users or matching target users
     try {
+        const userIdsToNotify = new Set();
         const assignmentsSnap = await db_1.db.collection("assignments")
             .where("requestId", "==", requestId)
             .where("assignmentStatus", "==", "Active")
             .get();
+        assignmentsSnap.docs.forEach((doc) => {
+            const data = doc.data();
+            if (data.userId)
+                userIdsToNotify.add(data.userId);
+        });
+        // If no direct assignments, notify active reps in target branches / regions
+        if (userIdsToNotify.size === 0) {
+            const targetBranches = requestData.targetBranches || [];
+            const targetRegions = requestData.targetRegions || [];
+            let usersQuery = db_1.db.collection("users").where("isActive", "==", true).where("role", "==", "REP");
+            if (targetBranches.length > 0 && targetBranches.length <= 30) {
+                usersQuery = usersQuery.where("branchId", "in", targetBranches);
+            }
+            const usersSnap = await usersQuery.get();
+            usersSnap.docs.forEach((uDoc) => {
+                const uData = uDoc.data();
+                if (targetRegions.length > 0) {
+                    if (uData.regionNo && targetRegions.includes(uData.regionNo)) {
+                        userIdsToNotify.add(uDoc.id);
+                    }
+                }
+                else {
+                    userIdsToNotify.add(uDoc.id);
+                }
+            });
+        }
         const titleAr = `تم نشر الطلب: ${requestData.titleAr}`;
         const titleEn = `Request Published: ${requestData.titleEn}`;
         const bodyAr = `الطلب متاح الآن لجمع البيانات.`;
         const bodyEn = `The request is now available for data collection.`;
-        const notificationPromises = assignmentsSnap.docs.map(doc => {
-            const assignmentData = doc.data();
-            if (assignmentData.userId) {
-                return (0, notificationService_1.sendNotificationInternal)(assignmentData.userId, titleAr, titleEn, bodyAr, bodyEn, { requestId, type: "REQUEST_PUBLISHED" });
-            }
-            return Promise.resolve();
-        });
+        const notificationPromises = Array.from(userIdsToNotify).map((uid) => (0, notificationService_1.sendNotificationInternal)(uid, titleAr, titleEn, bodyAr, bodyEn, { requestId, type: "REQUEST_PUBLISHED" }));
         await Promise.allSettled(notificationPromises);
     }
     catch (error) {
@@ -255,5 +277,39 @@ exports.cloneRequest = functions.https.onCall(async (data, context) => {
         messageAr: "تم نسخ الطلب بنجاح كمسودة جديدة.",
         messageEn: "Request cloned successfully as a new draft.",
     };
+});
+exports.deleteRequest = functions.https.onCall(async (data, context) => {
+    checkAdminOrSupervisor(context);
+    const { requestId } = data || {};
+    if (!requestId || typeof requestId !== "string") {
+        throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
+    }
+    const requestRef = db_1.db.collection("requests").doc(requestId);
+    const requestDoc = await requestRef.get();
+    if (!requestDoc.exists) {
+        throw new functions.https.HttpsError("not-found", "Request not found.");
+    }
+    // Batch delete fields, assignments, records, and the request itself
+    const batch = db_1.db.batch();
+    // 1. Delete request fields
+    const fieldsSnap = await db_1.db.collection("request_fields").where("requestId", "==", requestId).get();
+    fieldsSnap.docs.forEach((doc) => batch.delete(doc.ref));
+    // 2. Delete assignments
+    const asgSnap = await db_1.db.collection("assignments").where("requestId", "==", requestId).get();
+    asgSnap.docs.forEach((doc) => batch.delete(doc.ref));
+    // 3. Delete records
+    const recSnap = await db_1.db.collection("records").where("requestId", "==", requestId).get();
+    recSnap.docs.forEach((doc) => batch.delete(doc.ref));
+    // 4. Delete the request document
+    batch.delete(requestRef);
+    await batch.commit();
+    await (0, auditLogger_1.logAuditSafe)({
+        userId: context.auth.uid,
+        userRole: context.auth.token.role || "ADMIN",
+        action: "REQUEST_DELETED",
+        entityType: "REQUEST",
+        entityId: requestId,
+    });
+    return { success: true };
 });
 //# sourceMappingURL=requestManagement.js.map

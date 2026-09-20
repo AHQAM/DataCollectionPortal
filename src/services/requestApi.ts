@@ -57,6 +57,11 @@ export const requestApi = {
     return data.requestId;
   },
 
+  deleteRequest: async (requestId: string): Promise<void> => {
+    const fn = httpsCallable(functions, 'deleteRequest');
+    await fn({ requestId });
+  },
+
   saveRequestFields: async (requestId: string, fields: RequestField[]) => {
     const fn = httpsCallable(functions, 'saveRequestFields');
     const res = await fn({ requestId, fields });

@@ -1,12 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'form_field_model.freezed.dart';
-part 'form_field_model.g.dart';
 
 @freezed
 abstract class FormFieldModel with _$FormFieldModel {
+  const FormFieldModel._();
+
   const factory FormFieldModel({
     required String id,
+    String? fieldKey,
     required String
     type, // 'text', 'number', 'dropdown', 'location', 'photo', 'signature', 'barcode'
     required String labelAr,
@@ -22,7 +24,10 @@ abstract class FormFieldModel with _$FormFieldModel {
     double? minValue,
     double? maxValue,
     @Default(0) int orderIndex,
+    Map<String, dynamic>? visibilityRule,
   }) = _FormFieldModel;
+
+  String get key => (fieldKey != null && fieldKey!.isNotEmpty) ? fieldKey! : id;
 
   factory FormFieldModel.fromJson(Map<String, dynamic> json) {
     final rawOptions = json['options'];
@@ -45,8 +50,17 @@ abstract class FormFieldModel with _$FormFieldModel {
     if (type == 'select' || type == 'single_choice') type = 'dropdown';
     if (type == 'barcode_scan' || type == 'qr_scan') type = 'barcode';
 
+    Map<String, dynamic>? visibilityRule;
+    if (json['visibilityRule'] is Map) {
+      visibilityRule = Map<String, dynamic>.from(json['visibilityRule'] as Map);
+    }
+
+    final rawKey = json['fieldKey']?.toString();
+    final rawId = (json['id'] ?? json['fieldId'] ?? rawKey ?? '').toString();
+
     return FormFieldModel(
-      id: (json['id'] ?? json['fieldId'] ?? json['fieldKey'] ?? '').toString(),
+      id: rawId,
+      fieldKey: (rawKey != null && rawKey.isNotEmpty) ? rawKey : rawId,
       type: type,
       labelAr: (json['labelAr'] ?? json['fieldLabelAr'] ?? '').toString(),
       labelEn:
@@ -69,6 +83,7 @@ abstract class FormFieldModel with _$FormFieldModel {
       maxValue: (json['maxValue'] as num?)?.toDouble(),
       orderIndex:
           ((json['orderIndex'] ?? json['sortOrder']) as num?)?.toInt() ?? 0,
+      visibilityRule: visibilityRule,
     );
   }
 }

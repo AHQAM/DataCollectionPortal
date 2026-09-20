@@ -219,6 +219,17 @@ export const useAppOperations = () => {
       }
     },
 
+    deleteRequest: async (requestId: string): Promise<boolean> => {
+      try {
+        await requestApi.deleteRequest(requestId);
+        logAudit('REQUEST_DELETED', 'Request', requestId, {});
+        return true;
+      } catch (err) {
+        console.error("requestApi deleteRequest error:", err);
+        return false;
+      }
+    },
+
     updateRequestFields: async (requestId: string, fields: RequestField[]) => {
       try {
         await requestApi.saveRequestFields(requestId, fields);
