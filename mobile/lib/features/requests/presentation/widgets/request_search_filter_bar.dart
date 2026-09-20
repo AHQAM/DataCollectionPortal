@@ -45,10 +45,7 @@ class RequestSearchFilterBar extends StatelessWidget {
               children: [
                 _buildFilterChip('ALL', isArabic ? 'الكل' : 'All'),
                 const SizedBox(width: 6),
-                _buildFilterChip(
-                  'Published',
-                  isArabic ? 'النشطة' : 'Active',
-                ),
+                _buildFilterChip('Published', isArabic ? 'النشطة' : 'Active'),
                 const SizedBox(width: 6),
                 _buildFilterChip(
                   'Completed',

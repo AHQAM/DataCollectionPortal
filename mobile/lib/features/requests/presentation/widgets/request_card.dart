@@ -7,11 +7,7 @@ class RequestCard extends StatelessWidget {
   final RequestModel request;
   final bool isArabic;
 
-  const RequestCard({
-    super.key,
-    required this.request,
-    required this.isArabic,
-  });
+  const RequestCard({super.key, required this.request, required this.isArabic});
 
   @override
   Widget build(BuildContext context) {

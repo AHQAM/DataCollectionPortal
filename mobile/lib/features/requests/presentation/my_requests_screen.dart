@@ -55,7 +55,8 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
             isArabic: isArabic,
             statusFilter: _statusFilter,
             onSearchChanged: (query) => setState(() => _searchQuery = query),
-            onStatusFilterChanged: (filter) => setState(() => _statusFilter = filter),
+            onStatusFilterChanged: (filter) =>
+                setState(() => _statusFilter = filter),
           ),
           const Divider(height: 1),
 
@@ -75,7 +76,8 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
                 // Filter requests
                 final filtered = requests.where((req) {
                   // Status filter
-                  if (_statusFilter == 'Published' && req.status != 'Published') {
+                  if (_statusFilter == 'Published' &&
+                      req.status != 'Published') {
                     return false;
                   }
                   if (_statusFilter == 'Completed' &&
@@ -86,12 +88,19 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
 
                   // Search query filter
                   if (_searchQuery.isNotEmpty) {
-                    final titleAr = (req.metadata['titleAr'] ?? '').toString().toLowerCase();
-                    final titleEn = (req.metadata['titleEn'] ?? '').toString().toLowerCase();
-                    final code = (req.metadata['requestCode'] ?? '').toString().toLowerCase();
+                    final titleAr = (req.metadata['titleAr'] ?? '')
+                        .toString()
+                        .toLowerCase();
+                    final titleEn = (req.metadata['titleEn'] ?? '')
+                        .toString()
+                        .toLowerCase();
+                    final code = (req.metadata['requestCode'] ?? '')
+                        .toString()
+                        .toLowerCase();
                     final actId = req.activityId.toLowerCase();
 
-                    final match = titleAr.contains(_searchQuery) ||
+                    final match =
+                        titleAr.contains(_searchQuery) ||
                         titleEn.contains(_searchQuery) ||
                         code.contains(_searchQuery) ||
                         actId.contains(_searchQuery);
@@ -105,7 +114,9 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
                 if (filtered.isEmpty) {
                   return Center(
                     child: Text(
-                      isArabic ? 'لا توجد طلبات مطابقة للبحث' : 'No matching requests found',
+                      isArabic
+                          ? 'لا توجد طلبات مطابقة للبحث'
+                          : 'No matching requests found',
                       style: TextStyle(color: Colors.grey.shade600),
                     ),
                   );

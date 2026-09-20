@@ -6,10 +6,7 @@ import '../../../../core/network/network_info.dart';
 class SyncStatusBottomSheet extends ConsumerWidget {
   final bool isArabic;
 
-  const SyncStatusBottomSheet({
-    super.key,
-    required this.isArabic,
-  });
+  const SyncStatusBottomSheet({super.key, required this.isArabic});
 
   static void show(BuildContext context, WidgetRef ref, bool isArabic) {
     showModalBottomSheet(

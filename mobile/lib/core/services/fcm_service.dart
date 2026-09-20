@@ -13,11 +13,9 @@ class FcmService {
   StreamSubscription<String>? _tokenRefreshSubscription;
   StreamSubscription<RemoteMessage>? _foregroundMessageSubscription;
 
-  FcmService({
-    FirebaseMessaging? messaging,
-    FirebaseFirestore? firestore,
-  })  : _messagingInstance = messaging,
-        _firestoreInstance = firestore;
+  FcmService({FirebaseMessaging? messaging, FirebaseFirestore? firestore})
+    : _messagingInstance = messaging,
+      _firestoreInstance = firestore;
 
   FirebaseMessaging? get _messaging {
     if (_messagingInstance != null) return _messagingInstance;
@@ -77,10 +75,13 @@ class FcmService {
     try {
       final firestore = _firestore;
       if (firestore == null) return;
-      await firestore.collection(AppConstants.usersCollection).doc(userId).update({
-        'fcmToken': token,
-        'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
-      });
+      await firestore
+          .collection(AppConstants.usersCollection)
+          .doc(userId)
+          .update({
+            'fcmToken': token,
+            'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+          });
       debugPrint('FCM Token synced successfully for user: $userId');
     } catch (e) {
       debugPrint('Failed to update FCM token in Firestore: $e');
@@ -111,9 +112,10 @@ class FcmService {
 
       final firestore = _firestore;
       if (firestore != null) {
-        await firestore.collection(AppConstants.usersCollection).doc(userId).update({
-          'fcmToken': FieldValue.delete(),
-        });
+        await firestore
+            .collection(AppConstants.usersCollection)
+            .doc(userId)
+            .update({'fcmToken': FieldValue.delete()});
         debugPrint('FCM Token cleared for user: $userId');
       }
     } catch (e) {
@@ -129,7 +131,9 @@ class FcmService {
       return;
     }
     _foregroundMessageSubscription?.cancel();
-    _foregroundMessageSubscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    _foregroundMessageSubscription = FirebaseMessaging.onMessage.listen((
+      RemoteMessage message,
+    ) {
       debugPrint('Foreground FCM message received: ${message.messageId}');
       final notification = message.notification;
       if (notification == null) return;
@@ -141,12 +145,17 @@ class FcmService {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           backgroundColor: AppConstants.primaryColor,
           duration: const Duration(seconds: 4),
           content: Row(
             children: [
-              const Icon(Icons.notifications_active_rounded, color: AppConstants.accentColor),
+              const Icon(
+                Icons.notifications_active_rounded,
+                color: AppConstants.accentColor,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -164,7 +173,10 @@ class FcmService {
                     if (body.isNotEmpty)
                       Text(
                         body,
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
