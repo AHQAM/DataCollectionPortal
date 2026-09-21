@@ -4,29 +4,19 @@ import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
-const DEFAULT_FIREBASE_CONFIG = {
-  apiKey: 'AIzaSyAYOf8Ayqjcq-Ew-UNGivcK0PXcj_pyXAw',
-  authDomain: 'landsurvey-ebb3b.firebaseapp.com',
-  projectId: 'landsurvey-ebb3b',
-  storageBucket: 'landsurvey-ebb3b.firebasestorage.app',
-  messagingSenderId: '152016503421',
-  appId: '1:152016503421:web:4ce2e5e5caf7df08f46714',
-  databaseId: 'datacollectionportal',
-};
-
-function getFirebaseEnv(name: string, fallback: string): string {
-  const value = import.meta.env[name];
-  return (value && value.trim()) ? value : fallback;
-}
-
 const firebaseConfig = {
-  apiKey: getFirebaseEnv('VITE_FIREBASE_API_KEY', DEFAULT_FIREBASE_CONFIG.apiKey),
-  authDomain: getFirebaseEnv('VITE_FIREBASE_AUTH_DOMAIN', DEFAULT_FIREBASE_CONFIG.authDomain),
-  projectId: getFirebaseEnv('VITE_FIREBASE_PROJECT_ID', DEFAULT_FIREBASE_CONFIG.projectId),
-  storageBucket: getFirebaseEnv('VITE_FIREBASE_STORAGE_BUCKET', DEFAULT_FIREBASE_CONFIG.storageBucket),
-  messagingSenderId: getFirebaseEnv('VITE_FIREBASE_MESSAGING_SENDER_ID', DEFAULT_FIREBASE_CONFIG.messagingSenderId),
-  appId: getFirebaseEnv('VITE_FIREBASE_APP_ID', DEFAULT_FIREBASE_CONFIG.appId),
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
+
+// Ensure critical configuration is present
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  console.error("Missing Firebase configuration in environment variables.");
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

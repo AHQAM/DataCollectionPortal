@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/l10n/app_localizations.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import '../domain/record_model.dart';
 import 'requests_controller.dart';
+import 'widgets/request_records_header.dart';
+import 'widgets/request_record_list_item.dart';
 
 class RequestRecordsScreen extends ConsumerStatefulWidget {
   final String requestId;
@@ -58,58 +58,19 @@ class _RequestRecordsScreenState extends ConsumerState<RequestRecordsScreen> {
       body: Column(
         children: [
           // Search & Filter Header
-          Container(
-            padding: const EdgeInsets.all(12),
-            color: Theme.of(context).colorScheme.surface,
-            child: Column(
-              children: [
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: isArabic
-                        ? 'بحث باسم العميل، رقم العميل، أو المنطقة...'
-                        : 'Search by customer, number, or area...',
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onChanged: (val) {
-                    setState(() {
-                      _searchQuery = val.trim().toLowerCase();
-                    });
-                  },
-                ),
-                const SizedBox(height: 8),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildFilterChip('ALL', isArabic ? 'الكل' : 'All'),
-                      const SizedBox(width: 6),
-                      _buildFilterChip(
-                        'Pending',
-                        isArabic ? 'بانتظار البدء' : 'Pending',
-                      ),
-                      const SizedBox(width: 6),
-                      _buildFilterChip(
-                        'DraftSaved',
-                        isArabic ? 'مسودة' : 'Draft',
-                      ),
-                      const SizedBox(width: 6),
-                      _buildFilterChip(
-                        'Submitted',
-                        isArabic ? 'مكتمل' : 'Completed',
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          RequestRecordsHeader(
+            isArabic: isArabic,
+            statusFilter: _statusFilter,
+            onSearchChanged: (val) {
+              setState(() {
+                _searchQuery = val;
+              });
+            },
+            onStatusFilterChanged: (val) {
+              setState(() {
+                _statusFilter = val;
+              });
+            },
           ),
           const Divider(height: 1),
 
@@ -204,7 +165,12 @@ class _RequestRecordsScreenState extends ConsumerState<RequestRecordsScreen> {
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {
                     final record = filtered[index];
-                    return _buildRecordCard(context, record, isArabic);
+                    return RequestRecordListItem(
+                      record: record,
+                      isArabic: isArabic,
+                      requestId: widget.requestId,
+                      activityId: widget.activityId,
+                    );
                   },
                 );
               },
@@ -218,300 +184,6 @@ class _RequestRecordsScreenState extends ConsumerState<RequestRecordsScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(String key, String label) {
-    final isSelected = _statusFilter == key;
-    return ChoiceChip(
-      label: Text(
-        label,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
-      ),
-      selected: isSelected,
-      onSelected: (_) {
-        setState(() {
-          _statusFilter = key;
-        });
-      },
-    );
-  }
-
-  Future<void> _makePhoneCall(
-    BuildContext context,
-    String phone,
-    bool isArabic,
-  ) async {
-    final uri = Uri.parse('tel:$phone');
-    try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
-      } else {
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              isArabic
-                  ? 'تعذر فتح الاتصال بالرقم: $phone'
-                  : 'Could not launch phone call to: $phone',
-            ),
-          ),
-        );
-      }
-    } catch (_) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? 'حدث خطأ أثناء محاولة الاتصال'
-                : 'Error launching phone call',
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<void> _openMapLocation(
-    BuildContext context,
-    String query,
-    bool isArabic,
-  ) async {
-    final uri = Uri.parse(
-      'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(query)}',
-    );
-    try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              isArabic
-                  ? 'تعذر فتح الخرائط للموقع المحدد'
-                  : 'Could not open maps for location',
-            ),
-          ),
-        );
-      }
-    } catch (_) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? 'حدث خطأ أثناء محاولة فتح الخريطة'
-                : 'Error opening maps',
-          ),
-        ),
-      );
-    }
-  }
-
-  Widget _buildRecordCard(
-    BuildContext context,
-    RecordModel record,
-    bool isArabic,
-  ) {
-    Color statusColor;
-    String statusText;
-    IconData statusIcon;
-
-    switch (record.recordStatus) {
-      case 'Submitted':
-      case 'Completed':
-        statusColor = const Color(0xFF059669);
-        statusText = isArabic ? 'مكتمل' : 'Completed';
-        statusIcon = Icons.check_circle;
-        break;
-      case 'DraftSaved':
-        statusColor = Colors.orange;
-        statusText = isArabic ? 'مسودة' : 'Draft';
-        statusIcon = Icons.edit_note;
-        break;
-      default:
-        statusColor = Colors.blue;
-        statusText = isArabic ? 'بانتظار البدء' : 'Pending';
-        statusIcon = Icons.schedule;
-        break;
-    }
-
-    final hasPhone = record.phone != null && record.phone!.trim().isNotEmpty;
-    final hasArea = record.area != null && record.area!.trim().isNotEmpty;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      elevation: 1.5,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: () {
-          context.push(
-            '/form/${widget.requestId}/${widget.activityId}?recordId=${Uri.encodeComponent(record.recordId)}&title=${Uri.encodeComponent(record.customerName)}',
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(14.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          record.customerName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${isArabic ? "رقم العميل" : "Customer No"}: ${record.customerNo}',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 12,
-                            fontFamily: 'monospace',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: statusColor.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(statusIcon, size: 14, color: statusColor),
-                        const SizedBox(width: 4),
-                        Text(
-                          statusText,
-                          style: TextStyle(
-                            color: statusColor,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    Icons.location_on_outlined,
-                    size: 14,
-                    color: Colors.grey.shade500,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${isArabic ? "المنطقة" : "Region"}: ${record.assignedRegionNo}',
-                    style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
-                  ),
-                  if (hasArea) ...[
-                    const SizedBox(width: 8),
-                    Text('•', style: TextStyle(color: Colors.grey.shade400)),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        record.area!,
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: 12,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              if (hasPhone) ...[
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.phone_outlined,
-                      size: 14,
-                      color: Colors.grey.shade500,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      record.phone!,
-                      style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontSize: 12,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-              const SizedBox(height: 10),
-              const Divider(height: 1),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  if (hasPhone) ...[
-                    IconButton.filledTonal(
-                      icon: const Icon(Icons.phone, size: 16),
-                      tooltip: isArabic ? 'اتصال بالعميل' : 'Call Customer',
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () =>
-                          _makePhoneCall(context, record.phone!, isArabic),
-                    ),
-                    const SizedBox(width: 6),
-                  ],
-                  if (hasArea) ...[
-                    IconButton.filledTonal(
-                      icon: const Icon(Icons.directions, size: 16),
-                      tooltip: isArabic ? 'فتح الخريطة' : 'Open in Maps',
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () =>
-                          _openMapLocation(context, record.area!, isArabic),
-                    ),
-                    const SizedBox(width: 6),
-                  ],
-                  const Spacer(),
-                  Text(
-                    isArabic ? 'فتح الاستبيان' : 'Open Form',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 2),
-                  Icon(
-                    isArabic ? Icons.chevron_left : Icons.chevron_right,
-                    size: 16,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

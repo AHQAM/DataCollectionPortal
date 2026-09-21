@@ -30,6 +30,8 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { CreateRequestModal, EditRequestModal, AssignmentsOverviewModal } from './requests';
+import { RequestsHeader } from './requests/RequestsHeader';
+import { RequestsTable } from './requests/RequestsTable';
 import { RequestFilters } from './requests/RequestFilters';
 import { RequestTableRow } from './requests/RequestTableRow';
 
@@ -255,37 +257,11 @@ export const AdminRequests: React.FC<Props> = ({
       )}
 
       {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-        <div>
-          <h1 className="text-lg font-extrabold text-slate-900">
-            {lang === 'ar' ? 'إدارة حملات وطلبات جمع البيانات' : 'Data Collection Requests'}
-          </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {lang === 'ar'
-              ? 'إنشاء وتعديل ونشر وأرشفة نماذج جمع البيانات بدون تعديل الكود'
-              : 'Create, build dynamic forms, publish, and archive field collection tasks'}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onOpenImportWizard('')}
-            className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md transition-all cursor-pointer"
-            title={lang === 'ar' ? 'إدراج بيانات الحملات والعملاء من ملفات الإكسل' : 'Import data from Excel'}
-          >
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>{lang === 'ar' ? 'إدراج بيانات من Excel' : 'Import from Excel'}</span>
-          </button>
-
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md transition-all cursor-pointer"
-          >
-            <FilePlus className="w-4 h-4" />
-            <span>{lang === 'ar' ? 'إنشاء طلب جديد' : 'Create New Request'}</span>
-          </button>
-        </div>
-      </div>
+      <RequestsHeader
+        lang={lang}
+        onOpenImportWizard={onOpenImportWizard}
+        onOpenCreateModal={() => setShowCreateModal(true)}
+      />
 
       {/* Filter and Search Bar */}
       <RequestFilters
@@ -298,67 +274,35 @@ export const AdminRequests: React.FC<Props> = ({
       />
 
       {/* Requests Table / Grid */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-start text-xs">
-            <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
-              <tr>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'رمز وعنوان الطلب' : 'Code & Title'}</th>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'النوع والأولوية' : 'Type & Priority'}</th>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'تاريخ الاستحقاق' : 'Due Date'}</th>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'السجلات' : 'Records'}</th>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'الحالة' : 'Status'}</th>
-                <th className="px-4 py-3 text-center">{lang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredRequests.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
-                    {lang === 'ar' ? 'لا توجد طلبات تطابق الفلتر' : 'No requests found'}
-                  </td>
-                </tr>
-              ) : (
-                filteredRequests.map((req) => {
-                  const reqFieldsCount = fields.filter((f) => f.requestId === req.requestId).length;
-
-                  return (
-                    <RequestTableRow
-                      key={req.requestId}
-                      req={req}
-                      lang={lang}
-                      fieldsCount={reqFieldsCount}
-                      actionLoadingId={actionLoadingId}
-                      onEdit={setEditingRequest}
-                      onViewAssignments={setViewingAssignmentsRequest}
-                      onOpenFormBuilder={onOpenFormBuilder}
-                      onOpenImportWizard={onOpenImportWizard}
-                      onPublish={handlePublish}
-                      onClose={handleClose}
-                      onArchive={handleArchive}
-                      onReopen={handleReopen}
-                      onClone={handleClone}
-                      onSaveTemplate={(r) => {
-                        setShowTemplateModal(r.requestId);
-                        setTemplateNameAr(r.titleAr);
-                        setTemplateNameEn(r.titleEn);
-                      }}
-                      onDelete={setDeleteConfirmRequest}
-                      onViewResponses={(r) => {
-                        if (onNavigate) {
-                          // The Reports module might need a way to auto-select the request.
-                          // But for now, navigating to it is the best we can do.
-                          onNavigate('reports');
-                        }
-                      }}
-                    />
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <RequestsTable
+        lang={lang}
+        requests={filteredRequests}
+        fields={fields}
+        actionLoadingId={actionLoadingId}
+        onEdit={setEditingRequest}
+        onViewAssignments={setViewingAssignmentsRequest}
+        onOpenFormBuilder={onOpenFormBuilder}
+        onOpenImportWizard={onOpenImportWizard}
+        onPublish={handlePublish}
+        onClose={handleClose}
+        onArchive={handleArchive}
+        onReopen={handleReopen}
+        onClone={handleClone}
+        onSaveTemplate={(r) => {
+          setShowTemplateModal(r.requestId);
+          setTemplateNameAr(r.titleAr);
+          setTemplateNameEn(r.titleEn);
+        }}
+        onDelete={setDeleteConfirmRequest}
+        onViewResponses={(r) => {
+          if (onNavigate) {
+            onNavigate('reports');
+          }
+          if (propOnViewResponses) {
+            propOnViewResponses(r.requestId);
+          }
+        }}
+      />
 
       {/* Create Request Modal */}
       <CreateRequestModal
