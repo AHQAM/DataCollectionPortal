@@ -42,10 +42,18 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
     final rule = field.visibilityRule;
     if (rule == null || rule.isEmpty) return true;
 
-    final targetFieldKey = rule['targetFieldKey']?.toString();
+    final targetFieldKey = rule['targetFieldKey']?.toString() ?? rule['targetFieldId']?.toString();
     if (targetFieldKey == null || targetFieldKey.isEmpty) return true;
 
-    final targetVal = _formData[targetFieldKey];
+    // Try finding the value in _formData using various possible keys
+    var targetVal = _formData[targetFieldKey];
+    if (targetVal == null) {
+      final possibleKeys = _formData.keys.where((k) => k.contains(targetFieldKey) || targetFieldKey.contains(k));
+      if (possibleKeys.isNotEmpty) {
+        targetVal = _formData[possibleKeys.first];
+      }
+    }
+
     final operator = rule['operator']?.toString() ?? 'equals';
     final ruleVal = rule['value']?.toString() ?? '';
 
@@ -53,12 +61,18 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
   }
 
   bool _isConditionMet(dynamic targetVal, String operator, String ruleVal) {
-    final tStr = targetVal?.toString().toLowerCase().trim();
+    final tStr = targetVal?.toString().toLowerCase().trim() ?? '';
     final rStr = ruleVal.toLowerCase().trim();
 
     switch (operator) {
       case 'equals':
+      case '==':
+        if (tStr.isEmpty && rStr.isNotEmpty) return false;
         if (tStr == rStr) return true;
+        
+        // Handle dropdown value vs label mismatch
+        if (tStr.isNotEmpty && rStr.isNotEmpty && (tStr.contains(rStr) || rStr.contains(tStr))) return true;
+
         // Boolean / Yes-No normalization
         if ((tStr == 'true' || tStr == 'yes' || tStr == 'نعم' || tStr == '1') &&
             (rStr == 'true' || rStr == 'yes' || rStr == 'نعم' || rStr == '1')) {
@@ -70,28 +84,30 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
         }
         return false;
       case 'not_equals':
+      case '!=':
+        if (tStr.isEmpty && rStr.isNotEmpty) return true;
         return !_isConditionMet(targetVal, 'equals', ruleVal);
       case 'contains':
-        if (targetVal == null) return false;
-        return targetVal.toString().toLowerCase().contains(rStr);
+        if (tStr.isEmpty) return false;
+        return tStr.contains(rStr);
       case 'greater_than':
-        if (targetVal == null) return false;
-        final tNum = num.tryParse(targetVal.toString());
-        final rNum = num.tryParse(ruleVal);
+      case '>':
+        if (tStr.isEmpty) return false;
+        final tNum = num.tryParse(tStr);
+        final rNum = num.tryParse(rStr);
         if (tNum == null || rNum == null) return false;
         return tNum > rNum;
       case 'less_than':
-        if (targetVal == null) return false;
-        final tNum = num.tryParse(targetVal.toString());
-        final rNum = num.tryParse(ruleVal);
+      case '<':
+        if (tStr.isEmpty) return false;
+        final tNum = num.tryParse(tStr);
+        final rNum = num.tryParse(rStr);
         if (tNum == null || rNum == null) return false;
         return tNum < rNum;
       case 'is_empty':
-        if (targetVal == null) return true;
-        return targetVal.toString().trim().isEmpty;
+        return tStr.isEmpty;
       case 'is_not_empty':
-        if (targetVal == null) return false;
-        return targetVal.toString().trim().isNotEmpty;
+        return tStr.isNotEmpty;
       default:
         return true;
     }
@@ -232,25 +248,12 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
 
     switch (field.type) {
       case 'text':
-        return TextFormField(
-          initialValue: currentValue?.toString(),
-          decoration: InputDecoration(
-            labelText: label,
-            hintText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          keyboardType: TextInputType.text,
-          readOnly: field.isReadOnly,
+        return TextInputField(
+          field: field,
+          isArabic: isArabic,
+          currentValue: currentValue?.toString(),
           onChanged: (val) => _setFieldValue(field, val),
-          validator: (value) {
-            if (field.isRequired && (value == null || value.trim().isEmpty)) {
-              return isArabic
-                  ? (field.validationMessageAr ?? l10n.requiredField)
-                  : (field.validationMessageEn ?? l10n.requiredField);
-            }
-            return null;
-          },
-          onSaved: (value) => _setFieldValue(field, value),
+          onSaved: (val) => _setFieldValue(field, val),
         );
 
       case 'textarea':
@@ -266,37 +269,16 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case 'decimal':
       case 'currency':
       case 'percentage':
-        return TextFormField(
-          initialValue: currentValue?.toString(),
-          decoration: InputDecoration(
-            labelText: label,
-            hintText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          readOnly: field.isReadOnly,
+        return NumberInputField(
+          field: field,
+          isArabic: isArabic,
+          currentValue: currentValue?.toString(),
           onChanged: (val) {
             if (val.trim().isNotEmpty) {
               _setFieldValue(field, num.tryParse(val) ?? val);
             } else {
               _setFieldValue(field, null);
             }
-          },
-          validator: (value) {
-            if (field.isRequired && (value == null || value.trim().isEmpty)) {
-              return isArabic
-                  ? (field.validationMessageAr ?? l10n.requiredField)
-                  : (field.validationMessageEn ?? l10n.requiredField);
-            }
-            if (value != null && value.trim().isNotEmpty) {
-              final parsed = num.tryParse(value);
-              if (parsed == null) {
-                return isArabic
-                    ? 'يرجى إدخال قيمة رقمية صحيحة'
-                    : 'Please enter a valid number';
-              }
-            }
-            return null;
           },
           onSaved: (value) {
             if (value != null && value.trim().isNotEmpty) {
@@ -310,29 +292,11 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case 'dropdown':
       case 'select':
       case 'single_choice':
-        return DropdownButtonFormField<String>(
-          initialValue: currentValue?.toString(),
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          items:
-              field.options
-                  ?.map(
-                    (option) =>
-                        DropdownMenuItem(value: option, child: Text(option)),
-                  )
-                  .toList() ??
-              [],
-          validator: (value) {
-            if (field.isRequired && value == null) {
-              return isArabic
-                  ? (field.validationMessageAr ?? l10n.requiredField)
-                  : (field.validationMessageEn ?? l10n.requiredField);
-            }
-            return null;
-          },
-          onChanged: field.isReadOnly ? null : (value) => _setFieldValue(field, value),
+        return DropdownField(
+          field: field,
+          isArabic: isArabic,
+          currentValue: currentValue?.toString(),
+          onChanged: (value) => _setFieldValue(field, value),
           onSaved: (value) => _setFieldValue(field, value),
         );
 
@@ -396,11 +360,6 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
           onChanged: (val) => _setFieldValue(field, val),
           onSaved: (val) => _setFieldValue(field, val),
         );
-
-      default:
-        return _UnimplementedField(label: label, icon: Icons.help_outline);
-    }
-  }
 
       default:
         return _UnimplementedField(label: label, icon: Icons.help_outline);

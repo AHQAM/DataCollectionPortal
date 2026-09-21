@@ -132,7 +132,8 @@ class SyncManager {
     } on FirebaseFunctionsException catch (e) {
       if (e.code == 'permission-denied' ||
           e.code == 'invalid-argument' ||
-          e.code == 'failed-precondition') {
+          e.code == 'failed-precondition' ||
+          e.code == 'not-found') {
         debugPrint('Permanent sync failure for ${action.id}: ${e.code}');
         return true;
       }

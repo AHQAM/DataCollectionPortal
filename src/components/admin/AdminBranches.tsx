@@ -378,11 +378,13 @@ export const AdminBranches: React.FC = () => {
   const handleConfirmImport = async () => {
     if (parsedBranches.length === 0 && parsedRegions.length === 0) return;
     const res = await importBranchesAndRegions(parsedBranches, parsedRegions, importMode);
-    setSuccessMessage(
-      lang === 'ar'
-        ? `تم استيراد ${res.branchesCount} فرع و ${res.regionsCount} منطقة ميدانية بنجاح`
-        : `Successfully imported ${res.branchesCount} branches and ${res.regionsCount} regions`
-    );
+    if (res.success && res.data) {
+      setSuccessMessage(
+        lang === 'ar'
+          ? `تم استيراد ${res.data.branchesCount} فرع و ${res.data.regionsCount} منطقة ميدانية بنجاح`
+          : `Successfully imported ${res.data.branchesCount} branches and ${res.data.regionsCount} regions`
+      );
+    }
     setShowExcelModal(false);
     setParsedBranches([]);
     setParsedRegions([]);

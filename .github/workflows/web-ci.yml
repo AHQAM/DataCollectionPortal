@@ -33,13 +33,13 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_FIREBASE_API_KEY: 'AIzaSyAYOf8Ayqjcq-Ew-UNGivcK0PXcj_pyXAw'
-          VITE_FIREBASE_AUTH_DOMAIN: 'landsurvey-ebb3b.firebaseapp.com'
-          VITE_FIREBASE_PROJECT_ID: 'landsurvey-ebb3b'
-          VITE_FIREBASE_STORAGE_BUCKET: 'landsurvey-ebb3b.firebasestorage.app'
-          VITE_FIREBASE_MESSAGING_SENDER_ID: '152016503421'
-          VITE_FIREBASE_APP_ID: '1:152016503421:web:4ce2e5e5caf7df08f46714'
-          VITE_FIREBASE_DATABASE_ID: 'datacollectionportal'
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_DATABASE_ID: ${{ secrets.VITE_FIREBASE_DATABASE_ID }}
           VITE_APP_VERSION: '1.0.0'
 
       - name: Deploy to Firebase Hosting

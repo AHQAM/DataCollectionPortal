@@ -90,7 +90,7 @@ export const AdminReports: React.FC = () => {
   if (activeAnalysisField) {
     filteredRecords.forEach((r) => {
       const resp = recordResponses[r.recordId] || r.rawData || {};
-      const val = resp[activeAnalysisField.fieldKey] ?? resp[activeAnalysisField.fieldId] ?? (activeAnalysisField as any).id;
+      const val = resp[activeAnalysisField.fieldKey] ?? resp[activeAnalysisField.fieldId] ?? '';
       if (val !== undefined && val !== null && val !== '') {
         const key = String(val);
         dynamicFieldCounts[key] = (dynamicFieldCounts[key] || 0) + 1;
@@ -101,7 +101,7 @@ export const AdminReports: React.FC = () => {
   // Get field response value safely
   const getFieldValue = (record: RecordItem, field: RequestField) => {
     const resp = recordResponses[record.recordId] || record.rawData || {};
-    return resp[field.fieldKey] ?? resp[field.fieldId] ?? (field as any).id;
+    return resp[field.fieldKey] ?? resp[field.fieldId] ?? '';
   };
 
   // Render preview cell value
@@ -170,7 +170,7 @@ export const AdminReports: React.FC = () => {
       // Add all dynamic form fields
       currentFields.forEach((f) => {
         const colTitle = `${f.fieldLabelAr} (${f.fieldKey})`;
-        const val = resp[f.fieldKey] ?? resp[f.fieldId] ?? (f as any).id ?? '';
+        const val = resp[f.fieldKey] ?? resp[f.fieldId] ?? '';
         row[colTitle] = typeof val === 'object' ? JSON.stringify(val) : String(val);
       });
 
@@ -201,7 +201,7 @@ export const AdminReports: React.FC = () => {
       };
 
       currentFields.forEach((f) => {
-        const val = resp[f.fieldKey] ?? resp[f.fieldId] ?? (f as any).id ?? '';
+        const val = resp[f.fieldKey] ?? resp[f.fieldId] ?? '';
         row[f.fieldKey] = typeof val === 'object' ? JSON.stringify(val) : String(val);
       });
 

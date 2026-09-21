@@ -262,7 +262,9 @@ export const AdminImportWizard: React.FC<Props> = ({ initialRequestId, onBack })
     };
 
     const res = await commitImport(selectedRequestId, validRows, mergedMapping, fileName || 'imported_file.xlsx');
-    setImportStats(res);
+    if (res.success && res.data) {
+      setImportStats(res.data);
+    }
     setIsImporting(false);
     confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
     setStep(4);

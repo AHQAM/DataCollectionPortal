@@ -159,9 +159,9 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
 
     try {
       const result = await importUsersBatch(newUsers);
-      if (result?.temporaryPasswords && result.temporaryPasswords.length > 0) {
-        setImportedCredentials(result.temporaryPasswords);
-        onSuccess(result.created || newUsers.length);
+      if (result.success && result.data?.temporaryPasswords && result.data.temporaryPasswords.length > 0) {
+        setImportedCredentials(result.data.temporaryPasswords);
+        onSuccess(result.data.createdCount || newUsers.length);
       } else {
         onSuccess(newUsers.length);
         onClose();

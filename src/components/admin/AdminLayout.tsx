@@ -87,6 +87,7 @@ export const AdminLayout: React.FC = () => {
           <AdminRequests
             onOpenFormBuilder={handleOpenFormBuilder}
             onOpenImportWizard={handleOpenImportWizard}
+            onNavigate={(mod) => setCurrentModule(mod)}
           />
         );
       case 'import':
