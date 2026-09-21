@@ -32,7 +32,6 @@ class LocationFormField extends StatefulWidget {
   State<LocationFormField> createState() => _LocationFormFieldState();
 }
 
-
 class _LocationFormFieldState extends State<LocationFormField> {
   Position? _position;
   bool _loading = false;
@@ -246,4 +245,3 @@ class _LocationFormFieldState extends State<LocationFormField> {
     );
   }
 }
-

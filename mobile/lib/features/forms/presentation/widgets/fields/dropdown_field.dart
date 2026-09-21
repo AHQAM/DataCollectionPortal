@@ -29,7 +29,14 @@ class DropdownField extends StatelessWidget {
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      items: field.options?.map((option) => DropdownMenuItem(value: option, child: Text(option))).toList() ?? [],
+      items:
+          field.options
+              ?.map(
+                (option) =>
+                    DropdownMenuItem(value: option, child: Text(option)),
+              )
+              .toList() ??
+          [],
       validator: (value) {
         if (field.isRequired && value == null) {
           return isArabic

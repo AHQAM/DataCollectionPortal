@@ -42,13 +42,16 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
     final rule = field.visibilityRule;
     if (rule == null || rule.isEmpty) return true;
 
-    final targetFieldKey = rule['targetFieldKey']?.toString() ?? rule['targetFieldId']?.toString();
+    final targetFieldKey =
+        rule['targetFieldKey']?.toString() ?? rule['targetFieldId']?.toString();
     if (targetFieldKey == null || targetFieldKey.isEmpty) return true;
 
     // Try finding the value in _formData using various possible keys
     var targetVal = _formData[targetFieldKey];
     if (targetVal == null) {
-      final possibleKeys = _formData.keys.where((k) => k.contains(targetFieldKey) || targetFieldKey.contains(k));
+      final possibleKeys = _formData.keys.where(
+        (k) => k.contains(targetFieldKey) || targetFieldKey.contains(k),
+      );
       if (possibleKeys.isNotEmpty) {
         targetVal = _formData[possibleKeys.first];
       }
@@ -69,9 +72,12 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case '==':
         if (tStr.isEmpty && rStr.isNotEmpty) return false;
         if (tStr == rStr) return true;
-        
+
         // Handle dropdown value vs label mismatch
-        if (tStr.isNotEmpty && rStr.isNotEmpty && (tStr.contains(rStr) || rStr.contains(tStr))) return true;
+        if (tStr.isNotEmpty &&
+            rStr.isNotEmpty &&
+            (tStr.contains(rStr) || rStr.contains(tStr)))
+          return true;
 
         // Boolean / Yes-No normalization
         if ((tStr == 'true' || tStr == 'yes' || tStr == 'نعم' || tStr == '1') &&

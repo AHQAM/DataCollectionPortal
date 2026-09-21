@@ -10,7 +10,7 @@ void main() {
     testWidgets('App starts and shows login screen', (tester) async {
       // Launch the app
       app.main();
-      
+
       // Wait for the app to settle
       await tester.pumpAndSettle();
 

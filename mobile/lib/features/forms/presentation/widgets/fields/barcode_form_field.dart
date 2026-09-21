@@ -53,4 +53,3 @@ class BarcodeFormField extends StatelessWidget {
     );
   }
 }
-

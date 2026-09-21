@@ -34,7 +34,6 @@ class PhotoFormField extends StatefulWidget {
   State<PhotoFormField> createState() => _PhotoFormFieldState();
 }
 
-
 class _PhotoFormFieldState extends State<PhotoFormField> {
   XFile? _imageFile;
   String? _uploadedUrl;
@@ -249,4 +248,3 @@ class _PhotoFormFieldState extends State<PhotoFormField> {
     );
   }
 }
-

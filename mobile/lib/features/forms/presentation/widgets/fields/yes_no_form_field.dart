@@ -32,7 +32,6 @@ class YesNoFormField extends StatefulWidget {
   State<YesNoFormField> createState() => _YesNoFormFieldState();
 }
 
-
 class _YesNoFormFieldState extends State<YesNoFormField> {
   bool? _value;
 
@@ -148,4 +147,3 @@ class _YesNoFormFieldState extends State<YesNoFormField> {
     );
   }
 }
-

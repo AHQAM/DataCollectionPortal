@@ -32,7 +32,6 @@ class RatingFormField extends StatefulWidget {
   State<RatingFormField> createState() => _RatingFormFieldState();
 }
 
-
 class _RatingFormFieldState extends State<RatingFormField> {
   int _rating = 0;
 
@@ -129,4 +128,3 @@ class _RatingFormFieldState extends State<RatingFormField> {
     );
   }
 }
-

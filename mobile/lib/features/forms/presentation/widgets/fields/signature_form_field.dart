@@ -34,7 +34,6 @@ class SignatureFormField extends StatefulWidget {
   State<SignatureFormField> createState() => _SignatureFormFieldState();
 }
 
-
 class _SignatureFormFieldState extends State<SignatureFormField> {
   final SignatureController _controller = SignatureController(
     penStrokeWidth: 3,
@@ -252,4 +251,3 @@ class _SignatureFormFieldState extends State<SignatureFormField> {
     );
   }
 }
-

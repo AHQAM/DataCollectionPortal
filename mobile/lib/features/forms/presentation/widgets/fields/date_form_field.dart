@@ -32,7 +32,6 @@ class DateFormField extends StatefulWidget {
   State<DateFormField> createState() => _DateFormFieldState();
 }
 
-
 class _DateFormFieldState extends State<DateFormField> {
   DateTime? _selectedDate;
   final _controller = TextEditingController();
@@ -80,4 +79,3 @@ class _DateFormFieldState extends State<DateFormField> {
     );
   }
 }
-
