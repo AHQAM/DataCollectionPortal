@@ -7,8 +7,6 @@ const Color _emerald = Color(0xFF059669);
 const Color _emeraldLight = Color(0xFFECFDF5);
 const Color _emeraldBorder = Color(0xFFA7F3D0);
 
-
-
 /// Location picker field with GPS coordinates
 class LocationFormField extends StatefulWidget {
   final FormFieldModel field;

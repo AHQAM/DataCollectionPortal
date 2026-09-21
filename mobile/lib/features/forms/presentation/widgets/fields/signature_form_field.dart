@@ -8,8 +8,6 @@ import 'package:mobile/features/forms/domain/form_field_model.dart';
 
 const Color _emerald = Color(0xFF059669);
 
-
-
 /// Signature canvas and capture form field
 class SignatureFormField extends StatefulWidget {
   final FormFieldModel field;

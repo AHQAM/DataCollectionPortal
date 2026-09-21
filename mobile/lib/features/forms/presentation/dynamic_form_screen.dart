@@ -75,11 +75,11 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case 'equals':
       case '==':
         if (tStr.isEmpty && rStr.isNotEmpty) {
-      return false;
-    }
+          return false;
+        }
         if (tStr == rStr) {
-      return true;
-    }
+          return true;
+        }
 
         // Handle dropdown value vs label mismatch
         if (tStr.isNotEmpty &&
@@ -101,35 +101,35 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       case 'not_equals':
       case '!=':
         if (tStr.isEmpty && rStr.isNotEmpty) {
-      return true;
-    }
+          return true;
+        }
         return !_isConditionMet(targetVal, 'equals', ruleVal);
       case 'contains':
         if (tStr.isEmpty) {
-      return false;
-    }
+          return false;
+        }
         return tStr.contains(rStr);
       case 'greater_than':
       case '>':
         if (tStr.isEmpty) {
-      return false;
-    }
+          return false;
+        }
         final tNum = num.tryParse(tStr);
         final rNum = num.tryParse(rStr);
         if (tNum == null || rNum == null) {
-      return false;
-    }
+          return false;
+        }
         return tNum > rNum;
       case 'less_than':
       case '<':
         if (tStr.isEmpty) {
-      return false;
-    }
+          return false;
+        }
         final tNum = num.tryParse(tStr);
         final rNum = num.tryParse(rStr);
         if (tNum == null || rNum == null) {
-      return false;
-    }
+          return false;
+        }
         return tNum < rNum;
       case 'is_empty':
         return tStr.isEmpty;

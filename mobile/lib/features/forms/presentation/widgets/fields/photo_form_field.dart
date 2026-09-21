@@ -8,8 +8,6 @@ import 'package:mobile/features/forms/domain/form_field_model.dart';
 
 const Color _emerald = Color(0xFF059669);
 
-
-
 /// Photo capture and upload form field
 class PhotoFormField extends StatefulWidget {
   final FormFieldModel field;

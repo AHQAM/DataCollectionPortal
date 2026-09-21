@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:mobile/features/forms/domain/form_field_model.dart';
 
-
 /// Multi-line text field
 class TextareaFormField extends StatelessWidget {
   final FormFieldModel field;

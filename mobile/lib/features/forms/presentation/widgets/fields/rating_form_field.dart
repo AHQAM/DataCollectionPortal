@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:mobile/features/forms/domain/form_field_model.dart';
 
-
 /// Star rating form field
 class RatingFormField extends StatefulWidget {
   final FormFieldModel field;

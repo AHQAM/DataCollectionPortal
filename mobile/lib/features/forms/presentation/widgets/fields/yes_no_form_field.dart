@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:mobile/features/forms/domain/form_field_model.dart';
 
-
 /// Yes/No boolean toggle field
 class YesNoFormField extends StatefulWidget {
   final FormFieldModel field;

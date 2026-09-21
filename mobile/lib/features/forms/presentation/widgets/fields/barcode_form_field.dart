@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:mobile/features/forms/domain/form_field_model.dart';
 
-
 /// Barcode input and scanner field
 class BarcodeFormField extends StatelessWidget {
   final FormFieldModel field;
