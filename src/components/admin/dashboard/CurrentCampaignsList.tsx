@@ -73,9 +73,7 @@ export const CurrentCampaignsList: React.FC<CurrentCampaignsListProps> = ({
           className="w-full h-10 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
         >
           <span>
-            {lang === "ar"
-              ? "عرض وإدارة جميع الطلبات"
-              : "Manage All Requests"}
+            {lang === "ar" ? "عرض وإدارة جميع الطلبات" : "Manage All Requests"}
           </span>
           <ArrowUpRight className="w-3.5 h-3.5" />
         </button>

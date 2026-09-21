@@ -37,9 +37,7 @@ interface AuthStore {
     newPassword: string,
     minLength: number,
   ) => Promise<{ success: boolean; message: string }>;
-  adminResetPassword: (
-    userId: string,
-  ) => Promise<{
+  adminResetPassword: (userId: string) => Promise<{
     success: boolean;
     temporaryPassword?: string;
     message: string;

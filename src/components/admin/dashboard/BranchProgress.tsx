@@ -58,7 +58,8 @@ export const BranchProgress: React.FC<BranchProgressProps> = ({
                 </span>
               </div>
               <div className="text-xs font-bold text-slate-700">
-                {completed} / {total} {lang === "ar" ? "سجل" : "records"} ({pct}%)
+                {completed} / {total} {lang === "ar" ? "سجل" : "records"} ({pct}
+                %)
               </div>
             </div>
 

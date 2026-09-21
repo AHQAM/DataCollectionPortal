@@ -422,7 +422,11 @@ export const AdminRequests: React.FC<Props> = ({
         onClose={() => setDeleteConfirmRequest(null)}
         onConfirm={handleDelete}
         lang={lang}
-        isDeleting={actionLoadingId !== null && deleteConfirmRequest !== null && actionLoadingId === `${deleteConfirmRequest.requestId}_delete`}
+        isDeleting={
+          actionLoadingId !== null &&
+          deleteConfirmRequest !== null &&
+          actionLoadingId === `${deleteConfirmRequest.requestId}_delete`
+        }
       />
     </div>
   );

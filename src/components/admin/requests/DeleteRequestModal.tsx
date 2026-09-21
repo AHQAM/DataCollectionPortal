@@ -26,9 +26,7 @@ export const DeleteRequestModal: React.FC<DeleteRequestModalProps> = ({
           <Trash2 className="w-6 h-6" />
         </div>
         <h3 className="font-bold text-sm text-slate-900 text-center mb-1">
-          {lang === "ar"
-            ? "تأكيد حذف الطلب بالكامل"
-            : "Confirm Delete Request"}
+          {lang === "ar" ? "تأكيد حذف الطلب بالكامل" : "Confirm Delete Request"}
         </h3>
         <p className="text-xs text-slate-500 text-center mb-4">
           {lang === "ar"
@@ -51,12 +49,8 @@ export const DeleteRequestModal: React.FC<DeleteRequestModalProps> = ({
             disabled={isDeleting}
             className="flex-1 h-9 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50"
           >
-            {isDeleting && (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            )}
-            <span>
-              {lang === "ar" ? "نعم، احذف نهائياً" : "Yes, Delete"}
-            </span>
+            {isDeleting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+            <span>{lang === "ar" ? "نعم، احذف نهائياً" : "Yes, Delete"}</span>
           </button>
         </div>
       </div>

@@ -61,9 +61,7 @@ export const DashboardBanner: React.FC<DashboardBannerProps> = ({
         >
           <Settings className="w-4 h-4" />
           <span>
-            {lang === "ar"
-              ? "إعدادات النظام وقاعدة البيانات"
-              : "Settings & DB"}
+            {lang === "ar" ? "إعدادات النظام وقاعدة البيانات" : "Settings & DB"}
           </span>
         </button>
       </div>

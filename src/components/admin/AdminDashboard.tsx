@@ -13,13 +13,7 @@ interface Props {
 
 export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
   const { lang } = useUIStore();
-  const {
-    requests,
-    records,
-    users,
-    branches,
-    auditLogs,
-  } = useDataStore();
+  const { requests, records, users, branches, auditLogs } = useDataStore();
 
   // Calculations
   const activeRequests = requests.filter(
@@ -62,8 +56,8 @@ export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="space-y-6">
       <DashboardBanner lang={lang} onNavigate={onNavigate} />
-      
-      <KpiCardsGrid 
+
+      <KpiCardsGrid
         lang={lang}
         activeRequests={activeRequests}
         draftRequests={draftRequests}
@@ -76,23 +70,23 @@ export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <BranchProgress 
-          lang={lang} 
-          onNavigate={onNavigate} 
-          branchStats={branchStats} 
+        <BranchProgress
+          lang={lang}
+          onNavigate={onNavigate}
+          branchStats={branchStats}
         />
-        
-        <CurrentCampaignsList 
-          lang={lang} 
-          onNavigate={onNavigate} 
-          requests={requests} 
+
+        <CurrentCampaignsList
+          lang={lang}
+          onNavigate={onNavigate}
+          requests={requests}
         />
       </div>
 
-      <RecentAuditActivity 
-        lang={lang} 
-        onNavigate={onNavigate} 
-        auditLogs={auditLogs} 
+      <RecentAuditActivity
+        lang={lang}
+        onNavigate={onNavigate}
+        auditLogs={auditLogs}
       />
     </div>
   );

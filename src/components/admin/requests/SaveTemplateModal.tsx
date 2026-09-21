@@ -27,9 +27,7 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl border border-slate-200">
         <h3 className="font-bold text-sm text-slate-900 mb-1">
-          {lang === "ar"
-            ? "حفظ الطلب كقالب معتمد"
-            : "Save as Request Template"}
+          {lang === "ar" ? "حفظ الطلب كقالب معتمد" : "Save as Request Template"}
         </h3>
         <p className="text-xs text-slate-500 mb-4">
           {lang === "ar"
@@ -40,9 +38,7 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
         <form onSubmit={onSubmit} className="space-y-3 text-xs">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم القالب بالعربية"
-                : "Template Name (Arabic)"}
+              {lang === "ar" ? "اسم القالب بالعربية" : "Template Name (Arabic)"}
             </label>
             <input
               type="text"
