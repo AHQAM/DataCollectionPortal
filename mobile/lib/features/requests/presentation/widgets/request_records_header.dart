@@ -69,15 +69,9 @@ class RequestRecordsHeader extends StatelessWidget {
                   isArabic ? 'بانتظار البدء' : 'Pending',
                 ),
                 const SizedBox(width: 6),
-                _buildFilterChip(
-                  'DraftSaved',
-                  isArabic ? 'مسودة' : 'Draft',
-                ),
+                _buildFilterChip('DraftSaved', isArabic ? 'مسودة' : 'Draft'),
                 const SizedBox(width: 6),
-                _buildFilterChip(
-                  'Submitted',
-                  isArabic ? 'مكتمل' : 'Completed',
-                ),
+                _buildFilterChip('Submitted', isArabic ? 'مكتمل' : 'Completed'),
               ],
             ),
           ),

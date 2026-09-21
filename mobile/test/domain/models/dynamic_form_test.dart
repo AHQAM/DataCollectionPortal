@@ -25,11 +25,7 @@ void main() {
     });
 
     test('Maps legacy field types correctly', () {
-      final json = {
-        'id': 'f2',
-        'fieldType': 'gps',
-        'fieldLabelAr': 'الموقع',
-      };
+      final json = {'id': 'f2', 'fieldType': 'gps', 'fieldLabelAr': 'الموقع'};
 
       final field = FormFieldModel.fromJson(json);
 
@@ -70,7 +66,7 @@ void main() {
           'targetFieldKey': 'status',
           'operator': 'equals',
           'value': 'rejected',
-        }
+        },
       };
 
       final field = FormFieldModel.fromJson(json);
