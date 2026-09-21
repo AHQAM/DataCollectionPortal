@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-import { AppProvider, useApp } from './context/AppContext';
-import { TopNavbar } from './components/common/TopNavbar';
-import { AuthPortal } from './components/common/AuthPortal';
-import { AdminLayout } from './components/admin/AdminLayout';
-import ErrorBoundary from './components/ErrorBoundary';
+import React, { useEffect } from "react";
+import { AppProvider, useApp } from "./context/AppContext";
+import { TopNavbar } from "./components/common/TopNavbar";
+import { AuthPortal } from "./components/common/AuthPortal";
+import { AdminLayout } from "./components/admin/AdminLayout";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const MainAppContent: React.FC = () => {
   const { lang, dir, currentUser, authReady } = useApp();
@@ -39,15 +39,17 @@ const MainAppContent: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
           <span className="font-semibold text-slate-700">
-            {lang === 'ar' ? 'منصة جمع البيانات الميدانية والمبيعات' : 'Field Sales Collection Hub'}
+            {lang === "ar"
+              ? "منصة جمع البيانات الميدانية والمبيعات"
+              : "Field Sales Collection Hub"}
           </span>
           <span className="text-slate-400 font-mono">v2.4.0 Enterprise</span>
         </div>
 
         <div className="text-[10px] text-slate-400">
-          {lang === 'ar'
-            ? 'متوافق مع حوكمة أمان الأجهزة وتغيير كلمات المرور الإلزامي ونظام الأوفلاين التلقائي'
-            : 'Compliant with device binding security, mandatory PIN change, and auto offline sync'}
+          {lang === "ar"
+            ? "متوافق مع حوكمة أمان الأجهزة وتغيير كلمات المرور الإلزامي ونظام الأوفلاين التلقائي"
+            : "Compliant with device binding security, mandatory PIN change, and auto offline sync"}
         </div>
       </footer>
     </div>

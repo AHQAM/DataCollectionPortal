@@ -27,8 +27,11 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Check Formatting
+        run: npm run format:check
+
       - name: Test
-        run: npm test
+        run: npm run test:coverage
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
@@ -37,7 +40,7 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_DATABASE_ID: ${{ secrets.VITE_FIREBASE_DATABASE_ID }}
-          VITE_APP_VERSION: '1.0.0'
+          VITE_APP_VERSION: "1.0.0"
 
       - name: Build
         run: npm run build
@@ -49,14 +52,14 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_DATABASE_ID: ${{ secrets.VITE_FIREBASE_DATABASE_ID }}
-          VITE_APP_VERSION: '1.0.0'
+          VITE_APP_VERSION: "1.0.0"
 
       - name: Deploy to Firebase Hosting
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LANDSURVEY_EBB3B }}'
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_LANDSURVEY_EBB3B }}"
           channelId: live
           projectId: landsurvey-ebb3b
           entryPoint: firebase

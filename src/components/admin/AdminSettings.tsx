@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
-import { Settings, CheckCircle2 } from 'lucide-react';
-import { SettingsSecuritySection } from './settings/SettingsSecuritySection';
-import { SettingsSupportSection } from './settings/SettingsSupportSection';
-import { SettingsDatabaseSection } from './settings/SettingsDatabaseSection';
+import React, { useState } from "react";
+import { useApp } from "../../context/AppContext";
+import { Settings, CheckCircle2 } from "lucide-react";
+import { SettingsSecuritySection } from "./settings/SettingsSecuritySection";
+import { SettingsSupportSection } from "./settings/SettingsSupportSection";
+import { SettingsDatabaseSection } from "./settings/SettingsDatabaseSection";
 
 export const AdminSettings: React.FC = () => {
   const {
@@ -32,10 +32,14 @@ export const AdminSettings: React.FC = () => {
 
   // Local settings form state
   const [maxFailedAttempts, setMaxFailedAttempts] = useState(
-    appSettings.maxLoginAttempts || appSettings.securityPolicy?.maxFailedAttempts || 3
+    appSettings.maxLoginAttempts ||
+      appSettings.securityPolicy?.maxFailedAttempts ||
+      3,
   );
   const [lockoutDurationMinutes, setLockoutDurationMinutes] = useState(
-    appSettings.lockoutMinutes || appSettings.securityPolicy?.lockoutDurationMinutes || 15
+    appSettings.lockoutMinutes ||
+      appSettings.securityPolicy?.lockoutDurationMinutes ||
+      15,
   );
   const [phone, setPhone] = useState(appSettings.supportContact.phone);
   const [email, setEmail] = useState(appSettings.supportContact.email);
@@ -65,9 +69,9 @@ export const AdminSettings: React.FC = () => {
     wipeDemoDataForProduction({ wipeBranchesAndRegions: wipeBranchesAlso });
     setShowWipeModal(false);
     setWipeSuccessMsg(
-      lang === 'ar'
-        ? 'تم تفريغ كافة البيانات التجريبية بنجاح! النظام الآن بصفحة بيضاء جاهز للتشغيل الفعلي بالشركة.'
-        : 'All demo data wiped successfully! System is now a clean blank slate ready for production.'
+      lang === "ar"
+        ? "تم تفريغ كافة البيانات التجريبية بنجاح! النظام الآن بصفحة بيضاء جاهز للتشغيل الفعلي بالشركة."
+        : "All demo data wiped successfully! System is now a clean blank slate ready for production.",
     );
     setTimeout(() => setWipeSuccessMsg(null), 5000);
   };
@@ -76,8 +80,8 @@ export const AdminSettings: React.FC = () => {
   const handleExportBackup = () => {
     const backupData = {
       exportedAt: new Date().toISOString(),
-      version: '2.4.0',
-      system: 'Field Sales Collection Hub',
+      version: "2.4.0",
+      system: "Field Sales Collection Hub",
       branches,
       regions,
       users,
@@ -86,16 +90,22 @@ export const AdminSettings: React.FC = () => {
       settings: appSettings,
     };
 
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupData, null, 2));
-    const dlAnchor = document.createElement('a');
-    dlAnchor.setAttribute('href', dataStr);
+    const dataStr =
+      "data:text/json;charset=utf-8," +
+      encodeURIComponent(JSON.stringify(backupData, null, 2));
+    const dlAnchor = document.createElement("a");
+    dlAnchor.setAttribute("href", dataStr);
     dlAnchor.setAttribute(
-      'download',
-      `database_backup_${new Date().toISOString().slice(0, 10)}.json`
+      "download",
+      `database_backup_${new Date().toISOString().slice(0, 10)}.json`,
     );
     dlAnchor.click();
 
-    setBackupSuccessMsg(lang === 'ar' ? 'تم تنزيل النسخة الاحتياطية بنجاح!' : 'Database backup downloaded successfully!');
+    setBackupSuccessMsg(
+      lang === "ar"
+        ? "تم تنزيل النسخة الاحتياطية بنجاح!"
+        : "Database backup downloaded successfully!",
+    );
     setTimeout(() => setBackupSuccessMsg(null), 4000);
   };
 
@@ -106,19 +116,25 @@ export const AdminSettings: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Settings className="w-5 h-5 text-purple-700" />
-            <span>{lang === 'ar' ? 'إعدادات النظام وسياسات الأمان' : 'System Settings & Security Policies'}</span>
+            <span>
+              {lang === "ar"
+                ? "إعدادات النظام وسياسات الأمان"
+                : "System Settings & Security Policies"}
+            </span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {lang === 'ar'
-              ? 'تخصيص سياسات كلمات المرور، قفل الحسابات التلقائي، وقنوات الدعم الفني'
-              : 'Configure authentication rules, account lockouts, and administrative contact channels'}
+            {lang === "ar"
+              ? "تخصيص سياسات كلمات المرور، قفل الحسابات التلقائي، وقنوات الدعم الفني"
+              : "Configure authentication rules, account lockouts, and administrative contact channels"}
           </p>
         </div>
 
         {savedSuccess && (
           <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 flex items-center gap-1">
             <CheckCircle2 className="w-4 h-4" />
-            <span>{lang === 'ar' ? 'تم حفظ الإعدادات' : 'Settings Saved!'}</span>
+            <span>
+              {lang === "ar" ? "تم حفظ الإعدادات" : "Settings Saved!"}
+            </span>
           </span>
         )}
       </div>
@@ -147,7 +163,7 @@ export const AdminSettings: React.FC = () => {
             type="submit"
             className="px-6 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-extrabold shadow-md transition-all cursor-pointer"
           >
-            {lang === 'ar' ? 'حفظ كافة التغييرات' : 'Save System Settings'}
+            {lang === "ar" ? "حفظ كافة التغييرات" : "Save System Settings"}
           </button>
         </div>
       </form>

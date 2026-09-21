@@ -1,11 +1,11 @@
-import React from 'react';
-import { User, Region } from '../../../types';
-import { Check } from 'lucide-react';
+import React from "react";
+import { User, Region } from "../../../types";
+import { Check } from "lucide-react";
 
 interface SupervisorGridViewProps {
   supervisors: User[];
   regions: Region[];
-  lang: 'ar' | 'en';
+  lang: "ar" | "en";
   onToggleRegion: (supervisor: User, regionNo: string) => void;
 }
 
@@ -19,10 +19,14 @@ export const SupervisorGridView: React.FC<SupervisorGridViewProps> = ({
     <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
       <div className="p-4 border-b border-slate-100 flex items-center justify-between">
         <span className="text-xs font-black text-slate-900">
-          {lang === 'ar' ? 'جدول التقاطع (المشرفين × المناطق الميدانية)' : 'Cross Matrix (Supervisors × Field Zones)'}
+          {lang === "ar"
+            ? "جدول التقاطع (المشرفين × المناطق الميدانية)"
+            : "Cross Matrix (Supervisors × Field Zones)"}
         </span>
         <span className="text-[11px] text-slate-500 font-medium">
-          {lang === 'ar' ? 'انقر على أي مربع لتفعيل أو إلغاء الإشراف مباشرة' : 'Click any cell to toggle supervision'}
+          {lang === "ar"
+            ? "انقر على أي مربع لتفعيل أو إلغاء الإشراف مباشرة"
+            : "Click any cell to toggle supervision"}
         </span>
       </div>
 
@@ -31,15 +35,23 @@ export const SupervisorGridView: React.FC<SupervisorGridViewProps> = ({
           <thead>
             <tr className="bg-slate-100 text-slate-700 font-black border-b border-slate-200">
               <th className="p-3 text-start sticky start-0 bg-slate-100 z-10 min-w-[200px]">
-                {lang === 'ar' ? 'المشرف' : 'Supervisor'}
+                {lang === "ar" ? "المشرف" : "Supervisor"}
               </th>
               <th className="p-3 text-center min-w-[90px]">
-                {lang === 'ar' ? 'إجمالي المناطق' : 'Total Zones'}
+                {lang === "ar" ? "إجمالي المناطق" : "Total Zones"}
               </th>
               {regions.map((reg) => (
-                <th key={reg.regionId} className="p-2 text-center min-w-[80px] border-s border-slate-200">
-                  <div className="font-mono text-purple-900 font-bold">{reg.regionNo}</div>
-                  <div className="text-[10px] text-slate-500 font-normal truncate max-w-[90px] mx-auto" title={reg.regionNameAr}>
+                <th
+                  key={reg.regionId}
+                  className="p-2 text-center min-w-[80px] border-s border-slate-200"
+                >
+                  <div className="font-mono text-purple-900 font-bold">
+                    {reg.regionNo}
+                  </div>
+                  <div
+                    className="text-[10px] text-slate-500 font-normal truncate max-w-[90px] mx-auto"
+                    title={reg.regionNameAr}
+                  >
                     {reg.regionNameAr}
                   </div>
                 </th>
@@ -51,10 +63,15 @@ export const SupervisorGridView: React.FC<SupervisorGridViewProps> = ({
               const allowed = new Set(sup.allowedRegionNos || []);
 
               return (
-                <tr key={sup.userId} className="hover:bg-purple-50/20 transition-colors">
+                <tr
+                  key={sup.userId}
+                  className="hover:bg-purple-50/20 transition-colors"
+                >
                   <td className="p-3 font-bold text-slate-900 sticky start-0 bg-white shadow-xs z-10">
                     <div>{sup.repNameAr}</div>
-                    <div className="text-[10px] font-mono text-slate-400 font-normal">{sup.repNo || sup.username}</div>
+                    <div className="text-[10px] font-mono text-slate-400 font-normal">
+                      {sup.repNo || sup.username}
+                    </div>
                   </td>
                   <td className="p-3 text-center font-black text-purple-900 font-mono">
                     {allowed.size}
@@ -67,7 +84,9 @@ export const SupervisorGridView: React.FC<SupervisorGridViewProps> = ({
                         key={reg.regionId}
                         onClick={() => onToggleRegion(sup, reg.regionNo)}
                         className={`p-2 text-center border-s border-slate-100 cursor-pointer transition-colors ${
-                          isSupervised ? 'bg-purple-100/60 hover:bg-purple-200/80' : 'hover:bg-slate-100/60'
+                          isSupervised
+                            ? "bg-purple-100/60 hover:bg-purple-200/80"
+                            : "hover:bg-slate-100/60"
                         }`}
                       >
                         <div className="flex items-center justify-center">

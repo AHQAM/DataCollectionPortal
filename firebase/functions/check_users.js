@@ -1,5 +1,5 @@
-const admin = require('firebase-admin');
-const { getFirestore } = require('firebase-admin/firestore');
+const admin = require("firebase-admin");
+const { getFirestore } = require("firebase-admin/firestore");
 
 admin.initializeApp({
   projectId: "landsurvey-ebb3b",
@@ -8,16 +8,16 @@ admin.initializeApp({
 const db = getFirestore("datacollectionportal");
 
 async function checkUsers() {
-  const usersRef = db.collection('users');
+  const usersRef = db.collection("users");
   const snapshot = await usersRef.get();
-  
+
   if (snapshot.empty) {
-    console.log('No matching documents.');
+    console.log("No matching documents.");
     return;
   }
-  
-  snapshot.forEach(doc => {
-    console.log(doc.id, '=>', doc.data());
+
+  snapshot.forEach((doc) => {
+    console.log(doc.id, "=>", doc.data());
   });
 }
 

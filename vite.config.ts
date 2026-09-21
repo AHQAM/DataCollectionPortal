@@ -1,8 +1,8 @@
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import {defineConfig} from 'vitest/config';
-import {VitePWA} from 'vite-plugin-pwa';
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import { defineConfig } from "vitest/config";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig(() => {
   return {
@@ -10,51 +10,52 @@ export default defineConfig(() => {
       react(),
       tailwindcss(),
       VitePWA({
-        registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
+        registerType: "autoUpdate",
+        includeAssets: ["favicon.ico", "apple-touch-icon.png", "icon.svg"],
         manifest: {
-          id: '/',
-          name: 'منصة جمع بيانات المبيعات | Sales Collection Hub',
-          short_name: 'جمع المبيعات',
-          description: 'تطبيق المندوب الميداني لجمع بيانات المبيعات ومتابعة العملاء وتعبئة النماذج',
-          theme_color: '#3b0764',
-          background_color: '#f8fafc',
-          display: 'standalone',
-          orientation: 'portrait',
-          start_url: '/',
-          scope: '/',
-          lang: 'ar',
-          dir: 'rtl',
-          categories: ['business', 'productivity'],
+          id: "/",
+          name: "منصة جمع بيانات المبيعات | Sales Collection Hub",
+          short_name: "جمع المبيعات",
+          description:
+            "تطبيق المندوب الميداني لجمع بيانات المبيعات ومتابعة العملاء وتعبئة النماذج",
+          theme_color: "#3b0764",
+          background_color: "#f8fafc",
+          display: "standalone",
+          orientation: "portrait",
+          start_url: "/",
+          scope: "/",
+          lang: "ar",
+          dir: "rtl",
+          categories: ["business", "productivity"],
           icons: [
             {
-              src: '/pwa-192x192.png',
-              sizes: '192x192',
-              type: 'image/png',
-              purpose: 'any',
+              src: "/pwa-192x192.png",
+              sizes: "192x192",
+              type: "image/png",
+              purpose: "any",
             },
             {
-              src: '/pwa-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'any',
+              src: "/pwa-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any",
             },
             {
-              src: '/pwa-maskable-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable',
+              src: "/pwa-maskable-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "maskable",
             },
           ],
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+          globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-              handler: 'CacheFirst',
+              handler: "CacheFirst",
               options: {
-                cacheName: 'google-fonts-cache',
+                cacheName: "google-fonts-cache",
                 expiration: {
                   maxEntries: 10,
                   maxAgeSeconds: 60 * 60 * 24 * 365,
@@ -66,9 +67,9 @@ export default defineConfig(() => {
             },
             {
               urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-              handler: 'CacheFirst',
+              handler: "CacheFirst",
               options: {
-                cacheName: 'gstatic-fonts-cache',
+                cacheName: "gstatic-fonts-cache",
                 expiration: {
                   maxEntries: 10,
                   maxAgeSeconds: 60 * 60 * 24 * 365,
@@ -82,28 +83,33 @@ export default defineConfig(() => {
         },
         devOptions: {
           enabled: true,
-          type: 'module',
+          type: "module",
         },
       }),
     ],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        "@": path.resolve(__dirname, "."),
       },
     },
     build: {
-      outDir: 'firebase/public',
+      outDir: "firebase/public",
       emptyOutDir: true,
       modulePreload: false,
       chunkSizeWarningLimit: 550, // Accommodates Firestore SDK (~512KB minified) without suppressing warnings for large application chunks
       rollupOptions: {
         output: {
           manualChunks: {
-            'vendor-react': ['react', 'react-dom'],
-            'vendor-firestore': ['firebase/firestore'],
-            'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/functions', 'firebase/storage'],
-            'vendor-icons': ['lucide-react'],
-            'vendor-utils': ['zustand'],
+            "vendor-react": ["react", "react-dom"],
+            "vendor-firestore": ["firebase/firestore"],
+            "vendor-firebase": [
+              "firebase/app",
+              "firebase/auth",
+              "firebase/functions",
+              "firebase/storage",
+            ],
+            "vendor-icons": ["lucide-react"],
+            "vendor-utils": ["zustand"],
           },
         },
       },
@@ -111,15 +117,15 @@ export default defineConfig(() => {
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modify—file watching is disabled to prevent flickering during agent edits.
-      hmr: process.env.DISABLE_HMR !== 'true',
+      hmr: process.env.DISABLE_HMR !== "true",
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
-      watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      watch: process.env.DISABLE_HMR === "true" ? null : {},
     },
     test: {
-      environment: 'jsdom',
+      environment: "jsdom",
       globals: true,
-      setupFiles: './src/setupTests.ts',
-      include: ['src/**/*.test.{ts,tsx}'],
+      setupFiles: "./src/setupTests.ts",
+      include: ["src/**/*.test.{ts,tsx}"],
     },
   };
 });

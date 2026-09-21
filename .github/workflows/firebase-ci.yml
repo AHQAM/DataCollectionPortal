@@ -2,9 +2,9 @@ name: Firebase Functions CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -13,19 +13,18 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v4
-      with:
-        node-version: 22
-        
-    - name: Install dependencies
-      run: cd firebase/functions && npm ci
-      
+      - uses: actions/checkout@v4
 
-    - name: Run tests
-      run: cd firebase/functions && npm run test
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-    - name: Build
-      run: cd firebase/functions && npm run build
+      - name: Install dependencies
+        run: cd firebase/functions && npm ci
+
+      - name: Run tests
+        run: cd firebase/functions && npm run test
+
+      - name: Build
+        run: cd firebase/functions && npm run build

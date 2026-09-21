@@ -8,26 +8,52 @@ import { logAuditSafe } from "./auditLogger";
 
 const checkAdminOrSupervisor = (context: functions.https.CallableContext) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated.",
+    );
   }
   const role = context.auth.token.role;
   if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {
-    throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Only admins or supervisors can perform this action.",
+    );
   }
 };
 
 export const createRequest = functions.https.onCall(async (data, context) => {
   checkAdminOrSupervisor(context);
 
-  const { titleAr, titleEn, descriptionAr, descriptionEn, dueDate, targetBranches, requestCode, requestType, priority, category, tags, allowEditAfterSubmit, allowEditAfterDueDate, requireSupervisorApproval } = data;
+  const {
+    titleAr,
+    titleEn,
+    descriptionAr,
+    descriptionEn,
+    dueDate,
+    targetBranches,
+    requestCode,
+    requestType,
+    priority,
+    category,
+    tags,
+    allowEditAfterSubmit,
+    allowEditAfterDueDate,
+    requireSupervisorApproval,
+  } = data;
 
   if (!titleAr) {
-    throw new functions.https.HttpsError("invalid-argument", "Title (Ar) is required.");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Title (Ar) is required.",
+    );
   }
 
-  const requestId = 'REQ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-  const finalRequestCode = requestCode || 'REQ-' + Math.floor(100 + Math.random() * 900);
-  
+  const requestId =
+    "REQ-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+  const finalRequestCode =
+    requestCode || "REQ-" + Math.floor(100 + Math.random() * 900);
+
   const requestRef = db.collection("requests").doc(requestId);
 
   await requestRef.set({
@@ -38,17 +64,21 @@ export const createRequest = functions.https.onCall(async (data, context) => {
     titleEn: titleEn || titleAr,
     descriptionAr: descriptionAr || "",
     descriptionEn: descriptionEn || "",
-    requestType: requestType || 'per_record',
+    requestType: requestType || "per_record",
     status: "Draft",
-    priority: priority || 'Normal',
-    category: category || 'General Field Survey',
-    tags: tags || ['ميداني'],
+    priority: priority || "Normal",
+    category: category || "General Field Survey",
+    tags: tags || ["ميداني"],
     startAt: new Date().toISOString(),
-    dueAt: dueDate ? admin.firestore.Timestamp.fromDate(new Date(dueDate)).toDate().toISOString() : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+    dueAt: dueDate
+      ? admin.firestore.Timestamp.fromDate(new Date(dueDate))
+          .toDate()
+          .toISOString()
+      : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
     allowEditAfterSubmit: allowEditAfterSubmit ?? true,
     allowEditAfterDueDate: allowEditAfterDueDate ?? false,
     requireSupervisorApproval: requireSupervisorApproval ?? false,
-    completionRule: 'all_required_fields',
+    completionRule: "all_required_fields",
     formSchemaVersion: 1,
     totalRecords: 0,
     totalAssignments: 0,
@@ -62,39 +92,53 @@ export const createRequest = functions.https.onCall(async (data, context) => {
   return { success: true, requestId: requestId, activityId: requestId };
 });
 
-export const updateDraftRequest = functions.https.onCall(async (data, context) => {
-  checkAdminOrSupervisor(context);
+export const updateDraftRequest = functions.https.onCall(
+  async (data, context) => {
+    checkAdminOrSupervisor(context);
 
-  const { requestId, updates } = data;
-  if (!requestId || !updates) {
-    throw new functions.https.HttpsError("invalid-argument", "requestId and updates are required.");
-  }
+    const { requestId, updates } = data;
+    if (!requestId || !updates) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "requestId and updates are required.",
+      );
+    }
 
-  const requestRef = db.collection("requests").doc(requestId);
-  const requestDoc = await requestRef.get();
+    const requestRef = db.collection("requests").doc(requestId);
+    const requestDoc = await requestRef.get();
 
-  if (!requestDoc.exists) {
-    throw new functions.https.HttpsError("not-found", "Request not found.");
-  }
+    if (!requestDoc.exists) {
+      throw new functions.https.HttpsError("not-found", "Request not found.");
+    }
 
-  if (requestDoc.data()?.status !== "Draft" && requestDoc.data()?.status !== "draft") {
-    throw new functions.https.HttpsError("failed-precondition", "Can only update draft requests.");
-  }
+    if (
+      requestDoc.data()?.status !== "Draft" &&
+      requestDoc.data()?.status !== "draft"
+    ) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Can only update draft requests.",
+      );
+    }
 
-  await requestRef.update({
-    ...updates,
-    updatedAt: new Date().toISOString()
-  });
+    await requestRef.update({
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    });
 
-  return { success: true };
-});
+    return { success: true };
+  },
+);
 
 export const publishRequest = functions.https.onCall(async (data, context) => {
   checkAdminOrSupervisor(context);
 
   const { requestId } = data;
   if (!requestId) {
-    throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "requestId is required.",
+    );
   }
 
   const requestRef = db.collection("requests").doc(requestId);
@@ -105,7 +149,7 @@ export const publishRequest = functions.https.onCall(async (data, context) => {
   }
 
   const requestData = requestDoc.data()!;
-  
+
   const updates: any = {
     status: "Published",
     publishedAt: new Date().toISOString(),
@@ -114,12 +158,13 @@ export const publishRequest = functions.https.onCall(async (data, context) => {
   };
 
   if (!requestData.schemaSnapshot) {
-    const fieldsSnapshot = await db.collection("request_fields")
+    const fieldsSnapshot = await db
+      .collection("request_fields")
       .where("requestId", "==", requestId)
       .get();
-      
+
     const fieldsArray = fieldsSnapshot.docs
-      .map(doc => doc.data())
+      .map((doc) => doc.data())
       .sort((left, right) => (left.orderIndex ?? 0) - (right.orderIndex ?? 0));
     updates.schemaSnapshot = fieldsArray;
     updates.formSchemaVersion = (requestData.formSchemaVersion || 0) + 1;
@@ -131,7 +176,8 @@ export const publishRequest = functions.https.onCall(async (data, context) => {
   try {
     const userIdsToNotify = new Set<string>();
 
-    const assignmentsSnap = await db.collection("assignments")
+    const assignmentsSnap = await db
+      .collection("assignments")
       .where("requestId", "==", requestId)
       .where("assignmentStatus", "==", "Active")
       .get();
@@ -146,7 +192,10 @@ export const publishRequest = functions.https.onCall(async (data, context) => {
       const targetBranches: string[] = requestData.targetBranches || [];
       const targetRegions: string[] = requestData.targetRegions || [];
 
-      let usersQuery = db.collection("users").where("isActive", "==", true).where("role", "==", "REP");
+      let usersQuery = db
+        .collection("users")
+        .where("isActive", "==", true)
+        .where("role", "==", "REP");
 
       if (targetBranches.length > 0 && targetBranches.length <= 30) {
         usersQuery = usersQuery.where("branchId", "in", targetBranches);
@@ -171,19 +220,18 @@ export const publishRequest = functions.https.onCall(async (data, context) => {
     const bodyEn = `The request is now available for data collection.`;
 
     const notificationPromises = Array.from(userIdsToNotify).map((uid) =>
-      sendNotificationInternal(
-        uid,
-        titleAr,
-        titleEn,
-        bodyAr,
-        bodyEn,
-        { requestId, type: "REQUEST_PUBLISHED" }
-      )
+      sendNotificationInternal(uid, titleAr, titleEn, bodyAr, bodyEn, {
+        requestId,
+        type: "REQUEST_PUBLISHED",
+      }),
     );
 
     await Promise.allSettled(notificationPromises);
   } catch (error) {
-    console.error(`Failed to send notifications for requestId ${requestId}`, error);
+    console.error(
+      `Failed to send notifications for requestId ${requestId}`,
+      error,
+    );
   }
 
   return { success: true };
@@ -194,7 +242,10 @@ export const closeRequest = functions.https.onCall(async (data, context) => {
 
   const { requestId } = data;
   if (!requestId) {
-    throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "requestId is required.",
+    );
   }
 
   await db.collection("requests").doc(requestId).update({
@@ -211,7 +262,10 @@ export const archiveRequest = functions.https.onCall(async (data, context) => {
 
   const { requestId } = data;
   if (!requestId) {
-    throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "requestId is required.",
+    );
   }
 
   await db.collection("requests").doc(requestId).update({
@@ -228,7 +282,10 @@ export const reopenRequest = functions.https.onCall(async (data, context) => {
 
   const { requestId } = data;
   if (!requestId) {
-    throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "requestId is required.",
+    );
   }
 
   await db.collection("requests").doc(requestId).update({
@@ -244,19 +301,26 @@ export const cloneRequest = functions.https.onCall(async (data, context) => {
 
   const { requestId } = data;
   if (!requestId) {
-    throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "requestId is required.",
+    );
   }
 
   const srcRef = db.collection("requests").doc(requestId);
   const srcDoc = await srcRef.get();
 
   if (!srcDoc.exists) {
-    throw new functions.https.HttpsError("not-found", "Source request not found.");
+    throw new functions.https.HttpsError(
+      "not-found",
+      "Source request not found.",
+    );
   }
 
   const srcData = srcDoc.data()!;
-  const newRequestId = 'REQ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-  const finalRequestCode = (srcData.requestCode || 'REQ') + '-COPY';
+  const newRequestId =
+    "REQ-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+  const finalRequestCode = (srcData.requestCode || "REQ") + "-COPY";
 
   const newRequestRef = db.collection("requests").doc(newRequestId);
 
@@ -265,8 +329,8 @@ export const cloneRequest = functions.https.onCall(async (data, context) => {
     requestId: newRequestId,
     activityId: newRequestId,
     requestCode: finalRequestCode,
-    titleAr: `${srcData.titleAr || ''} (نسخة)`.trim(),
-    titleEn: `${srcData.titleEn || ''} (Copy)`.trim(),
+    titleAr: `${srcData.titleAr || ""} (نسخة)`.trim(),
+    titleEn: `${srcData.titleEn || ""} (Copy)`.trim(),
     status: "Draft",
     totalRecords: 0,
     totalAssignments: 0,
@@ -282,7 +346,8 @@ export const cloneRequest = functions.https.onCall(async (data, context) => {
   batch.set(newRequestRef, newRequestData);
 
   // Copy request fields
-  const fieldsSnapshot = await db.collection("request_fields")
+  const fieldsSnapshot = await db
+    .collection("request_fields")
     .where("requestId", "==", requestId)
     .get();
 
@@ -313,7 +378,10 @@ export const deleteRequest = functions.https.onCall(async (data, context) => {
   checkAdminOrSupervisor(context);
   const { requestId } = data || {};
   if (!requestId || typeof requestId !== "string") {
-    throw new functions.https.HttpsError("invalid-argument", "requestId is required.");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "requestId is required.",
+    );
   }
 
   const requestRef = db.collection("requests").doc(requestId);
@@ -326,15 +394,24 @@ export const deleteRequest = functions.https.onCall(async (data, context) => {
   const batch = db.batch();
 
   // 1. Delete request fields
-  const fieldsSnap = await db.collection("request_fields").where("requestId", "==", requestId).get();
+  const fieldsSnap = await db
+    .collection("request_fields")
+    .where("requestId", "==", requestId)
+    .get();
   fieldsSnap.docs.forEach((doc) => batch.delete(doc.ref));
 
   // 2. Delete assignments
-  const asgSnap = await db.collection("assignments").where("requestId", "==", requestId).get();
+  const asgSnap = await db
+    .collection("assignments")
+    .where("requestId", "==", requestId)
+    .get();
   asgSnap.docs.forEach((doc) => batch.delete(doc.ref));
 
   // 3. Delete records
-  const recSnap = await db.collection("records").where("requestId", "==", requestId).get();
+  const recSnap = await db
+    .collection("records")
+    .where("requestId", "==", requestId)
+    .get();
   recSnap.docs.forEach((doc) => batch.delete(doc.ref));
 
   // 4. Delete the request document
@@ -352,4 +429,3 @@ export const deleteRequest = functions.https.onCall(async (data, context) => {
 
   return { success: true };
 });
-

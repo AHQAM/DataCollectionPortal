@@ -1,4 +1,4 @@
-export type UserRole = 'ADMIN' | 'SUPERVISOR' | 'REP';
+export type UserRole = "ADMIN" | "SUPERVISOR" | "REP";
 
 export interface UserPermissions {
   canManageUsers: boolean;
@@ -7,54 +7,64 @@ export interface UserPermissions {
   canViewAllBranches: boolean;
 }
 
-export type RequestStatus = 'Draft' | 'ReadyForReview' | 'Published' | 'Closed' | 'Archived' | 'Cancelled';
-export type RequestPriority = 'Low' | 'Normal' | 'High' | 'Urgent';
-export type RequestType = 'per_record' | 'per_rep' | 'per_region' | 'per_branch';
+export type RequestStatus =
+  | "Draft"
+  | "ReadyForReview"
+  | "Published"
+  | "Closed"
+  | "Archived"
+  | "Cancelled";
+export type RequestPriority = "Low" | "Normal" | "High" | "Urgent";
+export type RequestType =
+  "per_record" | "per_rep" | "per_region" | "per_branch";
 
-export type RecordStatus = 'Pending' | 'InProgress' | 'DraftSaved' | 'Submitted' | 'Completed' | 'Rejected' | 'Reopened';
-export type AssignmentStatus = 'Active' | 'Completed' | 'Pending' | 'Reassigned';
+export type RecordStatus =
+  | "Pending"
+  | "InProgress"
+  | "DraftSaved"
+  | "Submitted"
+  | "Completed"
+  | "Rejected"
+  | "Reopened";
+export type AssignmentStatus =
+  "Active" | "Completed" | "Pending" | "Reassigned";
 
 export type DynamicFieldType =
-  | 'text'
-  | 'textarea'
-  | 'integer'
-  | 'decimal'
-  | 'currency'
-  | 'percentage'
-  | 'date'
-  | 'time'
-  | 'datetime'
-  | 'yes_no'
-  | 'select'
-  | 'multi_select'
-  | 'searchable_dropdown'
-  | 'radio'
-  | 'single_choice'
-  | 'checkbox'
-  | 'multi_choice'
-  | 'rating'
-  | 'photo'
-  | 'multi_photo'
-  | 'barcode_scan'
-  | 'qr_scan'
-  | 'file'
-  | 'file_attachment'
-  | 'gps'
-  | 'signature'
-  | 'readonly_imported'
-  | 'readonly_calculated'
-  | 'calculated_field'
-  | 'hidden_system'
-  | 'static_heading'
-  | 'static_instruction'
-  | 'divider';
+  | "text"
+  | "textarea"
+  | "integer"
+  | "decimal"
+  | "currency"
+  | "percentage"
+  | "date"
+  | "time"
+  | "datetime"
+  | "yes_no"
+  | "select"
+  | "multi_select"
+  | "searchable_dropdown"
+  | "radio"
+  | "single_choice"
+  | "checkbox"
+  | "multi_choice"
+  | "rating"
+  | "photo"
+  | "multi_photo"
+  | "barcode_scan"
+  | "qr_scan"
+  | "file"
+  | "file_attachment"
+  | "gps"
+  | "signature"
+  | "readonly_imported"
+  | "readonly_calculated"
+  | "calculated_field"
+  | "hidden_system"
+  | "static_heading"
+  | "static_instruction"
+  | "divider";
 
 export type FieldType = DynamicFieldType;
-export type AssignmentItem = Assignment;
-export type Request = RequestItem;
-export type Field = RequestField;
-export type Template = RequestTemplate;
-export type RecordResponse = ResponseValue;
 
 export interface FieldOption {
   id: string;
@@ -65,7 +75,14 @@ export interface FieldOption {
 
 export interface ConditionalRule {
   targetFieldKey: string;
-  operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than' | 'is_empty' | 'is_not_empty';
+  operator:
+    | "equals"
+    | "not_equals"
+    | "contains"
+    | "greater_than"
+    | "less_than"
+    | "is_empty"
+    | "is_not_empty";
   value: string;
 }
 
@@ -116,6 +133,7 @@ export interface User {
   repNameEn?: string;
   email?: string;
   mobile?: string;
+  mobileNo?: string;
   branchId: string;
   branchNameAr?: string;
   branchNameEn?: string;
@@ -130,9 +148,9 @@ export interface User {
   lastLoginAt?: string;
   passwordChangedAt?: string;
   sessionVersion: number;
-  deviceBindingStatus: 'UNBOUND' | 'BOUND' | 'RELEASE_REQUESTED';
+  deviceBindingStatus: "UNBOUND" | "BOUND" | "RELEASE_REQUESTED";
   boundDeviceId?: string;
-  boundDevicePlatform?: 'Android' | 'iOS' | 'Web';
+  boundDevicePlatform?: "Android" | "iOS" | "Web";
   boundDeviceLabel?: string;
   maxAllowedDevices: number;
   createdAt: string;
@@ -257,6 +275,7 @@ export interface RecordItem {
   lastSavedBy?: string;
   rejectionReasonAr?: string;
   rejectionReasonEn?: string;
+  activityId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -292,7 +311,7 @@ export interface ImportLog {
   unmatchedRows: number;
   mappingJson: Record<string, string>;
   errorReportPath?: string;
-  importStatus: 'SUCCESS' | 'FAILED' | 'PARTIAL';
+  importStatus: "SUCCESS" | "FAILED" | "PARTIAL";
   notes?: string;
 }
 
@@ -301,13 +320,19 @@ export interface NotificationItem {
   userId: string;
   requestId?: string;
   assignmentId?: string;
-  notificationType: 'NEW_REQUEST' | 'DUE_REMINDER' | 'COMPLETION' | 'PASSWORD_RESET' | 'DEVICE_BIND' | 'RECORD_REOPENED';
-  channel: 'PUSH' | 'IN_APP' | 'SMS' | 'WHATSAPP_PLACEHOLDER';
+  notificationType:
+    | "NEW_REQUEST"
+    | "DUE_REMINDER"
+    | "COMPLETION"
+    | "PASSWORD_RESET"
+    | "DEVICE_BIND"
+    | "RECORD_REOPENED";
+  channel: "PUSH" | "IN_APP" | "SMS" | "WHATSAPP_PLACEHOLDER";
   titleAr: string;
   titleEn: string;
   bodyAr: string;
   bodyEn: string;
-  status: 'PENDING' | 'SENT' | 'FAILED' | 'READ';
+  status: "PENDING" | "SENT" | "FAILED" | "READ";
   sentAt: string;
   readAt?: string;
   errorMessage?: string;
@@ -321,12 +346,12 @@ export interface DeviceBinding {
   repName?: string;
   regionNo: string;
   deviceIdHash: string;
-  devicePlatform: 'Android' | 'iOS' | 'Web';
+  devicePlatform: "Android" | "iOS" | "Web";
   platform?: string;
   deviceLabel: string;
   appVersion: string;
-  status: 'ACTIVE' | 'RELEASED' | 'PENDING_REPLACEMENT';
-  bindingStatus?: 'Bound' | 'Unbound' | 'ReplacementPending' | string;
+  status: "ACTIVE" | "RELEASED" | "PENDING_REPLACEMENT";
+  bindingStatus?: "Bound" | "Unbound" | "ReplacementPending" | string;
   installationDeviceId?: string;
   boundAt: string;
   releasedAt?: string;
@@ -345,7 +370,7 @@ export interface PasswordResetRequest {
   regionNo: string;
   repNameAr?: string;
   requestNotes?: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  status: "PENDING" | "APPROVED" | "REJECTED";
   requestedAt: string;
   reviewedBy?: string;
   reviewedAt?: string;
@@ -373,7 +398,7 @@ export interface AuditLog {
 }
 
 export interface AppSettings {
-  defaultLanguage: 'ar' | 'en';
+  defaultLanguage: "ar" | "en";
   defaultPasswordPolicy: {
     minLength: number;
     preventImmediateReuse: boolean;
@@ -401,6 +426,6 @@ export interface OfflineQueueItem {
   responses: Record<string, any>;
   isDraft: boolean;
   queuedAt: string;
-  status: 'QUEUED' | 'SYNCING' | 'SYNCED' | 'FAILED';
+  status: "QUEUED" | "SYNCING" | "SYNCED" | "FAILED";
   error?: string;
 }

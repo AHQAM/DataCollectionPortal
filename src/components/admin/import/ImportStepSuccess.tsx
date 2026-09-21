@@ -1,6 +1,6 @@
-import React from 'react';
-import { RequestItem, User } from '../../../types';
-import { CheckCircle2, Smartphone } from 'lucide-react';
+import React from "react";
+import { RequestItem, User } from "../../../types";
+import { CheckCircle2, Smartphone } from "lucide-react";
 
 interface Props {
   lang: string;
@@ -32,11 +32,13 @@ export const ImportStepSuccess: React.FC<Props> = ({
       </div>
 
       <h2 className="text-lg font-extrabold text-slate-900">
-        {lang === 'ar' ? 'تم استيراد السجلات وتوزيعها على المناديب بنجاح!' : 'Import & Assignment Completed!'}
+        {lang === "ar"
+          ? "تم استيراد السجلات وتوزيعها على المناديب بنجاح!"
+          : "Import & Assignment Completed!"}
       </h2>
 
       <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
-        {lang === 'ar'
+        {lang === "ar"
           ? `تم اعتماد وحفظ ${importStats?.created || validRows.length} سجل وتوزيعها فورياً على مناطق المناديب في حملة "${currentRequest?.titleAr}". البيانات متاحة الآن في تطبيق الهاتف والحقول المعتمدة تظهر للعرض فقط.`
           : `${importStats?.created || validRows.length} records successfully imported and assigned to regional representatives.`}
       </p>
@@ -46,7 +48,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
           onClick={onBack}
           className="px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md cursor-pointer transition-all"
         >
-          {lang === 'ar' ? 'الرجوع لقائمة الطلبات' : 'Go to Requests'}
+          {lang === "ar" ? "الرجوع لقائمة الطلبات" : "Go to Requests"}
         </button>
 
         {import.meta.env.DEV && (
@@ -54,7 +56,9 @@ export const ImportStepSuccess: React.FC<Props> = ({
             onClick={() => {
               const firstValidReg = validRows[0]?.[systemColMap.regionNo];
               const rep = users.find(
-                (u) => u.regionNo === firstValidReg || u.allowedRegionNos?.includes(firstValidReg)
+                (u) =>
+                  u.regionNo === firstValidReg ||
+                  u.allowedRegionNos?.includes(firstValidReg),
               );
               if (rep) {
                 quickSwitchUser(rep.userId);
@@ -64,7 +68,9 @@ export const ImportStepSuccess: React.FC<Props> = ({
           >
             <Smartphone className="w-4 h-4" />
             <span>
-              {lang === 'ar' ? 'فتح واجهة الهاتف لمعاينة السجلات والمطابقة' : 'Preview in Mobile View'}
+              {lang === "ar"
+                ? "فتح واجهة الهاتف لمعاينة السجلات والمطابقة"
+                : "Preview in Mobile View"}
             </span>
           </button>
         )}
@@ -73,7 +79,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
           onClick={onReset}
           className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
         >
-          {lang === 'ar' ? 'استيراد ملف إكسل آخر' : 'Import Another File'}
+          {lang === "ar" ? "استيراد ملف إكسل آخر" : "Import Another File"}
         </button>
       </div>
     </div>

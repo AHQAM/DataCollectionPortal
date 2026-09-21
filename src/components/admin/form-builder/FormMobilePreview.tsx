@@ -1,6 +1,6 @@
-import React from 'react';
-import { RequestField } from '../../../types';
-import { Eye, Lock } from 'lucide-react';
+import React from "react";
+import { RequestField } from "../../../types";
+import { Eye, Lock } from "lucide-react";
 
 interface FormMobilePreviewProps {
   lang: string;
@@ -19,9 +19,16 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
     if (!field.visibilityRule) return true;
     const targetVal = previewValues[field.visibilityRule.targetFieldKey];
     const ruleVal = field.visibilityRule.value;
-    if (field.visibilityRule.operator === 'equals') return String(targetVal) === String(ruleVal);
-    if (field.visibilityRule.operator === 'not_equals') return String(targetVal) !== String(ruleVal);
-    if (field.visibilityRule.operator === 'is_not_empty') return targetVal !== undefined && targetVal !== null && String(targetVal).trim() !== '';
+    if (field.visibilityRule.operator === "equals")
+      return String(targetVal) === String(ruleVal);
+    if (field.visibilityRule.operator === "not_equals")
+      return String(targetVal) !== String(ruleVal);
+    if (field.visibilityRule.operator === "is_not_empty")
+      return (
+        targetVal !== undefined &&
+        targetVal !== null &&
+        String(targetVal).trim() !== ""
+      );
     return true;
   };
 
@@ -30,17 +37,23 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
       <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
         <span className="font-extrabold text-xs text-slate-800 flex items-center gap-1.5">
           <Eye className="w-4 h-4 text-purple-700" />
-          <span>{lang === 'ar' ? 'المعاينة التفاعلية الحية' : 'Live Interactive Preview'}</span>
+          <span>
+            {lang === "ar"
+              ? "المعاينة التفاعلية الحية"
+              : "Live Interactive Preview"}
+          </span>
         </span>
         <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-          {lang === 'ar' ? 'مباشر' : 'Live'}
+          {lang === "ar" ? "مباشر" : "Live"}
         </span>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-3 pe-1">
         {formFields.length === 0 ? (
           <div className="p-8 text-center text-slate-400 text-xs">
-            {lang === 'ar' ? 'النموذج فارغ. أضف حقولاً للبدء.' : 'Form is empty. Add fields to start.'}
+            {lang === "ar"
+              ? "النموذج فارغ. أضف حقولاً للبدء."
+              : "Form is empty. Add fields to start."}
           </div>
         ) : (
           formFields.map((f) => {
@@ -53,18 +66,24 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
               <div
                 key={f.fieldId}
                 className={`p-3 rounded-xl border text-xs shadow-2xs transition-all ${
-                  isReadOnly ? 'bg-amber-50/40 border-amber-200/90' : 'bg-white border-slate-200'
+                  isReadOnly
+                    ? "bg-amber-50/40 border-amber-200/90"
+                    : "bg-white border-slate-200"
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
                   <label className="font-bold text-slate-800 flex items-center gap-1">
-                    <span>{lang === 'ar' ? f.fieldLabelAr : f.fieldLabelEn}</span>
-                    {f.isRequired && !isReadOnly && <span className="text-rose-600 font-bold mx-1">*</span>}
+                    <span>
+                      {lang === "ar" ? f.fieldLabelAr : f.fieldLabelEn}
+                    </span>
+                    {f.isRequired && !isReadOnly && (
+                      <span className="text-rose-600 font-bold mx-1">*</span>
+                    )}
                   </label>
                   {isReadOnly && (
                     <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 font-bold border border-amber-300 flex items-center gap-0.5">
                       <Lock className="w-2.5 h-2.5" />
-                      <span>{lang === 'ar' ? 'للعرض فقط' : 'Read-only'}</span>
+                      <span>{lang === "ar" ? "للعرض فقط" : "Read-only"}</span>
                     </span>
                   )}
                 </div>
@@ -72,84 +91,108 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                 {isReadOnly ? (
                   <div className="w-full h-8 px-2.5 rounded-lg border border-amber-200 bg-white text-xs font-bold text-slate-800 flex items-center justify-between">
                     <span>
-                      {f.defaultValue !== undefined && f.defaultValue !== null && String(f.defaultValue).trim() !== ''
+                      {f.defaultValue !== undefined &&
+                      f.defaultValue !== null &&
+                      String(f.defaultValue).trim() !== ""
                         ? String(f.defaultValue)
-                        : f.fieldType === 'currency'
-                        ? (lang === 'ar' ? '15,000 ر.س' : '15,000 SAR')
-                        : f.fieldType === 'date'
-                        ? '2026-06-01'
-                        : (lang === 'ar' ? `[بيانات ${f.fieldLabelAr} من ملف الإكسل]` : `[${f.fieldLabelEn || f.fieldKey} from Excel]`)}
+                        : f.fieldType === "currency"
+                          ? lang === "ar"
+                            ? "15,000 ر.س"
+                            : "15,000 SAR"
+                          : f.fieldType === "date"
+                            ? "2026-06-01"
+                            : lang === "ar"
+                              ? `[بيانات ${f.fieldLabelAr} من ملف الإكسل]`
+                              : `[${f.fieldLabelEn || f.fieldKey} from Excel]`}
                     </span>
                     <span className="text-[9px] text-amber-700 font-medium">
-                      {lang === 'ar' ? 'مستورد من الإكسل' : 'Excel Imported'}
+                      {lang === "ar" ? "مستورد من الإكسل" : "Excel Imported"}
                     </span>
                   </div>
                 ) : (
                   <>
-                    {f.fieldType === 'select' && (
+                    {f.fieldType === "select" && (
                       <select
-                        value={val || ''}
-                        onChange={(e) => onPreviewValueChange(f.fieldKey, e.target.value)}
+                        value={val || ""}
+                        onChange={(e) =>
+                          onPreviewValueChange(f.fieldKey, e.target.value)
+                        }
                         className="w-full h-8 px-2 rounded-lg border border-slate-300 text-xs"
                       >
                         <option value="">-- اختر --</option>
                         {(f.options || []).map((opt) => (
                           <option key={opt.id} value={opt.value}>
-                            {lang === 'ar' ? opt.labelAr : opt.labelEn}
+                            {lang === "ar" ? opt.labelAr : opt.labelEn}
                           </option>
                         ))}
                       </select>
                     )}
 
-                    {f.fieldType === 'yes_no' && (
+                    {f.fieldType === "yes_no" && (
                       <div className="flex gap-1.5">
                         <button
                           type="button"
                           onClick={() => onPreviewValueChange(f.fieldKey, true)}
                           className={`flex-1 py-1 rounded-lg border text-xs font-bold transition-colors cursor-pointer ${
-                            val === true ? 'bg-purple-900 text-white' : 'bg-slate-100 text-slate-700'
+                            val === true
+                              ? "bg-purple-900 text-white"
+                              : "bg-slate-100 text-slate-700"
                           }`}
                         >
-                          {lang === 'ar' ? 'نعم' : 'Yes'}
+                          {lang === "ar" ? "نعم" : "Yes"}
                         </button>
                         <button
                           type="button"
-                          onClick={() => onPreviewValueChange(f.fieldKey, false)}
+                          onClick={() =>
+                            onPreviewValueChange(f.fieldKey, false)
+                          }
                           className={`flex-1 py-1 rounded-lg border text-xs font-bold transition-colors cursor-pointer ${
-                            val === false ? 'bg-purple-900 text-white' : 'bg-slate-100 text-slate-700'
+                            val === false
+                              ? "bg-purple-900 text-white"
+                              : "bg-slate-100 text-slate-700"
                           }`}
                         >
-                          {lang === 'ar' ? 'لا' : 'No'}
+                          {lang === "ar" ? "لا" : "No"}
                         </button>
                       </div>
                     )}
 
-                    {f.fieldType === 'textarea' && (
+                    {f.fieldType === "textarea" && (
                       <textarea
                         rows={2}
-                        value={val || ''}
-                        onChange={(e) => onPreviewValueChange(f.fieldKey, e.target.value)}
+                        value={val || ""}
+                        onChange={(e) =>
+                          onPreviewValueChange(f.fieldKey, e.target.value)
+                        }
                         className="w-full p-2 rounded-lg border border-slate-300 text-xs"
                       />
                     )}
 
-                    {f.fieldType === 'currency' && (
+                    {f.fieldType === "currency" && (
                       <div className="relative">
                         <input
                           type="number"
-                          value={val || ''}
-                          onChange={(e) => onPreviewValueChange(f.fieldKey, e.target.value)}
+                          value={val || ""}
+                          onChange={(e) =>
+                            onPreviewValueChange(f.fieldKey, e.target.value)
+                          }
                           className="w-full h-8 px-2 rounded-lg border border-slate-300 text-xs"
                         />
-                        <span className="absolute top-1.5 end-2 text-[10px] text-slate-400 font-bold">ر.س</span>
+                        <span className="absolute top-1.5 end-2 text-[10px] text-slate-400 font-bold">
+                          ر.س
+                        </span>
                       </div>
                     )}
 
-                    {!['select', 'yes_no', 'textarea', 'currency'].includes(f.fieldType) && (
+                    {!["select", "yes_no", "textarea", "currency"].includes(
+                      f.fieldType,
+                    ) && (
                       <input
                         type="text"
-                        value={val || ''}
-                        onChange={(e) => onPreviewValueChange(f.fieldKey, e.target.value)}
+                        value={val || ""}
+                        onChange={(e) =>
+                          onPreviewValueChange(f.fieldKey, e.target.value)
+                        }
                         className="w-full h-8 px-2 rounded-lg border border-slate-300 text-xs"
                         placeholder={f.fieldType}
                       />

@@ -6,11 +6,17 @@ import { USER_ROLES } from "./roles";
 
 const checkAdminOrSupervisor = (context: functions.https.CallableContext) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated.",
+    );
   }
   const role = context.auth.token.role;
   if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {
-    throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Only admins or supervisors can perform this action.",
+    );
   }
 };
 
@@ -20,7 +26,10 @@ export const reassignRecords = functions.https.onCall(async (data, context) => {
   const { recordIds, newUserId } = data;
 
   if (!recordIds || !Array.isArray(recordIds) || !newUserId) {
-    throw new functions.https.HttpsError("invalid-argument", "recordIds array and newUserId are required.");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "recordIds array and newUserId are required.",
+    );
   }
 
   // Check if new user exists and is a representative
@@ -32,7 +41,10 @@ export const reassignRecords = functions.https.onCall(async (data, context) => {
   }
 
   if (userDoc.data()?.role !== USER_ROLES.REP) {
-    throw new functions.https.HttpsError("invalid-argument", "Target user must be a representative.");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Target user must be a representative.",
+    );
   }
 
   const batch = db.batch();
@@ -45,7 +57,8 @@ export const reassignRecords = functions.https.onCall(async (data, context) => {
     if (recordDoc.exists) {
       batch.update(recordRef, {
         assignedUserId: newUserId,
-        assignedRegionNo: userDoc.data()?.regionNo || userDoc.data()?.username || "",
+        assignedRegionNo:
+          userDoc.data()?.regionNo || userDoc.data()?.username || "",
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     }
@@ -66,10 +79,13 @@ export const reassignRecords = functions.https.onCall(async (data, context) => {
       titleEn,
       bodyAr,
       bodyEn,
-      { count: recordIds.length.toString(), type: "RECORDS_REASSIGNED" }
+      { count: recordIds.length.toString(), type: "RECORDS_REASSIGNED" },
     );
   } catch (error) {
-    console.error(`Failed to send notification to user ${newUserId} after reassigning records.`, error);
+    console.error(
+      `Failed to send notification to user ${newUserId} after reassigning records.`,
+      error,
+    );
   }
 
   return { success: true, count: recordIds.length };

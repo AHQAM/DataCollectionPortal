@@ -1,38 +1,50 @@
-import React, { useState } from 'react';
-import { httpsCallable } from 'firebase/functions';
-import { functions } from '../../firebase';
-import { useApp } from '../../context/AppContext';
-import { Send, X, AlertCircle, CheckCircle2, Radio, Users } from 'lucide-react';
+import React, { useState } from "react";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "../../firebase";
+import { useApp } from "../../context/AppContext";
+import { Send, X, AlertCircle, CheckCircle2, Radio, Users } from "lucide-react";
 
 interface BroadcastNotificationModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProps> = ({
-  isOpen,
-  onClose,
-}) => {
+export const BroadcastNotificationModal: React.FC<
+  BroadcastNotificationModalProps
+> = ({ isOpen, onClose }) => {
   const { lang, dir } = useApp();
 
-  const [targetAudience, setTargetAudience] = useState<'ALL' | 'REPRESENTATIVES' | 'SUPERVISORS'>('ALL');
-  const [titleAr, setTitleAr] = useState('');
-  const [titleEn, setTitleEn] = useState('');
-  const [bodyAr, setBodyAr] = useState('');
-  const [bodyEn, setBodyEn] = useState('');
-  const [requestId, setRequestId] = useState('');
+  const [targetAudience, setTargetAudience] = useState<
+    "ALL" | "REPRESENTATIVES" | "SUPERVISORS"
+  >("ALL");
+  const [titleAr, setTitleAr] = useState("");
+  const [titleEn, setTitleEn] = useState("");
+  const [bodyAr, setBodyAr] = useState("");
+  const [bodyEn, setBodyEn] = useState("");
+  const [requestId, setRequestId] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!titleAr.trim() || !titleEn.trim() || !bodyAr.trim() || !bodyEn.trim()) {
+    if (
+      !titleAr.trim() ||
+      !titleEn.trim() ||
+      !bodyAr.trim() ||
+      !bodyEn.trim()
+    ) {
       setStatusMessage({
-        type: 'error',
-        text: lang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill all required fields',
+        type: "error",
+        text:
+          lang === "ar"
+            ? "يرجى ملء جميع الحقول المطلوبة"
+            : "Please fill all required fields",
       });
       return;
     }
@@ -51,10 +63,10 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
           payload?: Record<string, string>;
         },
         { success: boolean; count: number }
-      >(functions, 'sendBroadcastNotification');
+      >(functions, "sendBroadcastNotification");
 
       const payload: Record<string, string> = {
-        type: 'BROADCAST',
+        type: "BROADCAST",
       };
       if (requestId.trim()) {
         payload.requestId = requestId.trim();
@@ -70,28 +82,32 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
       });
 
       setStatusMessage({
-        type: 'success',
+        type: "success",
         text:
-          lang === 'ar'
+          lang === "ar"
             ? `تم إرسال الإشعار بنجاح إلى ${res.data.count} مستخدم!`
             : `Notification successfully sent to ${res.data.count} users!`,
       });
 
       // Clear form on success
-      setTitleAr('');
-      setTitleEn('');
-      setBodyAr('');
-      setBodyEn('');
-      setRequestId('');
+      setTitleAr("");
+      setTitleEn("");
+      setBodyAr("");
+      setBodyEn("");
+      setRequestId("");
       setTimeout(() => {
         onClose();
         setStatusMessage(null);
       }, 2000);
     } catch (err: any) {
-      console.error('Error sending broadcast notification:', err);
+      console.error("Error sending broadcast notification:", err);
       setStatusMessage({
-        type: 'error',
-        text: err?.message || (lang === 'ar' ? 'حدث خطأ أثناء إرسال الإشعار' : 'Failed to send notification'),
+        type: "error",
+        text:
+          err?.message ||
+          (lang === "ar"
+            ? "حدث خطأ أثناء إرسال الإشعار"
+            : "Failed to send notification"),
       });
     } finally {
       setIsSubmitting(false);
@@ -112,10 +128,14 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
             </div>
             <div>
               <h3 className="font-bold text-lg leading-tight">
-                {lang === 'ar' ? 'بث إشعار عام (FCM)' : 'Broadcast Push Notification'}
+                {lang === "ar"
+                  ? "بث إشعار عام (FCM)"
+                  : "Broadcast Push Notification"}
               </h3>
               <p className="text-xs text-purple-200 mt-0.5">
-                {lang === 'ar' ? 'إرسال إشعار فوري لجميع الأجهزة النشطة' : 'Send instant push to active devices'}
+                {lang === "ar"
+                  ? "إرسال إشعار فوري لجميع الأجهزة النشطة"
+                  : "Send instant push to active devices"}
               </p>
             </div>
           </div>
@@ -132,12 +152,12 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
           {statusMessage && (
             <div
               className={`p-3.5 rounded-xl flex items-start gap-2.5 text-xs font-semibold ${
-                statusMessage.type === 'success'
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                  : 'bg-rose-50 text-rose-800 border border-rose-200'
+                statusMessage.type === "success"
+                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                  : "bg-rose-50 text-rose-800 border border-rose-200"
               }`}
             >
-              {statusMessage.type === 'success' ? (
+              {statusMessage.type === "success" ? (
                 <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 mt-0.5" />
               ) : (
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
@@ -150,13 +170,23 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-purple-700" />
-              <span>{lang === 'ar' ? 'الجمهور المستهدف' : 'Target Audience'}</span>
+              <span>
+                {lang === "ar" ? "الجمهور المستهدف" : "Target Audience"}
+              </span>
             </label>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { id: 'ALL', labelAr: 'الجميع', labelEn: 'All' },
-                { id: 'REPRESENTATIVES', labelAr: 'المندوبين', labelEn: 'Reps' },
-                { id: 'SUPERVISORS', labelAr: 'المشرفين', labelEn: 'Supervisors' },
+                { id: "ALL", labelAr: "الجميع", labelEn: "All" },
+                {
+                  id: "REPRESENTATIVES",
+                  labelAr: "المندوبين",
+                  labelEn: "Reps",
+                },
+                {
+                  id: "SUPERVISORS",
+                  labelAr: "المشرفين",
+                  labelEn: "Supervisors",
+                },
               ].map((opt) => (
                 <button
                   type="button"
@@ -164,11 +194,11 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
                   onClick={() => setTargetAudience(opt.id as any)}
                   className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
                     targetAudience === opt.id
-                      ? 'bg-purple-900 text-white border-purple-900 shadow-sm'
-                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                      ? "bg-purple-900 text-white border-purple-900 shadow-sm"
+                      : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                   }`}
                 >
-                  {lang === 'ar' ? opt.labelAr : opt.labelEn}
+                  {lang === "ar" ? opt.labelAr : opt.labelEn}
                 </button>
               ))}
             </div>
@@ -178,7 +208,7 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {lang === 'ar' ? 'العنوان (بالعربية) *' : 'Title (Arabic) *'}
+                {lang === "ar" ? "العنوان (بالعربية) *" : "Title (Arabic) *"}
               </label>
               <input
                 type="text"
@@ -191,7 +221,9 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {lang === 'ar' ? 'العنوان (بالإنجليزية) *' : 'Title (English) *'}
+                {lang === "ar"
+                  ? "العنوان (بالإنجليزية) *"
+                  : "Title (English) *"}
               </label>
               <input
                 type="text"
@@ -208,7 +240,7 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {lang === 'ar' ? 'نص الإشعار (بالعربية) *' : 'Body (Arabic) *'}
+                {lang === "ar" ? "نص الإشعار (بالعربية) *" : "Body (Arabic) *"}
               </label>
               <textarea
                 required
@@ -221,7 +253,9 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {lang === 'ar' ? 'نص الإشعار (بالإنجليزية) *' : 'Body (English) *'}
+                {lang === "ar"
+                  ? "نص الإشعار (بالإنجليزية) *"
+                  : "Body (English) *"}
               </label>
               <textarea
                 required
@@ -237,7 +271,9 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
           {/* Optional Request ID for Deep Linking */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              {lang === 'ar' ? 'معرف الطلب (اختياري للتوجيه المباشر)' : 'Request ID (Optional for deep linking)'}
+              {lang === "ar"
+                ? "معرف الطلب (اختياري للتوجيه المباشر)"
+                : "Request ID (Optional for deep linking)"}
             </label>
             <input
               type="text"
@@ -256,7 +292,7 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
               disabled={isSubmitting}
               className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
             >
-              {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+              {lang === "ar" ? "إلغاء" : "Cancel"}
             </button>
             <button
               type="submit"
@@ -266,12 +302,12 @@ export const BroadcastNotificationModal: React.FC<BroadcastNotificationModalProp
               <Send className="w-3.5 h-3.5" />
               <span>
                 {isSubmitting
-                  ? lang === 'ar'
-                    ? 'جاري الإرسال...'
-                    : 'Sending...'
-                  : lang === 'ar'
-                  ? 'إرسال البث الآن'
-                  : 'Send Broadcast Now'}
+                  ? lang === "ar"
+                    ? "جاري الإرسال..."
+                    : "Sending..."
+                  : lang === "ar"
+                    ? "إرسال البث الآن"
+                    : "Send Broadcast Now"}
               </span>
             </button>
           </div>

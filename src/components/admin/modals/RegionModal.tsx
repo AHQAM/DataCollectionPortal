@@ -1,6 +1,6 @@
-import React from 'react';
-import { MapPin, X, AlertTriangle } from 'lucide-react';
-import { Region, Branch } from '../../../types';
+import React from "react";
+import { MapPin, X, AlertTriangle } from "lucide-react";
+import { Region, Branch } from "../../../types";
 
 interface RegionModalProps {
   lang: string;
@@ -49,8 +49,12 @@ export const RegionModal: React.FC<RegionModalProps> = ({
             </div>
             <h3 className="text-sm font-extrabold text-slate-900">
               {editingRegion
-                ? lang === 'ar' ? 'تعديل بيانات المنطقة' : 'Edit Region'
-                : lang === 'ar' ? 'إضافة منطقة ميدانية جديدة' : 'New Field Region'}
+                ? lang === "ar"
+                  ? "تعديل بيانات المنطقة"
+                  : "Edit Region"
+                : lang === "ar"
+                  ? "إضافة منطقة ميدانية جديدة"
+                  : "New Field Region"}
             </h3>
           </div>
           <button
@@ -71,7 +75,7 @@ export const RegionModal: React.FC<RegionModalProps> = ({
         <form onSubmit={handleSaveRegion} className="space-y-3.5 mt-4 text-xs">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === 'ar' ? 'الفرع التابع له' : 'Parent Branch'} *
+              {lang === "ar" ? "الفرع التابع له" : "Parent Branch"} *
             </label>
             <select
               value={regionBranchId}
@@ -81,7 +85,8 @@ export const RegionModal: React.FC<RegionModalProps> = ({
             >
               {branches.map((b) => (
                 <option key={b.branchId} value={b.branchId}>
-                  {lang === 'ar' ? b.branchNameAr : b.branchNameEn} ({b.branchId})
+                  {lang === "ar" ? b.branchNameAr : b.branchNameEn} (
+                  {b.branchId})
                 </option>
               ))}
             </select>
@@ -89,7 +94,10 @@ export const RegionModal: React.FC<RegionModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === 'ar' ? 'رقم المنطقة الميدانية (Region Number)' : 'Region Number'} *
+              {lang === "ar"
+                ? "رقم المنطقة الميدانية (Region Number)"
+                : "Region Number"}{" "}
+              *
             </label>
             <input
               type="text"
@@ -100,15 +108,18 @@ export const RegionModal: React.FC<RegionModalProps> = ({
               required
             />
             <span className="text-[10px] text-slate-400 mt-1 block">
-              {lang === 'ar'
-                ? 'يُستخدم كرقم دخول للمندوب الميداني وكرمز للمنطقة في ملفات الإكسل'
-                : 'Used by rep to login and matches Region No column in Excel'}
+              {lang === "ar"
+                ? "يُستخدم كرقم دخول للمندوب الميداني وكرمز للمنطقة في ملفات الإكسل"
+                : "Used by rep to login and matches Region No column in Excel"}
             </span>
           </div>
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === 'ar' ? 'اسم المنطقة والأحياء (بالعربية)' : 'Region Name (Arabic)'} *
+              {lang === "ar"
+                ? "اسم المنطقة والأحياء (بالعربية)"
+                : "Region Name (Arabic)"}{" "}
+              *
             </label>
             <input
               type="text"
@@ -122,7 +133,9 @@ export const RegionModal: React.FC<RegionModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === 'ar' ? 'اسم المنطقة (بالإنجليزية)' : 'Region Name (English)'}
+              {lang === "ar"
+                ? "اسم المنطقة (بالإنجليزية)"
+                : "Region Name (English)"}
             </label>
             <input
               type="text"
@@ -139,13 +152,13 @@ export const RegionModal: React.FC<RegionModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold cursor-pointer"
             >
-              {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+              {lang === "ar" ? "إلغاء" : "Cancel"}
             </button>
             <button
               type="submit"
               className="px-5 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-extrabold shadow-sm transition-all cursor-pointer"
             >
-              {lang === 'ar' ? 'حفظ المنطقة' : 'Save Region'}
+              {lang === "ar" ? "حفظ المنطقة" : "Save Region"}
             </button>
           </div>
         </form>

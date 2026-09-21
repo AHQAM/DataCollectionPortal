@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
-import { Branch, Region } from '../../types';
-import { CheckCircle2 } from 'lucide-react';
+import React, { useState } from "react";
+import { useApp } from "../../context/AppContext";
+import { Branch, Region } from "../../types";
+import { CheckCircle2 } from "lucide-react";
 
-import { BranchModal } from './modals/BranchModal';
-import { RegionModal } from './modals/RegionModal';
-import { ExcelImportModal } from './modals/ExcelImportModal';
-import { BranchStatsHeader } from './branches/BranchStatsHeader';
-import { BranchesListView } from './branches/BranchesListView';
-import { RegionsListView } from './branches/RegionsListView';
-import { BranchesHeader } from './branches/BranchesHeader';
-import { BranchesTabsAndFilters } from './branches/BranchesTabsAndFilters';
+import { BranchModal } from "./modals/BranchModal";
+import { RegionModal } from "./modals/RegionModal";
+import { ExcelImportModal } from "./modals/ExcelImportModal";
+import { BranchStatsHeader } from "./branches/BranchStatsHeader";
+import { BranchesListView } from "./branches/BranchesListView";
+import { RegionsListView } from "./branches/RegionsListView";
+import { BranchesHeader } from "./branches/BranchesHeader";
+import { BranchesTabsAndFilters } from "./branches/BranchesTabsAndFilters";
 
-import { useBranchesExcelImport } from '../../hooks/useBranchesExcelImport';
+import { useBranchesExcelImport } from "../../hooks/useBranchesExcelImport";
 
 export const AdminBranches: React.FC = () => {
   const {
@@ -30,23 +30,25 @@ export const AdminBranches: React.FC = () => {
     importBranchesAndRegions,
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'branches' | 'regions'>('branches');
-  const [selectedBranchId, setSelectedBranchId] = useState<string>('ALL');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<"branches" | "regions">(
+    "branches",
+  );
+  const [selectedBranchId, setSelectedBranchId] = useState<string>("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Modals
   const [showBranchModal, setShowBranchModal] = useState(false);
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
-  const [branchCode, setBranchCode] = useState('');
-  const [branchNameAr, setBranchNameAr] = useState('');
-  const [branchNameEn, setBranchNameEn] = useState('');
+  const [branchCode, setBranchCode] = useState("");
+  const [branchNameAr, setBranchNameAr] = useState("");
+  const [branchNameEn, setBranchNameEn] = useState("");
 
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [editingRegion, setEditingRegion] = useState<Region | null>(null);
-  const [regionNo, setRegionNo] = useState('');
-  const [regionNameAr, setRegionNameAr] = useState('');
-  const [regionNameEn, setRegionNameEn] = useState('');
-  const [regionBranchId, setRegionBranchId] = useState('');
+  const [regionNo, setRegionNo] = useState("");
+  const [regionNameAr, setRegionNameAr] = useState("");
+  const [regionNameEn, setRegionNameEn] = useState("");
+  const [regionBranchId, setRegionBranchId] = useState("");
 
   const [alertError, setAlertError] = useState<string | null>(null);
 
@@ -74,8 +76,8 @@ export const AdminBranches: React.FC = () => {
   const handleOpenAddBranch = () => {
     setEditingBranch(null);
     setBranchCode(`BR-${Math.floor(100 + Math.random() * 900)}`);
-    setBranchNameAr('');
-    setBranchNameEn('');
+    setBranchNameAr("");
+    setBranchNameEn("");
     setShowBranchModal(true);
     setAlertError(null);
   };
@@ -92,7 +94,11 @@ export const AdminBranches: React.FC = () => {
   const handleSaveBranch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!branchNameAr.trim()) {
-      setAlertError(lang === 'ar' ? 'يرجى إدخال اسم الفرع بالعربية' : 'Please enter branch Arabic name');
+      setAlertError(
+        lang === "ar"
+          ? "يرجى إدخال اسم الفرع بالعربية"
+          : "Please enter branch Arabic name",
+      );
       return;
     }
 
@@ -102,11 +108,19 @@ export const AdminBranches: React.FC = () => {
           branchNameAr: branchNameAr.trim(),
           branchNameEn: branchNameEn.trim() || branchNameAr.trim(),
         });
-        setSuccessMessage(lang === 'ar' ? 'تم تحديث بيانات الفرع بنجاح' : 'Branch updated successfully');
+        setSuccessMessage(
+          lang === "ar"
+            ? "تم تحديث بيانات الفرع بنجاح"
+            : "Branch updated successfully",
+        );
       } else {
         const code = branchCode.trim().toUpperCase();
         if (branches.some((b) => b.branchId === code)) {
-          setAlertError(lang === 'ar' ? 'رمز الفرع موجود مسبقاً' : 'Branch ID already exists');
+          setAlertError(
+            lang === "ar"
+              ? "رمز الفرع موجود مسبقاً"
+              : "Branch ID already exists",
+          );
           return;
         }
         await createBranch({
@@ -114,11 +128,17 @@ export const AdminBranches: React.FC = () => {
           branchNameAr: branchNameAr.trim(),
           branchNameEn: branchNameEn.trim() || branchNameAr.trim(),
         });
-        setSuccessMessage(lang === 'ar' ? 'تمت إضافة الفرع الجديد بنجاح' : 'New branch created successfully');
+        setSuccessMessage(
+          lang === "ar"
+            ? "تمت إضافة الفرع الجديد بنجاح"
+            : "New branch created successfully",
+        );
       }
     } catch (err) {
       console.error(err);
-      setAlertError(lang === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving branch');
+      setAlertError(
+        lang === "ar" ? "حدث خطأ أثناء الحفظ" : "Error saving branch",
+      );
       return;
     }
 
@@ -127,12 +147,20 @@ export const AdminBranches: React.FC = () => {
   };
 
   const handleDeleteBranch = async (b: Branch) => {
-    if (window.confirm(lang === 'ar' ? `هل أنت متأكد من حذف ${b.branchNameAr}؟` : `Delete branch ${b.branchNameEn}?`)) {
+    if (
+      window.confirm(
+        lang === "ar"
+          ? `هل أنت متأكد من حذف ${b.branchNameAr}؟`
+          : `Delete branch ${b.branchNameEn}?`,
+      )
+    ) {
       const res = await deleteBranch(b.branchId);
       if (!res.success) {
-        alert(res.message || 'Cannot delete');
+        alert(res.message || "Cannot delete");
       } else {
-        setSuccessMessage(lang === 'ar' ? 'تم حذف الفرع بنجاح' : 'Branch deleted');
+        setSuccessMessage(
+          lang === "ar" ? "تم حذف الفرع بنجاح" : "Branch deleted",
+        );
         setTimeout(() => setSuccessMessage(null), 3000);
       }
     }
@@ -141,10 +169,10 @@ export const AdminBranches: React.FC = () => {
   // Region handlers
   const handleOpenAddRegion = (presetBranchId?: string) => {
     setEditingRegion(null);
-    setRegionNo('');
-    setRegionNameAr('');
-    setRegionNameEn('');
-    setRegionBranchId(presetBranchId || (branches[0]?.branchId || ''));
+    setRegionNo("");
+    setRegionNameAr("");
+    setRegionNameEn("");
+    setRegionBranchId(presetBranchId || branches[0]?.branchId || "");
     setShowRegionModal(true);
     setAlertError(null);
   };
@@ -162,7 +190,11 @@ export const AdminBranches: React.FC = () => {
   const handleSaveRegion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!regionNo.trim() || !regionNameAr.trim() || !regionBranchId) {
-      setAlertError(lang === 'ar' ? 'يرجى تعبئة كافة الحقول المطلوبة' : 'Please fill all required fields');
+      setAlertError(
+        lang === "ar"
+          ? "يرجى تعبئة كافة الحقول المطلوبة"
+          : "Please fill all required fields",
+      );
       return;
     }
 
@@ -176,10 +208,18 @@ export const AdminBranches: React.FC = () => {
           regionNameEn: regionNameEn.trim() || regionNameAr.trim(),
           branchId: regionBranchId,
         });
-        setSuccessMessage(lang === 'ar' ? 'تم تحديث بيانات المنطقة بنجاح' : 'Region updated successfully');
+        setSuccessMessage(
+          lang === "ar"
+            ? "تم تحديث بيانات المنطقة بنجاح"
+            : "Region updated successfully",
+        );
       } else {
         if (regions.some((r) => r.regionNo === cleanNo)) {
-          setAlertError(lang === 'ar' ? 'رقم المنطقة مستخدم مسبقاً، يرجى اختيار رقم فريد' : 'Region number already exists');
+          setAlertError(
+            lang === "ar"
+              ? "رقم المنطقة مستخدم مسبقاً، يرجى اختيار رقم فريد"
+              : "Region number already exists",
+          );
           return;
         }
         await createRegion({
@@ -189,11 +229,17 @@ export const AdminBranches: React.FC = () => {
           regionNameEn: regionNameEn.trim() || regionNameAr.trim(),
           branchId: regionBranchId,
         });
-        setSuccessMessage(lang === 'ar' ? 'تمت إضافة المنطقة بنجاح' : 'New region created successfully');
+        setSuccessMessage(
+          lang === "ar"
+            ? "تمت إضافة المنطقة بنجاح"
+            : "New region created successfully",
+        );
       }
     } catch (err) {
       console.error(err);
-      setAlertError(lang === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving region');
+      setAlertError(
+        lang === "ar" ? "حدث خطأ أثناء الحفظ" : "Error saving region",
+      );
       return;
     }
 
@@ -202,12 +248,18 @@ export const AdminBranches: React.FC = () => {
   };
 
   const handleDeleteRegion = async (r: Region) => {
-    if (window.confirm(lang === 'ar' ? `هل أنت متأكد من حذف منطقة ${r.regionNameAr} (#${r.regionNo})؟` : `Delete region ${r.regionNameEn}?`)) {
+    if (
+      window.confirm(
+        lang === "ar"
+          ? `هل أنت متأكد من حذف منطقة ${r.regionNameAr} (#${r.regionNo})؟`
+          : `Delete region ${r.regionNameEn}?`,
+      )
+    ) {
       const res = await deleteRegion(r.regionId);
       if (!res.success) {
-        alert(res.message || 'Cannot delete region');
+        alert(res.message || "Cannot delete region");
       } else {
-        setSuccessMessage(lang === 'ar' ? 'تم حذف المنطقة' : 'Region deleted');
+        setSuccessMessage(lang === "ar" ? "تم حذف المنطقة" : "Region deleted");
         setTimeout(() => setSuccessMessage(null), 3000);
       }
     }
@@ -216,11 +268,16 @@ export const AdminBranches: React.FC = () => {
   // Filtered lists
   const filteredBranches = branches.filter((b) => {
     const q = searchQuery.toLowerCase();
-    return b.branchNameAr.toLowerCase().includes(q) || b.branchNameEn.toLowerCase().includes(q) || b.branchId.toLowerCase().includes(q);
+    return (
+      b.branchNameAr.toLowerCase().includes(q) ||
+      b.branchNameEn.toLowerCase().includes(q) ||
+      b.branchId.toLowerCase().includes(q)
+    );
   });
 
   const filteredRegions = regions.filter((r) => {
-    if (selectedBranchId !== 'ALL' && r.branchId !== selectedBranchId) return false;
+    if (selectedBranchId !== "ALL" && r.branchId !== selectedBranchId)
+      return false;
     const q = searchQuery.toLowerCase();
     return (
       r.regionNo.includes(q) ||
@@ -239,7 +296,11 @@ export const AdminBranches: React.FC = () => {
           setExcelParseError(null);
         }}
         onOpenAddBranch={handleOpenAddBranch}
-        onOpenAddRegion={() => handleOpenAddRegion(selectedBranchId !== 'ALL' ? selectedBranchId : undefined)}
+        onOpenAddRegion={() =>
+          handleOpenAddRegion(
+            selectedBranchId !== "ALL" ? selectedBranchId : undefined,
+          )
+        }
       />
 
       {successMessage && (
@@ -269,7 +330,7 @@ export const AdminBranches: React.FC = () => {
         setSearchQuery={setSearchQuery}
       />
 
-      {activeTab === 'branches' ? (
+      {activeTab === "branches" ? (
         <BranchesListView
           lang={lang}
           branches={filteredBranches}
@@ -279,7 +340,7 @@ export const AdminBranches: React.FC = () => {
           onDeleteBranch={handleDeleteBranch}
           onSelectBranchAndSwitchToRegions={(bId) => {
             setSelectedBranchId(bId);
-            setActiveTab('regions');
+            setActiveTab("regions");
           }}
           onOpenAddRegion={handleOpenAddRegion}
         />
@@ -348,7 +409,7 @@ export const AdminBranches: React.FC = () => {
           setShowExcelModal(false);
           setParsedBranches([]);
           setParsedRegions([]);
-          setExcelFileName('');
+          setExcelFileName("");
           setExcelParseError(null);
         }}
       />

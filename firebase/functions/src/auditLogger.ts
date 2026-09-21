@@ -26,7 +26,9 @@ export interface AuditLogEntry {
  */
 export async function createAuditLog(entry: AuditLogEntry): Promise<string> {
   // Sanitize details — strip any sensitive fields that may have leaked
-  const sanitizedDetails = entry.details ? sanitizeDetails(entry.details) : undefined;
+  const sanitizedDetails = entry.details
+    ? sanitizeDetails(entry.details)
+    : undefined;
 
   const logRef = db.collection("auditLogs").doc();
   await logRef.set({
@@ -63,16 +65,30 @@ export async function logAuditSafe(entry: AuditLogEntry): Promise<void> {
  */
 function sanitizeDetails(details: Record<string, any>): Record<string, any> {
   const SENSITIVE_KEYS = [
-    "password", "passwordHash", "newPassword", "oldPassword",
-    "token", "customToken", "refreshToken", "fcmToken",
-    "secret", "apiKey", "installationDeviceId",
+    "password",
+    "passwordHash",
+    "newPassword",
+    "oldPassword",
+    "token",
+    "customToken",
+    "refreshToken",
+    "fcmToken",
+    "secret",
+    "apiKey",
+    "installationDeviceId",
   ];
 
   const sanitized: Record<string, any> = {};
   for (const [key, value] of Object.entries(details)) {
-    if (SENSITIVE_KEYS.some(sk => key.toLowerCase().includes(sk.toLowerCase()))) {
+    if (
+      SENSITIVE_KEYS.some((sk) => key.toLowerCase().includes(sk.toLowerCase()))
+    ) {
       sanitized[key] = "[REDACTED]";
-    } else if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    } else if (
+      typeof value === "object" &&
+      value !== null &&
+      !Array.isArray(value)
+    ) {
       sanitized[key] = sanitizeDetails(value);
     } else {
       sanitized[key] = value;

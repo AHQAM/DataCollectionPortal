@@ -3,7 +3,7 @@ import { hashPassword, verifyPassword } from "../auth";
 describe("Auth Module - Password Hashing", () => {
   it("should hash a password and verify it correctly", async () => {
     const plainText = "mySecurePassword123";
-    
+
     // Hash
     const hash = await hashPassword(plainText);
     expect(hash).toBeDefined();

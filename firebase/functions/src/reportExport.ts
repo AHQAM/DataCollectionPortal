@@ -5,8 +5,15 @@ import { USER_ROLES } from "./roles";
 import { logAuditSafe } from "./auditLogger";
 
 export const exportReport = functions.https.onCall(async (data, context) => {
-  if (!context.auth || (context.auth.token.role !== USER_ROLES.ADMIN && context.auth.token.role !== USER_ROLES.SUPERVISOR)) {
-    throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can export reports.");
+  if (
+    !context.auth ||
+    (context.auth.token.role !== USER_ROLES.ADMIN &&
+      context.auth.token.role !== USER_ROLES.SUPERVISOR)
+  ) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Only admins or supervisors can export reports.",
+    );
   }
 
   const callerRole = context.auth.token.role;
@@ -18,14 +25,22 @@ export const exportReport = functions.https.onCall(async (data, context) => {
     branchId !== "ALL" &&
     branchId !== callerBranchId
   ) {
-    throw new functions.https.HttpsError("permission-denied", "Branch is outside your scope.");
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Branch is outside your scope.",
+    );
   }
 
   if (!requestId) {
-    throw new functions.https.HttpsError("invalid-argument", "Missing requestId.");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Missing requestId.",
+    );
   }
 
-  let recordsQuery: admin.firestore.Query = db.collection("records").where("requestId", "==", requestId);
+  let recordsQuery: admin.firestore.Query = db
+    .collection("records")
+    .where("requestId", "==", requestId);
   if (branchId && branchId !== "ALL") {
     recordsQuery = recordsQuery.where("branchId", "==", branchId);
   } else if (callerRole === USER_ROLES.SUPERVISOR) {
@@ -36,7 +51,7 @@ export const exportReport = functions.https.onCall(async (data, context) => {
   }
 
   const recordsSnap = await recordsQuery.limit(5000).get();
-  const records = recordsSnap.docs.map(d => d.data());
+  const records = recordsSnap.docs.map((d) => d.data());
 
   // Fetch responses
   const responsesSnap = await db
@@ -54,17 +69,26 @@ export const exportReport = functions.https.onCall(async (data, context) => {
     return { success: true, csvString: "" };
   }
 
-  const baseHeaders = ["Record ID", "Status", "Customer No", "Customer Name", "Region No", "Branch", "Rep No", "Rep Name"];
-  
+  const baseHeaders = [
+    "Record ID",
+    "Status",
+    "Customer No",
+    "Customer Name",
+    "Region No",
+    "Branch",
+    "Rep No",
+    "Rep Name",
+  ];
+
   // Find all dynamic keys from responses
   const dynamicKeys = new Set<string>();
   records.forEach((rec) => {
     const resp = responsesMap[rec.recordId];
     if (resp) {
-      Object.keys(resp.data || resp).forEach(k => dynamicKeys.add(k));
+      Object.keys(resp.data || resp).forEach((k) => dynamicKeys.add(k));
     }
   });
-  
+
   const dynamicHeaders = Array.from(dynamicKeys);
   const allHeaders = [...baseHeaders, ...dynamicHeaders];
 
@@ -87,10 +111,12 @@ export const exportReport = functions.https.onCall(async (data, context) => {
       rec.regionNo,
       rec.branchName,
       rec.repNo,
-      rec.repName
+      rec.repName,
     ];
-    
-    const dynamicCols = dynamicHeaders.map(k => resp[k] !== undefined ? resp[k] : "");
+
+    const dynamicCols = dynamicHeaders.map((k) =>
+      resp[k] !== undefined ? resp[k] : "",
+    );
     return [...baseCols, ...dynamicCols].map(escapeCsv).join(",");
   });
 
@@ -100,14 +126,14 @@ export const exportReport = functions.https.onCall(async (data, context) => {
   await logAuditSafe({
     userId: context.auth.uid,
     userRole: callerRole,
-    action: 'REPORT_EXPORTED',
-    entityType: 'REPORT',
+    action: "REPORT_EXPORTED",
+    entityType: "REPORT",
     entityId: requestId,
     details: {
       exportedRecordsCount: records.length,
       branchFilter: branchId,
-      statusFilter: status
-    }
+      statusFilter: status,
+    },
   });
 
   return { success: true, count: records.length, csvString };

@@ -10,7 +10,7 @@ export const sendNotificationInternal = async (
   titleEn: string,
   bodyAr: string,
   bodyEn: string,
-  data?: Record<string, any>
+  data?: Record<string, any>,
 ) => {
   // Sanitize data values to strings (FCM data payload requirement)
   const sanitizedData: Record<string, string> = {};
@@ -51,17 +51,23 @@ export const sendNotificationInternal = async (
     if (Array.isArray(userData?.fcmTokens)) {
       rawTokens.push(...userData.fcmTokens);
     }
-    if (typeof userData?.fcmToken === "string" && !rawTokens.includes(userData.fcmToken)) {
+    if (
+      typeof userData?.fcmToken === "string" &&
+      !rawTokens.includes(userData.fcmToken)
+    ) {
       rawTokens.push(userData.fcmToken);
     }
 
-    const tokens = rawTokens.filter((t) => typeof t === "string" && t.trim().length > 0);
+    const tokens = rawTokens.filter(
+      (t) => typeof t === "string" && t.trim().length > 0,
+    );
 
     if (tokens.length > 0) {
       // Localize push notification based on user's preferredLanguage
       const userLang = userData?.preferredLanguage === "en" ? "en" : "ar";
-      const pushTitle = userLang === "en" ? (titleEn || titleAr) : (titleAr || titleEn);
-      const pushBody = userLang === "en" ? (bodyEn || bodyAr) : (bodyAr || bodyEn);
+      const pushTitle =
+        userLang === "en" ? titleEn || titleAr : titleAr || titleEn;
+      const pushBody = userLang === "en" ? bodyEn || bodyAr : bodyAr || bodyEn;
 
       const messages = tokens.map((token: string) => ({
         notification: {
@@ -74,7 +80,7 @@ export const sendNotificationInternal = async (
 
       try {
         const response = await admin.messaging().sendEach(messages);
-        
+
         // Check for expired/unregistered tokens and prune them
         const invalidTokens: string[] = [];
         response.responses.forEach((resp, idx) => {
@@ -95,10 +101,14 @@ export const sendNotificationInternal = async (
             userUpdate.fcmToken = admin.firestore.FieldValue.delete();
           }
           if (Array.isArray(userData?.fcmTokens)) {
-            userUpdate.fcmTokens = admin.firestore.FieldValue.arrayRemove(...invalidTokens);
+            userUpdate.fcmTokens = admin.firestore.FieldValue.arrayRemove(
+              ...invalidTokens,
+            );
           }
           await db.collection("users").doc(userId).update(userUpdate);
-          console.log(`Pruned ${invalidTokens.length} invalid FCM tokens for user ${userId}`);
+          console.log(
+            `Pruned ${invalidTokens.length} invalid FCM tokens for user ${userId}`,
+          );
         }
       } catch (err) {
         console.error(`Failed to send FCM to user ${userId}`, err);
@@ -108,42 +118,56 @@ export const sendNotificationInternal = async (
 };
 
 // Callable for Admin to send manual broadcast
-export const sendBroadcastNotification = functions.https.onCall(async (data, context) => {
-  if (!context.auth || (context.auth.token.role !== USER_ROLES.ADMIN && context.auth.token.role !== USER_ROLES.SUPERVISOR)) {
-    throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can send broadcasts.");
-  }
+export const sendBroadcastNotification = functions.https.onCall(
+  async (data, context) => {
+    if (
+      !context.auth ||
+      (context.auth.token.role !== USER_ROLES.ADMIN &&
+        context.auth.token.role !== USER_ROLES.SUPERVISOR)
+    ) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Only admins or supervisors can send broadcasts.",
+      );
+    }
 
-  const { targetAudience, titleAr, titleEn, bodyAr, bodyEn, payload } = data;
-  
-  if (!titleAr || !titleEn || !bodyAr || !bodyEn) {
-    throw new functions.https.HttpsError("invalid-argument", "Missing title or body.");
-  }
+    const { targetAudience, titleAr, titleEn, bodyAr, bodyEn, payload } = data;
 
-  let usersQuery: admin.firestore.Query = db.collection("users").where("isActive", "==", true);
-  
-  if (targetAudience === "REPRESENTATIVES") {
-    usersQuery = usersQuery.where("role", "==", USER_ROLES.REP);
-  } else if (targetAudience === "SUPERVISORS") {
-    usersQuery = usersQuery.where("role", "==", USER_ROLES.SUPERVISOR);
-  }
+    if (!titleAr || !titleEn || !bodyAr || !bodyEn) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Missing title or body.",
+      );
+    }
 
-  const usersSnap = await usersQuery.get();
-  const promises: Promise<void>[] = [];
+    let usersQuery: admin.firestore.Query = db
+      .collection("users")
+      .where("isActive", "==", true);
 
-  usersSnap.docs.forEach((doc) => {
-    promises.push(
-      sendNotificationInternal(
-        doc.id,
-        titleAr,
-        titleEn,
-        bodyAr,
-        bodyEn,
-        payload
-      )
-    );
-  });
+    if (targetAudience === "REPRESENTATIVES") {
+      usersQuery = usersQuery.where("role", "==", USER_ROLES.REP);
+    } else if (targetAudience === "SUPERVISORS") {
+      usersQuery = usersQuery.where("role", "==", USER_ROLES.SUPERVISOR);
+    }
 
-  await Promise.allSettled(promises);
+    const usersSnap = await usersQuery.get();
+    const promises: Promise<void>[] = [];
 
-  return { success: true, count: usersSnap.size };
-});
+    usersSnap.docs.forEach((doc) => {
+      promises.push(
+        sendNotificationInternal(
+          doc.id,
+          titleAr,
+          titleEn,
+          bodyAr,
+          bodyEn,
+          payload,
+        ),
+      );
+    });
+
+    await Promise.allSettled(promises);
+
+    return { success: true, count: usersSnap.size };
+  },
+);

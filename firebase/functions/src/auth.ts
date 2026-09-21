@@ -23,20 +23,27 @@ const LOCKOUT_MINUTES = 15;
  */
 export const authenticateWithRegionPassword = functions.https.onCall(
   async (data, context) => {
-    const { regionNo, password, installationDeviceId, platform, appVersion, fcmToken } = data;
+    const {
+      regionNo,
+      password,
+      installationDeviceId,
+      platform,
+      appVersion,
+      fcmToken,
+    } = data;
 
     // Input validation
     if (!regionNo || !password || !installationDeviceId) {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "Missing required fields."
+        "Missing required fields.",
       );
     }
 
     if (typeof regionNo !== "string" || typeof password !== "string") {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "Invalid input types."
+        "Invalid input types.",
       );
     }
 
@@ -45,7 +52,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
     if (password.length > 128) {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "Password exceeds maximum length."
+        "Password exceeds maximum length.",
       );
     }
 
@@ -70,7 +77,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
 
         throw new functions.https.HttpsError(
           "unauthenticated",
-          "بيانات الاعتماد غير صحيحة. | Invalid credentials."
+          "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
         );
       }
 
@@ -81,7 +88,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
       if (!["REP", "SUPERVISOR", "ADMIN"].includes(userData.role)) {
         throw new functions.https.HttpsError(
           "unauthenticated",
-          "بيانات الاعتماد غير صحيحة. | Invalid credentials."
+          "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
         );
       }
 
@@ -97,7 +104,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
 
         throw new functions.https.HttpsError(
           "permission-denied",
-          "الحساب غير مفعل. يرجى التواصل مع الإدارة. | Account is deactivated. Please contact administration."
+          "الحساب غير مفعل. يرجى التواصل مع الإدارة. | Account is deactivated. Please contact administration.",
         );
       }
 
@@ -109,7 +116,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
 
         if (lockDate > new Date()) {
           const remainingMinutes = Math.ceil(
-            (lockDate.getTime() - Date.now()) / 60000
+            (lockDate.getTime() - Date.now()) / 60000,
           );
 
           await logAuditSafe({
@@ -123,7 +130,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
 
           throw new functions.https.HttpsError(
             "permission-denied",
-            `الحساب مقفل مؤقتاً. حاول بعد ${remainingMinutes} دقيقة. | Account is temporarily locked. Try again in ${remainingMinutes} minutes.`
+            `الحساب مقفل مؤقتاً. حاول بعد ${remainingMinutes} دقيقة. | Account is temporarily locked. Try again in ${remainingMinutes} minutes.`,
           );
         }
       }
@@ -135,7 +142,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
         console.error(`User ${userId} has no passwordHash set`);
         throw new functions.https.HttpsError(
           "internal",
-          "حدث خطأ في إعدادات الحساب. | Account configuration error."
+          "حدث خطأ في إعدادات الحساب. | Account configuration error.",
         );
       }
 
@@ -181,7 +188,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
 
         throw new functions.https.HttpsError(
           "unauthenticated",
-          "بيانات الاعتماد غير صحيحة. | Invalid credentials."
+          "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
         );
       }
 
@@ -192,7 +199,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
         if (storedDeviceHash) {
           const deviceMatches = await bcrypt.compare(
             installationDeviceId,
-            storedDeviceHash
+            storedDeviceHash,
           );
 
           if (!deviceMatches) {
@@ -207,13 +214,16 @@ export const authenticateWithRegionPassword = functions.https.onCall(
 
             throw new functions.https.HttpsError(
               "permission-denied",
-              "هذا الحساب مرتبط بجهاز آخر. يرجى التواصل مع الإدارة لفك ارتباط الجهاز. | This account is linked to another device. Please contact the administrator to release the device."
+              "هذا الحساب مرتبط بجهاز آخر. يرجى التواصل مع الإدارة لفك ارتباط الجهاز. | This account is linked to another device. Please contact the administrator to release the device.",
             );
           }
         }
       } else if (userData.deviceBindingStatus === "UNBOUND") {
         // First login — bind device
-        const deviceIdHash = await bcrypt.hash(installationDeviceId, BCRYPT_SALT_ROUNDS);
+        const deviceIdHash = await bcrypt.hash(
+          installationDeviceId,
+          BCRYPT_SALT_ROUNDS,
+        );
 
         await userDoc.ref.update({
           deviceBindingStatus: "BOUND",
@@ -354,10 +364,10 @@ export const authenticateWithRegionPassword = functions.https.onCall(
       console.error("Authentication error:", error);
       throw new functions.https.HttpsError(
         "internal",
-        "حدث خطأ في الخادم. | Internal server error."
+        "حدث خطأ في الخادم. | Internal server error.",
       );
     }
-  }
+  },
 );
 
 /**
@@ -373,7 +383,7 @@ export async function hashPassword(password: string): Promise<string> {
  */
 export async function verifyPassword(
   password: string,
-  hash: string
+  hash: string,
 ): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }

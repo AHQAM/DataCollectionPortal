@@ -1,66 +1,238 @@
-import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useRequestOps } from '../hooks/useRequestOps';
-import { requestApi } from '../services';
-import * as useUserOps from '../hooks/useUserOps';
+import { renderHook, act } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { useRequestOps } from "../hooks/useRequestOps";
+import { requestApi } from "../services";
+import * as auditUtils from "../utils/audit";
 
-vi.mock('../services', () => ({
+vi.mock("../services", () => ({
   requestApi: {
     createRequest: vi.fn(),
     updateDraftRequest: vi.fn(),
+    publishRequest: vi.fn(),
+    closeRequest: vi.fn(),
+    archiveRequest: vi.fn(),
+    reopenRequest: vi.fn(),
+    cloneRequest: vi.fn(),
+    deleteRequest: vi.fn(),
+    saveRequestFields: vi.fn(),
   },
 }));
 
-vi.mock('../hooks/useUserOps', () => ({
+vi.mock("../utils/audit", () => ({
   logAudit: vi.fn(),
 }));
 
-describe('useRequestOps Hook', () => {
+describe("useRequestOps Hook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('createRequest calls API and returns success', async () => {
-    (requestApi.createRequest as any).mockResolvedValue('new_req_id');
-
+  // --- createRequest ---
+  it("createRequest calls API and returns success", async () => {
+    (requestApi.createRequest as any).mockResolvedValue("new_req_id");
     const { result } = renderHook(() => useRequestOps());
-
     let res;
     await act(async () => {
-      res = await result.current.createRequest({
-        requestCode: 'REQ-123',
-        titleAr: 'Test Request',
-      }, []);
+      res = await result.current.createRequest(
+        { requestCode: "REQ-123", titleAr: "Test Request" },
+        [],
+      );
     });
-
     expect(res?.success).toBe(true);
-    expect(res?.data).toBe('new_req_id');
-    expect(requestApi.createRequest).toHaveBeenCalled();
-    expect(useUserOps.logAudit).toHaveBeenCalledWith(
-      'REQUEST_CREATED_VIA_CF',
-      'Request',
-      'new_req_id',
-      expect.any(Object)
+    expect(res?.data).toBe("new_req_id");
+    expect(auditUtils.logAudit).toHaveBeenCalledWith(
+      "REQUEST_CREATED_VIA_CF",
+      "Request",
+      "new_req_id",
+      expect.any(Object),
     );
   });
 
-  it('updateRequest calls API and returns success', async () => {
-    (requestApi.updateDraftRequest as any).mockResolvedValue(undefined);
-
+  it("createRequest returns failure on error", async () => {
+    (requestApi.createRequest as any).mockRejectedValue(new Error("API Error"));
     const { result } = renderHook(() => useRequestOps());
-
     let res;
     await act(async () => {
-      res = await result.current.updateRequest('req_1', { titleAr: 'New Title' });
+      res = await result.current.createRequest({ requestCode: "REQ-123" }, []);
     });
+    expect(res?.success).toBe(false);
+    expect(res?.error).toBeDefined();
+  });
 
+  // --- updateRequest ---
+  it("updateRequest calls API and returns success", async () => {
+    (requestApi.updateDraftRequest as any).mockResolvedValue(undefined);
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.updateRequest("req_1", {
+        titleAr: "New Title",
+      });
+    });
     expect(res?.success).toBe(true);
-    expect(requestApi.updateDraftRequest).toHaveBeenCalledWith('req_1', { titleAr: 'New Title' });
-    expect(useUserOps.logAudit).toHaveBeenCalledWith(
-      'REQUEST_UPDATED',
-      'Request',
-      'req_1',
-      expect.any(Object)
+    expect(auditUtils.logAudit).toHaveBeenCalledWith(
+      "REQUEST_UPDATED",
+      "Request",
+      "req_1",
+      expect.any(Object),
     );
+  });
+
+  it("updateRequest returns failure on error", async () => {
+    (requestApi.updateDraftRequest as any).mockRejectedValue(
+      new Error("API Error"),
+    );
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.updateRequest("req_1", {
+        titleAr: "New Title",
+      });
+    });
+    expect(res?.success).toBe(false);
+  });
+
+  // --- publishRequest ---
+  it("publishRequest calls API and returns success", async () => {
+    (requestApi.publishRequest as any).mockResolvedValue(undefined);
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.publishRequest("req_1");
+    });
+    expect(res?.success).toBe(true);
+    expect(auditUtils.logAudit).toHaveBeenCalledWith(
+      "REQUEST_PUBLISHED",
+      "Request",
+      "req_1",
+      {},
+    );
+  });
+
+  it("publishRequest returns failure on error", async () => {
+    (requestApi.publishRequest as any).mockRejectedValue(
+      new Error("API Error"),
+    );
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.publishRequest("req_1");
+    });
+    expect(res?.success).toBe(false);
+  });
+
+  // --- closeRequest ---
+  it("closeRequest calls API and returns success", async () => {
+    (requestApi.closeRequest as any).mockResolvedValue(undefined);
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.closeRequest("req_1");
+    });
+    expect(res?.success).toBe(true);
+    expect(auditUtils.logAudit).toHaveBeenCalledWith(
+      "REQUEST_CLOSED",
+      "Request",
+      "req_1",
+      {},
+    );
+  });
+
+  // --- archiveRequest ---
+  it("archiveRequest calls API and returns success", async () => {
+    (requestApi.archiveRequest as any).mockResolvedValue(undefined);
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.archiveRequest("req_1");
+    });
+    expect(res?.success).toBe(true);
+    expect(auditUtils.logAudit).toHaveBeenCalledWith(
+      "REQUEST_ARCHIVED",
+      "Request",
+      "req_1",
+      {},
+    );
+  });
+
+  // --- reopenRequest ---
+  it("reopenRequest calls API and returns success", async () => {
+    (requestApi.reopenRequest as any).mockResolvedValue(undefined);
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.reopenRequest("req_1");
+    });
+    expect(res?.success).toBe(true);
+    expect(auditUtils.logAudit).toHaveBeenCalledWith(
+      "REQUEST_REOPENED",
+      "Request",
+      "req_1",
+      {},
+    );
+  });
+
+  // --- cloneRequest ---
+  it("cloneRequest calls API and returns success", async () => {
+    (requestApi.cloneRequest as any).mockResolvedValue("cloned_id");
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.cloneRequest("req_1");
+    });
+    expect(res?.success).toBe(true);
+    expect(res?.data).toBe("cloned_id");
+    expect(auditUtils.logAudit).toHaveBeenCalledWith(
+      "REQUEST_CLONED",
+      "Request",
+      "cloned_id",
+      { sourceRequestId: "req_1" },
+    );
+  });
+
+  // --- deleteRequest ---
+  it("deleteRequest calls API and returns success", async () => {
+    (requestApi.deleteRequest as any).mockResolvedValue(undefined);
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.deleteRequest("req_1");
+    });
+    expect(res?.success).toBe(true);
+    expect(auditUtils.logAudit).toHaveBeenCalledWith(
+      "REQUEST_DELETED",
+      "Request",
+      "req_1",
+      {},
+    );
+  });
+
+  // --- updateRequestFields ---
+  it("updateRequestFields calls API and returns success", async () => {
+    (requestApi.saveRequestFields as any).mockResolvedValue(undefined);
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.updateRequestFields("req_1", []);
+    });
+    expect(res?.success).toBe(true);
+    expect(auditUtils.logAudit).toHaveBeenCalledWith(
+      "REQUEST_FIELDS_UPDATED",
+      "Request",
+      "req_1",
+      { fieldsCount: 0 },
+    );
+  });
+
+  it("updateRequestFields returns failure on error", async () => {
+    (requestApi.saveRequestFields as any).mockRejectedValue(
+      new Error("API Error"),
+    );
+    const { result } = renderHook(() => useRequestOps());
+    let res;
+    await act(async () => {
+      res = await result.current.updateRequestFields("req_1", []);
+    });
+    expect(res?.success).toBe(false);
   });
 });

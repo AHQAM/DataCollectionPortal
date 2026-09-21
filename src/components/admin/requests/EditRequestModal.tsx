@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { X, Edit, Building, Check } from 'lucide-react';
-import { RequestItem, Branch, Region, RequestPriority } from '../../../types';
+import React, { useState, useEffect } from "react";
+import { X, Edit, Building, Check } from "lucide-react";
+import { RequestItem, Branch, Region, RequestPriority } from "../../../types";
 
 interface EditRequestModalProps {
   request: RequestItem | null;
@@ -19,32 +19,38 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
   lang,
   onSubmit,
 }) => {
-  const [editTitleAr, setEditTitleAr] = useState('');
-  const [editTitleEn, setEditTitleEn] = useState('');
-  const [editDescAr, setEditDescAr] = useState('');
-  const [editPriority, setEditPriority] = useState<RequestPriority>('Normal');
-  const [editDueAt, setEditDueAt] = useState('');
-  const [editTargetScope, setEditTargetScope] = useState<'ALL' | 'SPECIFIC'>('ALL');
-  const [editSelectedBranchIds, setEditSelectedBranchIds] = useState<string[]>([]);
-  const [editSelectedRegionNos, setEditSelectedRegionNos] = useState<string[]>([]);
+  const [editTitleAr, setEditTitleAr] = useState("");
+  const [editTitleEn, setEditTitleEn] = useState("");
+  const [editDescAr, setEditDescAr] = useState("");
+  const [editPriority, setEditPriority] = useState<RequestPriority>("Normal");
+  const [editDueAt, setEditDueAt] = useState("");
+  const [editTargetScope, setEditTargetScope] = useState<"ALL" | "SPECIFIC">(
+    "ALL",
+  );
+  const [editSelectedBranchIds, setEditSelectedBranchIds] = useState<string[]>(
+    [],
+  );
+  const [editSelectedRegionNos, setEditSelectedRegionNos] = useState<string[]>(
+    [],
+  );
 
   useEffect(() => {
     if (request) {
-      setEditTitleAr(request.titleAr || '');
-      setEditTitleEn(request.titleEn || '');
-      setEditDescAr(request.descriptionAr || '');
-      setEditPriority(request.priority || 'Normal');
-      setEditDueAt(request.dueAt ? request.dueAt.split('T')[0] : '');
+      setEditTitleAr(request.titleAr || "");
+      setEditTitleEn(request.titleEn || "");
+      setEditDescAr(request.descriptionAr || "");
+      setEditPriority(request.priority || "Normal");
+      setEditDueAt(request.dueAt ? request.dueAt.split("T")[0] : "");
 
       const tBranches = request.targetBranches || [];
       const tRegions = request.targetRegions || [];
 
       if (tBranches.length === 0 && tRegions.length === 0) {
-        setEditTargetScope('ALL');
+        setEditTargetScope("ALL");
         setEditSelectedBranchIds([]);
         setEditSelectedRegionNos([]);
       } else {
-        setEditTargetScope('SPECIFIC');
+        setEditTargetScope("SPECIFIC");
         setEditSelectedBranchIds(tBranches);
         setEditSelectedRegionNos(tRegions);
       }
@@ -64,8 +70,8 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
       priority: editPriority,
       dueAt: new Date(editDueAt).toISOString(),
       dueDate: editDueAt,
-      targetBranches: editTargetScope === 'ALL' ? [] : editSelectedBranchIds,
-      targetRegions: editTargetScope === 'ALL' ? [] : editSelectedRegionNos,
+      targetBranches: editTargetScope === "ALL" ? [] : editSelectedBranchIds,
+      targetRegions: editTargetScope === "ALL" ? [] : editSelectedRegionNos,
     });
   };
 
@@ -75,8 +81,14 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
           <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
             <Edit className="w-4 h-4 text-purple-700" />
-            <span>{lang === 'ar' ? 'تعديل تفاصيل واستهداف الطلب' : 'Edit Request Details & Scope'}</span>
-            <span className="text-purple-700 font-mono text-xs">({request.requestCode})</span>
+            <span>
+              {lang === "ar"
+                ? "تعديل تفاصيل واستهداف الطلب"
+                : "Edit Request Details & Scope"}
+            </span>
+            <span className="text-purple-700 font-mono text-xs">
+              ({request.requestCode})
+            </span>
           </h2>
           <button
             onClick={onClose}
@@ -90,22 +102,28 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === 'ar' ? 'الأولوية' : 'Priority'}
+                {lang === "ar" ? "الأولوية" : "Priority"}
               </label>
               <select
                 value={editPriority}
-                onChange={(e) => setEditPriority(e.target.value as RequestPriority)}
+                onChange={(e) =>
+                  setEditPriority(e.target.value as RequestPriority)
+                }
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               >
-                <option value="low">{lang === 'ar' ? 'منخفضة' : 'Low'}</option>
-                <option value="medium">{lang === 'ar' ? 'متوسطة' : 'Medium'}</option>
-                <option value="high">{lang === 'ar' ? 'عالية' : 'High'}</option>
-                <option value="urgent">{lang === 'ar' ? 'حرجة / عاجلة' : 'Urgent'}</option>
+                <option value="low">{lang === "ar" ? "منخفضة" : "Low"}</option>
+                <option value="medium">
+                  {lang === "ar" ? "متوسطة" : "Medium"}
+                </option>
+                <option value="high">{lang === "ar" ? "عالية" : "High"}</option>
+                <option value="urgent">
+                  {lang === "ar" ? "حرجة / عاجلة" : "Urgent"}
+                </option>
               </select>
             </div>
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === 'ar' ? 'تاريخ الاستحقاق' : 'Due Date'}
+                {lang === "ar" ? "تاريخ الاستحقاق" : "Due Date"}
               </label>
               <input
                 type="date"
@@ -119,7 +137,9 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === 'ar' ? 'عنوان الطلب (بالعربية)' : 'Request Title (Arabic)'}
+              {lang === "ar"
+                ? "عنوان الطلب (بالعربية)"
+                : "Request Title (Arabic)"}
             </label>
             <input
               type="text"
@@ -132,7 +152,9 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === 'ar' ? 'عنوان الطلب (بالإنجليزية)' : 'Request Title (English)'}
+              {lang === "ar"
+                ? "عنوان الطلب (بالإنجليزية)"
+                : "Request Title (English)"}
             </label>
             <input
               type="text"
@@ -144,7 +166,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === 'ar' ? 'التعليمات والإرشادات' : 'Instructions'}
+              {lang === "ar" ? "التعليمات والإرشادات" : "Instructions"}
             </label>
             <textarea
               rows={2}
@@ -159,58 +181,74 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 font-extrabold text-purple-950">
                 <Building className="w-4 h-4 text-purple-700" />
-                <span>{lang === 'ar' ? 'نطاق الفروع والمناطق المستهدفة' : 'Target Branches & Zones'}</span>
+                <span>
+                  {lang === "ar"
+                    ? "نطاق الفروع والمناطق المستهدفة"
+                    : "Target Branches & Zones"}
+                </span>
               </div>
               <div className="flex gap-2">
                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
                   <input
                     type="radio"
                     name="editTargetScope"
-                    checked={editTargetScope === 'ALL'}
-                    onChange={() => setEditTargetScope('ALL')}
+                    checked={editTargetScope === "ALL"}
+                    onChange={() => setEditTargetScope("ALL")}
                     className="text-purple-900"
                   />
-                  <span>{lang === 'ar' ? 'كل الفروع والمناطق' : 'All Branches'}</span>
+                  <span>
+                    {lang === "ar" ? "كل الفروع والمناطق" : "All Branches"}
+                  </span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
                   <input
                     type="radio"
                     name="editTargetScope"
-                    checked={editTargetScope === 'SPECIFIC'}
-                    onChange={() => setEditTargetScope('SPECIFIC')}
+                    checked={editTargetScope === "SPECIFIC"}
+                    onChange={() => setEditTargetScope("SPECIFIC")}
                     className="text-purple-900"
                   />
-                  <span>{lang === 'ar' ? 'تحديد فروع ومناطق' : 'Specific'}</span>
+                  <span>
+                    {lang === "ar" ? "تحديد فروع ومناطق" : "Specific"}
+                  </span>
                 </label>
               </div>
             </div>
 
-            {editTargetScope === 'SPECIFIC' && (
+            {editTargetScope === "SPECIFIC" && (
               <div className="space-y-2 pt-2 border-t border-purple-200/60 animate-in fade-in">
                 <div>
                   <div className="font-bold text-slate-600 text-[11px] mb-1">
-                    {lang === 'ar' ? 'اختر الفروع المستهدفة:' : 'Select Target Branches:'}
+                    {lang === "ar"
+                      ? "اختر الفروع المستهدفة:"
+                      : "Select Target Branches:"}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {branches.map((b) => {
-                      const isSelected = editSelectedBranchIds.includes(b.branchId);
+                      const isSelected = editSelectedBranchIds.includes(
+                        b.branchId,
+                      );
                       return (
                         <button
                           key={b.branchId}
                           type="button"
                           onClick={() => {
                             setEditSelectedBranchIds((prev) =>
-                              isSelected ? prev.filter((id) => id !== b.branchId) : [...prev, b.branchId]
+                              isSelected
+                                ? prev.filter((id) => id !== b.branchId)
+                                : [...prev, b.branchId],
                             );
                           }}
                           className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all flex items-center gap-1 cursor-pointer border ${
                             isSelected
-                              ? 'bg-purple-900 text-white border-purple-900 shadow-2xs'
-                              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                              ? "bg-purple-900 text-white border-purple-900 shadow-2xs"
+                              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
                           }`}
                         >
                           {isSelected && <Check className="w-3 h-3" />}
-                          <span>{lang === 'ar' ? b.branchNameAr : b.branchNameEn}</span>
+                          <span>
+                            {lang === "ar" ? b.branchNameAr : b.branchNameEn}
+                          </span>
                         </button>
                       );
                     })}
@@ -220,29 +258,38 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 {editSelectedBranchIds.length > 0 && (
                   <div className="pt-1">
                     <div className="font-bold text-slate-600 text-[11px] mb-1">
-                      {lang === 'ar' ? 'المناطق التابعة للفروع المختارة:' : 'Regions in Selected Branches:'}
+                      {lang === "ar"
+                        ? "المناطق التابعة للفروع المختارة:"
+                        : "Regions in Selected Branches:"}
                     </div>
                     <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1 bg-white rounded-lg border border-slate-200">
                       {regions
-                        .filter((r) => editSelectedBranchIds.includes(r.branchId))
+                        .filter((r) =>
+                          editSelectedBranchIds.includes(r.branchId),
+                        )
                         .map((r) => {
-                          const isRegSelected = editSelectedRegionNos.includes(r.regionNo);
+                          const isRegSelected = editSelectedRegionNos.includes(
+                            r.regionNo,
+                          );
                           return (
                             <button
                               key={r.regionNo}
                               type="button"
                               onClick={() => {
                                 setEditSelectedRegionNos((prev) =>
-                                  isRegSelected ? prev.filter((no) => no !== r.regionNo) : [...prev, r.regionNo]
+                                  isRegSelected
+                                    ? prev.filter((no) => no !== r.regionNo)
+                                    : [...prev, r.regionNo],
                                 );
                               }}
                               className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all cursor-pointer border ${
                                 isRegSelected
-                                  ? 'bg-purple-700 text-white border-purple-700'
-                                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                                  ? "bg-purple-700 text-white border-purple-700"
+                                  : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                               }`}
                             >
-                              {r.regionNo} - {lang === 'ar' ? r.regionNameAr : r.regionNameEn}
+                              {r.regionNo} -{" "}
+                              {lang === "ar" ? r.regionNameAr : r.regionNameEn}
                             </button>
                           );
                         })}
@@ -259,13 +306,13 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
               onClick={onClose}
               className="flex-1 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer"
             >
-              {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+              {lang === "ar" ? "إلغاء" : "Cancel"}
             </button>
             <button
               type="submit"
               className="flex-2 h-10 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-bold cursor-pointer shadow-md"
             >
-              {lang === 'ar' ? 'حفظ التعديلات' : 'Save Changes'}
+              {lang === "ar" ? "حفظ التعديلات" : "Save Changes"}
             </button>
           </div>
         </form>

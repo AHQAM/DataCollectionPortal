@@ -1,6 +1,6 @@
-import React from 'react';
-import { ImportedCredential } from './userImportParser';
-import { CheckCircle2, Download } from 'lucide-react';
+import React from "react";
+import { ImportedCredential } from "./userImportParser";
+import { CheckCircle2, Download } from "lucide-react";
 
 interface UserImportCredentialsTableProps {
   lang: string;
@@ -8,11 +8,9 @@ interface UserImportCredentialsTableProps {
   onDownloadCredentialsExcel: () => void;
 }
 
-export const UserImportCredentialsTable: React.FC<UserImportCredentialsTableProps> = ({
-  lang,
-  importedCredentials,
-  onDownloadCredentialsExcel,
-}) => {
+export const UserImportCredentialsTable: React.FC<
+  UserImportCredentialsTableProps
+> = ({ lang, importedCredentials, onDownloadCredentialsExcel }) => {
   return (
     <div className="p-6 overflow-y-auto space-y-5 flex-1 animate-in fade-in">
       {/* Success Header */}
@@ -20,10 +18,12 @@ export const UserImportCredentialsTable: React.FC<UserImportCredentialsTableProp
         <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
         <div className="flex-1">
           <h3 className="text-sm font-extrabold text-emerald-950">
-            {lang === 'ar' ? 'تم استيراد حسابات المناديب بنجاح!' : 'Representatives imported successfully!'}
+            {lang === "ar"
+              ? "تم استيراد حسابات المناديب بنجاح!"
+              : "Representatives imported successfully!"}
           </h3>
           <p className="text-xs text-emerald-800 mt-1 leading-relaxed">
-            {lang === 'ar'
+            {lang === "ar"
               ? `تم إنشاء (${importedCredentials.length}) حساب مندوب بكلمات مرور مؤقتة لمرة واحدة. يمكنك تنزيل كشف البيانات الآن لتسليمه للمناديب يدوياً.`
               : `Created (${importedCredentials.length}) representative accounts with temporary passwords. You can download the credentials sheet now.`}
           </p>
@@ -34,7 +34,11 @@ export const UserImportCredentialsTable: React.FC<UserImportCredentialsTableProp
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
         >
           <Download className="w-4 h-4" />
-          <span>{lang === 'ar' ? 'تنزيل كشف كلمات المرور (Excel)' : 'Download Credentials (Excel)'}</span>
+          <span>
+            {lang === "ar"
+              ? "تنزيل كشف كلمات المرور (Excel)"
+              : "Download Credentials (Excel)"}
+          </span>
         </button>
       </div>
 
@@ -42,10 +46,14 @@ export const UserImportCredentialsTable: React.FC<UserImportCredentialsTableProp
       <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
         <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
           <span className="text-xs font-bold text-slate-700">
-            {lang === 'ar' ? 'كشف بيانات الدخول المؤقتة:' : 'Temporary Credentials Sheet:'}
+            {lang === "ar"
+              ? "كشف بيانات الدخول المؤقتة:"
+              : "Temporary Credentials Sheet:"}
           </span>
           <span className="text-[11px] text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-            {lang === 'ar' ? 'يلزم تغيير كلمة المرور عند أول تسجيل دخول' : 'Must change password on first login'}
+            {lang === "ar"
+              ? "يلزم تغيير كلمة المرور عند أول تسجيل دخول"
+              : "Must change password on first login"}
           </span>
         </div>
         <div className="max-h-72 overflow-y-auto">
@@ -53,24 +61,45 @@ export const UserImportCredentialsTable: React.FC<UserImportCredentialsTableProp
             <thead className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 sticky top-0">
               <tr>
                 <th className="px-3 py-2 text-start w-10">#</th>
-                <th className="px-3 py-2 text-start">{lang === 'ar' ? 'اسم المندوب' : 'Rep Name'}</th>
-                <th className="px-3 py-2 text-start">{lang === 'ar' ? 'رقم المندوب (المعرف)' : 'Username / Rep No'}</th>
-                <th className="px-3 py-2 text-start">{lang === 'ar' ? 'الفرع' : 'Branch'}</th>
-                <th className="px-3 py-2 text-start">{lang === 'ar' ? 'المناطق المصرحة' : 'Regions'}</th>
-                <th className="px-3 py-2 text-start">{lang === 'ar' ? 'كلمة المرور المؤقتة' : 'Temporary Password'}</th>
+                <th className="px-3 py-2 text-start">
+                  {lang === "ar" ? "اسم المندوب" : "Rep Name"}
+                </th>
+                <th className="px-3 py-2 text-start">
+                  {lang === "ar" ? "رقم المندوب (المعرف)" : "Username / Rep No"}
+                </th>
+                <th className="px-3 py-2 text-start">
+                  {lang === "ar" ? "الفرع" : "Branch"}
+                </th>
+                <th className="px-3 py-2 text-start">
+                  {lang === "ar" ? "المناطق المصرحة" : "Regions"}
+                </th>
+                <th className="px-3 py-2 text-start">
+                  {lang === "ar" ? "كلمة المرور المؤقتة" : "Temporary Password"}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {importedCredentials.map((cred, idx) => (
                 <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-3 py-2 text-slate-400 font-mono text-[11px]">{idx + 1}</td>
-                  <td className="px-3 py-2 font-bold text-slate-900">{cred.repNameAr}</td>
-                  <td className="px-3 py-2 font-mono font-bold text-purple-900">#{cred.username}</td>
-                  <td className="px-3 py-2 text-slate-600">{cred.branchName || '---'}</td>
+                  <td className="px-3 py-2 text-slate-400 font-mono text-[11px]">
+                    {idx + 1}
+                  </td>
+                  <td className="px-3 py-2 font-bold text-slate-900">
+                    {cred.repNameAr}
+                  </td>
+                  <td className="px-3 py-2 font-mono font-bold text-purple-900">
+                    #{cred.username}
+                  </td>
+                  <td className="px-3 py-2 text-slate-600">
+                    {cred.branchName || "---"}
+                  </td>
                   <td className="px-3 py-2">
                     <div className="flex flex-wrap gap-1">
                       {cred.allowedRegionNos.map((reg) => (
-                        <span key={reg} className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                        <span
+                          key={reg}
+                          className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200"
+                        >
                           #{reg}
                         </span>
                       ))}

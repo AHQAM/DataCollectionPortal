@@ -11,34 +11,34 @@ import {
   AuditLog,
   AppSettings,
   RequestTemplate,
-} from '../types';
+} from "../types";
 
 export const INITIAL_BRANCHES: Branch[] = [];
 export const INITIAL_REGIONS: Region[] = [];
 
 export const INITIAL_USERS: User[] = [
   {
-    userId: 'USER-ADMIN',
-    username: 'ADMIN',
-    regionNo: '000',
+    userId: "USER-ADMIN",
+    username: "ADMIN",
+    regionNo: "000",
     allowedRegionNos: [],
-    repNo: 'MGR-01',
-    repNameAr: 'مدير النظام',
-    repNameEn: 'System Admin',
-    email: 'admin@salescollection.sa',
-    mobile: '+966501112233',
-    branchId: 'BR-RYD',
-    branchNameAr: 'المركز الرئيسي',
-    role: 'ADMIN',
+    repNo: "MGR-01",
+    repNameAr: "مدير النظام",
+    repNameEn: "System Admin",
+    email: "admin@salescollection.sa",
+    mobile: "+966501112233",
+    branchId: "BR-RYD",
+    branchNameAr: "المركز الرئيسي",
+    role: "ADMIN",
     mustChangePassword: false,
     isActive: true,
     failedLoginCount: 0,
     sessionVersion: 1,
-    deviceBindingStatus: 'UNBOUND',
+    deviceBindingStatus: "UNBOUND",
     maxAllowedDevices: 2,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  }
+  },
 ];
 
 export const SAMPLE_REQUESTS: RequestItem[] = [];
@@ -51,7 +51,7 @@ export const INITIAL_AUDIT_LOGS: AuditLog[] = [];
 export const INITIAL_TEMPLATES: RequestTemplate[] = [];
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
-  defaultLanguage: 'ar',
+  defaultLanguage: "ar",
   defaultPasswordPolicy: {
     minLength: 6,
     preventImmediateReuse: true,
@@ -60,10 +60,10 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   lockoutMinutes: 15,
   maxDevicesPerUser: 1,
   googleDriveSyncEnabled: false,
-  googleDriveFolder: 'Archive',
+  googleDriveFolder: "Archive",
   supportContact: {
-    phone: '920001234',
-    email: 'support@salescollection.sa',
-    whatsapp: '+966501112233',
+    phone: "920001234",
+    email: "support@salescollection.sa",
+    whatsapp: "+966501112233",
   },
 };

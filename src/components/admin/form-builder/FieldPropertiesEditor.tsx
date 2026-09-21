@@ -1,7 +1,7 @@
-import React from 'react';
-import { RequestField, FieldType, FieldOption } from '../../../types';
-import { Copy, Trash2, Lock } from 'lucide-react';
-import { ALL_FIELD_TYPES } from './formBuilderTypes';
+import React from "react";
+import { RequestField, FieldType, FieldOption } from "../../../types";
+import { Copy, Trash2, Lock } from "lucide-react";
+import { ALL_FIELD_TYPES } from "./formBuilderTypes";
 
 interface FieldPropertiesEditorProps {
   lang: string;
@@ -24,7 +24,9 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
     return (
       <div className="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex items-center justify-center min-h-[400px]">
         <div className="p-8 text-center text-slate-400 text-xs">
-          {lang === 'ar' ? 'اختر حقلاً من القائمة الجانبية لتعديله' : 'Select a field to edit'}
+          {lang === "ar"
+            ? "اختر حقلاً من القائمة الجانبية لتعديله"
+            : "Select a field to edit"}
         </div>
       </div>
     );
@@ -35,21 +37,23 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
       <div className="space-y-4 text-xs">
         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
           <span className="font-extrabold text-sm text-slate-900">
-            {lang === 'ar' ? 'خصائص الحقل وقواعد الإلزام والشرطية' : 'Field Settings & Rules'}
+            {lang === "ar"
+              ? "خصائص الحقل وقواعد الإلزام والشرطية"
+              : "Field Settings & Rules"}
           </span>
 
           <div className="flex items-center gap-1">
             <button
               onClick={() => onDuplicateField(selectedField)}
               className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
-              title={lang === 'ar' ? 'استنساخ الحقل' : 'Duplicate'}
+              title={lang === "ar" ? "استنساخ الحقل" : "Duplicate"}
             >
               <Copy className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => onDeleteField(selectedField.fieldId)}
               className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition-colors cursor-pointer"
-              title={lang === 'ar' ? 'حذف الحقل' : 'Delete'}
+              title={lang === "ar" ? "حذف الحقل" : "Delete"}
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -59,16 +63,18 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
         {/* Field Type Selector */}
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === 'ar' ? 'نوع الحقل (24 نوعاً متاحاً)' : 'Field Type'}
+            {lang === "ar" ? "نوع الحقل (24 نوعاً متاحاً)" : "Field Type"}
           </label>
           <select
             value={selectedField.fieldType}
-            onChange={(e) => onUpdateField({ fieldType: e.target.value as FieldType })}
+            onChange={(e) =>
+              onUpdateField({ fieldType: e.target.value as FieldType })
+            }
             className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white font-bold text-purple-950"
           >
             {ALL_FIELD_TYPES.map((t) => (
               <option key={t.type} value={t.type}>
-                {t.icon} {lang === 'ar' ? t.labelAr : t.labelEn} ({t.type})
+                {t.icon} {lang === "ar" ? t.labelAr : t.labelEn} ({t.type})
               </option>
             ))}
           </select>
@@ -78,12 +84,14 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === 'ar' ? 'مفتاح الحقل البرمجي' : 'Field Key (Unique)'}
+              {lang === "ar" ? "مفتاح الحقل البرمجي" : "Field Key (Unique)"}
             </label>
             <input
               type="text"
               value={selectedField.fieldKey}
-              onChange={(e) => onUpdateField({ fieldKey: e.target.value.trim() })}
+              onChange={(e) =>
+                onUpdateField({ fieldKey: e.target.value.trim() })
+              }
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono"
             />
           </div>
@@ -92,13 +100,26 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
             <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800">
               <input
                 type="checkbox"
-                checked={selectedField.isRequired && !(selectedField.readOnlyRule || selectedField.isReadOnly)}
-                disabled={!!selectedField.readOnlyRule || !!selectedField.isReadOnly}
-                onChange={(e) => onUpdateField({ isRequired: e.target.checked })}
+                checked={
+                  selectedField.isRequired &&
+                  !(selectedField.readOnlyRule || selectedField.isReadOnly)
+                }
+                disabled={
+                  !!selectedField.readOnlyRule || !!selectedField.isReadOnly
+                }
+                onChange={(e) =>
+                  onUpdateField({ isRequired: e.target.checked })
+                }
                 className="rounded text-purple-900 w-4 h-4 disabled:opacity-40"
               />
-              <span className={selectedField.readOnlyRule || selectedField.isReadOnly ? 'text-slate-400' : ''}>
-                {lang === 'ar' ? 'حقل إلزامي من المندوب' : 'Required from Rep'}
+              <span
+                className={
+                  selectedField.readOnlyRule || selectedField.isReadOnly
+                    ? "text-slate-400"
+                    : ""
+                }
+              >
+                {lang === "ar" ? "حقل إلزامي من المندوب" : "Required from Rep"}
               </span>
             </label>
           </div>
@@ -109,12 +130,16 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
           <label className="flex items-center gap-2 cursor-pointer font-bold text-amber-950 text-xs">
             <input
               type="checkbox"
-              checked={!!selectedField.readOnlyRule || !!selectedField.isReadOnly}
+              checked={
+                !!selectedField.readOnlyRule || !!selectedField.isReadOnly
+              }
               onChange={(e) =>
                 onUpdateField({
                   readOnlyRule: e.target.checked,
                   isReadOnly: e.target.checked,
-                  isRequired: e.target.checked ? false : selectedField.isRequired,
+                  isRequired: e.target.checked
+                    ? false
+                    : selectedField.isRequired,
                 })
               }
               className="rounded text-amber-700 w-4 h-4"
@@ -122,23 +147,23 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
             <div className="flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-amber-700" />
               <span>
-                {lang === 'ar'
-                  ? 'حقل للعرض فقط (بيانات مستوردة عبر الإكسل - غير قابلة للتعديل من المندوب)'
-                  : 'Read-Only Field (Imported via Excel - Non-editable by rep)'}
+                {lang === "ar"
+                  ? "حقل للعرض فقط (بيانات مستوردة عبر الإكسل - غير قابلة للتعديل من المندوب)"
+                  : "Read-Only Field (Imported via Excel - Non-editable by rep)"}
               </span>
             </div>
           </label>
           <p className="text-[11px] text-amber-800/90 leading-relaxed ps-6">
-            {lang === 'ar'
-              ? 'عند تفعيل هذا الخيار، يتم استيراد القيمة (مثل: رقم العميل، اسم العميل، الفرع، الموقع، المديونية، تاريخ آخر تعامل) من ملف الإكسل وتظهر للمندوب كمرجع ثابت بدون إمكانية التعديل، بينما يقوم بتعبأة الحقول الأخرى مثل سبب عدم الشراء.'
-              : 'When enabled, this value is imported from Excel (e.g. Customer No, Name, Branch, Location, Debt, Last Deal Date) and shown to the rep as read-only, allowing them to fill other fields like Reason for No Purchase.'}
+            {lang === "ar"
+              ? "عند تفعيل هذا الخيار، يتم استيراد القيمة (مثل: رقم العميل، اسم العميل، الفرع، الموقع، المديونية، تاريخ آخر تعامل) من ملف الإكسل وتظهر للمندوب كمرجع ثابت بدون إمكانية التعديل، بينما يقوم بتعبأة الحقول الأخرى مثل سبب عدم الشراء."
+              : "When enabled, this value is imported from Excel (e.g. Customer No, Name, Branch, Location, Debt, Last Deal Date) and shown to the rep as read-only, allowing them to fill other fields like Reason for No Purchase."}
           </p>
         </div>
 
         {/* Labels AR & EN */}
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === 'ar' ? 'تسمية الحقل بالعربية' : 'Label (Arabic)'}
+            {lang === "ar" ? "تسمية الحقل بالعربية" : "Label (Arabic)"}
           </label>
           <input
             type="text"
@@ -150,7 +175,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
 
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === 'ar' ? 'تسمية الحقل بالإنجليزية' : 'Label (English)'}
+            {lang === "ar" ? "تسمية الحقل بالإنجليزية" : "Label (English)"}
           </label>
           <input
             type="text"
@@ -164,22 +189,22 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === 'ar' ? 'نص إرشادي بالعربية' : 'Help Text (Arabic)'}
+              {lang === "ar" ? "نص إرشادي بالعربية" : "Help Text (Arabic)"}
             </label>
             <input
               type="text"
-              value={selectedField.helpTextAr || ''}
+              value={selectedField.helpTextAr || ""}
               onChange={(e) => onUpdateField({ helpTextAr: e.target.value })}
               className="w-full h-9 px-3 rounded-xl border border-slate-300"
             />
           </div>
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === 'ar' ? 'نص إرشادي بالإنجليزية' : 'Help Text (English)'}
+              {lang === "ar" ? "نص إرشادي بالإنجليزية" : "Help Text (English)"}
             </label>
             <input
               type="text"
-              value={selectedField.helpTextEn || ''}
+              value={selectedField.helpTextEn || ""}
               onChange={(e) => onUpdateField({ helpTextEn: e.target.value })}
               className="w-full h-9 px-3 rounded-xl border border-slate-300"
             />
@@ -187,11 +212,18 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
         </div>
 
         {/* Options Manager */}
-        {['select', 'single_choice', 'multi_choice', 'searchable_dropdown'].includes(selectedField.fieldType) && (
+        {[
+          "select",
+          "single_choice",
+          "multi_choice",
+          "searchable_dropdown",
+        ].includes(selectedField.fieldType) && (
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-800">
-                {lang === 'ar' ? 'خيارات القائمة المتاحة للمندوب' : 'Dropdown Options'}
+                {lang === "ar"
+                  ? "خيارات القائمة المتاحة للمندوب"
+                  : "Dropdown Options"}
               </span>
               <button
                 type="button"
@@ -207,7 +239,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
                 }}
                 className="text-[10px] font-bold text-purple-700 bg-purple-100 hover:bg-purple-200 px-2 py-0.5 rounded cursor-pointer transition-colors"
               >
-                + {lang === 'ar' ? 'إضافة خيار' : 'Add Option'}
+                + {lang === "ar" ? "إضافة خيار" : "Add Option"}
               </button>
             </div>
 
@@ -250,7 +282,9 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      const next = (selectedField.options || []).filter((_, idx) => idx !== i);
+                      const next = (selectedField.options || []).filter(
+                        (_, idx) => idx !== i,
+                      );
                       onUpdateField({ options: next });
                     }}
                     className="p-1 text-rose-500 hover:text-rose-700 cursor-pointer"
@@ -266,17 +300,19 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
         {/* Conditional Visibility Rule Builder */}
         <div className="p-3 bg-purple-50/50 rounded-xl border border-purple-100 space-y-2">
           <span className="font-bold text-purple-950 block">
-            {lang === 'ar' ? 'قاعدة الظهور الشرطي (Conditional Visibility)' : 'Conditional Visibility Rule'}
+            {lang === "ar"
+              ? "قاعدة الظهور الشرطي (Conditional Visibility)"
+              : "Conditional Visibility Rule"}
           </span>
           <p className="text-[11px] text-slate-500">
-            {lang === 'ar'
-              ? 'إظهار هذا الحقل فقط إذا تحققت قيمة معينة في حقل آخر'
-              : 'Show this field only when target field equals value'}
+            {lang === "ar"
+              ? "إظهار هذا الحقل فقط إذا تحققت قيمة معينة في حقل آخر"
+              : "Show this field only when target field equals value"}
           </p>
 
           <div className="grid grid-cols-3 gap-2">
             <select
-              value={selectedField.visibilityRule?.targetFieldKey || ''}
+              value={selectedField.visibilityRule?.targetFieldKey || ""}
               onChange={(e) => {
                 if (!e.target.value) {
                   onUpdateField({ visibilityRule: undefined });
@@ -284,15 +320,17 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
                   onUpdateField({
                     visibilityRule: {
                       targetFieldKey: e.target.value,
-                      operator: 'equals',
-                      value: 'other_reason',
+                      operator: "equals",
+                      value: "other_reason",
                     },
                   });
                 }
               }}
               className="h-8 px-2 rounded border border-slate-300 text-[11px]"
             >
-              <option value="">{lang === 'ar' ? '-- بدون شرط --' : '-- No Condition --'}</option>
+              <option value="">
+                {lang === "ar" ? "-- بدون شرط --" : "-- No Condition --"}
+              </option>
               {formFields
                 .filter((f) => f.fieldId !== selectedField.fieldId)
                 .map((f) => (
@@ -303,11 +341,14 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
             </select>
 
             <select
-              value={selectedField.visibilityRule?.operator || 'equals'}
+              value={selectedField.visibilityRule?.operator || "equals"}
               onChange={(e) => {
                 if (selectedField.visibilityRule) {
                   onUpdateField({
-                    visibilityRule: { ...selectedField.visibilityRule, operator: e.target.value as any },
+                    visibilityRule: {
+                      ...selectedField.visibilityRule,
+                      operator: e.target.value as any,
+                    },
                   });
                 }
               }}
@@ -321,11 +362,14 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
 
             <input
               type="text"
-              value={selectedField.visibilityRule?.value || ''}
+              value={selectedField.visibilityRule?.value || ""}
               onChange={(e) => {
                 if (selectedField.visibilityRule) {
                   onUpdateField({
-                    visibilityRule: { ...selectedField.visibilityRule, value: e.target.value },
+                    visibilityRule: {
+                      ...selectedField.visibilityRule,
+                      value: e.target.value,
+                    },
                   });
                 }
               }}

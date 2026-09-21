@@ -1,11 +1,11 @@
-import React from 'react';
-import { RequestField } from '../../../types';
-import { ExternalLink, Compass } from 'lucide-react';
+import React from "react";
+import { RequestField } from "../../../types";
+import { ExternalLink, Compass } from "lucide-react";
 
 interface RecordResponseWidgetProps {
   field: RequestField;
   val: any;
-  lang: 'ar' | 'en';
+  lang: "ar" | "en";
   setActiveImagePreview: (url: string) => void;
 }
 
@@ -15,42 +15,49 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
   lang,
   setActiveImagePreview,
 }) => {
-  if (val === undefined || val === null || val === '') {
+  if (val === undefined || val === null || val === "") {
     return (
       <span className="text-slate-400 italic text-xs">
-        {lang === 'ar' ? 'لم يتم تقديم إجابة' : 'No response provided'}
+        {lang === "ar" ? "لم يتم تقديم إجابة" : "No response provided"}
       </span>
     );
   }
 
   // Boolean or Yes/No
   if (
-    typeof val === 'boolean' ||
-    val === 'true' ||
-    val === 'false' ||
-    val === 'yes' ||
-    val === 'no' ||
-    val === 'نعم' ||
-    val === 'لا'
+    typeof val === "boolean" ||
+    val === "true" ||
+    val === "false" ||
+    val === "yes" ||
+    val === "no" ||
+    val === "نعم" ||
+    val === "لا"
   ) {
-    const isYes = val === true || val === 'true' || val === 'yes' || val === 'نعم';
+    const isYes =
+      val === true || val === "true" || val === "yes" || val === "نعم";
     return (
       <span
         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
-          isYes ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+          isYes
+            ? "bg-emerald-100 text-emerald-800"
+            : "bg-rose-100 text-rose-800"
         }`}
       >
-        {isYes ? '✓ ' + (lang === 'ar' ? 'نعم' : 'Yes') : '✕ ' + (lang === 'ar' ? 'لا' : 'No')}
+        {isYes
+          ? "✓ " + (lang === "ar" ? "نعم" : "Yes")
+          : "✕ " + (lang === "ar" ? "لا" : "No")}
       </span>
     );
   }
 
   // Photos / Images
   if (
-    field.fieldType === 'photo' ||
-    field.fieldType === 'multi_photo' ||
-    (typeof val === 'string' &&
-      (val.startsWith('http://') || val.startsWith('https://') || val.startsWith('data:image/')))
+    field.fieldType === "photo" ||
+    field.fieldType === "multi_photo" ||
+    (typeof val === "string" &&
+      (val.startsWith("http://") ||
+        val.startsWith("https://") ||
+        val.startsWith("data:image/")))
   ) {
     const urls = Array.isArray(val) ? val : [val];
     return (
@@ -77,21 +84,34 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
 
   // Signature
   if (
-    field.fieldType === 'signature' &&
-    typeof val === 'string' &&
-    (val.startsWith('data:image') || val.startsWith('http'))
+    field.fieldType === "signature" &&
+    typeof val === "string" &&
+    (val.startsWith("data:image") || val.startsWith("http"))
   ) {
     return (
       <div className="p-2 bg-white rounded-xl border border-slate-200 max-w-xs shadow-inner">
-        <img src={val} alt="Signature" className="max-h-24 object-contain mx-auto" />
+        <img
+          src={val}
+          alt="Signature"
+          className="max-h-24 object-contain mx-auto"
+        />
       </div>
     );
   }
 
   // GPS / Location
-  if (field.fieldType === 'gps' || (typeof val === 'object' && val.latitude !== undefined)) {
-    const lat = typeof val === 'object' ? val.latitude : parseFloat(String(val).split(',')[0]);
-    const lng = typeof val === 'object' ? val.longitude : parseFloat(String(val).split(',')[1]);
+  if (
+    field.fieldType === "gps" ||
+    (typeof val === "object" && val.latitude !== undefined)
+  ) {
+    const lat =
+      typeof val === "object"
+        ? val.latitude
+        : parseFloat(String(val).split(",")[0]);
+    const lng =
+      typeof val === "object"
+        ? val.longitude
+        : parseFloat(String(val).split(",")[1]);
     const hasCoords = !isNaN(lat) && !isNaN(lng);
 
     return (
@@ -107,7 +127,9 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
             className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline"
           >
             <Compass className="w-3.5 h-3.5" />
-            <span>{lang === 'ar' ? 'عرض على خرائط Google' : 'Open in Google Maps'}</span>
+            <span>
+              {lang === "ar" ? "عرض على خرائط Google" : "Open in Google Maps"}
+            </span>
           </a>
         )}
       </div>
@@ -117,12 +139,12 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
   // Option / Select / Radio
   if (field.options && field.options.length > 0) {
     const match = field.options.find(
-      (opt) => opt.value === String(val) || opt.id === String(val)
+      (opt) => opt.value === String(val) || opt.id === String(val),
     );
     if (match) {
       return (
         <span className="inline-block font-semibold text-xs text-purple-900 bg-purple-50 px-3 py-1 rounded-lg border border-purple-200">
-          {lang === 'ar' ? match.labelAr : match.labelEn}
+          {lang === "ar" ? match.labelAr : match.labelEn}
         </span>
       );
     }

@@ -4,7 +4,7 @@ import fft from "firebase-functions-test";
 const testEnv = fft();
 
 jest.mock("../config/db", () => ({
-  DATABASE_ID: 'datacollectionportal',
+  DATABASE_ID: "datacollectionportal",
   db: {
     collection: jest.fn(),
   },
@@ -72,7 +72,9 @@ describe("Request Management - publishRequest", () => {
       return {
         where: jest.fn().mockReturnThis(),
         get: jest.fn().mockResolvedValue({ docs: [] }),
-        doc: jest.fn().mockReturnValue({ set: jest.fn().mockResolvedValue(true) }),
+        doc: jest
+          .fn()
+          .mockReturnValue({ set: jest.fn().mockResolvedValue(true) }),
       };
     });
 
@@ -98,7 +100,7 @@ describe("Request Management - publishRequest", () => {
           { id: "field1", orderIndex: 1 },
           { id: "field2", orderIndex: 2 },
         ],
-      })
+      }),
     );
   });
 
@@ -108,9 +110,9 @@ describe("Request Management - publishRequest", () => {
     // Setup mocks: this time schemaSnapshot exists
     const requestDocMock = {
       exists: true,
-      data: () => ({ 
-        formSchemaVersion: 1, 
-        schemaSnapshot: [{ id: "existing_field" }] 
+      data: () => ({
+        formSchemaVersion: 1,
+        schemaSnapshot: [{ id: "existing_field" }],
       }),
     };
 
@@ -137,7 +139,9 @@ describe("Request Management - publishRequest", () => {
       return {
         where: jest.fn().mockReturnThis(),
         get: jest.fn().mockResolvedValue({ docs: [] }),
-        doc: jest.fn().mockReturnValue({ set: jest.fn().mockResolvedValue(true) }),
+        doc: jest
+          .fn()
+          .mockReturnValue({ set: jest.fn().mockResolvedValue(true) }),
       };
     });
 
@@ -156,7 +160,7 @@ describe("Request Management - publishRequest", () => {
     expect(requestRefMock.update).toHaveBeenCalledWith(
       expect.objectContaining({
         status: "Published",
-      })
+      }),
     );
 
     // Verify it doesn't overwrite schemaSnapshot

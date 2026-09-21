@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
-import { RequestItem, RequestPriority, RequestType } from '../../types';
+import React, { useState } from "react";
+import { useApp } from "../../context/AppContext";
+import { RequestItem, RequestPriority, RequestType } from "../../types";
 import {
   FilePlus,
   Search,
@@ -28,12 +28,18 @@ import {
   Loader2,
   Trash2,
   AlertTriangle,
-} from 'lucide-react';
-import { CreateRequestModal, EditRequestModal, AssignmentsOverviewModal } from './requests';
-import { RequestsHeader } from './requests/RequestsHeader';
-import { RequestsTable } from './requests/RequestsTable';
-import { RequestFilters } from './requests/RequestFilters';
-import { RequestTableRow } from './requests/RequestTableRow';
+} from "lucide-react";
+import {
+  CreateRequestModal,
+  EditRequestModal,
+  AssignmentsOverviewModal,
+} from "./requests";
+import { RequestsHeader } from "./requests/RequestsHeader";
+import { RequestsTable } from "./requests/RequestsTable";
+import { RequestFilters } from "./requests/RequestFilters";
+import { RequestTableRow } from "./requests/RequestTableRow";
+import { SaveTemplateModal } from "./requests/SaveTemplateModal";
+import { DeleteRequestModal } from "./requests/DeleteRequestModal";
 
 interface Props {
   onOpenFormBuilder: (requestId: string) => void;
@@ -69,17 +75,23 @@ export const AdminRequests: React.FC<Props> = ({
     saveAsTemplate,
   } = useApp();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showTemplateModal, setShowTemplateModal] = useState<string | null>(null);
-  const [templateNameAr, setTemplateNameAr] = useState('');
-  const [templateNameEn, setTemplateNameEn] = useState('');
+  const [showTemplateModal, setShowTemplateModal] = useState<string | null>(
+    null,
+  );
+  const [templateNameAr, setTemplateNameAr] = useState("");
+  const [templateNameEn, setTemplateNameEn] = useState("");
 
   // Active Modals & Operations State
-  const [editingRequest, setEditingRequest] = useState<RequestItem | null>(null);
-  const [viewingAssignmentsRequest, setViewingAssignmentsRequest] = useState<RequestItem | null>(null);
-  const [deleteConfirmRequest, setDeleteConfirmRequest] = useState<RequestItem | null>(null);
+  const [editingRequest, setEditingRequest] = useState<RequestItem | null>(
+    null,
+  );
+  const [viewingAssignmentsRequest, setViewingAssignmentsRequest] =
+    useState<RequestItem | null>(null);
+  const [deleteConfirmRequest, setDeleteConfirmRequest] =
+    useState<RequestItem | null>(null);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -89,7 +101,7 @@ export const AdminRequests: React.FC<Props> = ({
   };
 
   const filteredRequests = requests.filter((r) => {
-    if (statusFilter !== 'ALL' && r.status !== statusFilter) return false;
+    if (statusFilter !== "ALL" && r.status !== statusFilter) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchAr = r.titleAr.toLowerCase().includes(q);
@@ -120,8 +132,8 @@ export const AdminRequests: React.FC<Props> = ({
           requestCode: data.requestCode,
           titleAr: data.titleAr.trim(),
           titleEn: data.titleEn?.trim() || data.titleAr.trim(),
-          descriptionAr: data.descriptionAr || '',
-          descriptionEn: data.descriptionEn || data.descriptionAr || '',
+          descriptionAr: data.descriptionAr || "",
+          descriptionEn: data.descriptionEn || data.descriptionAr || "",
           priority: data.priority,
           requestType: data.requestType,
           dueAt: new Date(data.dueAt).toISOString(),
@@ -131,7 +143,7 @@ export const AdminRequests: React.FC<Props> = ({
           allowEditAfterSubmit: data.allowEditAfterSubmit,
           requireSupervisorApproval: data.requireSupervisorApproval,
         },
-        []
+        [],
       );
 
       setShowCreateModal(false);
@@ -140,26 +152,40 @@ export const AdminRequests: React.FC<Props> = ({
       }
     } catch (err) {
       console.error("Error creating request:", err);
-      alert(lang === 'ar' ? 'حدث خطأ أثناء إنشاء الطلب' : 'Error creating request');
+      alert(
+        lang === "ar" ? "حدث خطأ أثناء إنشاء الطلب" : "Error creating request",
+      );
     }
   };
 
-  const handleEditSubmit = async (requestId: string, updates: Partial<RequestItem>) => {
+  const handleEditSubmit = async (
+    requestId: string,
+    updates: Partial<RequestItem>,
+  ) => {
     try {
       await updateRequest(requestId, updates);
       setEditingRequest(null);
     } catch (err) {
       console.error("Error updating request:", err);
-      alert(lang === 'ar' ? 'تعذر حفظ تعديلات الطلب' : 'Error updating request');
+      alert(
+        lang === "ar" ? "تعذر حفظ تعديلات الطلب" : "Error updating request",
+      );
     }
   };
 
   const handleSaveTemplateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (showTemplateModal) {
-      saveAsTemplate(showTemplateModal, templateNameAr, templateNameEn, 'Custom');
+      saveAsTemplate(
+        showTemplateModal,
+        templateNameAr,
+        templateNameEn,
+        "Custom",
+      );
       setShowTemplateModal(null);
-      showToast(lang === 'ar' ? 'تم حفظ القالب بنجاح' : 'Template saved successfully');
+      showToast(
+        lang === "ar" ? "تم حفظ القالب بنجاح" : "Template saved successfully",
+      );
     }
   };
 
@@ -167,14 +193,16 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_publish`);
     try {
       await publishRequest(requestId);
-      showToast(lang === 'ar' ? 'تم نشر الطلب بنجاح' : 'Request published successfully');
+      showToast(
+        lang === "ar" ? "تم نشر الطلب بنجاح" : "Request published successfully",
+      );
     } catch (err: any) {
       const message =
         err?.details?.message ||
         err?.message ||
-        (lang === 'ar'
-          ? 'تعذر نشر الطلب. تحقق من حقول النموذج ثم حاول مرة أخرى.'
-          : 'The request could not be published. Check the form fields and try again.');
+        (lang === "ar"
+          ? "تعذر نشر الطلب. تحقق من حقول النموذج ثم حاول مرة أخرى."
+          : "The request could not be published. Check the form fields and try again.");
       alert(message);
     } finally {
       setActionLoadingId(null);
@@ -185,9 +213,16 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_close`);
     try {
       await closeRequest(requestId);
-      showToast(lang === 'ar' ? 'تم إغلاق الطلب بنجاح' : 'Request closed successfully');
+      showToast(
+        lang === "ar" ? "تم إغلاق الطلب بنجاح" : "Request closed successfully",
+      );
     } catch (err: any) {
-      alert(err?.message || (lang === 'ar' ? 'حدث خطأ أثناء إغلاق الطلب' : 'Error closing request'));
+      alert(
+        err?.message ||
+          (lang === "ar"
+            ? "حدث خطأ أثناء إغلاق الطلب"
+            : "Error closing request"),
+      );
     } finally {
       setActionLoadingId(null);
     }
@@ -197,9 +232,18 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_archive`);
     try {
       await archiveRequest(requestId);
-      showToast(lang === 'ar' ? 'تمت أرشفة الطلب بنجاح' : 'Request archived successfully');
+      showToast(
+        lang === "ar"
+          ? "تمت أرشفة الطلب بنجاح"
+          : "Request archived successfully",
+      );
     } catch (err: any) {
-      alert(err?.message || (lang === 'ar' ? 'حدث خطأ أثناء أرشفة الطلب' : 'Error archiving request'));
+      alert(
+        err?.message ||
+          (lang === "ar"
+            ? "حدث خطأ أثناء أرشفة الطلب"
+            : "Error archiving request"),
+      );
     } finally {
       setActionLoadingId(null);
     }
@@ -209,9 +253,18 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_reopen`);
     try {
       await reopenRequest(requestId);
-      showToast(lang === 'ar' ? 'تمت إعادة فتح الطلب بنجاح' : 'Request reopened successfully');
+      showToast(
+        lang === "ar"
+          ? "تمت إعادة فتح الطلب بنجاح"
+          : "Request reopened successfully",
+      );
     } catch (err: any) {
-      alert(err?.message || (lang === 'ar' ? 'حدث خطأ أثناء إعادة فتح الطلب' : 'Error reopening request'));
+      alert(
+        err?.message ||
+          (lang === "ar"
+            ? "حدث خطأ أثناء إعادة فتح الطلب"
+            : "Error reopening request"),
+      );
     } finally {
       setActionLoadingId(null);
     }
@@ -221,9 +274,18 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_clone`);
     try {
       await cloneRequest(requestId);
-      showToast(lang === 'ar' ? 'تم استنساخ الطلب بنجاح' : 'Request cloned successfully');
+      showToast(
+        lang === "ar"
+          ? "تم استنساخ الطلب بنجاح"
+          : "Request cloned successfully",
+      );
     } catch (err: any) {
-      alert(err?.message || (lang === 'ar' ? 'حدث خطأ أثناء استنساخ الطلب' : 'Error cloning request'));
+      alert(
+        err?.message ||
+          (lang === "ar"
+            ? "حدث خطأ أثناء استنساخ الطلب"
+            : "Error cloning request"),
+      );
     } finally {
       setActionLoadingId(null);
     }
@@ -234,12 +296,21 @@ export const AdminRequests: React.FC<Props> = ({
     try {
       const res = await deleteRequest(requestId);
       if (res.success) {
-        showToast(lang === 'ar' ? 'تم حذف الطلب وجميع بياناته بنجاح' : 'Request deleted successfully');
+        showToast(
+          lang === "ar"
+            ? "تم حذف الطلب وجميع بياناته بنجاح"
+            : "Request deleted successfully",
+        );
       } else {
-        alert(lang === 'ar' ? 'فشل حذف الطلب' : 'Failed to delete request');
+        alert(lang === "ar" ? "فشل حذف الطلب" : "Failed to delete request");
       }
     } catch (err: any) {
-      alert(err?.message || (lang === 'ar' ? 'حدث خطأ أثناء حذف الطلب' : 'Error deleting request'));
+      alert(
+        err?.message ||
+          (lang === "ar"
+            ? "حدث خطأ أثناء حذف الطلب"
+            : "Error deleting request"),
+      );
     } finally {
       setActionLoadingId(null);
       setDeleteConfirmRequest(null);
@@ -296,7 +367,7 @@ export const AdminRequests: React.FC<Props> = ({
         onDelete={setDeleteConfirmRequest}
         onViewResponses={(r) => {
           if (onNavigate) {
-            onNavigate('reports');
+            onNavigate("reports");
           }
           if (propOnViewResponses) {
             propOnViewResponses(r.requestId);
@@ -335,108 +406,24 @@ export const AdminRequests: React.FC<Props> = ({
         lang={lang}
         onOpenImportWizard={onOpenImportWizard}
       />
+      <SaveTemplateModal
+        isOpen={showTemplateModal !== null}
+        onClose={() => setShowTemplateModal(null)}
+        lang={lang}
+        templateNameAr={templateNameAr}
+        setTemplateNameAr={setTemplateNameAr}
+        templateNameEn={templateNameEn}
+        setTemplateNameEn={setTemplateNameEn}
+        onSubmit={handleSaveTemplateSubmit}
+      />
 
-
-      {/* Save Template Modal */}
-      {showTemplateModal && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl border border-slate-200">
-            <h3 className="font-bold text-sm text-slate-900 mb-1">
-              {lang === 'ar' ? 'حفظ الطلب كقالب معتمد' : 'Save as Request Template'}
-            </h3>
-            <p className="text-xs text-slate-500 mb-4">
-              {lang === 'ar'
-                ? 'يمكنك إعادة استخدام هيكل الحقول لاحقاً لحملات مشابهة'
-                : 'Save field schema to reuse in future campaigns'}
-            </p>
-
-            <form onSubmit={handleSaveTemplateSubmit} className="space-y-3 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'اسم القالب بالعربية' : 'Template Name (Arabic)'}
-                </label>
-                <input
-                  type="text"
-                  value={templateNameAr}
-                  onChange={(e) => setTemplateNameAr(e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-slate-300"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {lang === 'ar' ? 'اسم القالب بالإنجليزية' : 'Template Name (English)'}
-                </label>
-                <input
-                  type="text"
-                  value={templateNameEn}
-                  onChange={(e) => setTemplateNameEn(e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-slate-300"
-                  required
-                />
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowTemplateModal(null)}
-                  className="flex-1 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
-                >
-                  {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 h-9 rounded-lg bg-purple-900 hover:bg-purple-800 text-white font-bold"
-                >
-                  {lang === 'ar' ? 'حفظ القالب' : 'Save'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Request Confirmation Modal */}
-      {deleteConfirmRequest && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
-            <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
-              <Trash2 className="w-6 h-6" />
-            </div>
-            <h3 className="font-bold text-sm text-slate-900 text-center mb-1">
-              {lang === 'ar' ? 'تأكيد حذف الطلب بالكامل' : 'Confirm Delete Request'}
-            </h3>
-            <p className="text-xs text-slate-500 text-center mb-4">
-              {lang === 'ar'
-                ? `هل أنت متأكد من رغبتك في حذف "${deleteConfirmRequest.titleAr}" (${deleteConfirmRequest.requestCode}) وجميع التكليفات والحقول والسجلات التابعة له؟ لا يمكن التراجع عن هذا الإجراء.`
-                : `Are you sure you want to delete "${deleteConfirmRequest.titleEn}" (${deleteConfirmRequest.requestCode}) and all associated assignments, fields, and records? This action cannot be undone.`}
-            </p>
-
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setDeleteConfirmRequest(null)}
-                disabled={actionLoadingId !== null}
-                className="flex-1 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs disabled:opacity-50"
-              >
-                {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDelete(deleteConfirmRequest.requestId)}
-                disabled={actionLoadingId !== null}
-                className="flex-1 h-9 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50"
-              >
-                {actionLoadingId === `${deleteConfirmRequest.requestId}_delete` && (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                )}
-                <span>{lang === 'ar' ? 'نعم، احذف نهائياً' : 'Yes, Delete'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteRequestModal
+        request={deleteConfirmRequest}
+        onClose={() => setDeleteConfirmRequest(null)}
+        onConfirm={handleDelete}
+        lang={lang}
+        isDeleting={actionLoadingId !== null && deleteConfirmRequest !== null && actionLoadingId === `${deleteConfirmRequest.requestId}_delete`}
+      />
     </div>
   );
 };

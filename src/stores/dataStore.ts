@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 import {
   User,
   Branch,
@@ -11,8 +11,8 @@ import {
   RequestTemplate,
   AuditLog,
   DeviceBinding,
-  PasswordResetRequest
-} from '../types';
+  PasswordResetRequest,
+} from "../types";
 
 interface DataStore {
   // Collections Data
@@ -93,11 +93,16 @@ export const useDataStore = create<DataStore>((set) => ({
   setDeviceBindings: (deviceBindings) => set({ deviceBindings }),
 
   passwordResetRequests: [],
-  setPasswordResetRequests: (passwordResetRequests) => set({ passwordResetRequests }),
+  setPasswordResetRequests: (passwordResetRequests) =>
+    set({ passwordResetRequests }),
 
-  addAuditLogLocal: (log) => set((state) => ({ auditLogs: [log, ...state.auditLogs] })),
-  
-  updateUserLocal: (updatedUser) => set((state) => ({
-    users: state.users.map((u) => u.userId === updatedUser.userId ? updatedUser : u)
-  })),
+  addAuditLogLocal: (log) =>
+    set((state) => ({ auditLogs: [log, ...state.auditLogs] })),
+
+  updateUserLocal: (updatedUser) =>
+    set((state) => ({
+      users: state.users.map((u) =>
+        u.userId === updatedUser.userId ? updatedUser : u,
+      ),
+    })),
 }));

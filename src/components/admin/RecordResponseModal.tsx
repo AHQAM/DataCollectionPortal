@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
-import { RecordItem, RequestField, RequestItem } from '../../types';
+import React, { useState } from "react";
+import { useApp } from "../../context/AppContext";
+import { RecordItem, RequestField, RequestItem } from "../../types";
 import {
   X,
   FileText,
@@ -18,8 +18,8 @@ import {
   PenTool,
   Download,
   Info,
-} from 'lucide-react';
-import { RecordResponseWidget } from './records/RecordResponseWidget';
+} from "lucide-react";
+import { RecordResponseWidget } from "./records/RecordResponseWidget";
 
 interface Props {
   record: RecordItem | null;
@@ -37,7 +37,9 @@ export const RecordResponseModal: React.FC<Props> = ({
   onClose,
 }) => {
   const { lang } = useApp();
-  const [activeImagePreview, setActiveImagePreview] = useState<string | null>(null);
+  const [activeImagePreview, setActiveImagePreview] = useState<string | null>(
+    null,
+  );
 
   if (!record) return null;
 
@@ -51,27 +53,33 @@ export const RecordResponseModal: React.FC<Props> = ({
   });
   // System keys to ignore from "extra keys"
   const ignoredKeys = new Set([
-    'recordId',
-    'requestId',
-    'activityId',
-    'submittedBy',
-    'submittedAt',
-    'updatedAt',
-    'createdAt',
-    'id',
-    'data',
-    'formData',
+    "recordId",
+    "requestId",
+    "activityId",
+    "submittedBy",
+    "submittedAt",
+    "updatedAt",
+    "createdAt",
+    "id",
+    "data",
+    "formData",
   ]);
 
   const extraEntries = Object.entries(respData).filter(
-    ([key]) => !knownKeys.has(key) && !ignoredKeys.has(key)
+    ([key]) => !knownKeys.has(key) && !ignoredKeys.has(key),
   );
 
   const getFieldValue = (field: RequestField) => {
-    if (respData[field.fieldKey] !== undefined && respData[field.fieldKey] !== null) {
+    if (
+      respData[field.fieldKey] !== undefined &&
+      respData[field.fieldKey] !== null
+    ) {
       return respData[field.fieldKey];
     }
-    if (respData[field.fieldId] !== undefined && respData[field.fieldId] !== null) {
+    if (
+      respData[field.fieldId] !== undefined &&
+      respData[field.fieldId] !== null
+    ) {
       return respData[field.fieldId];
     }
     return undefined;
@@ -90,19 +98,27 @@ export const RecordResponseModal: React.FC<Props> = ({
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'Completed':
-      case 'Submitted':
+      case "Completed":
+      case "Submitted":
         return (
           <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{status === 'Submitted' ? (lang === 'ar' ? 'تم الإرسال' : 'Submitted') : (lang === 'ar' ? 'مكتمل' : 'Completed')}</span>
+            <span>
+              {status === "Submitted"
+                ? lang === "ar"
+                  ? "تم الإرسال"
+                  : "Submitted"
+                : lang === "ar"
+                  ? "مكتمل"
+                  : "Completed"}
+            </span>
           </span>
         );
-      case 'DraftSaved':
+      case "DraftSaved":
         return (
           <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
-            <span>{lang === 'ar' ? 'مسودة محفوظة' : 'Draft Saved'}</span>
+            <span>{lang === "ar" ? "مسودة محفوظة" : "Draft Saved"}</span>
           </span>
         );
       default:
@@ -126,12 +142,15 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-extrabold text-slate-900">
-                  {lang === 'ar' ? 'تفاصيل استجابة السجل الميداني' : 'Field Record Response Details'}
+                  {lang === "ar"
+                    ? "تفاصيل استجابة السجل الميداني"
+                    : "Field Record Response Details"}
                 </h2>
                 {getStatusBadge(record.recordStatus)}
               </div>
               <p className="text-xs text-slate-500 font-mono mt-0.5">
-                {request?.requestCode} - {lang === 'ar' ? request?.titleAr : request?.titleEn}
+                {request?.requestCode} -{" "}
+                {lang === "ar" ? request?.titleAr : request?.titleEn}
               </p>
             </div>
           </div>
@@ -140,7 +159,7 @@ export const RecordResponseModal: React.FC<Props> = ({
             <button
               onClick={() => window.print()}
               className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
-              title={lang === 'ar' ? 'طباعة' : 'Print'}
+              title={lang === "ar" ? "طباعة" : "Print"}
             >
               <Printer className="w-4 h-4" />
             </button>
@@ -160,44 +179,66 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <User className="w-3.5 h-3.5 text-purple-600" />
-                <span>{lang === 'ar' ? 'العميل' : 'Customer'}</span>
+                <span>{lang === "ar" ? "العميل" : "Customer"}</span>
               </div>
-              <div className="text-xs font-black text-slate-900 truncate">{record.customerName}</div>
-              <div className="text-[10px] font-mono text-slate-400">{record.customerNo}</div>
+              <div className="text-xs font-black text-slate-900 truncate">
+                {record.customerName}
+              </div>
+              <div className="text-[10px] font-mono text-slate-400">
+                {record.customerNo}
+              </div>
             </div>
 
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <MapPin className="w-3.5 h-3.5 text-purple-600" />
-                <span>{lang === 'ar' ? 'المندوب والمنطقة' : 'Rep & Region'}</span>
+                <span>
+                  {lang === "ar" ? "المندوب والمنطقة" : "Rep & Region"}
+                </span>
               </div>
-              <div className="text-xs font-black text-slate-900 truncate">{record.repName || '-'}</div>
-              <div className="text-[10px] font-mono text-purple-700">#{record.assignedRegionNo || record.regionNo || '-'}</div>
+              <div className="text-xs font-black text-slate-900 truncate">
+                {record.repName || "-"}
+              </div>
+              <div className="text-[10px] font-mono text-purple-700">
+                #{record.assignedRegionNo || record.regionNo || "-"}
+              </div>
             </div>
 
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <Building className="w-3.5 h-3.5 text-purple-600" />
-                <span>{lang === 'ar' ? 'الفرع' : 'Branch'}</span>
+                <span>{lang === "ar" ? "الفرع" : "Branch"}</span>
               </div>
-              <div className="text-xs font-black text-slate-900 truncate">{record.branchName || '-'}</div>
-              <div className="text-[10px] font-mono text-slate-400">{record.branchId || '-'}</div>
+              <div className="text-xs font-black text-slate-900 truncate">
+                {record.branchName || "-"}
+              </div>
+              <div className="text-[10px] font-mono text-slate-400">
+                {record.branchId || "-"}
+              </div>
             </div>
 
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <Calendar className="w-3.5 h-3.5 text-purple-600" />
-                <span>{lang === 'ar' ? 'تاريخ التحديث / الإرسال' : 'Submission Date'}</span>
+                <span>
+                  {lang === "ar"
+                    ? "تاريخ التحديث / الإرسال"
+                    : "Submission Date"}
+                </span>
               </div>
               <div className="text-xs font-black text-slate-900">
                 {record.submittedAt || record.updatedAt
-                  ? new Date(record.submittedAt || record.updatedAt).toLocaleDateString()
-                  : '-'}
+                  ? new Date(
+                      record.submittedAt || record.updatedAt,
+                    ).toLocaleDateString()
+                  : "-"}
               </div>
               <div className="text-[10px] text-slate-400">
                 {record.submittedAt || record.updatedAt
-                  ? new Date(record.submittedAt || record.updatedAt).toLocaleTimeString()
-                  : ''}
+                  ? new Date(
+                      record.submittedAt || record.updatedAt,
+                    ).toLocaleTimeString()
+                  : ""}
               </div>
             </div>
           </div>
@@ -207,16 +248,22 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-purple-700" />
-                <span>{lang === 'ar' ? 'الاستجابات وإجابات الحقول' : 'Field Responses & Answers'}</span>
+                <span>
+                  {lang === "ar"
+                    ? "الاستجابات وإجابات الحقول"
+                    : "Field Responses & Answers"}
+                </span>
               </h3>
               <span className="text-[11px] font-mono text-slate-400">
-                {fields.length} {lang === 'ar' ? 'حقل معرف' : 'fields defined'}
+                {fields.length} {lang === "ar" ? "حقل معرف" : "fields defined"}
               </span>
             </div>
 
             {fields.length === 0 ? (
               <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-400 text-xs">
-                {lang === 'ar' ? 'لا توجد حقول معرفة لهذا الطلب.' : 'No form fields defined for this campaign.'}
+                {lang === "ar"
+                  ? "لا توجد حقول معرفة لهذا الطلب."
+                  : "No form fields defined for this campaign."}
               </div>
             ) : (
               <div className="space-y-3">
@@ -233,10 +280,15 @@ export const RecordResponseModal: React.FC<Props> = ({
                             {index + 1}
                           </span>
                           <span className="text-xs font-bold text-slate-900">
-                            {lang === 'ar' ? field.fieldLabelAr : field.fieldLabelEn}
+                            {lang === "ar"
+                              ? field.fieldLabelAr
+                              : field.fieldLabelEn}
                           </span>
                           {field.isRequired && (
-                            <span className="text-rose-500 font-bold text-xs" title="مطلوب / Required">
+                            <span
+                              className="text-rose-500 font-bold text-xs"
+                              title="مطلوب / Required"
+                            >
                               *
                             </span>
                           )}
@@ -248,7 +300,7 @@ export const RecordResponseModal: React.FC<Props> = ({
 
                       {(field.helpTextAr || field.helpTextEn) && (
                         <p className="text-[11px] text-slate-400">
-                          {lang === 'ar' ? field.helpTextAr : field.helpTextEn}
+                          {lang === "ar" ? field.helpTextAr : field.helpTextEn}
                         </p>
                       )}
 
@@ -265,14 +317,25 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="space-y-3 pt-3 border-t border-slate-100">
               <h4 className="text-xs font-extrabold text-slate-600 flex items-center gap-1.5">
                 <Info className="w-3.5 h-3.5 text-slate-400" />
-                <span>{lang === 'ar' ? 'بيانات وحقول إضافية مسجلة' : 'Additional Response Data'}</span>
+                <span>
+                  {lang === "ar"
+                    ? "بيانات وحقول إضافية مسجلة"
+                    : "Additional Response Data"}
+                </span>
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {extraEntries.map(([key, val]) => (
-                  <div key={key} className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-                    <span className="font-mono text-[10px] text-slate-500 block mb-1">{key}</span>
+                  <div
+                    key={key}
+                    className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs"
+                  >
+                    <span className="font-mono text-[10px] text-slate-500 block mb-1">
+                      {key}
+                    </span>
                     <span className="font-semibold text-slate-800">
-                      {typeof val === 'object' ? JSON.stringify(val) : String(val)}
+                      {typeof val === "object"
+                        ? JSON.stringify(val)
+                        : String(val)}
                     </span>
                   </div>
                 ))}
@@ -284,14 +347,14 @@ export const RecordResponseModal: React.FC<Props> = ({
         {/* Footer */}
         <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
           <div className="text-[11px] text-slate-400 font-mono">
-            {lang === 'ar' ? 'معرف السجل:' : 'Record ID:'} {record.recordId}
+            {lang === "ar" ? "معرف السجل:" : "Record ID:"} {record.recordId}
           </div>
 
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer"
           >
-            {lang === 'ar' ? 'إغلاق' : 'Close'}
+            {lang === "ar" ? "إغلاق" : "Close"}
           </button>
         </div>
       </div>
@@ -312,7 +375,7 @@ export const RecordResponseModal: React.FC<Props> = ({
               onClick={() => setActiveImagePreview(null)}
               className="mt-3 px-4 py-1.5 rounded-full bg-white/20 hover:bg-white/40 text-white text-xs font-bold backdrop-blur-md transition-all"
             >
-              {lang === 'ar' ? 'إغلاق المعاينة' : 'Close Preview'}
+              {lang === "ar" ? "إغلاق المعاينة" : "Close Preview"}
             </button>
           </div>
         </div>

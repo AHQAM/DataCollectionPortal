@@ -1,15 +1,17 @@
-import React from 'react';
-import { Shield } from 'lucide-react';
+import React from "react";
+import { Shield } from "lucide-react";
 
 interface SettingsSecuritySectionProps {
-  lang: 'ar' | 'en';
+  lang: "ar" | "en";
   maxFailedAttempts: number;
   setMaxFailedAttempts: (v: number) => void;
   lockoutDurationMinutes: number;
   setLockoutDurationMinutes: (v: number) => void;
 }
 
-export const SettingsSecuritySection: React.FC<SettingsSecuritySectionProps> = ({
+export const SettingsSecuritySection: React.FC<
+  SettingsSecuritySectionProps
+> = ({
   lang,
   maxFailedAttempts,
   setMaxFailedAttempts,
@@ -20,13 +22,19 @@ export const SettingsSecuritySection: React.FC<SettingsSecuritySectionProps> = (
     <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
       <div className="flex items-center gap-2 text-xs font-extrabold text-purple-950 pb-2 border-b border-slate-100">
         <Shield className="w-4 h-4 text-purple-700" />
-        <span>{lang === 'ar' ? 'سياسة كلمات المرور وقفل الحسابات (القسم 5)' : 'Password & Lockout Security Policy'}</span>
+        <span>
+          {lang === "ar"
+            ? "سياسة كلمات المرور وقفل الحسابات (القسم 5)"
+            : "Password & Lockout Security Policy"}
+        </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === 'ar' ? 'الحد الأقصى لمحاولات الدخول الخاطئة قبل القفل' : 'Max Failed Attempts Before Lockout'}
+            {lang === "ar"
+              ? "الحد الأقصى لمحاولات الدخول الخاطئة قبل القفل"
+              : "Max Failed Attempts Before Lockout"}
           </label>
           <input
             type="number"
@@ -37,13 +45,17 @@ export const SettingsSecuritySection: React.FC<SettingsSecuritySectionProps> = (
             className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
           />
           <span className="text-[10px] text-slate-400 mt-1 block">
-            {lang === 'ar' ? 'القيمة المعتمدة: 3 محاولات' : 'Default: 3 attempts'}
+            {lang === "ar"
+              ? "القيمة المعتمدة: 3 محاولات"
+              : "Default: 3 attempts"}
           </span>
         </div>
 
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === 'ar' ? 'مدة قفل الحساب التلقائي (بالدقائق)' : 'Automatic Lockout Duration (Minutes)'}
+            {lang === "ar"
+              ? "مدة قفل الحساب التلقائي (بالدقائق)"
+              : "Automatic Lockout Duration (Minutes)"}
           </label>
           <input
             type="number"
@@ -54,17 +66,31 @@ export const SettingsSecuritySection: React.FC<SettingsSecuritySectionProps> = (
             className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
           />
           <span className="text-[10px] text-slate-400 mt-1 block">
-            {lang === 'ar' ? 'القيمة المعتمدة: 15 دقيقة' : 'Default: 15 minutes'}
+            {lang === "ar"
+              ? "القيمة المعتمدة: 15 دقيقة"
+              : "Default: 15 minutes"}
           </span>
         </div>
       </div>
 
       <div className="p-3 bg-purple-50/70 rounded-xl text-xs space-y-1 text-purple-950">
-        <div className="font-bold">{lang === 'ar' ? 'القواعد الأمنية المطبقة إجبارياً:' : 'Enforced Security Rules:'}</div>
-        <div className="text-[11px] text-slate-600">• يتم إنشاء كلمة مرور مؤقتة وفريدة للحسابات الجديدة.</div>
-        <div className="text-[11px] text-slate-600">• فرض تغيير كلمة المرور فور أول تسجيل دخول بنجاح.</div>
-        <div className="text-[11px] text-slate-600">• يجب تغيير كلمة المرور المؤقتة عند أول تسجيل دخول.</div>
-        <div className="text-[11px] text-slate-600">• حصر الحساب على هاتف ذكي واحد معتمد (UUID).</div>
+        <div className="font-bold">
+          {lang === "ar"
+            ? "القواعد الأمنية المطبقة إجبارياً:"
+            : "Enforced Security Rules:"}
+        </div>
+        <div className="text-[11px] text-slate-600">
+          • يتم إنشاء كلمة مرور مؤقتة وفريدة للحسابات الجديدة.
+        </div>
+        <div className="text-[11px] text-slate-600">
+          • فرض تغيير كلمة المرور فور أول تسجيل دخول بنجاح.
+        </div>
+        <div className="text-[11px] text-slate-600">
+          • يجب تغيير كلمة المرور المؤقتة عند أول تسجيل دخول.
+        </div>
+        <div className="text-[11px] text-slate-600">
+          • حصر الحساب على هاتف ذكي واحد معتمد (UUID).
+        </div>
       </div>
     </div>
   );

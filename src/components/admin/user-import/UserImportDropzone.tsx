@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import {
   FileSpreadsheet,
   UploadCloud,
@@ -6,7 +6,7 @@ import {
   Sparkles,
   Info,
   ArrowUpDown,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface UserImportDropzoneProps {
   lang: string;
@@ -49,9 +49,9 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
         <div className="flex items-center gap-2 text-xs text-purple-950 font-bold">
           <Info className="w-4 h-4 text-purple-700 shrink-0" />
           <span>
-            {lang === 'ar'
-              ? 'الأعمدة: [رقم_المندوب (المعرف)] و [اسم_المندوب] و [الفرع] و [رقم_الجوال]'
-              : 'Columns: [Rep_Number (ID)], [Rep_Name], [Branch], [Phone]'}
+            {lang === "ar"
+              ? "الأعمدة: [رقم_المندوب (المعرف)] و [اسم_المندوب] و [الفرع] و [رقم_الجوال]"
+              : "Columns: [Rep_Number (ID)], [Rep_Name], [Branch], [Phone]"}
           </span>
         </div>
 
@@ -62,7 +62,11 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-purple-100 text-purple-900 border border-purple-300 text-xs font-bold transition-all shadow-2xs cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 text-purple-700" />
-            <span>{lang === 'ar' ? 'تحميل نموذج Excel المعتمد' : 'Download Sample Template'}</span>
+            <span>
+              {lang === "ar"
+                ? "تحميل نموذج Excel المعتمد"
+                : "Download Sample Template"}
+            </span>
           </button>
 
           <button
@@ -71,7 +75,11 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold transition-all shadow-2xs cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>{lang === 'ar' ? 'تجربة عينة مناديب جدة والمدينة (18 منطقة)' : 'Load Demo Sample'}</span>
+            <span>
+              {lang === "ar"
+                ? "تجربة عينة مناديب جدة والمدينة (18 منطقة)"
+                : "Load Demo Sample"}
+            </span>
           </button>
         </div>
       </div>
@@ -81,9 +89,9 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
         <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs text-emerald-900 flex items-center gap-2 animate-in fade-in">
           <ArrowUpDown className="w-4 h-4 text-emerald-600 shrink-0" />
           <div className="font-bold">
-            {lang === 'ar'
-              ? 'ذكاء النظام: تم الكشف تلقائياً عن تبديل في محتوى العمودين A و B (تم تصحيح رقم المندوب واسم المندوب تلقائياً دون أي أخطاء)!'
-              : 'Auto-detected swapped columns A & B: Successfully corrected Rep No and Rep Name!'}
+            {lang === "ar"
+              ? "ذكاء النظام: تم الكشف تلقائياً عن تبديل في محتوى العمودين A و B (تم تصحيح رقم المندوب واسم المندوب تلقائياً دون أي أخطاء)!"
+              : "Auto-detected swapped columns A & B: Successfully corrected Rep No and Rep Name!"}
           </div>
         </div>
       )}
@@ -99,8 +107,8 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
         onClick={() => fileInputRef.current?.click()}
         className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
           isDragging
-            ? 'border-purple-600 bg-purple-50'
-            : 'border-slate-300 hover:border-purple-400 bg-slate-50/50 hover:bg-white'
+            ? "border-purple-600 bg-purple-50"
+            : "border-slate-300 hover:border-purple-400 bg-slate-50/50 hover:bg-white"
         }`}
       >
         <input
@@ -121,16 +129,16 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
               <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
               <span>{fileName}</span>
             </span>
-          ) : lang === 'ar' ? (
-            'اسحب وأفلت ملف إكسل (.xlsx, .xls, .csv) هنا، أو اضغط للاختيار من جهازك'
+          ) : lang === "ar" ? (
+            "اسحب وأفلت ملف إكسل (.xlsx, .xls, .csv) هنا، أو اضغط للاختيار من جهازك"
           ) : (
-            'Drag and drop Excel (.xlsx, .xls, .csv) file here, or click to browse'
+            "Drag and drop Excel (.xlsx, .xls, .csv) file here, or click to browse"
           )}
         </p>
         <p className="text-[11px] text-slate-400 mt-1">
-          {lang === 'ar'
-            ? 'يتعرف المعالج تلقائياً على الأعمدة المتبادلة ويدمج صفوف نفس المندوب تلقائياً'
-            : 'Auto detects swapped columns and merges multi-region representative rows'}
+          {lang === "ar"
+            ? "يتعرف المعالج تلقائياً على الأعمدة المتبادلة ويدمج صفوف نفس المندوب تلقائياً"
+            : "Auto detects swapped columns and merges multi-region representative rows"}
         </p>
       </div>
     </div>

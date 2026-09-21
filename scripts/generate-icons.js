@@ -1,6 +1,6 @@
-import fs from 'fs';
-import zlib from 'zlib';
-import path from 'path';
+import fs from "fs";
+import zlib from "zlib";
+import path from "path";
 
 function crc32(buf) {
   let crc = 0xffffffff;
@@ -33,7 +33,7 @@ function generatePng(width, height, isMaskable = false) {
   ihdrData.writeUInt8(0, 10);
   ihdrData.writeUInt8(0, 11);
   ihdrData.writeUInt8(0, 12);
-  const ihdr = createChunk('IHDR', ihdrData);
+  const ihdr = createChunk("IHDR", ihdrData);
 
   // Raw image data: scanlines with filter byte 0
   const raw = Buffer.alloc(height * (1 + width * 4));
@@ -87,7 +87,11 @@ function generatePng(width, height, isMaskable = false) {
           b = 255;
 
           // Clip at the top
-          if (y < cbTop + height * 0.07 && x >= cx - width * 0.11 && x <= cx + width * 0.11) {
+          if (
+            y < cbTop + height * 0.07 &&
+            x >= cx - width * 0.11 &&
+            x <= cx + width * 0.11
+          ) {
             r = 147;
             g = 51;
             b = 234; // purple clip
@@ -95,25 +99,45 @@ function generatePng(width, height, isMaskable = false) {
 
           // Checkmark or bars inside
           // Bar 1 (Emerald)
-          if (y >= cbTop + height * 0.12 && y <= cbTop + height * 0.16 && x >= cbLeft + width * 0.06 && x <= cbRight - width * 0.06) {
+          if (
+            y >= cbTop + height * 0.12 &&
+            y <= cbTop + height * 0.16 &&
+            x >= cbLeft + width * 0.06 &&
+            x <= cbRight - width * 0.06
+          ) {
             r = 16;
             g = 185;
             b = 129; // emerald-500
           }
           // Bar 2 (Purple)
-          if (y >= cbTop + height * 0.21 && y <= cbTop + height * 0.25 && x >= cbLeft + width * 0.06 && x <= cbRight - width * 0.12) {
+          if (
+            y >= cbTop + height * 0.21 &&
+            y <= cbTop + height * 0.25 &&
+            x >= cbLeft + width * 0.06 &&
+            x <= cbRight - width * 0.12
+          ) {
             r = 124;
             g = 58;
             b = 237; // purple-600
           }
           // Bar 3 (Slate/Blue)
-          if (y >= cbTop + height * 0.30 && y <= cbTop + height * 0.34 && x >= cbLeft + width * 0.06 && x <= cbRight - width * 0.18) {
+          if (
+            y >= cbTop + height * 0.3 &&
+            y <= cbTop + height * 0.34 &&
+            x >= cbLeft + width * 0.06 &&
+            x <= cbRight - width * 0.18
+          ) {
             r = 59;
             g = 130;
             b = 246; // blue-500
           }
           // Bottom check badge
-          if (y >= cbTop + height * 0.38 && y <= cbTop + height * 0.44 && x >= cbLeft + width * 0.06 && x <= cbLeft + width * 0.18) {
+          if (
+            y >= cbTop + height * 0.38 &&
+            y <= cbTop + height * 0.44 &&
+            x >= cbLeft + width * 0.06 &&
+            x <= cbLeft + width * 0.18
+          ) {
             r = 16;
             g = 185;
             b = 129; // green dot
@@ -129,21 +153,36 @@ function generatePng(width, height, isMaskable = false) {
   }
 
   const deflated = zlib.deflateSync(raw, { level: 9 });
-  const idat = createChunk('IDAT', deflated);
-  const iend = createChunk('IEND', Buffer.alloc(0));
+  const idat = createChunk("IDAT", deflated);
+  const iend = createChunk("IEND", Buffer.alloc(0));
 
   return Buffer.concat([signature, ihdr, idat, iend]);
 }
 
-const publicDir = path.resolve('public');
+const publicDir = path.resolve("public");
 if (!fs.existsSync(publicDir)) {
   fs.mkdirSync(publicDir, { recursive: true });
 }
 
-fs.writeFileSync(path.join(publicDir, 'pwa-192x192.png'), generatePng(192, 192, false));
-fs.writeFileSync(path.join(publicDir, 'pwa-512x512.png'), generatePng(512, 512, false));
-fs.writeFileSync(path.join(publicDir, 'pwa-maskable-512x512.png'), generatePng(512, 512, true));
-fs.writeFileSync(path.join(publicDir, 'apple-touch-icon.png'), generatePng(180, 180, false));
-fs.writeFileSync(path.join(publicDir, 'favicon.ico'), generatePng(64, 64, false));
+fs.writeFileSync(
+  path.join(publicDir, "pwa-192x192.png"),
+  generatePng(192, 192, false),
+);
+fs.writeFileSync(
+  path.join(publicDir, "pwa-512x512.png"),
+  generatePng(512, 512, false),
+);
+fs.writeFileSync(
+  path.join(publicDir, "pwa-maskable-512x512.png"),
+  generatePng(512, 512, true),
+);
+fs.writeFileSync(
+  path.join(publicDir, "apple-touch-icon.png"),
+  generatePng(180, 180, false),
+);
+fs.writeFileSync(
+  path.join(publicDir, "favicon.ico"),
+  generatePng(64, 64, false),
+);
 
-console.log('PWA PNG Icons generated successfully in public/ folder!');
+console.log("PWA PNG Icons generated successfully in public/ folder!");

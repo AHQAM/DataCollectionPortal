@@ -1,10 +1,10 @@
-import React from 'react';
-import { useApp } from '../../context/AppContext';
-import { FieldListSidebar } from './form-builder/FieldListSidebar';
-import { FieldPropertiesEditor } from './form-builder/FieldPropertiesEditor';
-import { FormMobilePreview } from './form-builder/FormMobilePreview';
-import { FormBuilderHeader } from './form-builder/FormBuilderHeader';
-import { useFormBuilder } from '../../hooks/useFormBuilder';
+import React from "react";
+import { useApp } from "../../context/AppContext";
+import { FieldListSidebar } from "./form-builder/FieldListSidebar";
+import { FieldPropertiesEditor } from "./form-builder/FieldPropertiesEditor";
+import { FormMobilePreview } from "./form-builder/FormMobilePreview";
+import { FormBuilderHeader } from "./form-builder/FormBuilderHeader";
+import { useFormBuilder } from "../../hooks/useFormBuilder";
 
 interface Props {
   requestId: string;
@@ -12,7 +12,11 @@ interface Props {
   onOpenImportWizard?: (requestId: string) => void;
 }
 
-export const AdminFormBuilder: React.FC<Props> = ({ requestId, onBack, onOpenImportWizard }) => {
+export const AdminFormBuilder: React.FC<Props> = ({
+  requestId,
+  onBack,
+  onOpenImportWizard,
+}) => {
   const { lang, dir, requests, fields, updateRequestFields } = useApp();
 
   const currentRequest = requests.find((r) => r.requestId === requestId);
@@ -74,7 +78,9 @@ export const AdminFormBuilder: React.FC<Props> = ({ requestId, onBack, onOpenImp
           lang={lang}
           formFields={formFields}
           previewValues={previewValues}
-          onPreviewValueChange={(key, val) => setPreviewValues((prev) => ({ ...prev, [key]: val }))}
+          onPreviewValueChange={(key, val) =>
+            setPreviewValues((prev) => ({ ...prev, [key]: val }))
+          }
         />
       </div>
     </div>

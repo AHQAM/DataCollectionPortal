@@ -1,15 +1,15 @@
-import { httpsCallable } from 'firebase/functions';
-import { functions } from '../firebase';
+import { httpsCallable } from "firebase/functions";
+import { functions } from "../firebase";
 
 export const recordApi = {
   submitRecord: async (
     requestId: string,
     recordId: string,
     formData: Record<string, any>,
-    activityId?: string
+    activityId?: string,
   ): Promise<{ success: boolean; responseId?: string; message?: string }> => {
     try {
-      const fn = httpsCallable(functions, 'submitResponse');
+      const fn = httpsCallable(functions, "submitResponse");
       const res = await fn({
         requestId,
         recordId,
@@ -20,8 +20,11 @@ export const recordApi = {
       const data = res.data as any;
       return { success: data.success, responseId: data.responseId };
     } catch (err: any) {
-      console.error('Error submitting record via Cloud Function:', err);
-      return { success: false, message: err.message || 'Error submitting record' };
+      console.error("Error submitting record via Cloud Function:", err);
+      return {
+        success: false,
+        message: err.message || "Error submitting record",
+      };
     }
   },
 
@@ -29,10 +32,10 @@ export const recordApi = {
     requestId: string,
     recordId: string,
     formData: Record<string, any>,
-    activityId?: string
+    activityId?: string,
   ): Promise<{ success: boolean; message?: string }> => {
     try {
-      const fn = httpsCallable(functions, 'saveDraftResponse');
+      const fn = httpsCallable(functions, "saveDraftResponse");
       const res = await fn({
         requestId,
         recordId,
@@ -42,13 +45,16 @@ export const recordApi = {
       const data = res.data as any;
       return { success: data.success };
     } catch (err: any) {
-      console.error('Error saving draft via Cloud Function:', err);
-      return { success: false, message: err.message || 'Error saving draft' };
+      console.error("Error saving draft via Cloud Function:", err);
+      return { success: false, message: err.message || "Error saving draft" };
     }
   },
 
-  reassignRecord: async (recordId: string, newUserId: string): Promise<{ success: boolean }> => {
-    const fn = httpsCallable(functions, 'reassignRecords');
+  reassignRecord: async (
+    recordId: string,
+    newUserId: string,
+  ): Promise<{ success: boolean }> => {
+    const fn = httpsCallable(functions, "reassignRecords");
     const res = await fn({ recordIds: [recordId], newUserId });
     return res.data as { success: boolean };
   },
@@ -58,9 +64,9 @@ export const recordApi = {
     importedRows: any[],
     mapping: any,
     fileName?: string,
-    lang: string = 'ar'
+    lang: string = "ar",
   ): Promise<{ total: number; created: number }> => {
-    const fn = httpsCallable(functions, 'commitImport');
+    const fn = httpsCallable(functions, "commitImport");
     const res = await fn({
       requestId,
       importedRows,

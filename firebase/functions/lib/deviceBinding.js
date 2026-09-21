@@ -1,39 +1,66 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
+var __createBinding =
+  (this && this.__createBinding) ||
+  (Object.create
+    ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        var desc = Object.getOwnPropertyDescriptor(m, k);
+        if (
+          !desc ||
+          ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)
+        ) {
+          desc = {
+            enumerable: true,
+            get: function () {
+              return m[k];
+            },
+          };
+        }
+        Object.defineProperty(o, k2, desc);
+      }
+    : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+      });
+var __setModuleDefault =
+  (this && this.__setModuleDefault) ||
+  (Object.create
+    ? function (o, v) {
+        Object.defineProperty(o, "default", { enumerable: true, value: v });
+      }
+    : function (o, v) {
+        o["default"] = v;
+      });
+var __importStar =
+  (this && this.__importStar) ||
+  (function () {
+    var ownKeys = function (o) {
+      ownKeys =
+        Object.getOwnPropertyNames ||
+        function (o) {
+          var ar = [];
+          for (var k in o)
+            if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+          return ar;
         };
-        return ownKeys(o);
+      return ownKeys(o);
     };
     return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
+      if (mod && mod.__esModule) return mod;
+      var result = {};
+      if (mod != null)
+        for (var k = ownKeys(mod), i = 0; i < k.length; i++)
+          if (k[i] !== "default") __createBinding(result, mod, k[i]);
+      __setModuleDefault(result, mod);
+      return result;
     };
-})();
+  })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rejectDeviceReplacement = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = void 0;
+exports.rejectDeviceReplacement =
+  exports.forceLogoutUser =
+  exports.replaceDevice =
+  exports.releaseDevice =
+    void 0;
 const db_1 = require("./config/db");
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
@@ -47,83 +74,98 @@ const roles_1 = require("./roles");
  * Next successful login will bind the new device.
  */
 exports.releaseDevice = functions.https.onCall(async (data, context) => {
-    if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Only administrators can release devices.");
+  if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "صلاحية المسؤول مطلوبة. | Only administrators can release devices.",
+    );
+  }
+  const { targetUserId, reason } = data;
+  if (!targetUserId) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "معرف المستخدم مطلوب. | Missing targetUserId.",
+    );
+  }
+  try {
+    const userRef = db_1.db.collection("users").doc(targetUserId);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) {
+      throw new functions.https.HttpsError(
+        "not-found",
+        "المستخدم غير موجود. | User not found.",
+      );
     }
-    const { targetUserId, reason } = data;
-    if (!targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | Missing targetUserId.");
+    const userData = userDoc.data();
+    if (userData.deviceBindingStatus !== "BOUND") {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "الحساب غير مرتبط بجهاز حالياً. | User account does not have an active bound device.",
+      );
     }
+    // Release device on user record
+    await userRef.update({
+      deviceBindingStatus: "UNBOUND",
+      boundDeviceIdHash: null,
+      boundDevicePlatform: null,
+      boundDeviceLabel: null,
+      fcmToken: null,
+      fcmTokenUpdatedAt: null,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    // Update deviceBindings log
+    const bindingsRef = db_1.db.collection("deviceBindings");
+    const snapshot = await bindingsRef
+      .where("userId", "==", targetUserId)
+      .where("status", "==", "ACTIVE")
+      .get();
+    if (!snapshot.empty) {
+      const batch = db_1.db.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.update(doc.ref, {
+          status: "RELEASED",
+          releasedAt: admin.firestore.FieldValue.serverTimestamp(),
+          releasedBy: context.auth.uid,
+          releaseReason: reason || "Admin requested release",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      });
+      await batch.commit();
+    }
+    // Revoke Firebase refresh tokens — forces re-login
     try {
-        const userRef = db_1.db.collection("users").doc(targetUserId);
-        const userDoc = await userRef.get();
-        if (!userDoc.exists) {
-            throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
-        }
-        const userData = userDoc.data();
-        if (userData.deviceBindingStatus !== "BOUND") {
-            throw new functions.https.HttpsError("failed-precondition", "الحساب غير مرتبط بجهاز حالياً. | User account does not have an active bound device.");
-        }
-        // Release device on user record
-        await userRef.update({
-            deviceBindingStatus: "UNBOUND",
-            boundDeviceIdHash: null,
-            boundDevicePlatform: null,
-            boundDeviceLabel: null,
-            fcmToken: null,
-            fcmTokenUpdatedAt: null,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        // Update deviceBindings log
-        const bindingsRef = db_1.db.collection("deviceBindings");
-        const snapshot = await bindingsRef
-            .where("userId", "==", targetUserId)
-            .where("status", "==", "ACTIVE")
-            .get();
-        if (!snapshot.empty) {
-            const batch = db_1.db.batch();
-            snapshot.docs.forEach((doc) => {
-                batch.update(doc.ref, {
-                    status: "RELEASED",
-                    releasedAt: admin.firestore.FieldValue.serverTimestamp(),
-                    releasedBy: context.auth.uid,
-                    releaseReason: reason || "Admin requested release",
-                    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-                });
-            });
-            await batch.commit();
-        }
-        // Revoke Firebase refresh tokens — forces re-login
-        try {
-            await admin.auth().revokeRefreshTokens(targetUserId);
-        }
-        catch (e) {
-            console.warn("Could not revoke tokens:", e);
-        }
-        await (0, auditLogger_1.logAuditSafe)({
-            userId: context.auth.uid,
-            userRole: "ADMIN",
-            action: "DEVICE_RELEASED",
-            entityType: "DEVICE_BINDING",
-            entityId: targetUserId,
-            details: {
-                reason: reason || "Admin requested release",
-                targetUserRegionNo: userData.regionNo,
-            },
-        });
-        return {
-            success: true,
-            messageAr: "تم فك ارتباط الجهاز بنجاح. سيتم ربط الجهاز الجديد عند تسجيل الدخول التالي.",
-            messageEn: "Device released successfully. A new device will be bound on next login.",
-        };
+      await admin.auth().revokeRefreshTokens(targetUserId);
+    } catch (e) {
+      console.warn("Could not revoke tokens:", e);
     }
-    catch (error) {
-        if (error instanceof functions.https.HttpsError) {
-            throw error;
-        }
-        console.error("Release device error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+    await (0, auditLogger_1.logAuditSafe)({
+      userId: context.auth.uid,
+      userRole: "ADMIN",
+      action: "DEVICE_RELEASED",
+      entityType: "DEVICE_BINDING",
+      entityId: targetUserId,
+      details: {
+        reason: reason || "Admin requested release",
+        targetUserRegionNo: userData.regionNo,
+      },
+    });
+    return {
+      success: true,
+      messageAr:
+        "تم فك ارتباط الجهاز بنجاح. سيتم ربط الجهاز الجديد عند تسجيل الدخول التالي.",
+      messageEn:
+        "Device released successfully. A new device will be bound on next login.",
+    };
+  } catch (error) {
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
     }
+    console.error("Release device error:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "حدث خطأ في الخادم. | Internal server error.",
+    );
+  }
 });
 /**
  * Cloud Function: replaceDevice
@@ -132,74 +174,86 @@ exports.releaseDevice = functions.https.onCall(async (data, context) => {
  * The next login from any device will be accepted and bound.
  */
 exports.replaceDevice = functions.https.onCall(async (data, context) => {
-    if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+  if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "صلاحية المسؤول مطلوبة. | Admin permission required.",
+    );
+  }
+  const { targetUserId, reason } = data;
+  if (!targetUserId) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "معرف المستخدم مطلوب. | User ID is required.",
+    );
+  }
+  try {
+    const userRef = db_1.db.collection("users").doc(targetUserId);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) {
+      throw new functions.https.HttpsError(
+        "not-found",
+        "المستخدم غير موجود. | User not found.",
+      );
     }
-    const { targetUserId, reason } = data;
-    if (!targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
+    // Set status to UNBOUND — next login binds new device
+    await userRef.update({
+      deviceBindingStatus: "UNBOUND",
+      boundDeviceIdHash: null,
+      boundDevicePlatform: null,
+      boundDeviceLabel: null,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    // Mark existing bindings as replaced
+    const snapshot = await db_1.db
+      .collection("deviceBindings")
+      .where("userId", "==", targetUserId)
+      .where("status", "==", "ACTIVE")
+      .get();
+    if (!snapshot.empty) {
+      const batch = db_1.db.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.update(doc.ref, {
+          status: "REPLACED",
+          releasedAt: admin.firestore.FieldValue.serverTimestamp(),
+          releasedBy: context.auth.uid,
+          releaseReason: reason || "Device replacement",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      });
+      await batch.commit();
     }
+    // Revoke tokens to force re-login
     try {
-        const userRef = db_1.db.collection("users").doc(targetUserId);
-        const userDoc = await userRef.get();
-        if (!userDoc.exists) {
-            throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
-        }
-        // Set status to UNBOUND — next login binds new device
-        await userRef.update({
-            deviceBindingStatus: "UNBOUND",
-            boundDeviceIdHash: null,
-            boundDevicePlatform: null,
-            boundDeviceLabel: null,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        // Mark existing bindings as replaced
-        const snapshot = await db_1.db
-            .collection("deviceBindings")
-            .where("userId", "==", targetUserId)
-            .where("status", "==", "ACTIVE")
-            .get();
-        if (!snapshot.empty) {
-            const batch = db_1.db.batch();
-            snapshot.docs.forEach((doc) => {
-                batch.update(doc.ref, {
-                    status: "REPLACED",
-                    releasedAt: admin.firestore.FieldValue.serverTimestamp(),
-                    releasedBy: context.auth.uid,
-                    releaseReason: reason || "Device replacement",
-                    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-                });
-            });
-            await batch.commit();
-        }
-        // Revoke tokens to force re-login
-        try {
-            await admin.auth().revokeRefreshTokens(targetUserId);
-        }
-        catch (e) {
-            console.warn("Could not revoke tokens:", e);
-        }
-        await (0, auditLogger_1.logAuditSafe)({
-            userId: context.auth.uid,
-            userRole: "ADMIN",
-            action: "DEVICE_REPLACEMENT_APPROVED",
-            entityType: "DEVICE_BINDING",
-            entityId: targetUserId,
-            details: { reason: reason || "Device replacement" },
-        });
-        return {
-            success: true,
-            messageAr: "تمت الموافقة على استبدال الجهاز. سيتم ربط الجهاز الجديد عند تسجيل الدخول التالي.",
-            messageEn: "Device replacement approved. New device will bind on next login.",
-        };
+      await admin.auth().revokeRefreshTokens(targetUserId);
+    } catch (e) {
+      console.warn("Could not revoke tokens:", e);
     }
-    catch (error) {
-        if (error instanceof functions.https.HttpsError) {
-            throw error;
-        }
-        console.error("Replace device error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+    await (0, auditLogger_1.logAuditSafe)({
+      userId: context.auth.uid,
+      userRole: "ADMIN",
+      action: "DEVICE_REPLACEMENT_APPROVED",
+      entityType: "DEVICE_BINDING",
+      entityId: targetUserId,
+      details: { reason: reason || "Device replacement" },
+    });
+    return {
+      success: true,
+      messageAr:
+        "تمت الموافقة على استبدال الجهاز. سيتم ربط الجهاز الجديد عند تسجيل الدخول التالي.",
+      messageEn:
+        "Device replacement approved. New device will bind on next login.",
+    };
+  } catch (error) {
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
     }
+    console.error("Replace device error:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "حدث خطأ في الخادم. | Internal server error.",
+    );
+  }
 });
 /**
  * Cloud Function: forceLogoutUser
@@ -208,121 +262,138 @@ exports.replaceDevice = functions.https.onCall(async (data, context) => {
  * forcing them to re-authenticate on next app launch.
  */
 exports.forceLogoutUser = functions.https.onCall(async (data, context) => {
-    if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
-    }
-    const { targetUserId, reason } = data;
-    if (!targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
-    }
-    try {
-        // Revoke all refresh tokens
-        await admin.auth().revokeRefreshTokens(targetUserId);
-        // Increment session version so old tokens become invalid at custom claim level too
-        const userRef = db_1.db.collection("users").doc(targetUserId);
-        const userDoc = await userRef.get();
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-            const newSessionVersion = (userData.sessionVersion || 0) + 1;
-            await userRef.update({
-                sessionVersion: newSessionVersion,
-                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            });
-            try {
-                await admin.auth().setCustomUserClaims(targetUserId, {
-                    role: userData.role,
-                    branchId: userData.branchId || null,
-                    allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
-                    sessionVersion: newSessionVersion,
-                    mustChangePassword: userData.mustChangePassword || false,
-                });
-            }
-            catch (e) {
-                console.warn("Could not update claims:", e);
-            }
-        }
-        await (0, auditLogger_1.logAuditSafe)({
-            userId: context.auth.uid,
-            userRole: "ADMIN",
-            action: "FORCE_LOGOUT",
-            entityType: "USER",
-            entityId: targetUserId,
-            details: { reason: reason || "Admin forced logout" },
+  if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "صلاحية المسؤول مطلوبة. | Admin permission required.",
+    );
+  }
+  const { targetUserId, reason } = data;
+  if (!targetUserId) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "معرف المستخدم مطلوب. | User ID is required.",
+    );
+  }
+  try {
+    // Revoke all refresh tokens
+    await admin.auth().revokeRefreshTokens(targetUserId);
+    // Increment session version so old tokens become invalid at custom claim level too
+    const userRef = db_1.db.collection("users").doc(targetUserId);
+    const userDoc = await userRef.get();
+    if (userDoc.exists) {
+      const userData = userDoc.data();
+      const newSessionVersion = (userData.sessionVersion || 0) + 1;
+      await userRef.update({
+        sessionVersion: newSessionVersion,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      try {
+        await admin.auth().setCustomUserClaims(targetUserId, {
+          role: userData.role,
+          branchId: userData.branchId || null,
+          allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
+          sessionVersion: newSessionVersion,
+          mustChangePassword: userData.mustChangePassword || false,
         });
-        return {
-            success: true,
-            messageAr: "تم تسجيل خروج المستخدم بنجاح.",
-            messageEn: "User logged out successfully.",
-        };
+      } catch (e) {
+        console.warn("Could not update claims:", e);
+      }
     }
-    catch (error) {
-        if (error instanceof functions.https.HttpsError) {
-            throw error;
-        }
-        console.error("Force logout error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+    await (0, auditLogger_1.logAuditSafe)({
+      userId: context.auth.uid,
+      userRole: "ADMIN",
+      action: "FORCE_LOGOUT",
+      entityType: "USER",
+      entityId: targetUserId,
+      details: { reason: reason || "Admin forced logout" },
+    });
+    return {
+      success: true,
+      messageAr: "تم تسجيل خروج المستخدم بنجاح.",
+      messageEn: "User logged out successfully.",
+    };
+  } catch (error) {
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
     }
+    console.error("Force logout error:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "حدث خطأ في الخادم. | Internal server error.",
+    );
+  }
 });
 /**
  * Cloud Function: rejectDeviceReplacement
  *
  * Admin-only: Rejects a pending device replacement request.
  */
-exports.rejectDeviceReplacement = functions.https.onCall(async (data, context) => {
+exports.rejectDeviceReplacement = functions.https.onCall(
+  async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "صلاحية المسؤول مطلوبة. | Admin permission required.",
+      );
     }
     const { bindingId, targetUserId, reason } = data || {};
     if (!bindingId && !targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف الربط أو معرف المستخدم مطلوب. | bindingId or targetUserId required.");
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "معرف الربط أو معرف المستخدم مطلوب. | bindingId or targetUserId required.",
+      );
     }
     try {
-        let targetDoc = null;
-        if (bindingId) {
-            const docRef = db_1.db.collection("deviceBindings").doc(bindingId);
-            const docSnap = await docRef.get();
-            if (docSnap.exists) {
-                targetDoc = docSnap;
-            }
+      let targetDoc = null;
+      if (bindingId) {
+        const docRef = db_1.db.collection("deviceBindings").doc(bindingId);
+        const docSnap = await docRef.get();
+        if (docSnap.exists) {
+          targetDoc = docSnap;
         }
-        if (!targetDoc && targetUserId) {
-            const snap = await db_1.db.collection("deviceBindings")
-                .where("userId", "==", targetUserId)
-                .where("status", "in", ["PENDING", "PENDING_APPROVAL", "ACTIVE"])
-                .limit(1)
-                .get();
-            if (!snap.empty) {
-                targetDoc = snap.docs[0];
-            }
+      }
+      if (!targetDoc && targetUserId) {
+        const snap = await db_1.db
+          .collection("deviceBindings")
+          .where("userId", "==", targetUserId)
+          .where("status", "in", ["PENDING", "PENDING_APPROVAL", "ACTIVE"])
+          .limit(1)
+          .get();
+        if (!snap.empty) {
+          targetDoc = snap.docs[0];
         }
-        if (targetDoc) {
-            await targetDoc.ref.update({
-                status: "REJECTED",
-                rejectedAt: admin.firestore.FieldValue.serverTimestamp(),
-                rejectedBy: context.auth.uid,
-                rejectionReason: reason || "Admin rejected replacement",
-                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            });
-        }
-        await (0, auditLogger_1.logAuditSafe)({
-            userId: context.auth.uid,
-            userRole: "ADMIN",
-            action: "DEVICE_REPLACEMENT_REJECTED",
-            entityType: "DEVICE_BINDING",
-            entityId: bindingId || targetUserId || 'UNKNOWN',
-            details: { reason: reason || "Admin rejected replacement" },
+      }
+      if (targetDoc) {
+        await targetDoc.ref.update({
+          status: "REJECTED",
+          rejectedAt: admin.firestore.FieldValue.serverTimestamp(),
+          rejectedBy: context.auth.uid,
+          rejectionReason: reason || "Admin rejected replacement",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
-        return {
-            success: true,
-            messageAr: "تم رفض طلب استبدال الجهاز.",
-            messageEn: "Device replacement request rejected.",
-        };
+      }
+      await (0, auditLogger_1.logAuditSafe)({
+        userId: context.auth.uid,
+        userRole: "ADMIN",
+        action: "DEVICE_REPLACEMENT_REJECTED",
+        entityType: "DEVICE_BINDING",
+        entityId: bindingId || targetUserId || "UNKNOWN",
+        details: { reason: reason || "Admin rejected replacement" },
+      });
+      return {
+        success: true,
+        messageAr: "تم رفض طلب استبدال الجهاز.",
+        messageEn: "Device replacement request rejected.",
+      };
+    } catch (error) {
+      if (error instanceof functions.https.HttpsError) throw error;
+      console.error("Reject device replacement error:", error);
+      throw new functions.https.HttpsError(
+        "internal",
+        "Internal server error.",
+      );
     }
-    catch (error) {
-        if (error instanceof functions.https.HttpsError)
-            throw error;
-        console.error("Reject device replacement error:", error);
-        throw new functions.https.HttpsError("internal", "Internal server error.");
-    }
-});
+  },
+);
 //# sourceMappingURL=deviceBinding.js.map

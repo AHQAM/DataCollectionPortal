@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
-import { User } from '../../types';
-import { getXLSX } from '../../utils/excel';
+import React, { useState } from "react";
+import { useApp } from "../../context/AppContext";
+import { User } from "../../types";
+import { getXLSX } from "../../utils/excel";
 import {
   FileSpreadsheet,
   CheckCircle2,
@@ -10,7 +10,7 @@ import {
   KeyRound,
   X,
   Layers,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   ParsedRepRow,
   ImportedCredential,
@@ -19,10 +19,10 @@ import {
   downloadCredentialsExcel,
   groupAndProcessRows,
   parseExcelRows,
-} from './user-import/userImportParser';
-import { UserImportDropzone } from './user-import/UserImportDropzone';
-import { UserImportPreviewTable } from './user-import/UserImportPreviewTable';
-import { UserImportCredentialsTable } from './user-import/UserImportCredentialsTable';
+} from "./user-import/userImportParser";
+import { UserImportDropzone } from "./user-import/UserImportDropzone";
+import { UserImportPreviewTable } from "./user-import/UserImportPreviewTable";
+import { UserImportCredentialsTable } from "./user-import/UserImportCredentialsTable";
 
 interface Props {
   isOpen: boolean;
@@ -30,7 +30,11 @@ interface Props {
   onSuccess: (count: number) => void;
 }
 
-export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
+export const AdminUserImportModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+}) => {
   const { lang, users, branches, importUsersBatch } = useApp();
 
   const [fileName, setFileName] = useState<string | null>(null);
@@ -39,7 +43,9 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [swappedDetected, setSwappedDetected] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [importedCredentials, setImportedCredentials] = useState<ImportedCredential[] | null>(null);
+  const [importedCredentials, setImportedCredentials] = useState<
+    ImportedCredential[] | null
+  >(null);
 
   if (!isOpen) return null;
 
@@ -62,7 +68,7 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
     }));
 
     const processed = groupAndProcessRows(rawList, users, lang);
-    setFileName('sample_representatives_dataset.xlsx');
+    setFileName("sample_representatives_dataset.xlsx");
     setTotalRawRows(REAL_SAMPLE_DATASET.length);
     setParsedRows(processed);
     setSwappedDetected(false);
@@ -79,13 +85,17 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
       try {
         const XLSX = await getXLSX();
         const data = e.target?.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
+        const workbook = XLSX.read(data, { type: "binary" });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonRows: any[] = XLSX.utils.sheet_to_json(worksheet);
 
         if (!jsonRows || jsonRows.length === 0) {
-          setErrorMsg(lang === 'ar' ? 'الملف فارغ أو لا يحتوي على صفوف صالحة' : 'The file is empty or contains no rows');
+          setErrorMsg(
+            lang === "ar"
+              ? "الملف فارغ أو لا يحتوي على صفوف صالحة"
+              : "The file is empty or contains no rows",
+          );
           setParsedRows([]);
           setTotalRawRows(0);
           return;
@@ -97,11 +107,11 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
         const processed = groupAndProcessRows(rawList, users, lang);
         setParsedRows(processed);
       } catch (err) {
-        console.error('Failed to parse excel file:', err);
+        console.error("Failed to parse excel file:", err);
         setErrorMsg(
-          lang === 'ar'
-            ? 'حدث خطأ أثناء قراءة ملف الإكسل. يرجى التأكد من صيغة الملف (.xlsx, .xls, .csv)'
-            : 'Error reading Excel file. Please ensure it is a valid .xlsx, .xls, or .csv'
+          lang === "ar"
+            ? "حدث خطأ أثناء قراءة ملف الإكسل. يرجى التأكد من صيغة الملف (.xlsx, .xls, .csv)"
+            : "Error reading Excel file. Please ensure it is a valid .xlsx, .xls, or .csv",
         );
       }
     };
@@ -118,39 +128,45 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
 
     const newUsers: User[] = validRows.map((r) => {
       const rawBranchName = r.branchName?.trim();
-      const exactBranchName = rawBranchName || (lang === 'ar' ? 'الفرع الرئيسي' : 'Main Branch');
+      const exactBranchName =
+        rawBranchName || (lang === "ar" ? "الفرع الرئيسي" : "Main Branch");
 
       const matchedBranch = branches.find(
         (b) =>
-          b.branchNameAr.trim().toLowerCase() === exactBranchName.toLowerCase() ||
-          b.branchNameEn?.trim().toLowerCase() === exactBranchName.toLowerCase() ||
-          b.branchId.toLowerCase() === exactBranchName.toLowerCase()
+          b.branchNameAr.trim().toLowerCase() ===
+            exactBranchName.toLowerCase() ||
+          b.branchNameEn?.trim().toLowerCase() ===
+            exactBranchName.toLowerCase() ||
+          b.branchId.toLowerCase() === exactBranchName.toLowerCase(),
       );
 
       const branchId = matchedBranch
         ? matchedBranch.branchId
-        : `BR-${encodeURIComponent(exactBranchName).replace(/%/g, '').slice(0, 12)}`;
+        : `BR-${encodeURIComponent(exactBranchName).replace(/%/g, "").slice(0, 12)}`;
 
       return {
         userId: `USER-${r.repNo}`,
         username: r.repNo,
         regionNo: r.repNo,
-        repNo: r.repNo.startsWith('REP-') ? r.repNo : `REP-${r.repNo}`,
+        repNo: r.repNo.startsWith("REP-") ? r.repNo : `REP-${r.repNo}`,
         repNameAr: r.repName,
         repNameEn: r.repName,
         email: `rep${r.repNo}@salescollection.sa`,
-        mobile: r.phone || '+966500000000',
+        mobile: r.phone || "+966500000000",
         branchId,
         branchNameAr: exactBranchName,
         branchNameEn: exactBranchName,
-        role: 'REP' as const,
-        allowedRegionNos: r.assignedRegions && r.assignedRegions.length > 0 ? r.assignedRegions : [r.repNo],
+        role: "REP" as const,
+        allowedRegionNos:
+          r.assignedRegions && r.assignedRegions.length > 0
+            ? r.assignedRegions
+            : [r.repNo],
         mustChangePassword: true,
         isActive: true,
         failedLoginCount: 0,
         failedLoginAttempts: 0,
         sessionVersion: 1,
-        deviceBindingStatus: 'UNBOUND' as const,
+        deviceBindingStatus: "UNBOUND" as const,
         maxAllowedDevices: 1,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -159,7 +175,11 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
 
     try {
       const result = await importUsersBatch(newUsers);
-      if (result.success && result.data?.temporaryPasswords && result.data.temporaryPasswords.length > 0) {
+      if (
+        result.success &&
+        result.data?.temporaryPasswords &&
+        result.data.temporaryPasswords.length > 0
+      ) {
         setImportedCredentials(result.data.temporaryPasswords);
         onSuccess(result.data.createdCount || newUsers.length);
       } else {
@@ -167,12 +187,12 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
         onClose();
       }
     } catch (err: any) {
-      console.error('Failed to import users batch:', err);
+      console.error("Failed to import users batch:", err);
       setErrorMsg(
         err?.message ||
-          (lang === 'ar'
-            ? 'حدث خطأ أثناء استيراد المستخدمين. يرجى المحاولة مرة أخرى.'
-            : 'Error importing users. Please try again.')
+          (lang === "ar"
+            ? "حدث خطأ أثناء استيراد المستخدمين. يرجى المحاولة مرة أخرى."
+            : "Error importing users. Please try again."),
       );
     } finally {
       setIsSubmitting(false);
@@ -192,9 +212,13 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
             </div>
             <div>
               <h2 className="text-base font-extrabold flex items-center gap-2">
-                <span>{lang === 'ar' ? 'استيراد المستخدمين والمناديب عبر Excel' : 'Import Users via Excel'}</span>
+                <span>
+                  {lang === "ar"
+                    ? "استيراد المستخدمين والمناديب عبر Excel"
+                    : "Import Users via Excel"}
+                </span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-                  {lang === 'ar' ? 'معتمد' : 'Verified'}
+                  {lang === "ar" ? "معتمد" : "Verified"}
                 </span>
               </h2>
             </div>
@@ -221,14 +245,14 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
               <Layers className="w-5 h-5 text-indigo-700 shrink-0 mt-0.5" />
               <div className="leading-relaxed text-indigo-950">
                 <span className="font-bold">
-                  {lang === 'ar'
-                    ? 'الحل الأفضل والمعتمد للمناديب متعددي المناطق: '
-                    : 'Best Practice for Multi-Region Reps: '}
+                  {lang === "ar"
+                    ? "الحل الأفضل والمعتمد للمناديب متعددي المناطق: "
+                    : "Best Practice for Multi-Region Reps: "}
                 </span>
                 <span>
-                  {lang === 'ar'
-                    ? 'يتم إنشاء حساب مستخدم واحد فقط للمندوب يربط جهازه بأمان، وتُدرج جميع أرقام مناطقه في قائمة صلاحياته. يحصل المندوب على رمز دخول مؤقت لمرة واحدة ويُطلب منه تغييره عند أول تسجيل دخول.'
-                    : 'A single user account is created with all assigned regions linked. The rep can sign in using any of their region numbers and toggle between regions easily!'}
+                  {lang === "ar"
+                    ? "يتم إنشاء حساب مستخدم واحد فقط للمندوب يربط جهازه بأمان، وتُدرج جميع أرقام مناطقه في قائمة صلاحياته. يحصل المندوب على رمز دخول مؤقت لمرة واحدة ويُطلب منه تغييره عند أول تسجيل دخول."
+                    : "A single user account is created with all assigned regions linked. The rep can sign in using any of their region numbers and toggle between regions easily!"}
                 </span>
               </div>
             </div>
@@ -263,12 +287,14 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
               <KeyRound className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 <div className="font-bold">
-                  {lang === 'ar' ? 'إجراءات الأمان وكلمات المرور:' : 'Security & PIN Policy:'}
+                  {lang === "ar"
+                    ? "إجراءات الأمان وكلمات المرور:"
+                    : "Security & PIN Policy:"}
                 </div>
                 <p className="text-[11px] text-amber-800 mt-0.5">
-                  {lang === 'ar'
-                    ? 'سيتم إنشاء رمز دخول مؤقت وفريد لكل مندوب مستورد، وسيلزم النظام المندوب بتعيين كلمة مرور جديدة فور تسجيل دخوله الأول.'
-                    : 'Imported representatives receive a unique temporary password and must set a new password on first sign-in.'}
+                  {lang === "ar"
+                    ? "سيتم إنشاء رمز دخول مؤقت وفريد لكل مندوب مستورد، وسيلزم النظام المندوب بتعيين كلمة مرور جديدة فور تسجيل دخوله الأول."
+                    : "Imported representatives receive a unique temporary password and must set a new password on first sign-in."}
                 </p>
               </div>
             </div>
@@ -285,7 +311,9 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-purple-900 text-xs font-bold border border-purple-300 transition-colors cursor-pointer"
               >
                 <Download className="w-4 h-4 text-purple-700" />
-                <span>{lang === 'ar' ? 'تصدير ملف Excel' : 'Export Excel'}</span>
+                <span>
+                  {lang === "ar" ? "تصدير ملف Excel" : "Export Excel"}
+                </span>
               </button>
 
               <button
@@ -293,7 +321,7 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
                 onClick={onClose}
                 className="px-6 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-extrabold shadow-md transition-all cursor-pointer"
               >
-                {lang === 'ar' ? 'تم الانتهاء والإغلاق' : 'Done & Close'}
+                {lang === "ar" ? "تم الانتهاء والإغلاق" : "Done & Close"}
               </button>
             </>
           ) : (
@@ -303,7 +331,7 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
                 onClick={onClose}
                 className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300 transition-colors cursor-pointer"
               >
-                {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+                {lang === "ar" ? "إلغاء" : "Cancel"}
               </button>
 
               <button
@@ -312,8 +340,8 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
                 onClick={handleCommitImport}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold shadow-md transition-all ${
                   validCount > 0 && !isSubmitting
-                    ? 'bg-purple-900 hover:bg-purple-800 text-white cursor-pointer'
-                    : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                    ? "bg-purple-900 hover:bg-purple-800 text-white cursor-pointer"
+                    : "bg-slate-300 text-slate-500 cursor-not-allowed"
                 }`}
               >
                 {isSubmitting ? (
@@ -323,10 +351,12 @@ export const AdminUserImportModal: React.FC<Props> = ({ isOpen, onClose, onSucce
                 )}
                 <span>
                   {isSubmitting
-                    ? (lang === 'ar' ? 'جاري الاستيراد...' : 'Importing...')
-                    : (lang === 'ar'
-                        ? `اعتماد استيراد (${validCount}) مندوب الآن`
-                        : `Commit Import (${validCount} Reps)`)}
+                    ? lang === "ar"
+                      ? "جاري الاستيراد..."
+                      : "Importing..."
+                    : lang === "ar"
+                      ? `اعتماد استيراد (${validCount}) مندوب الآن`
+                      : `Commit Import (${validCount} Reps)`}
                 </span>
               </button>
             </>

@@ -3,39 +3,41 @@
  */
 
 export const USER_ROLES = {
-  ADMIN: 'ADMIN',
-  SUPERVISOR: 'SUPERVISOR',
-  REP: 'REP',
+  ADMIN: "ADMIN",
+  SUPERVISOR: "SUPERVISOR",
+  REP: "REP",
 } as const;
 
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 
 export const REQUEST_STATUS = {
-  DRAFT: 'Draft',
-  PUBLISHED: 'Published',
-  CLOSED: 'Closed',
-  ARCHIVED: 'Archived',
+  DRAFT: "Draft",
+  PUBLISHED: "Published",
+  CLOSED: "Closed",
+  ARCHIVED: "Archived",
 } as const;
 
-export type RequestStatusType = (typeof REQUEST_STATUS)[keyof typeof REQUEST_STATUS];
+export type RequestStatusType =
+  (typeof REQUEST_STATUS)[keyof typeof REQUEST_STATUS];
 
 export const RECORD_STATUS = {
-  PENDING: 'Pending',
-  DRAFT_SAVED: 'DraftSaved',
-  SUBMITTED: 'Submitted',
-  COMPLETED: 'Completed',
+  PENDING: "Pending",
+  DRAFT_SAVED: "DraftSaved",
+  SUBMITTED: "Submitted",
+  COMPLETED: "Completed",
 } as const;
 
-export type RecordStatusType = (typeof RECORD_STATUS)[keyof typeof RECORD_STATUS];
+export type RecordStatusType =
+  (typeof RECORD_STATUS)[keyof typeof RECORD_STATUS];
 
 export const DEVICE_BINDING_STATUS = {
-  BOUND: 'BOUND',
-  UNBOUND: 'UNBOUND',
-  ACTIVE: 'ACTIVE',
-  RELEASED: 'RELEASED',
-  REPLACED: 'REPLACED',
-  REJECTED: 'REJECTED',
-  PENDING: 'PENDING',
+  BOUND: "BOUND",
+  UNBOUND: "UNBOUND",
+  ACTIVE: "ACTIVE",
+  RELEASED: "RELEASED",
+  REPLACED: "REPLACED",
+  REJECTED: "REJECTED",
+  PENDING: "PENDING",
 } as const;
 
 export const BUSINESS_RULES = {

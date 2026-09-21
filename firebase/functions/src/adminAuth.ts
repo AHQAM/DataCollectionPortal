@@ -19,7 +19,7 @@ export const createAdminSupervisorUser = functions.https.onCall(
     if (!context.auth) {
       throw new functions.https.HttpsError(
         "unauthenticated",
-        "يجب تسجيل الدخول لإجراء هذه العملية. | Must be logged in."
+        "يجب تسجيل الدخول لإجراء هذه العملية. | Must be logged in.",
       );
     }
 
@@ -27,24 +27,32 @@ export const createAdminSupervisorUser = functions.https.onCall(
     if (context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
-        "ليس لديك الصلاحيات الكافية. | Insufficient permissions."
+        "ليس لديك الصلاحيات الكافية. | Insufficient permissions.",
       );
     }
 
-    const { email, role, branchId, repNameAr, repNameEn, mobileNo, allowedRegionNos } = data;
+    const {
+      email,
+      role,
+      branchId,
+      repNameAr,
+      repNameEn,
+      mobileNo,
+      allowedRegionNos,
+    } = data;
 
     // 3. Validate Inputs
     if (!email || !role || !repNameAr) {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "بيانات المستخدم غير مكتملة. | Missing required fields."
+        "بيانات المستخدم غير مكتملة. | Missing required fields.",
       );
     }
 
     if (role !== USER_ROLES.SUPERVISOR && role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "يمكن إنشاء حسابات مشرفين ومدراء فقط عبر هذه الدالة. | Can only create Supervisor/Admin."
+        "يمكن إنشاء حسابات مشرفين ومدراء فقط عبر هذه الدالة. | Can only create Supervisor/Admin.",
       );
     }
 
@@ -111,13 +119,13 @@ export const createAdminSupervisorUser = functions.https.onCall(
       if (error.code === "auth/email-already-exists") {
         throw new functions.https.HttpsError(
           "already-exists",
-          "البريد الإلكتروني مسجل مسبقاً. | Email already exists."
+          "البريد الإلكتروني مسجل مسبقاً. | Email already exists.",
         );
       }
       throw new functions.https.HttpsError(
         "internal",
-        "حدث خطأ أثناء إنشاء المستخدم. | Internal server error."
+        "حدث خطأ أثناء إنشاء المستخدم. | Internal server error.",
       );
     }
-  }
+  },
 );

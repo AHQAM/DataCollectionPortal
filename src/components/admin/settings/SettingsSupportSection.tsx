@@ -1,8 +1,8 @@
-import React from 'react';
-import { PhoneCall } from 'lucide-react';
+import React from "react";
+import { PhoneCall } from "lucide-react";
 
 interface SettingsSupportSectionProps {
-  lang: 'ar' | 'en';
+  lang: "ar" | "en";
   phone: string;
   setPhone: (v: string) => void;
   email: string;
@@ -24,13 +24,17 @@ export const SettingsSupportSection: React.FC<SettingsSupportSectionProps> = ({
     <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
       <div className="flex items-center gap-2 text-xs font-extrabold text-purple-950 pb-2 border-b border-slate-100">
         <PhoneCall className="w-4 h-4 text-purple-700" />
-        <span>{lang === 'ar' ? 'قنوات التواصل والدعم الفني للمناديب' : 'Support Channels for Representatives'}</span>
+        <span>
+          {lang === "ar"
+            ? "قنوات التواصل والدعم الفني للمناديب"
+            : "Support Channels for Representatives"}
+        </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === 'ar' ? 'الهاتف الموحد' : 'Phone'}
+            {lang === "ar" ? "الهاتف الموحد" : "Phone"}
           </label>
           <input
             type="text"
@@ -42,7 +46,7 @@ export const SettingsSupportSection: React.FC<SettingsSupportSectionProps> = ({
 
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+            {lang === "ar" ? "البريد الإلكتروني" : "Email"}
           </label>
           <input
             type="email"
@@ -54,7 +58,7 @@ export const SettingsSupportSection: React.FC<SettingsSupportSectionProps> = ({
 
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === 'ar' ? 'رقم واتساب الإدارة' : 'WhatsApp'}
+            {lang === "ar" ? "رقم واتساب الإدارة" : "WhatsApp"}
           </label>
           <input
             type="text"

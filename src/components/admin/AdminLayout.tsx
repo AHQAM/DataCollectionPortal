@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import React, { useState } from "react";
+import { useApp } from "../../context/AppContext";
 import {
   LayoutDashboard,
   FileText,
@@ -17,62 +17,172 @@ import {
   Menu,
   X,
   Sliders,
-} from 'lucide-react';
-import { AdminDashboard } from './AdminDashboard';
-import { AdminRequests } from './AdminRequests';
-import { AdminFormBuilder } from './AdminFormBuilder';
-import { AdminImportWizard } from './AdminImportWizard';
-import { AdminBranches } from './AdminBranches';
-import { AdminSupervisorMatrix } from './AdminSupervisorMatrix';
-import { AdminUsers } from './AdminUsers';
-import { AdminDeviceManager } from './AdminDeviceManager';
-import { AdminAssignments } from './AdminAssignments';
-import { AdminReports } from './AdminReports';
-import { AdminArchive } from './AdminArchive';
-import { AdminAuditLogs } from './AdminAuditLogs';
-import { AdminSettings } from './AdminSettings';
+} from "lucide-react";
+const AdminDashboard = React.lazy(() =>
+  import("./AdminDashboard").then((module) => ({
+    default: module.AdminDashboard,
+  })),
+);
+const AdminRequests = React.lazy(() =>
+  import("./AdminRequests").then((module) => ({
+    default: module.AdminRequests,
+  })),
+);
+const AdminFormBuilder = React.lazy(() =>
+  import("./AdminFormBuilder").then((module) => ({
+    default: module.AdminFormBuilder,
+  })),
+);
+const AdminImportWizard = React.lazy(() =>
+  import("./AdminImportWizard").then((module) => ({
+    default: module.AdminImportWizard,
+  })),
+);
+const AdminBranches = React.lazy(() =>
+  import("./AdminBranches").then((module) => ({
+    default: module.AdminBranches,
+  })),
+);
+const AdminSupervisorMatrix = React.lazy(() =>
+  import("./AdminSupervisorMatrix").then((module) => ({
+    default: module.AdminSupervisorMatrix,
+  })),
+);
+const AdminUsers = React.lazy(() =>
+  import("./AdminUsers").then((module) => ({ default: module.AdminUsers })),
+);
+const AdminDeviceManager = React.lazy(() =>
+  import("./AdminDeviceManager").then((module) => ({
+    default: module.AdminDeviceManager,
+  })),
+);
+const AdminAssignments = React.lazy(() =>
+  import("./AdminAssignments").then((module) => ({
+    default: module.AdminAssignments,
+  })),
+);
+const AdminReports = React.lazy(() =>
+  import("./AdminReports").then((module) => ({ default: module.AdminReports })),
+);
+const AdminArchive = React.lazy(() =>
+  import("./AdminArchive").then((module) => ({ default: module.AdminArchive })),
+);
+const AdminAuditLogs = React.lazy(() =>
+  import("./AdminAuditLogs").then((module) => ({
+    default: module.AdminAuditLogs,
+  })),
+);
+const AdminSettings = React.lazy(() =>
+  import("./AdminSettings").then((module) => ({
+    default: module.AdminSettings,
+  })),
+);
 
 export const AdminLayout: React.FC = () => {
   const { lang, dir, t, currentUser } = useApp();
 
-  const [currentModule, setCurrentModule] = useState<string>('dashboard');
-  const [activeBuilderRequestId, setActiveBuilderRequestId] = useState<string | null>(null);
-  const [activeImportRequestId, setActiveImportRequestId] = useState<string | null>(null);
+  const [currentModule, setCurrentModule] = useState<string>("dashboard");
+  const [activeBuilderRequestId, setActiveBuilderRequestId] = useState<
+    string | null
+  >(null);
+  const [activeImportRequestId, setActiveImportRequestId] = useState<
+    string | null
+  >(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const menuItems = [
-    { id: 'dashboard', labelAr: 'لوحة القيادة', labelEn: 'Dashboard', icon: LayoutDashboard },
-    { id: 'branches', labelAr: 'إدارة الفروع والمناطق', labelEn: 'Branches & Regions', icon: Building2 },
-    { id: 'supervisor_matrix', labelAr: 'مصفوفة صلاحيات المشرفين', labelEn: 'Supervisor Permissions', icon: ShieldCheck },
-    { id: 'users', labelAr: 'المستخدمين والمناديب', labelEn: 'Users & Reps', icon: Users },
-    { id: 'requests', labelAr: 'طلبات جمع البيانات', labelEn: 'Requests & Forms', icon: FileText },
-    { id: 'import', labelAr: 'معالج استيراد Excel', labelEn: 'Excel Import Wizard', icon: UploadCloud },
-    { id: 'devices', labelAr: 'ربط وأمان الأجهزة', labelEn: 'Device Security', icon: Smartphone },
-    { id: 'assignments', labelAr: 'إعادة توزيع السجلات', labelEn: 'Record Reassignments', icon: Layers },
-    { id: 'reports', labelAr: 'التقارير وتصدير إكسل', labelEn: 'Reports & Export', icon: FileSpreadsheet },
-    { id: 'archive', labelAr: 'الأرشيف التاريخي', labelEn: 'Archive', icon: Archive },
-    { id: 'audit', labelAr: 'سجل التدقيق والرقابة', labelEn: 'Audit Trail', icon: ShieldCheck },
-    { id: 'settings', labelAr: 'إعدادات النظام', labelEn: 'Settings', icon: Settings },
+    {
+      id: "dashboard",
+      labelAr: "لوحة القيادة",
+      labelEn: "Dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      id: "branches",
+      labelAr: "إدارة الفروع والمناطق",
+      labelEn: "Branches & Regions",
+      icon: Building2,
+    },
+    {
+      id: "supervisor_matrix",
+      labelAr: "مصفوفة صلاحيات المشرفين",
+      labelEn: "Supervisor Permissions",
+      icon: ShieldCheck,
+    },
+    {
+      id: "users",
+      labelAr: "المستخدمين والمناديب",
+      labelEn: "Users & Reps",
+      icon: Users,
+    },
+    {
+      id: "requests",
+      labelAr: "طلبات جمع البيانات",
+      labelEn: "Requests & Forms",
+      icon: FileText,
+    },
+    {
+      id: "import",
+      labelAr: "معالج استيراد Excel",
+      labelEn: "Excel Import Wizard",
+      icon: UploadCloud,
+    },
+    {
+      id: "devices",
+      labelAr: "ربط وأمان الأجهزة",
+      labelEn: "Device Security",
+      icon: Smartphone,
+    },
+    {
+      id: "assignments",
+      labelAr: "إعادة توزيع السجلات",
+      labelEn: "Record Reassignments",
+      icon: Layers,
+    },
+    {
+      id: "reports",
+      labelAr: "التقارير وتصدير إكسل",
+      labelEn: "Reports & Export",
+      icon: FileSpreadsheet,
+    },
+    {
+      id: "archive",
+      labelAr: "الأرشيف التاريخي",
+      labelEn: "Archive",
+      icon: Archive,
+    },
+    {
+      id: "audit",
+      labelAr: "سجل التدقيق والرقابة",
+      labelEn: "Audit Trail",
+      icon: ShieldCheck,
+    },
+    {
+      id: "settings",
+      labelAr: "إعدادات النظام",
+      labelEn: "Settings",
+      icon: Settings,
+    },
   ];
 
   const handleOpenFormBuilder = (requestId: string) => {
     setActiveBuilderRequestId(requestId);
-    setCurrentModule('form_builder');
+    setCurrentModule("form_builder");
   };
 
   const handleOpenImportWizard = (requestId: string) => {
     setActiveImportRequestId(requestId);
-    setCurrentModule('import');
+    setCurrentModule("import");
   };
 
   const renderModuleContent = () => {
-    if (currentModule === 'form_builder' && activeBuilderRequestId) {
+    if (currentModule === "form_builder" && activeBuilderRequestId) {
       return (
         <AdminFormBuilder
           requestId={activeBuilderRequestId}
           onBack={() => {
             setActiveBuilderRequestId(null);
-            setCurrentModule('requests');
+            setCurrentModule("requests");
           }}
           onOpenImportWizard={handleOpenImportWizard}
         />
@@ -80,9 +190,9 @@ export const AdminLayout: React.FC = () => {
     }
 
     switch (currentModule) {
-      case 'dashboard':
+      case "dashboard":
         return <AdminDashboard onNavigate={(mod) => setCurrentModule(mod)} />;
-      case 'requests':
+      case "requests":
         return (
           <AdminRequests
             onOpenFormBuilder={handleOpenFormBuilder}
@@ -90,33 +200,33 @@ export const AdminLayout: React.FC = () => {
             onNavigate={(mod) => setCurrentModule(mod)}
           />
         );
-      case 'import':
+      case "import":
         return (
           <AdminImportWizard
             initialRequestId={activeImportRequestId || undefined}
             onBack={() => {
               setActiveImportRequestId(null);
-              setCurrentModule('requests');
+              setCurrentModule("requests");
             }}
           />
         );
-      case 'branches':
+      case "branches":
         return <AdminBranches />;
-      case 'supervisor_matrix':
+      case "supervisor_matrix":
         return <AdminSupervisorMatrix />;
-      case 'users':
+      case "users":
         return <AdminUsers />;
-      case 'devices':
+      case "devices":
         return <AdminDeviceManager />;
-      case 'assignments':
+      case "assignments":
         return <AdminAssignments />;
-      case 'reports':
+      case "reports":
         return <AdminReports />;
-      case 'archive':
+      case "archive":
         return <AdminArchive />;
-      case 'audit':
+      case "audit":
         return <AdminAuditLogs />;
-      case 'settings':
+      case "settings":
         return <AdminSettings />;
       default:
         return <AdminDashboard onNavigate={(mod) => setCurrentModule(mod)} />;
@@ -141,7 +251,9 @@ export const AdminLayout: React.FC = () => {
               <div className="p-4 border-b border-slate-100 flex items-center justify-between">
                 <div className="text-xs font-extrabold uppercase tracking-wider text-purple-900 flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-purple-700" />
-                  <span>{lang === 'ar' ? 'إدارة المنظومة' : 'Management Portal'}</span>
+                  <span>
+                    {lang === "ar" ? "إدارة المنظومة" : "Management Portal"}
+                  </span>
                 </div>
                 <button
                   onClick={() => setIsSidebarOpen(false)}
@@ -168,12 +280,16 @@ export const AdminLayout: React.FC = () => {
                         }}
                         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-start cursor-pointer ${
                           isActive
-                            ? 'bg-purple-900 text-white shadow-xs font-extrabold'
-                            : 'text-slate-600 hover:bg-slate-100 hover:text-purple-950'
+                            ? "bg-purple-900 text-white shadow-xs font-extrabold"
+                            : "text-slate-600 hover:bg-slate-100 hover:text-purple-950"
                         }`}
                       >
-                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                        <span className="truncate">{lang === 'ar' ? item.labelAr : item.labelEn}</span>
+                        <Icon
+                          className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`}
+                        />
+                        <span className="truncate">
+                          {lang === "ar" ? item.labelAr : item.labelEn}
+                        </span>
                       </button>
                     );
                   })}
@@ -185,16 +301,20 @@ export const AdminLayout: React.FC = () => {
             <div className="p-3.5 border-t border-slate-200/80 bg-slate-50/70">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-purple-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                  {currentUser?.repNameAr.charAt(0) || 'م'}
+                  {currentUser?.repNameAr.charAt(0) || "م"}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="font-extrabold text-xs text-slate-900 truncate">
                     {currentUser?.repNameAr}
                   </div>
                   <div className="text-[10px] text-purple-700 font-bold truncate">
-                    {currentUser?.role === 'ADMIN'
-                      ? lang === 'ar' ? 'مدير النظام المركزي' : 'System Admin'
-                      : lang === 'ar' ? 'مشرف فرع' : 'Branch Supervisor'}
+                    {currentUser?.role === "ADMIN"
+                      ? lang === "ar"
+                        ? "مدير النظام المركزي"
+                        : "System Admin"
+                      : lang === "ar"
+                        ? "مشرف فرع"
+                        : "Branch Supervisor"}
                   </div>
                 </div>
               </div>
@@ -207,7 +327,7 @@ export const AdminLayout: React.FC = () => {
       <aside className="hidden lg:flex w-64 shrink-0 bg-white border-e border-slate-200 sticky top-16 h-[calc(100vh-4rem)] flex-col justify-between z-20">
         <div className="p-4 overflow-y-auto">
           <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 px-3 mb-2">
-            {lang === 'ar' ? 'إدارة المنظومة' : 'Management Portal'}
+            {lang === "ar" ? "إدارة المنظومة" : "Management Portal"}
           </div>
 
           <nav className="space-y-1">
@@ -223,12 +343,16 @@ export const AdminLayout: React.FC = () => {
                   }}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-start cursor-pointer ${
                     isActive
-                      ? 'bg-purple-900 text-white shadow-xs font-extrabold'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-purple-950'
+                      ? "bg-purple-900 text-white shadow-xs font-extrabold"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-purple-950"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                  <span className="truncate">{lang === 'ar' ? item.labelAr : item.labelEn}</span>
+                  <Icon
+                    className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`}
+                  />
+                  <span className="truncate">
+                    {lang === "ar" ? item.labelAr : item.labelEn}
+                  </span>
                 </button>
               );
             })}
@@ -239,16 +363,20 @@ export const AdminLayout: React.FC = () => {
         <div className="p-3.5 border-t border-slate-200/80 bg-slate-50/50">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-purple-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-              {currentUser?.repNameAr.charAt(0) || 'م'}
+              {currentUser?.repNameAr.charAt(0) || "م"}
             </div>
             <div className="min-w-0 flex-1">
               <div className="font-extrabold text-xs text-slate-900 truncate">
                 {currentUser?.repNameAr}
               </div>
               <div className="text-[10px] text-purple-700 font-bold truncate">
-                {currentUser?.role === 'ADMIN'
-                  ? lang === 'ar' ? 'مدير النظام المركزي' : 'System Admin'
-                  : lang === 'ar' ? 'مشرف فرع' : 'Branch Supervisor'}
+                {currentUser?.role === "ADMIN"
+                  ? lang === "ar"
+                    ? "مدير النظام المركزي"
+                    : "System Admin"
+                  : lang === "ar"
+                    ? "مشرف فرع"
+                    : "Branch Supervisor"}
               </div>
             </div>
           </div>
@@ -264,14 +392,24 @@ export const AdminLayout: React.FC = () => {
             className="flex items-center gap-2 text-xs font-bold text-purple-900 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg border border-purple-200 transition-colors"
           >
             <Menu className="w-4 h-4 text-purple-700" />
-            <span>{lang === 'ar' ? 'القائمة الإدارية' : 'Admin Menu'}</span>
+            <span>{lang === "ar" ? "القائمة الإدارية" : "Admin Menu"}</span>
           </button>
           <span className="text-xs font-bold text-purple-900">
-            {menuItems.find((m) => m.id === currentModule)?.labelAr || ''}
+            {menuItems.find((m) => m.id === currentModule)?.labelAr || ""}
           </span>
         </div>
 
-        {renderModuleContent()}
+        <React.Suspense
+          fallback={
+            <div className="flex items-center justify-center p-12 text-sm text-slate-500 font-bold">
+              {lang === "ar"
+                ? "جاري تحميل واجهة الإدارة..."
+                : "Loading module..."}
+            </div>
+          }
+        >
+          {renderModuleContent()}
+        </React.Suspense>
       </main>
     </div>
   );

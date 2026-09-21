@@ -1,9 +1,9 @@
-import React from 'react';
-import { RequestItem, RequestField } from '../../../types';
-import { RequestTableRow } from './RequestTableRow';
+import React from "react";
+import { RequestItem, RequestField } from "../../../types";
+import { RequestTableRow } from "./RequestTableRow";
 
 interface RequestsTableProps {
-  lang: 'ar' | 'en';
+  lang: "ar" | "en";
   requests: RequestItem[];
   fields: RequestField[];
   actionLoadingId: string | null;
@@ -45,24 +45,41 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({
         <table className="w-full text-start text-xs">
           <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
-              <th className="px-4 py-3 text-start">{lang === 'ar' ? 'رمز وعنوان الطلب' : 'Code & Title'}</th>
-              <th className="px-4 py-3 text-start">{lang === 'ar' ? 'النوع والأولوية' : 'Type & Priority'}</th>
-              <th className="px-4 py-3 text-start">{lang === 'ar' ? 'تاريخ الاستحقاق' : 'Due Date'}</th>
-              <th className="px-4 py-3 text-start">{lang === 'ar' ? 'السجلات' : 'Records'}</th>
-              <th className="px-4 py-3 text-start">{lang === 'ar' ? 'الحالة' : 'Status'}</th>
-              <th className="px-4 py-3 text-center">{lang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
+              <th className="px-4 py-3 text-start">
+                {lang === "ar" ? "رمز وعنوان الطلب" : "Code & Title"}
+              </th>
+              <th className="px-4 py-3 text-start">
+                {lang === "ar" ? "النوع والأولوية" : "Type & Priority"}
+              </th>
+              <th className="px-4 py-3 text-start">
+                {lang === "ar" ? "تاريخ الاستحقاق" : "Due Date"}
+              </th>
+              <th className="px-4 py-3 text-start">
+                {lang === "ar" ? "السجلات" : "Records"}
+              </th>
+              <th className="px-4 py-3 text-start">
+                {lang === "ar" ? "الحالة" : "Status"}
+              </th>
+              <th className="px-4 py-3 text-center">
+                {lang === "ar" ? "الإجراءات" : "Actions"}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {requests.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
-                  {lang === 'ar' ? 'لا توجد طلبات' : 'No requests found'}
+                <td
+                  colSpan={6}
+                  className="px-4 py-8 text-center text-slate-400"
+                >
+                  {lang === "ar" ? "لا توجد طلبات" : "No requests found"}
                 </td>
               </tr>
             ) : (
               requests.map((req) => {
-                const reqFieldsCount = fields.filter((f) => f.requestId === req.requestId).length;
+                const reqFieldsCount = fields.filter(
+                  (f) => f.requestId === req.requestId,
+                ).length;
 
                 return (
                   <RequestTableRow

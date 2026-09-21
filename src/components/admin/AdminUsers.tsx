@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
-import { User, UserRole } from '../../types';
+import React, { useState } from "react";
+import { useApp } from "../../context/AppContext";
+import { User, UserRole } from "../../types";
 import {
   Users,
   UserPlus,
@@ -17,11 +17,11 @@ import {
   X,
   RefreshCw,
   FileSpreadsheet,
-} from 'lucide-react';
-import { AdminUserImportModal } from './AdminUserImportModal';
-import { UserFilters } from './users/UserFilters';
-import { UserTableRow } from './users/UserTableRow';
-import { UserCreateModal } from './users/UserCreateModal';
+} from "lucide-react";
+import { AdminUserImportModal } from "./AdminUserImportModal";
+import { UserFilters } from "./users/UserFilters";
+import { UserTableRow } from "./users/UserTableRow";
+import { UserCreateModal } from "./users/UserCreateModal";
 
 export const AdminUsers: React.FC = () => {
   const {
@@ -39,25 +39,25 @@ export const AdminUsers: React.FC = () => {
     updateUser,
   } = useApp();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("ALL");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // New User Form State
-  const [newRole, setNewRole] = useState<UserRole>('REP');
-  const [newRegionNo, setNewRegionNo] = useState('');
-  const [newRepNo, setNewRepNo] = useState('');
-  const [newRepNameAr, setNewRepNameAr] = useState('');
-  const [newRepNameEn, setNewRepNameEn] = useState('');
-  const [newBranchId, setNewBranchId] = useState(branches[0]?.branchId || '');
+  const [newRole, setNewRole] = useState<UserRole>("REP");
+  const [newRegionNo, setNewRegionNo] = useState("");
+  const [newRepNo, setNewRepNo] = useState("");
+  const [newRepNameAr, setNewRepNameAr] = useState("");
+  const [newRepNameEn, setNewRepNameEn] = useState("");
+  const [newBranchId, setNewBranchId] = useState(branches[0]?.branchId || "");
   const [newAllowedRegions, setNewAllowedRegions] = useState<string[]>([]);
   const [newPermissions, setNewPermissions] = useState({
     canManageUsers: false,
     canManageRequests: false,
     canManageRegions: false,
-    canViewAllBranches: false
+    canViewAllBranches: false,
   });
 
   const showToast = (msg: string) => {
@@ -66,14 +66,15 @@ export const AdminUsers: React.FC = () => {
   };
 
   const filteredUsers = users.filter((u) => {
-    if (roleFilter !== 'ALL' && u.role !== roleFilter) return false;
+    if (roleFilter !== "ALL" && u.role !== roleFilter) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchNameAr = u.repNameAr.toLowerCase().includes(q);
-      const matchNameEn = (u.repNameEn || '').toLowerCase().includes(q);
+      const matchNameEn = (u.repNameEn || "").toLowerCase().includes(q);
       const matchReg = u.regionNo.includes(q);
-      const matchRepNo = (u.repNo || '').toLowerCase().includes(q);
-      if (!matchNameAr && !matchNameEn && !matchReg && !matchRepNo) return false;
+      const matchRepNo = (u.repNo || "").toLowerCase().includes(q);
+      if (!matchNameAr && !matchNameEn && !matchReg && !matchRepNo)
+        return false;
     }
     return true;
   });
@@ -81,15 +82,21 @@ export const AdminUsers: React.FC = () => {
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRepNameAr.trim()) {
-      alert(lang === 'ar' ? 'يرجى إدخال الاسم بالعربية' : 'Arabic name is required');
+      alert(
+        lang === "ar" ? "يرجى إدخال الاسم بالعربية" : "Arabic name is required",
+      );
       return;
     }
     if (!newRegionNo.trim()) {
-      alert(lang === 'ar' ? 'يرجى إدخال رقم المنطقة / البريد الإلكتروني' : 'Region No. or Email is required');
+      alert(
+        lang === "ar"
+          ? "يرجى إدخال رقم المنطقة / البريد الإلكتروني"
+          : "Region No. or Email is required",
+      );
       return;
     }
     if (!newBranchId) {
-      alert(lang === 'ar' ? 'يرجى اختيار الفرع' : 'Please select a branch');
+      alert(lang === "ar" ? "يرجى اختيار الفرع" : "Please select a branch");
       return;
     }
 
@@ -101,16 +108,33 @@ export const AdminUsers: React.FC = () => {
         repNameAr: newRepNameAr.trim(),
         repNameEn: newRepNameEn.trim() || undefined,
         branchId: newBranchId,
-        allowedRegionNos: newAllowedRegions.length > 0 ? newAllowedRegions : [newRegionNo.trim()],
-        permissions: newRole === 'SUPERVISOR' ? newPermissions : undefined,
+        allowedRegionNos:
+          newAllowedRegions.length > 0
+            ? newAllowedRegions
+            : [newRegionNo.trim()],
+        permissions: newRole === "SUPERVISOR" ? newPermissions : undefined,
       });
       setShowCreateModal(false);
-      showToast(lang === 'ar' ? 'تم إنشاء الحساب بنجاح (سيتم إصدار كلمة مرور مؤقتة)' : 'User created. A temporary password will be issued.');
+      showToast(
+        lang === "ar"
+          ? "تم إنشاء الحساب بنجاح (سيتم إصدار كلمة مرور مؤقتة)"
+          : "User created. A temporary password will be issued.",
+      );
       // Reset form
-      setNewRegionNo(''); setNewRepNo(''); setNewRepNameAr(''); setNewRepNameEn(''); setNewAllowedRegions([]); setNewRole('REP');
+      setNewRegionNo("");
+      setNewRepNo("");
+      setNewRepNameAr("");
+      setNewRepNameEn("");
+      setNewAllowedRegions([]);
+      setNewRole("REP");
     } catch (err: any) {
       console.error(err);
-      const msg = err?.details?.message || err?.message || (lang === 'ar' ? 'حدث خطأ أثناء إنشاء المستخدم' : 'Error creating user');
+      const msg =
+        err?.details?.message ||
+        err?.message ||
+        (lang === "ar"
+          ? "حدث خطأ أثناء إنشاء المستخدم"
+          : "Error creating user");
       alert(msg);
     }
   };
@@ -142,13 +166,27 @@ export const AdminUsers: React.FC = () => {
           <table className="w-full text-start text-xs">
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'المستخدم / المندوب' : 'User'}</th>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'رقم المنطقة (اسم الدخول)' : 'Region No'}</th>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'المناطق المصرحة' : 'Allowed Regions'}</th>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'الفرع' : 'Branch'}</th>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'الجهاز المعتمد' : 'Bound Device'}</th>
-                <th className="px-4 py-3 text-start">{lang === 'ar' ? 'حالة الحساب' : 'Account Status'}</th>
-                <th className="px-4 py-3 text-center">{lang === 'ar' ? 'الإجراءات الإدارية' : 'Admin Actions'}</th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "المستخدم / المندوب" : "User"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "رقم المنطقة (اسم الدخول)" : "Region No"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "المناطق المصرحة" : "Allowed Regions"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "الفرع" : "Branch"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "الجهاز المعتمد" : "Bound Device"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "حالة الحساب" : "Account Status"}
+                </th>
+                <th className="px-4 py-3 text-center">
+                  {lang === "ar" ? "الإجراءات الإدارية" : "Admin Actions"}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -162,21 +200,25 @@ export const AdminUsers: React.FC = () => {
                       void resetUserPassword(id).then((result) => {
                         showToast(
                           result.success
-                            ? `${result.message}${result.temporaryPassword ? ` ${result.temporaryPassword}` : ''}`
-                            : result.message
+                            ? `${result.message}${result.temporaryPassword ? ` ${result.temporaryPassword}` : ""}`
+                            : result.message,
                         );
                       });
                     }}
                     onUnlockUser={(id) => {
                       unlockUser(id);
-                      showToast(lang === 'ar' ? `تم إلغاء قفل الحساب` : `Account unlocked`);
+                      showToast(
+                        lang === "ar"
+                          ? `تم إلغاء قفل الحساب`
+                          : `Account unlocked`,
+                      );
                     }}
                     onReleaseDevice={(id) => {
                       releaseUserDevice(id);
                       showToast(
-                        lang === 'ar'
+                        lang === "ar"
                           ? `تم فك ارتباط الجهاز للحساب`
-                          : `Device unlinked for account`
+                          : `Device unlinked for account`,
                       );
                     }}
                   />
@@ -219,9 +261,9 @@ export const AdminUsers: React.FC = () => {
         onClose={() => setShowImportModal(false)}
         onSuccess={(count) =>
           showToast(
-            lang === 'ar'
+            lang === "ar"
               ? `تم استيراد ${count} مندوب بنجاح (كلمات مرور مؤقتة مع إلزام التغيير فوراً)`
-              : `Imported ${count} representatives successfully (temporary passwords, change required)`
+              : `Imported ${count} representatives successfully (temporary passwords, change required)`,
           )
         }
       />

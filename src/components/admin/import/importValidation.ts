@@ -1,4 +1,4 @@
-import { RequestField } from '../../../types';
+import { RequestField } from "../../../types";
 
 export interface ValidationResult {
   valid: Record<string, any>[];
@@ -7,7 +7,7 @@ export interface ValidationResult {
 
 export function autoMapColumns(
   headers: string[],
-  formFields: RequestField[]
+  formFields: RequestField[],
 ): { sysMap: Record<string, string>; fMap: Record<string, string> } {
   const sysMap: Record<string, string> = {};
   const fMap: Record<string, string> = {};
@@ -16,36 +16,49 @@ export function autoMapColumns(
     const lower = h.toLowerCase().trim();
 
     // System field matching
-    if (lower.includes('region') || lower.includes('منطقة') || lower.includes('منطقه')) {
+    if (
+      lower.includes("region") ||
+      lower.includes("منطقة") ||
+      lower.includes("منطقه")
+    ) {
       sysMap.regionNo = h;
-    } else if (lower.includes('repno') || lower.includes('رقم_مندوب') || lower.includes('رقم المندوب')) {
+    } else if (
+      lower.includes("repno") ||
+      lower.includes("رقم_مندوب") ||
+      lower.includes("رقم المندوب")
+    ) {
       sysMap.repNo = h;
     } else if (
-      lower.includes('repname') ||
-      lower.includes('اسم_مندوب') ||
-      lower.includes('اسم المندوب') ||
-      lower.includes('المندوب')
+      lower.includes("repname") ||
+      lower.includes("اسم_مندوب") ||
+      lower.includes("اسم المندوب") ||
+      lower.includes("المندوب")
     ) {
       sysMap.repName = h;
-    } else if (lower.includes('branch') || lower.includes('فرع')) {
+    } else if (lower.includes("branch") || lower.includes("فرع")) {
       sysMap.branchName = h;
     } else if (
-      lower === 'customerno' ||
-      lower === 'customer_no' ||
-      lower === 'cust_no' ||
-      lower.includes('رقم_عميل') ||
-      lower.includes('رقم العميل')
+      lower === "customerno" ||
+      lower === "customer_no" ||
+      lower === "cust_no" ||
+      lower.includes("رقم_عميل") ||
+      lower.includes("رقم العميل")
     ) {
       sysMap.customerNo = h;
     } else if (
-      lower === 'customername' ||
-      lower === 'customer_name' ||
-      lower === 'cust_name' ||
-      lower.includes('اسم_عميل') ||
-      lower.includes('اسم العميل')
+      lower === "customername" ||
+      lower === "customer_name" ||
+      lower === "cust_name" ||
+      lower.includes("اسم_عميل") ||
+      lower.includes("اسم العميل")
     ) {
       sysMap.customerName = h;
-    } else if (lower.includes('area') || lower.includes('مدينة') || lower.includes('حي') || lower.includes('موقع')) {
+    } else if (
+      lower.includes("area") ||
+      lower.includes("مدينة") ||
+      lower.includes("حي") ||
+      lower.includes("موقع")
+    ) {
       sysMap.area = h;
     }
 
@@ -53,7 +66,7 @@ export function autoMapColumns(
     formFields.forEach((f) => {
       const keyLower = f.fieldKey.toLowerCase();
       const labelArLower = f.fieldLabelAr.toLowerCase();
-      const labelEnLower = (f.fieldLabelEn || '').toLowerCase();
+      const labelEnLower = (f.fieldLabelEn || "").toLowerCase();
 
       if (
         lower === keyLower ||
@@ -74,27 +87,33 @@ export function validateImportRows(
   rawRows: Record<string, any>[],
   systemColMap: Record<string, string>,
   fieldColMap: Record<string, string>,
-  selectedRequestId: string
+  selectedRequestId: string,
 ): ValidationResult {
   const valid: Record<string, any>[] = [];
-  const invalid: { row: number; reasonAr: string; reasonEn: string; data: any }[] = [];
+  const invalid: {
+    row: number;
+    reasonAr: string;
+    reasonEn: string;
+    data: any;
+  }[] = [];
   const seenCustomers = new Set<string>();
 
   rawRows.forEach((row, idx) => {
     const rowNum = idx + 2;
     const regCol = systemColMap.regionNo;
-    const custNoCol = systemColMap.customerNo || fieldColMap['customer_no'];
-    const custNameCol = systemColMap.customerName || fieldColMap['customer_name'];
+    const custNoCol = systemColMap.customerNo || fieldColMap["customer_no"];
+    const custNameCol =
+      systemColMap.customerName || fieldColMap["customer_name"];
 
-    const regVal = String(row[regCol] || '').trim();
-    const custNoVal = String(row[custNoCol] || '').trim();
-    const custNameVal = String(row[custNameCol] || '').trim();
+    const regVal = String(row[regCol] || "").trim();
+    const custNoVal = String(row[custNoCol] || "").trim();
+    const custNameVal = String(row[custNameCol] || "").trim();
 
     if (!regVal) {
       invalid.push({
         row: rowNum,
-        reasonAr: 'رقم المنطقة مفقود (إلزامي لتوجيه السجل للمندوب)',
-        reasonEn: 'Region Number is required for assignment',
+        reasonAr: "رقم المنطقة مفقود (إلزامي لتوجيه السجل للمندوب)",
+        reasonEn: "Region Number is required for assignment",
         data: row,
       });
       return;
@@ -103,8 +122,8 @@ export function validateImportRows(
     if (!custNoVal && !custNameVal) {
       invalid.push({
         row: rowNum,
-        reasonAr: 'رقم واسم العميل مفقودان',
-        reasonEn: 'Customer Number or Name is required',
+        reasonAr: "رقم واسم العميل مفقودان",
+        reasonEn: "Customer Number or Name is required",
         data: row,
       });
       return;

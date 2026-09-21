@@ -14,138 +14,136 @@ import { hashPassword, verifyPassword } from "./auth";
  * prevents reuse of immediately previous password, and
  * sets mustChangePassword to false.
  */
-export const changePassword = functions.https.onCall(
-  async (data, context) => {
-    // Must be authenticated
-    if (!context.auth) {
+export const changePassword = functions.https.onCall(async (data, context) => {
+  // Must be authenticated
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "يجب تسجيل الدخول أولاً. | Authentication required.",
+    );
+  }
+
+  const { currentPassword, newPassword } = data;
+
+  if (!currentPassword || !newPassword) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "كلمة المرور الحالية والجديدة مطلوبة. | Current and new password are required.",
+    );
+  }
+
+  if (typeof newPassword !== "string" || newPassword.length < 6) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "كلمة المرور يجب أن تكون 6 أحرف على الأقل. | Password must be at least 6 characters.",
+    );
+  }
+
+  if (newPassword.length > 128) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "كلمة المرور طويلة جداً. | Password is too long.",
+    );
+  }
+
+  const userId = context.auth.uid;
+
+  try {
+    const userRef = db.collection("users").doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
       throw new functions.https.HttpsError(
-        "unauthenticated",
-        "يجب تسجيل الدخول أولاً. | Authentication required."
+        "not-found",
+        "المستخدم غير موجود. | User not found.",
       );
     }
 
-    const { currentPassword, newPassword } = data;
+    const userData = userDoc.data()!;
 
-    if (!currentPassword || !newPassword) {
-      throw new functions.https.HttpsError(
-        "invalid-argument",
-        "كلمة المرور الحالية والجديدة مطلوبة. | Current and new password are required."
-      );
-    }
+    // Verify current password
+    const isCurrentValid = await verifyPassword(
+      currentPassword,
+      userData.passwordHash,
+    );
 
-    if (typeof newPassword !== "string" || newPassword.length < 6) {
-      throw new functions.https.HttpsError(
-        "invalid-argument",
-        "كلمة المرور يجب أن تكون 6 أحرف على الأقل. | Password must be at least 6 characters."
-      );
-    }
-
-    if (newPassword.length > 128) {
-      throw new functions.https.HttpsError(
-        "invalid-argument",
-        "كلمة المرور طويلة جداً. | Password is too long."
-      );
-    }
-
-    const userId = context.auth.uid;
-
-    try {
-      const userRef = db.collection("users").doc(userId);
-      const userDoc = await userRef.get();
-
-      if (!userDoc.exists) {
-        throw new functions.https.HttpsError(
-          "not-found",
-          "المستخدم غير موجود. | User not found."
-        );
-      }
-
-      const userData = userDoc.data()!;
-
-      // Verify current password
-      const isCurrentValid = await verifyPassword(
-        currentPassword,
-        userData.passwordHash
-      );
-
-      if (!isCurrentValid) {
-        await logAuditSafe({
-          userId,
-          userRole: userData.role,
-          action: "PASSWORD_CHANGE_FAILED_WRONG_CURRENT",
-          entityType: "AUTH",
-          entityId: userId,
-        });
-
-        throw new functions.https.HttpsError(
-          "unauthenticated",
-          "كلمة المرور الحالية غير صحيحة. | Current password is incorrect."
-        );
-      }
-
-      // Prevent reuse of current password
-      const isSameAsCurrent = await verifyPassword(
-        newPassword,
-        userData.passwordHash
-      );
-
-      if (isSameAsCurrent) {
-        throw new functions.https.HttpsError(
-          "invalid-argument",
-          "لا يمكن استخدام نفس كلمة المرور الحالية. | Cannot reuse current password."
-        );
-      }
-
-      // Hash new password
-      const newHash = await hashPassword(newPassword);
-
-      // Increment session version to invalidate old sessions
-      const newSessionVersion = (userData.sessionVersion || 0) + 1;
-
-      await userRef.update({
-        passwordHash: newHash,
-        mustChangePassword: false,
-        passwordChangedAt: admin.firestore.FieldValue.serverTimestamp(),
-        sessionVersion: newSessionVersion,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-      // Update custom claims with new session version
-      const customClaims = {
-        role: userData.role,
-        branchId: userData.branchId || null,
-        regionNo: userData.regionNo || null,
-        allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
-        sessionVersion: newSessionVersion,
-        mustChangePassword: false,
-      };
-      await admin.auth().setCustomUserClaims(userId, customClaims);
-
+    if (!isCurrentValid) {
       await logAuditSafe({
         userId,
         userRole: userData.role,
-        action: "PASSWORD_CHANGED",
+        action: "PASSWORD_CHANGE_FAILED_WRONG_CURRENT",
         entityType: "AUTH",
         entityId: userId,
       });
 
-      return {
-        success: true,
-        messageAr: "تم تغيير كلمة المرور بنجاح.",
-        messageEn: "Password changed successfully.",
-      };
-    } catch (error: any) {
-      if (error instanceof functions.https.HttpsError) {
-        throw error;
-      }
-      console.error("Change password error:", error);
       throw new functions.https.HttpsError(
-        "internal",
-        "حدث خطأ في الخادم. | Internal server error."
+        "unauthenticated",
+        "كلمة المرور الحالية غير صحيحة. | Current password is incorrect.",
       );
     }
+
+    // Prevent reuse of current password
+    const isSameAsCurrent = await verifyPassword(
+      newPassword,
+      userData.passwordHash,
+    );
+
+    if (isSameAsCurrent) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "لا يمكن استخدام نفس كلمة المرور الحالية. | Cannot reuse current password.",
+      );
+    }
+
+    // Hash new password
+    const newHash = await hashPassword(newPassword);
+
+    // Increment session version to invalidate old sessions
+    const newSessionVersion = (userData.sessionVersion || 0) + 1;
+
+    await userRef.update({
+      passwordHash: newHash,
+      mustChangePassword: false,
+      passwordChangedAt: admin.firestore.FieldValue.serverTimestamp(),
+      sessionVersion: newSessionVersion,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Update custom claims with new session version
+    const customClaims = {
+      role: userData.role,
+      branchId: userData.branchId || null,
+      regionNo: userData.regionNo || null,
+      allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
+      sessionVersion: newSessionVersion,
+      mustChangePassword: false,
+    };
+    await admin.auth().setCustomUserClaims(userId, customClaims);
+
+    await logAuditSafe({
+      userId,
+      userRole: userData.role,
+      action: "PASSWORD_CHANGED",
+      entityType: "AUTH",
+      entityId: userId,
+    });
+
+    return {
+      success: true,
+      messageAr: "تم تغيير كلمة المرور بنجاح.",
+      messageEn: "Password changed successfully.",
+    };
+  } catch (error: any) {
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+    console.error("Change password error:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "حدث خطأ في الخادم. | Internal server error.",
+    );
   }
-);
+});
 
 /**
  * Cloud Function: requestPasswordReset
@@ -160,7 +158,7 @@ export const requestPasswordReset = functions.https.onCall(
     if (!regionNo) {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "رقم المنطقة مطلوب. | Region number is required."
+        "رقم المنطقة مطلوب. | Region number is required.",
       );
     }
 
@@ -218,10 +216,10 @@ export const requestPasswordReset = functions.https.onCall(
       console.error("Password reset request error:", error);
       throw new functions.https.HttpsError(
         "internal",
-        "حدث خطأ في الخادم. | Internal server error."
+        "حدث خطأ في الخادم. | Internal server error.",
       );
     }
-  }
+  },
 );
 
 /**
@@ -237,7 +235,7 @@ export const adminResetPassword = functions.https.onCall(
     if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
-        "صلاحية المسؤول مطلوبة. | Admin permission required."
+        "صلاحية المسؤول مطلوبة. | Admin permission required.",
       );
     }
 
@@ -246,7 +244,7 @@ export const adminResetPassword = functions.https.onCall(
     if (!targetUserId) {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "معرف المستخدم مطلوب. | User ID is required."
+        "معرف المستخدم مطلوب. | User ID is required.",
       );
     }
 
@@ -257,7 +255,7 @@ export const adminResetPassword = functions.https.onCall(
     ) {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "كلمة المرور المؤقتة مطلوبة ويجب أن تكون 12 حرفاً على الأقل. | A temporary password of at least 12 characters is required."
+        "كلمة المرور المؤقتة مطلوبة ويجب أن تكون 12 حرفاً على الأقل. | A temporary password of at least 12 characters is required.",
       );
     }
 
@@ -270,7 +268,7 @@ export const adminResetPassword = functions.https.onCall(
       if (!userDoc.exists) {
         throw new functions.https.HttpsError(
           "not-found",
-          "المستخدم غير موجود. | User not found."
+          "المستخدم غير موجود. | User not found.",
         );
       }
 
@@ -293,7 +291,10 @@ export const adminResetPassword = functions.https.onCall(
       try {
         await admin.auth().revokeRefreshTokens(targetUserId);
       } catch (e) {
-        console.warn("Could not revoke tokens (user may not exist in Auth):", e);
+        console.warn(
+          "Could not revoke tokens (user may not exist in Auth):",
+          e,
+        );
       }
 
       // Update custom claims
@@ -350,10 +351,10 @@ export const adminResetPassword = functions.https.onCall(
       console.error("Admin reset password error:", error);
       throw new functions.https.HttpsError(
         "internal",
-        "حدث خطأ في الخادم. | Internal server error."
+        "حدث خطأ في الخادم. | Internal server error.",
       );
     }
-  }
+  },
 );
 
 /**
@@ -367,7 +368,7 @@ export const adminUnlockAccount = functions.https.onCall(
     if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
       throw new functions.https.HttpsError(
         "permission-denied",
-        "صلاحية المسؤول مطلوبة. | Admin permission required."
+        "صلاحية المسؤول مطلوبة. | Admin permission required.",
       );
     }
 
@@ -376,7 +377,7 @@ export const adminUnlockAccount = functions.https.onCall(
     if (!targetUserId) {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "معرف المستخدم مطلوب. | User ID is required."
+        "معرف المستخدم مطلوب. | User ID is required.",
       );
     }
 
@@ -387,7 +388,7 @@ export const adminUnlockAccount = functions.https.onCall(
       if (!userDoc.exists) {
         throw new functions.https.HttpsError(
           "not-found",
-          "المستخدم غير موجود. | User not found."
+          "المستخدم غير موجود. | User not found.",
         );
       }
 
@@ -417,8 +418,8 @@ export const adminUnlockAccount = functions.https.onCall(
       console.error("Unlock account error:", error);
       throw new functions.https.HttpsError(
         "internal",
-        "حدث خطأ في الخادم. | Internal server error."
+        "حدث خطأ في الخادم. | Internal server error.",
       );
     }
-  }
+  },
 );

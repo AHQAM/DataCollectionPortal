@@ -1,5 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 interface Props {
   children?: ReactNode;
@@ -25,7 +25,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    console.error("Uncaught error:", error, errorInfo);
   }
 
   private handleReload = () => {
@@ -39,17 +39,26 @@ class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4" dir="rtl">
+        <div
+          className="min-h-screen bg-slate-50 flex items-center justify-center p-4"
+          dir="rtl"
+        >
           <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center border border-red-100">
             <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertTriangle className="w-8 h-8" />
             </div>
-            <h1 className="text-2xl font-black text-slate-900 mb-2">عذراً، حدث خطأ غير متوقع</h1>
+            <h1 className="text-2xl font-black text-slate-900 mb-2">
+              عذراً، حدث خطأ غير متوقع
+            </h1>
             <p className="text-slate-500 mb-6 text-sm">
-              واجه التطبيق مشكلة غير متوقعة. يرجى تحديث الصفحة أو المحاولة مرة أخرى لاحقاً.
+              واجه التطبيق مشكلة غير متوقعة. يرجى تحديث الصفحة أو المحاولة مرة
+              أخرى لاحقاً.
             </p>
             {this.state.error && (
-              <div className="bg-slate-100 rounded-xl p-3 mb-6 text-left overflow-auto max-h-32 text-xs font-mono text-slate-600" dir="ltr">
+              <div
+                className="bg-slate-100 rounded-xl p-3 mb-6 text-left overflow-auto max-h-32 text-xs font-mono text-slate-600"
+                dir="ltr"
+              >
                 {this.state.error.message}
               </div>
             )}
