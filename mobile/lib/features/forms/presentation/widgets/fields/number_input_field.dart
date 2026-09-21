@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../../domain/form_field_model.dart';
+import 'package:mobile/l10n/app_localizations.dart';
+import 'package:mobile/features/forms/domain/form_field_model.dart';
 
 class NumberInputField extends StatelessWidget {
   final FormFieldModel field;

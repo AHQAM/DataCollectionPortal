@@ -40,11 +40,15 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
 
   bool _isFieldVisible(FormFieldModel field) {
     final rule = field.visibilityRule;
-    if (rule == null || rule.isEmpty) return true;
+    if (rule == null || rule.isEmpty) {
+      return true;
+    }
 
     final targetFieldKey =
         rule['targetFieldKey']?.toString() ?? rule['targetFieldId']?.toString();
-    if (targetFieldKey == null || targetFieldKey.isEmpty) return true;
+    if (targetFieldKey == null || targetFieldKey.isEmpty) {
+      return true;
+    }
 
     // Try finding the value in _formData using various possible keys
     var targetVal = _formData[targetFieldKey];
@@ -70,14 +74,19 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
     switch (operator) {
       case 'equals':
       case '==':
-        if (tStr.isEmpty && rStr.isNotEmpty) return false;
-        if (tStr == rStr) return true;
+        if (tStr.isEmpty && rStr.isNotEmpty) {
+      return false;
+    }
+        if (tStr == rStr) {
+      return true;
+    }
 
         // Handle dropdown value vs label mismatch
         if (tStr.isNotEmpty &&
             rStr.isNotEmpty &&
-            (tStr.contains(rStr) || rStr.contains(tStr)))
+            (tStr.contains(rStr) || rStr.contains(tStr))) {
           return true;
+        }
 
         // Boolean / Yes-No normalization
         if ((tStr == 'true' || tStr == 'yes' || tStr == 'نعم' || tStr == '1') &&
@@ -91,24 +100,36 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
         return false;
       case 'not_equals':
       case '!=':
-        if (tStr.isEmpty && rStr.isNotEmpty) return true;
+        if (tStr.isEmpty && rStr.isNotEmpty) {
+      return true;
+    }
         return !_isConditionMet(targetVal, 'equals', ruleVal);
       case 'contains':
-        if (tStr.isEmpty) return false;
+        if (tStr.isEmpty) {
+      return false;
+    }
         return tStr.contains(rStr);
       case 'greater_than':
       case '>':
-        if (tStr.isEmpty) return false;
+        if (tStr.isEmpty) {
+      return false;
+    }
         final tNum = num.tryParse(tStr);
         final rNum = num.tryParse(rStr);
-        if (tNum == null || rNum == null) return false;
+        if (tNum == null || rNum == null) {
+      return false;
+    }
         return tNum > rNum;
       case 'less_than':
       case '<':
-        if (tStr.isEmpty) return false;
+        if (tStr.isEmpty) {
+      return false;
+    }
         final tNum = num.tryParse(tStr);
         final rNum = num.tryParse(rStr);
-        if (tNum == null || rNum == null) return false;
+        if (tNum == null || rNum == null) {
+      return false;
+    }
         return tNum < rNum;
       case 'is_empty':
         return tStr.isEmpty;
