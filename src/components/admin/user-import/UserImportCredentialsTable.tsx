@@ -65,7 +65,9 @@ export const UserImportCredentialsTable: React.FC<
                   {lang === "ar" ? "اسم المستخدم" : "User Name"}
                 </th>
                 <th className="px-3 py-2 text-start">
-                  {lang === "ar" ? "رقم المستخدم (اسم الدخول)" : "Username / User No"}
+                  {lang === "ar"
+                    ? "رقم المستخدم (اسم الدخول)"
+                    : "Username / User No"}
                 </th>
                 <th className="px-3 py-2 text-start">
                   {lang === "ar" ? "الفرع" : "Branch"}

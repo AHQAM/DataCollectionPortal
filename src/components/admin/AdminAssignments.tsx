@@ -156,9 +156,7 @@ export const AdminAssignments: React.FC = () => {
           <table className="w-full text-start text-xs">
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-start">
-                  {targetEntityLabel}
-                </th>
+                <th className="px-4 py-3 text-start">{targetEntityLabel}</th>
                 <th className="px-4 py-3 text-start">
                   {lang === "ar" ? "المنطقة" : "Region"}
                 </th>
@@ -273,9 +271,7 @@ export const AdminAssignments: React.FC = () => {
           <div className="bg-white w-full max-w-md rounded-2xl p-5 shadow-2xl border border-slate-200 text-xs">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
               <h3 className="font-extrabold text-sm text-slate-900">
-                {lang === "ar"
-                  ? "إعادة توجيه السجل"
-                  : "Reassign Record"}
+                {lang === "ar" ? "إعادة توجيه السجل" : "Reassign Record"}
               </h3>
               <button
                 onClick={() => setReassignModalRecord(null)}
@@ -291,7 +287,8 @@ export const AdminAssignments: React.FC = () => {
               </div>
               <div className="text-[11px] text-slate-500">
                 {lang === "ar" ? "المستخدم الحالي: " : "Current User: "}
-                {reassignModalRecord.userName} ({lang === "ar" ? "المنطقة #" : "Region #"}
+                {reassignModalRecord.userName} (
+                {lang === "ar" ? "المنطقة #" : "Region #"}
                 {reassignModalRecord.assignedRegionNo})
               </div>
             </div>

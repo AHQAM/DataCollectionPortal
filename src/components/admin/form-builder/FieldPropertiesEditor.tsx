@@ -124,7 +124,9 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
                     : ""
                 }
               >
-                {lang === "ar" ? "حقل إلزامي من المستخدم" : "Required from User"}
+                {lang === "ar"
+                  ? "حقل إلزامي من المستخدم"
+                  : "Required from User"}
               </span>
             </label>
           </div>

@@ -179,7 +179,11 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <User className="w-3.5 h-3.5 text-purple-600" />
-                <span>{lang === "ar" ? "الجهة المستهدفة / السجل" : "Target Entity / Record"}</span>
+                <span>
+                  {lang === "ar"
+                    ? "الجهة المستهدفة / السجل"
+                    : "Target Entity / Record"}
+                </span>
               </div>
               <div className="text-xs font-black text-slate-900 truncate">
                 {record.targetName}

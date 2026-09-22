@@ -243,7 +243,7 @@ export const commitImport = functions.https.onCall(async (data, context) => {
       regionNo: regionVal || "UNASSIGNED",
       userNo,
       userName,
-      
+
       area: String(
         row[mapping["area"]] ||
           row["Area"] ||

@@ -122,9 +122,7 @@ describe("useDataStore", () => {
 
     useDataStore.getState().setRecords([mockRecord]);
     expect(useDataStore.getState().records).toHaveLength(1);
-    expect(useDataStore.getState().records[0].targetName).toBe(
-      "مؤسسة الرياض",
-    );
+    expect(useDataStore.getState().records[0].targetName).toBe("مؤسسة الرياض");
   });
 
   it("prepends audit logs with addAuditLogLocal", () => {

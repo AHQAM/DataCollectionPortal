@@ -206,9 +206,9 @@ export const TopNavbar: React.FC = () => {
                                   ? lang === "ar"
                                     ? `مشرف • ${u.branchNameAr || u.branchId}`
                                     : `Supervisor • ${u.branchNameEn || u.branchNameAr || u.branchId}`
-                                   : lang === "ar"
-                                     ? `مستخدم • منطقة ${u.regionNo} • ${u.branchNameAr || u.branchId}`
-                                     : `User • Region ${u.regionNo} • ${u.branchNameEn || u.branchNameAr || u.branchId}`}
+                                  : lang === "ar"
+                                    ? `مستخدم • منطقة ${u.regionNo} • ${u.branchNameAr || u.branchId}`
+                                    : `User • Region ${u.regionNo} • ${u.branchNameEn || u.branchNameAr || u.branchId}`}
                             </div>
                           </div>
                           {(() => {

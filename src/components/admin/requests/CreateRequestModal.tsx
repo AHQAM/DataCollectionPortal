@@ -189,9 +189,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                     : "Per Record / Target Entity"}
                 </option>
                 <option value="per_rep">
-                  {lang === "ar"
-                    ? "استجابة واحدة لكل مستخدم"
-                    : "Per User"}
+                  {lang === "ar" ? "استجابة واحدة لكل مستخدم" : "Per User"}
                 </option>
                 <option value="per_region">
                   {lang === "ar" ? "استجابة لكل منطقة" : "Per Region"}

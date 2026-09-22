@@ -110,8 +110,10 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
             <select
               defaultValue=""
               onChange={(e) => {
-                if (e.target.value === "general") handleLoadGeneralSurveyPreset();
-                else if (e.target.value === "asset") handleLoadAssetAuditPreset();
+                if (e.target.value === "general")
+                  handleLoadGeneralSurveyPreset();
+                else if (e.target.value === "asset")
+                  handleLoadAssetAuditPreset();
                 else if (e.target.value === "debt")
                   handleLoadInactiveCustomersPreset();
                 e.target.value = "";

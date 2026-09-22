@@ -65,9 +65,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
       <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl border border-slate-200">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
           <h2 className="font-extrabold text-sm text-slate-900">
-            {lang === "ar"
-              ? "إضافة مستخدم جديد"
-              : "Create New User Account"}
+            {lang === "ar" ? "إضافة مستخدم جديد" : "Create New User Account"}
           </h2>
           <button
             onClick={onClose}
@@ -169,9 +167,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم المستخدم (بالعربية)"
-                : "User Name (Arabic)"}
+              {lang === "ar" ? "اسم المستخدم (بالعربية)" : "User Name (Arabic)"}
             </label>
             <input
               type="text"

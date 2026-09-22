@@ -1,4 +1,5 @@
 # Field Data Collection Hub - AHQAM
+
 منصة جمع البيانات الميدانية
 
 A production-ready, Arabic-first, bilingual dynamic mobile application and responsive Admin Web Portal designed for arbitrary, multi-purpose field data collection (surveys, facility audits, inspections, customer evaluations, inventory, and record verification).
@@ -7,7 +8,7 @@ A production-ready, Arabic-first, bilingual dynamic mobile application and respo
 
 ## Key Highlights
 
-- **Dynamic Multi-Purpose Architecture**: No hardcoded entity constraints. Orders support custom target entity labels (`targetEntityLabelAr` / `targetEntityLabelEn`, e.g., *Facility, School, Clinic, Store, Beneficiary, Record*).
+- **Dynamic Multi-Purpose Architecture**: No hardcoded entity constraints. Orders support custom target entity labels (`targetEntityLabelAr` / `targetEntityLabelEn`, e.g., _Facility, School, Clinic, Store, Beneficiary, Record_).
 - **Visual Drag & Drop Form Builder**: Supports 10+ field types (text, numbers, ratings, dropdowns, dates, photos, locations, signatures) with conditional visibility rules and ready-to-use presets (General Survey, Asset & Facility Audit, Inactivity Audit).
 - **Intelligent Excel Import Wizard**: Automatically maps generic headers (`معرف_الجهة`, `اسم_الجهة`, `الفرع`, `المنطقة`, `الموقع`) with row-by-row validation, duplicate detection, and instant preview.
 - **Offline-First Resilience**: PWA with IndexedDB durable offline queue for web, and Hive-powered offline queue in Flutter mobile with automatic background synchronization upon network reconnection.
@@ -71,6 +72,7 @@ npm install
 npm run build
 firebase deploy --only hosting
 ```
+
 Live URL: `https://landsurvey-ebb3b.web.app`
 
 ### 3. Flutter Mobile App

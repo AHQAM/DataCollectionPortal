@@ -27,9 +27,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <span className="text-purple-700">👤</span>
             <span>
-              {lang === "ar"
-                ? "إدارة المستخدمين"
-                : "User Management"}
+              {lang === "ar" ? "إدارة المستخدمين" : "User Management"}
             </span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -81,7 +79,11 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
         <div className="flex gap-1.5 text-xs">
           {[
             { key: "ALL", labelAr: "الكل", labelEn: "All" },
-            { key: "REP", labelAr: "المستخدمين الميدانيين", labelEn: "Field Users" },
+            {
+              key: "REP",
+              labelAr: "المستخدمين الميدانيين",
+              labelEn: "Field Users",
+            },
             { key: "SUPERVISOR", labelAr: "المشرفين", labelEn: "Supervisors" },
             { key: "ADMIN", labelAr: "المدراء", labelEn: "Admins" },
           ].map((tab) => (

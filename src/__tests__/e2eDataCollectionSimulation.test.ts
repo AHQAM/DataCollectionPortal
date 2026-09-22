@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { autoMapColumns, validateImportRows } from "../components/admin/import/importValidation";
+import {
+  autoMapColumns,
+  validateImportRows,
+} from "../components/admin/import/importValidation";
 import { RequestItem, RecordItem, RequestField } from "../types";
 
 describe("End-to-End Dynamic Data Collection Simulation", () => {
@@ -9,8 +12,10 @@ describe("End-to-End Dynamic Data Collection Simulation", () => {
     requestCode: "FAC-AUDIT-26",
     titleAr: "حصر وتدقيق المنشآت والمرافق 2026",
     titleEn: "Facility & Assets Audit 2026",
-    descriptionAr: "تدقيق جاهزية مرافق ومستودعات الشركة والتحقق من اشتراطات السلامة",
-    descriptionEn: "Audit of company facilities, warehouses, and safety compliance",
+    descriptionAr:
+      "تدقيق جاهزية مرافق ومستودعات الشركة والتحقق من اشتراطات السلامة",
+    descriptionEn:
+      "Audit of company facilities, warehouses, and safety compliance",
     status: "Published",
     priority: "High",
     requestType: "per_record",
@@ -59,10 +64,25 @@ describe("End-to-End Dynamic Data Collection Simulation", () => {
       isRequired: true,
       sortOrder: 2,
       options: [
-        { id: "opt_1", value: "excellent", labelAr: "ممتازة", labelEn: "Excellent" },
+        {
+          id: "opt_1",
+          value: "excellent",
+          labelAr: "ممتازة",
+          labelEn: "Excellent",
+        },
         { id: "opt_2", value: "good", labelAr: "جيدة", labelEn: "Good" },
-        { id: "opt_3", value: "needs_maintenance", labelAr: "تحتاج صيانة", labelEn: "Needs Maintenance" },
-        { id: "opt_4", value: "critical", labelAr: "حرجة", labelEn: "Critical" },
+        {
+          id: "opt_3",
+          value: "needs_maintenance",
+          labelAr: "تحتاج صيانة",
+          labelEn: "Needs Maintenance",
+        },
+        {
+          id: "opt_4",
+          value: "critical",
+          labelAr: "حرجة",
+          labelEn: "Critical",
+        },
       ],
       schemaVersion: 1,
       isActive: true,
@@ -216,7 +236,8 @@ describe("End-to-End Dynamic Data Collection Simulation", () => {
         facility_condition: "good",
         safety_compliance: "yes",
         rating: 4,
-        inspection_notes: "تم فحص مخارج الطوارئ ومضخات الحريق، الموقع مطابق مع التوصية بتجديد طفايات القسم B.",
+        inspection_notes:
+          "تم فحص مخارج الطوارئ ومضخات الحريق، الموقع مطابق مع التوصية بتجديد طفايات القسم B.",
       },
       submittedBy: "u_emp_01",
       submittedAt: "2026-09-22T11:30:00.000Z",
@@ -225,7 +246,10 @@ describe("End-to-End Dynamic Data Collection Simulation", () => {
     // Verify all required fields have responses
     const requiredFields = mockFacilityFields.filter((f) => f.isRequired);
     const hasAllRequired = requiredFields.every(
-      (f) => userSubmission.responses[f.fieldKey as keyof typeof userSubmission.responses] !== undefined,
+      (f) =>
+        userSubmission.responses[
+          f.fieldKey as keyof typeof userSubmission.responses
+        ] !== undefined,
     );
     expect(hasAllRequired).toBe(true);
 
@@ -261,16 +285,29 @@ describe("End-to-End Dynamic Data Collection Simulation", () => {
 
   it("Step 5: verifies dynamic report column header resolution", () => {
     // Helper function used in ReportDataTable and AdminAssignments to determine entity label
-    const resolveEntityLabel = (req: RequestItem | undefined, lang: "ar" | "en", type: "id" | "name") => {
-      const customLabel = lang === "ar" ? req?.targetEntityLabelAr : req?.targetEntityLabelEn;
+    const resolveEntityLabel = (
+      req: RequestItem | undefined,
+      lang: "ar" | "en",
+      type: "id" | "name",
+    ) => {
+      const customLabel =
+        lang === "ar" ? req?.targetEntityLabelAr : req?.targetEntityLabelEn;
       if (customLabel) {
         return type === "id"
-          ? lang === "ar" ? `معرف ${customLabel}` : `${customLabel} ID`
-          : lang === "ar" ? `اسم ${customLabel}` : `${customLabel} Name`;
+          ? lang === "ar"
+            ? `معرف ${customLabel}`
+            : `${customLabel} ID`
+          : lang === "ar"
+            ? `اسم ${customLabel}`
+            : `${customLabel} Name`;
       }
       return type === "id"
-        ? lang === "ar" ? "معرف السجل / الجهة" : "Target / Record ID"
-        : lang === "ar" ? "اسم السجل / الجهة" : "Target / Record Name";
+        ? lang === "ar"
+          ? "معرف السجل / الجهة"
+          : "Target / Record ID"
+        : lang === "ar"
+          ? "اسم السجل / الجهة"
+          : "Target / Record Name";
     };
 
     // In Arabic:
@@ -286,8 +323,16 @@ describe("End-to-End Dynamic Data Collection Simulation", () => {
     expect(nameHeaderEn).toBe("Facility Name");
 
     // For a request with no custom labels, it falls back gracefully:
-    const defaultReq: RequestItem = { ...mockFacilityRequest, targetEntityLabelAr: undefined, targetEntityLabelEn: undefined };
-    expect(resolveEntityLabel(defaultReq, "ar", "id")).toBe("معرف السجل / الجهة");
-    expect(resolveEntityLabel(defaultReq, "ar", "name")).toBe("اسم السجل / الجهة");
+    const defaultReq: RequestItem = {
+      ...mockFacilityRequest,
+      targetEntityLabelAr: undefined,
+      targetEntityLabelEn: undefined,
+    };
+    expect(resolveEntityLabel(defaultReq, "ar", "id")).toBe(
+      "معرف السجل / الجهة",
+    );
+    expect(resolveEntityLabel(defaultReq, "ar", "name")).toBe(
+      "اسم السجل / الجهة",
+    );
   });
 });

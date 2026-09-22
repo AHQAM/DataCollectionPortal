@@ -113,7 +113,9 @@ export const ReportDataTable: React.FC<Props> = ({
           <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "الجهة المستهدفة / السجل" : "Target Entity / Record"}
+                {lang === "ar"
+                  ? "الجهة المستهدفة / السجل"
+                  : "Target Entity / Record"}
               </th>
               <th className="px-4 py-3 text-start">
                 {lang === "ar" ? "المنطقة والمستخدم" : "Region & User"}
