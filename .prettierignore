@@ -1,0 +1,10 @@
+node_modules/
+build/
+dist/
+coverage/
+dev-dist/
+firebase/public/
+firebase/functions/lib/
+firebase/functions/node_modules/
+mobile/
+*.log
