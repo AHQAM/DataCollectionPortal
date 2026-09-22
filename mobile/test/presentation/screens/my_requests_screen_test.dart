@@ -66,9 +66,7 @@ void main() {
 
       await tester.pumpWidget(
         createTestApp(const MyRequestsScreen(), [
-          myRequestsProvider.overrideWith(
-            (ref) => Stream.value(mockRequests),
-          ),
+          myRequestsProvider.overrideWith((ref) => Stream.value(mockRequests)),
         ]),
       );
 
