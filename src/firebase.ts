@@ -30,6 +30,29 @@ export const db = getFirestore(
 export const functions = getFunctions(app);
 export const storage = getStorage(app);
 
+// Initialize Firebase App Check (Web)
+if (typeof window !== "undefined" && firebaseConfig.apiKey) {
+  const recaptchaKey = import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY;
+  if (recaptchaKey) {
+    if (import.meta.env.DEV) {
+      // Allow debug token for development and staging tests
+      // @ts-ignore
+      self.FIREBASE_APPCHECK_DEBUG_TOKEN =
+        import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
+    }
+    try {
+      const { initializeAppCheck, ReCaptchaV3Provider } =
+        await import("firebase/app-check");
+      initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(recaptchaKey),
+        isTokenAutoRefreshEnabled: true,
+      });
+    } catch (e) {
+      console.warn("Firebase App Check initialization failed:", e);
+    }
+  }
+}
+
 // Use Emulators if in development mode and VITE_USE_FIREBASE_EMULATOR is true
 if (
   import.meta.env.DEV &&

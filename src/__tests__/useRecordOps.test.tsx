@@ -48,7 +48,9 @@ describe("useRecordOps Hook", () => {
     });
 
     it("saves draft and logs audit when online", async () => {
-      (recordApi.saveDraftRecord as any).mockResolvedValueOnce(undefined);
+      (recordApi.saveDraftRecord as any).mockResolvedValueOnce({
+        success: true,
+      });
       const hook = useRecordOps();
       const res = await hook.saveDraftRecord("r1", { fieldA: 1 });
 
@@ -67,7 +69,20 @@ describe("useRecordOps Hook", () => {
       );
     });
 
-    it("returns failure when api fails", async () => {
+    it("returns failure when api fails logically", async () => {
+      (recordApi.saveDraftRecord as any).mockResolvedValueOnce({
+        success: false,
+        message: "Server rejected draft",
+      });
+      const hook = useRecordOps();
+      const res = await hook.saveDraftRecord("r1", { fieldA: 1 });
+
+      expect(res.success).toBe(false);
+      expect(res.error).toBe("Server rejected draft");
+      expect(logAudit).not.toHaveBeenCalled();
+    });
+
+    it("returns failure when api fails with exception", async () => {
       (recordApi.saveDraftRecord as any).mockRejectedValueOnce(
         new Error("API Error"),
       );

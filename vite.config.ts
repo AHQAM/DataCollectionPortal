@@ -82,7 +82,7 @@ export default defineConfig(() => {
           ],
         },
         devOptions: {
-          enabled: true,
+          enabled: false,
           type: "module",
         },
       }),
@@ -120,12 +120,6 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== "true",
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === "true" ? null : {},
-    },
-    test: {
-      environment: "jsdom",
-      globals: true,
-      setupFiles: "./src/setupTests.ts",
-      include: ["src/**/*.test.{ts,tsx}"],
     },
   };
 });

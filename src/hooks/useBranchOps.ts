@@ -11,7 +11,10 @@ export const useBranchOps = () => {
       branchNameEn: string;
     }) => {
       try {
-        await branchRegionApi.createBranch(branchData);
+        const res = await branchRegionApi.createBranch(branchData);
+        if (res && res.success === false) {
+          return { success: false, error: "Failed to create branch" };
+        }
         logAudit("BRANCH_CREATED", "Branch", branchData.branchId, {
           name: branchData.branchNameAr,
         });
@@ -24,7 +27,10 @@ export const useBranchOps = () => {
 
     updateBranch: async (branchId: string, updates: Partial<Branch>) => {
       try {
-        await branchRegionApi.updateBranch(branchId, updates);
+        const res = await branchRegionApi.updateBranch(branchId, updates);
+        if (res && res.success === false) {
+          return { success: false, error: "Failed to update branch" };
+        }
         logAudit("BRANCH_UPDATED", "Branch", branchId, updates);
         return { success: true };
       } catch (err: any) {
@@ -63,7 +69,10 @@ export const useBranchOps = () => {
       branchId: string;
     }) => {
       try {
-        await branchRegionApi.createRegion(regionData);
+        const res = await branchRegionApi.createRegion(regionData);
+        if (res && res.success === false) {
+          return { success: false, error: "Failed to create region" };
+        }
         logAudit("REGION_CREATED", "Region", regionData.regionNo, {
           name: regionData.regionNameAr,
         });
@@ -76,7 +85,10 @@ export const useBranchOps = () => {
 
     updateRegion: async (regionNo: string, updates: Partial<Region>) => {
       try {
-        await branchRegionApi.updateRegion(regionNo, updates);
+        const res = await branchRegionApi.updateRegion(regionNo, updates);
+        if (res && res.success === false) {
+          return { success: false, error: "Failed to update region" };
+        }
         logAudit("REGION_UPDATED", "Region", regionNo, updates);
         return { success: true };
       } catch (err: any) {

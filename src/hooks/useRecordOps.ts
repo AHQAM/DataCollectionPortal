@@ -14,12 +14,18 @@ export const useRecordOps = () => {
         const { records } = useDataStore.getState();
         const rec = records.find((r) => r.recordId === recordId);
         const reqId = rec?.requestId || "";
-        await recordApi.saveDraftRecord(
+        const res = await recordApi.saveDraftRecord(
           reqId,
           recordId,
           values,
-          (rec as any)?.activityId || reqId,
+          rec?.activityId || reqId,
         );
+        if (!res.success) {
+          return {
+            success: false,
+            error: res.message || "Failed to save draft",
+          };
+        }
         logAudit("RECORD_DRAFT_SAVED", "Record", recordId, {
           isOffline: false,
         });
@@ -41,7 +47,7 @@ export const useRecordOps = () => {
           reqId,
           recordId,
           values,
-          (targetRecord as any)?.activityId || reqId,
+          targetRecord?.activityId || reqId,
         );
         if (res.success) {
           logAudit("RECORD_COMPLETED", "Record", recordId, {

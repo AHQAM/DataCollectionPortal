@@ -5,6 +5,7 @@ import { randomBytes } from "crypto";
 import { logAuditSafe } from "./auditLogger";
 import { hashPassword } from "./auth";
 import { USER_ROLES } from "./roles";
+import { verifyAppCheck } from "./config/appCheck";
 
 /**
  * Cloud Function: createAdminSupervisorUser
@@ -15,6 +16,9 @@ import { USER_ROLES } from "./roles";
  */
 export const createAdminSupervisorUser = functions.https.onCall(
   async (data, context) => {
+    // 0. Verify App Check (if enabled)
+    verifyAppCheck(context);
+
     // 1. Verify Caller Authentication
     if (!context.auth) {
       throw new functions.https.HttpsError(

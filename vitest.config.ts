@@ -12,17 +12,23 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
-    include: ["src/__tests__/**/*.test.{ts,tsx}"],
+    setupFiles: "./src/setupTests.ts",
+    include: ["src/**/*.{test,spec}.{ts,tsx}"],
     coverage: {
       provider: "v8",
       thresholds: {
-        lines: 15,
-        functions: 10,
-        branches: 5,
-        statements: 15,
+        lines: 16,
+        functions: 13,
+        branches: 8,
+        statements: 16,
       },
       include: ["src/**/*.ts", "src/**/*.tsx"],
-      exclude: ["src/__tests__/**"],
+      exclude: [
+        "src/__tests__/**",
+        "src/setupTests.ts",
+        "src/main.tsx",
+        "src/firebase.ts",
+      ],
     },
   },
 });
