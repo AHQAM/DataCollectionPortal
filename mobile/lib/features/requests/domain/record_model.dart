@@ -76,12 +76,13 @@ class RecordModel {
     }
 
     final tId = (data['targetId'] ?? data['customerNo'] ?? '').toString();
-    final tName = (data['targetName'] ??
-            data['customerName'] ??
-            data['targetId'] ??
-            data['customerNo'] ??
-            'سجل')
-        .toString();
+    final tName =
+        (data['targetName'] ??
+                data['customerName'] ??
+                data['targetId'] ??
+                data['customerNo'] ??
+                'سجل')
+            .toString();
 
     return RecordModel(
       recordId: id,
