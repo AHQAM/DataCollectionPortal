@@ -2,18 +2,40 @@ import { useUIStore } from "../stores/uiStore";
 import { useDataStore } from "../stores/dataStore";
 import { recordApi } from "../services";
 import { logAudit } from "../utils/audit";
+import { enqueueOfflineRecord, flushOfflineQueue } from "../utils/offlineQueue";
 
 export const useRecordOps = () => {
   return {
     saveDraftRecord: async (recordId: string, values: Record<string, any>) => {
       const isOnline = useUIStore.getState().isOnline;
+      const { lang } = useUIStore.getState();
+      const { records } = useDataStore.getState();
+      const rec = records.find((r) => r.recordId === recordId);
+      const reqId = rec?.requestId || "";
+
       if (!isOnline) {
-        return { success: false, error: "Offline mode" };
+        try {
+          await enqueueOfflineRecord({
+            recordId,
+            requestId: reqId,
+            activityId: rec?.activityId || reqId,
+            values,
+            isDraft: true,
+          });
+          return {
+            success: true,
+            isOffline: true,
+            message:
+              lang === "ar"
+                ? "تم حفظ المسودة محلياً. ستتم المزامنة تلقائياً عند عودة الاتصال."
+                : "Draft saved offline. Will sync automatically when online.",
+          };
+        } catch (queueErr) {
+          return { success: false, error: queueErr };
+        }
       }
+
       try {
-        const { records } = useDataStore.getState();
-        const rec = records.find((r) => r.recordId === recordId);
-        const reqId = rec?.requestId || "";
         const res = await recordApi.saveDraftRecord(
           reqId,
           recordId,
@@ -37,10 +59,37 @@ export const useRecordOps = () => {
     },
 
     submitRecord: async (recordId: string, values: Record<string, any>) => {
+      const isOnline = useUIStore.getState().isOnline;
       const { records } = useDataStore.getState();
       const { lang } = useUIStore.getState();
       const targetRecord = records.find((r) => r.recordId === recordId);
       const reqId = targetRecord?.requestId || "";
+
+      if (!isOnline) {
+        try {
+          await enqueueOfflineRecord({
+            recordId,
+            requestId: reqId,
+            activityId: targetRecord?.activityId || reqId,
+            values,
+            isDraft: false,
+          });
+          return {
+            success: true,
+            isOffline: true,
+            message:
+              lang === "ar"
+                ? "تم اعتماد السجل محلياً بدون اتصال. ستتم المزامنة تلقائياً فور توفر الإنترنت."
+                : "Submitted offline. Will sync automatically when online.",
+          };
+        } catch (queueErr) {
+          return {
+            success: false,
+            message: "Error queueing offline submission",
+            error: queueErr,
+          };
+        }
+      }
 
       try {
         const res = await recordApi.submitRecord(
@@ -74,6 +123,10 @@ export const useRecordOps = () => {
           error: err,
         };
       }
+    },
+
+    syncOfflineQueue: async () => {
+      return flushOfflineQueue();
     },
 
     reassignRecord: async (

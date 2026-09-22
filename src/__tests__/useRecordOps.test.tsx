@@ -18,6 +18,13 @@ vi.mock("../utils/audit", () => ({
   logAudit: vi.fn(),
 }));
 
+vi.mock("../utils/offlineQueue", () => ({
+  enqueueOfflineRecord: vi.fn().mockResolvedValue("queue_123"),
+  flushOfflineQueue: vi.fn(),
+}));
+
+import { enqueueOfflineRecord } from "../utils/offlineQueue";
+
 describe("useRecordOps Hook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -38,12 +45,19 @@ describe("useRecordOps Hook", () => {
   });
 
   describe("saveDraftRecord", () => {
-    it("fails if offline", async () => {
+    it("enqueues offline if not online", async () => {
       useUIStore.setState({ isOnline: false } as any);
       const hook = useRecordOps();
       const res = await hook.saveDraftRecord("r1", { fieldA: 1 });
-      expect(res.success).toBe(false);
-      expect(res.error).toBe("Offline mode");
+      expect(res.success).toBe(true);
+      expect(res.isOffline).toBe(true);
+      expect(enqueueOfflineRecord).toHaveBeenCalledWith(
+        expect.objectContaining({
+          recordId: "r1",
+          values: { fieldA: 1 },
+          isDraft: true,
+        }),
+      );
       expect(recordApi.saveDraftRecord).not.toHaveBeenCalled();
     });
 

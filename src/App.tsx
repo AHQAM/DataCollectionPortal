@@ -6,12 +6,35 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 const MainAppContent: React.FC = () => {
-  const { lang, dir, currentUser, authReady } = useApp();
+  const { lang, dir, currentUser, authReady, setIsOnline, syncOfflineQueue } =
+    useApp();
 
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
   }, [lang, dir]);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      syncOfflineQueue?.();
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    if (navigator.onLine) {
+      syncOfflineQueue?.();
+    }
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
   if (!authReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100 text-slate-700">
