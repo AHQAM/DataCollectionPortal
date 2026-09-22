@@ -17,7 +17,7 @@ export const recordApi = {
         formData,
         submittedAt: new Date().toISOString(),
       });
-      const data = res.data as any;
+      const data = res.data as { success: boolean; responseId?: string };
       return { success: data.success, responseId: data.responseId };
     } catch (err: any) {
       console.error("Error submitting record via Cloud Function:", err);
@@ -42,7 +42,7 @@ export const recordApi = {
         activityId: activityId || requestId,
         formData,
       });
-      const data = res.data as any;
+      const data = res.data as { success: boolean };
       return { success: data.success };
     } catch (err: any) {
       console.error("Error saving draft via Cloud Function:", err);
@@ -74,7 +74,7 @@ export const recordApi = {
       fileName,
       lang,
     });
-    const resultData = res.data as any;
+    const resultData = res.data as { created?: number };
     return {
       total: importedRows.length,
       created: resultData?.created || importedRows.length,

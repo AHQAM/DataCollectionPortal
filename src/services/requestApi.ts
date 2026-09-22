@@ -9,7 +9,7 @@ export const requestApi = {
   ): Promise<string> => {
     const createReqFn = httpsCallable(functions, "createRequest");
     const response = await createReqFn(newReq);
-    const data = response.data as any;
+    const data = response.data as { requestId: string };
     const newId = data.requestId;
 
     if (newFields && newFields.length > 0) {
@@ -56,7 +56,7 @@ export const requestApi = {
   cloneRequest: async (requestId: string): Promise<string> => {
     const fn = httpsCallable(functions, "cloneRequest");
     const res = await fn({ requestId });
-    const data = res.data as any;
+    const data = res.data as { requestId: string };
     return data.requestId;
   },
 
