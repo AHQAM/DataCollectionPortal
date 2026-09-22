@@ -15,6 +15,7 @@ import 'core/router/app_router.dart';
 import 'core/storage/hive_service.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'core/services/fcm_service.dart';
 
 @pragma('vm:entry-point')
@@ -62,6 +63,20 @@ void main() {
           options: DefaultFirebaseOptions.currentPlatform,
         );
         firebaseInitialized = true;
+
+        // Configure App Check
+        try {
+          await FirebaseAppCheck.instance.activate(
+            providerAndroid: kDebugMode
+                ? const AndroidDebugProvider()
+                : const AndroidPlayIntegrityProvider(),
+            providerApple: kDebugMode
+                ? const AppleDebugProvider()
+                : const AppleDeviceCheckProvider(),
+          );
+        } catch (e) {
+          debugPrint('Firebase App Check activation failed: $e');
+        }
 
         // Configure Crashlytics (disabled in debug mode, active in release/production)
         await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
