@@ -41,9 +41,9 @@ describe("Import Wizard Cloud Functions", () => {
 
   describe("importDataPreview", () => {
     it("throws unauthenticated if user is not logged in", async () => {
-      await expect(wrappedImportDataPreview({}, { auth: null })).rejects.toThrow(
-        /User must be authenticated/i,
-      );
+      await expect(
+        wrappedImportDataPreview({}, { auth: null }),
+      ).rejects.toThrow(/User must be authenticated/i);
     });
 
     it("throws permission-denied if user is not ADMIN or SUPERVISOR", async () => {
