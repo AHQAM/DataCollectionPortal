@@ -117,7 +117,7 @@ export const AdminImportWizard: React.FC<Props> = ({
 
           const rows: Record<string, any>[] = [];
           for (let i = 1; i < data.length; i++) {
-            const rowData = data[i] as any[];
+            const rowData = data[i] as unknown[];
             if (!rowData || rowData.length === 0) continue;
             const rowObj: Record<string, any> = {};
             headers.forEach((h, colIdx) => {

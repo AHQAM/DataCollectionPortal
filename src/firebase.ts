@@ -30,40 +30,68 @@ export const db = getFirestore(
 export const functions = getFunctions(app);
 export const storage = getStorage(app);
 
-// Initialize Firebase App Check (Web)
-if (typeof window !== "undefined" && firebaseConfig.apiKey) {
+// Modularized Firebase App Check initialization
+export async function initAppCheck(appInstance = app) {
+  if (typeof window === "undefined" || !firebaseConfig.apiKey) {
+    return null;
+  }
   const recaptchaKey =
     import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY ||
     import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY;
-  if (recaptchaKey) {
-    (async () => {
-      if (import.meta.env.DEV) {
-        // Allow debug token for development and staging tests
-        // @ts-ignore
-        self.FIREBASE_APPCHECK_DEBUG_TOKEN =
-          import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
-      }
-      try {
-        const {
-          initializeAppCheck,
-          ReCaptchaEnterpriseProvider,
-          ReCaptchaV3Provider,
-        } = await import("firebase/app-check");
-
-        const isV3 = import.meta.env.VITE_RECAPTCHA_PROVIDER === "v3";
-        const provider = isV3
-          ? new ReCaptchaV3Provider(recaptchaKey)
-          : new ReCaptchaEnterpriseProvider(recaptchaKey);
-
-        initializeAppCheck(app, {
-          provider,
-          isTokenAutoRefreshEnabled: true,
-        });
-      } catch (e) {
-        console.warn("Firebase App Check initialization failed:", e);
-      }
-    })();
+  if (!recaptchaKey) {
+    return null;
   }
+
+  if (import.meta.env.DEV) {
+    // Allow debug token for development and staging tests
+    // @ts-ignore
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN =
+      import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
+  }
+
+  try {
+    const {
+      initializeAppCheck,
+      ReCaptchaEnterpriseProvider,
+      ReCaptchaV3Provider,
+    } = await import("firebase/app-check");
+
+    const isV3 = import.meta.env.VITE_RECAPTCHA_PROVIDER === "v3";
+    const provider = isV3
+      ? new ReCaptchaV3Provider(recaptchaKey)
+      : new ReCaptchaEnterpriseProvider(recaptchaKey);
+
+    return initializeAppCheck(appInstance, {
+      provider,
+      isTokenAutoRefreshEnabled: true,
+    });
+  } catch (e) {
+    console.warn("Firebase App Check initialization failed:", e);
+    return null;
+  }
+}
+
+// Modularized Firebase Emulator connections
+export function connectEmulators(
+  authInst = auth,
+  dbInst = db,
+  functionsInst = functions,
+  storageInst = storage,
+) {
+  try {
+    connectAuthEmulator(authInst, "http://127.0.0.1:9099");
+    connectFirestoreEmulator(dbInst, "127.0.0.1", 8080);
+    connectFunctionsEmulator(functionsInst, "127.0.0.1", 5001);
+    connectStorageEmulator(storageInst, "127.0.0.1", 9199);
+    console.log("Firebase Emulators connected.");
+  } catch (e) {
+    console.error("Failed to connect to Firebase Emulators:", e);
+  }
+}
+
+// Auto-initialize App Check in browser environment
+if (typeof window !== "undefined") {
+  initAppCheck();
 }
 
 // Use Emulators if in development mode and VITE_USE_FIREBASE_EMULATOR is true
@@ -71,13 +99,5 @@ if (
   import.meta.env.DEV &&
   import.meta.env.VITE_USE_FIREBASE_EMULATOR === "true"
 ) {
-  try {
-    connectAuthEmulator(auth, "http://127.0.0.1:9099");
-    connectFirestoreEmulator(db, "127.0.0.1", 8080);
-    connectFunctionsEmulator(functions, "127.0.0.1", 5001);
-    connectStorageEmulator(storage, "127.0.0.1", 9199);
-    console.log("Firebase Emulators connected.");
-  } catch (e) {
-    console.error("Failed to connect to Firebase Emulators:", e);
-  }
+  connectEmulators();
 }

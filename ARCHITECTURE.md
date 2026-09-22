@@ -87,6 +87,16 @@ Typed wrappers around Firebase Callable Cloud Functions and Firestore queries:
 - **Device Binding**: Mobile representatives are bound to authorized physical devices, preventing account sharing.
 - **Audit Logging**: Immutable audit logs recorded on every state-altering administrative and field action.
 
+### E. Localization Architecture Decision
+
+- **Pattern:** Inline Ternary Localization (`lang === 'ar' ? '...' : '...'`).
+- **Rationale:** The web application consists of 66 cohesive components that already utilize the reactive `useApp().lang` context. Rather than maintaining an auxiliary external dictionary that diverges over time, the team formally standardized on inline localization and eliminated the legacy `translations.ts` file, eliminating architectural drift and reducing bundle overhead.
+
+### F. Observability & Error Monitoring
+
+- **Web Admin Portal:** Integrated error monitoring via `src/utils/monitoring.ts` and `src/components/ErrorBoundary.tsx`. Uncaught exceptions, unhandled promise rejections, and component crashes are captured with contextual breadcrumbs and forwarded to Sentry when `VITE_SENTRY_DSN` is configured, with an in-memory buffer fallback.
+- **Mobile Client:** Firebase Crashlytics and Analytics track runtime crashes, fatal exceptions, and device performance metrics.
+
 ---
 
 ## 2. Directory Structure

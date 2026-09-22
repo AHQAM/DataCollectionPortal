@@ -209,6 +209,7 @@ export interface RequestItem {
   totalAssignments: number;
   targetBranches?: string[];
   targetRegions?: string[];
+  activityId?: string;
 }
 
 export interface RequestTemplate {

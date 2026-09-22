@@ -179,10 +179,7 @@ export const useFirestoreSync = () => {
             data[recordId] = answers;
           }
         });
-        // In the datastore, recordResponses is an array but in AppContext it was an object.
-        // Wait, in my DataStore, I declared it as `RecordResponse[]`. Let me change that to what it was in AppContext.
-        // But for now, we'll cast it if we must. Actually I should fix the DataStore type to match.
-        setRecordResponses(data as any);
+        setRecordResponses(data);
       },
       (error) => console.error("Error listening to responses:", error),
     );

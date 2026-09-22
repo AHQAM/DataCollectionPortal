@@ -25,7 +25,7 @@ export function usePWAInstall() {
     // Detect iOS devices
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIOSDevice =
-      /iphone|ipad|ipod/.test(userAgent) && !(window as any).MSStream;
+      /iphone|ipad|ipod/.test(userAgent) && !("MSStream" in window);
     setIsIOS(isIOSDevice);
 
     const handleBeforeInstallPrompt = (e: Event) => {

@@ -13,6 +13,23 @@ import { doc, getDoc } from "firebase/firestore";
 
 const STORAGE_PREFIX = "sales_collection_hub_v1_";
 
+interface AuthResponseData {
+  success: boolean;
+  token?: string;
+  userId?: string;
+  uid?: string;
+  regionNo: string;
+  allowedRegionNos?: string[];
+  repNo?: string;
+  repNameAr?: string;
+  repNameEn?: string;
+  branchId: string;
+  role: User["role"];
+  mustChangePassword?: boolean;
+  sessionVersion?: number;
+  message?: string;
+}
+
 interface LoginResult {
   success: boolean;
   messageAr?: string;
@@ -123,7 +140,7 @@ export const useAuthStore = create<AuthStore>((set, get) => {
             appVersion: import.meta.env.VITE_APP_VERSION || "1.0.0",
           });
 
-          const data = response.data as any;
+          const data = response.data as AuthResponseData;
           if (data.success && data.token) {
             await signInWithCustomToken(auth, data.token);
             const loggedInUser: User = {

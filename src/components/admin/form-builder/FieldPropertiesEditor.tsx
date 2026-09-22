@@ -1,5 +1,10 @@
 import React from "react";
-import { RequestField, FieldType, FieldOption } from "../../../types";
+import {
+  RequestField,
+  FieldType,
+  FieldOption,
+  ConditionalRule,
+} from "../../../types";
 import { Copy, Trash2, Lock } from "lucide-react";
 import { ALL_FIELD_TYPES } from "./formBuilderTypes";
 
@@ -347,7 +352,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
                   onUpdateField({
                     visibilityRule: {
                       ...selectedField.visibilityRule,
-                      operator: e.target.value as any,
+                      operator: e.target.value as ConditionalRule["operator"],
                     },
                   });
                 }

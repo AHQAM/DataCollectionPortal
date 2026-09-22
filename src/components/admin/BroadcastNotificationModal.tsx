@@ -175,23 +175,25 @@ export const BroadcastNotificationModal: React.FC<
               </span>
             </label>
             <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: "ALL", labelAr: "الجميع", labelEn: "All" },
-                {
-                  id: "REPRESENTATIVES",
-                  labelAr: "المندوبين",
-                  labelEn: "Reps",
-                },
-                {
-                  id: "SUPERVISORS",
-                  labelAr: "المشرفين",
-                  labelEn: "Supervisors",
-                },
-              ].map((opt) => (
+              {(
+                [
+                  { id: "ALL", labelAr: "الجميع", labelEn: "All" },
+                  {
+                    id: "REPRESENTATIVES",
+                    labelAr: "المندوبين",
+                    labelEn: "Reps",
+                  },
+                  {
+                    id: "SUPERVISORS",
+                    labelAr: "المشرفين",
+                    labelEn: "Supervisors",
+                  },
+                ] as const
+              ).map((opt) => (
                 <button
                   type="button"
                   key={opt.id}
-                  onClick={() => setTargetAudience(opt.id as any)}
+                  onClick={() => setTargetAudience(opt.id)}
                   className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
                     targetAudience === opt.id
                       ? "bg-purple-900 text-white border-purple-900 shadow-sm"
