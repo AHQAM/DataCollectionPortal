@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { autoMapColumns, validateImportRows } from "./import/importValidation";
+import { downloadCustomTemplate } from "./import/templateGenerator";
+import { generateDemoDataset } from "./import/demoDataGenerator";
 import { ImportStepSelectFile } from "./import/ImportStepSelectFile";
 import { ImportStepMapping } from "./import/ImportStepMapping";
 import { ImportStepPreview } from "./import/ImportStepPreview";
@@ -141,198 +143,31 @@ export const AdminImportWizard: React.FC<Props> = ({
   // Generate and Download Request-Specific Excel Template
   const handleDownloadCustomTemplate = async () => {
     if (!currentRequest) return;
-    const XLSX = await getXLSX();
-
-    const headers: string[] = [
-      "رقم المنطقة (RegionNo)",
-      "رقم المندوب (RepNo - اختياري)",
-      "اسم الفرع (BranchName - اختياري)",
-    ];
-
-    requestFields.forEach((f) => {
-      headers.push(`${f.fieldLabelAr} (${f.fieldKey})`);
+    await downloadCustomTemplate({
+      currentRequest,
+      requestFields,
+      regions,
+      branches,
+      users,
     });
-
-    const sampleRows: any[][] = [];
-    const availableRegions: {
-      regionNo: string;
-      regionNameAr: string;
-      branchId?: string;
-    }[] =
-      regions.length > 0
-        ? regions
-        : [
-            {
-              regionNo: "101",
-              regionNameAr: "المنطقة",
-              branchId: branches[0]?.branchId,
-            },
-          ];
-
-    availableRegions.slice(0, 3).forEach((reg, idx) => {
-      const rep = users.find(
-        (u) =>
-          u.regionNo === reg.regionNo ||
-          u.allowedRegionNos?.includes(reg.regionNo),
-      );
-      const branch =
-        branches.find((b) => b.branchId === reg.branchId) || branches[0];
-
-      const row: any[] = [
-        reg.regionNo,
-        rep?.repNo || `REP-${reg.regionNo}`,
-        branch?.branchNameAr || "الفرع الرئيسي",
-      ];
-
-      requestFields.forEach((f) => {
-        if (f.fieldKey === "customer_no" || f.fieldKey === "cust_no") {
-          row.push(`CUST-${1000 + idx + 1}`);
-        } else if (
-          f.fieldKey === "customer_name" ||
-          f.fieldKey === "cust_name"
-        ) {
-          row.push(
-            idx === 0
-              ? "شركة الوفاق للتجارة"
-              : idx === 1
-                ? "مؤسسة النماء المركزية"
-                : "متجر الأمل للتوريدات",
-          );
-        } else if (f.fieldKey === "branch_name") {
-          row.push(branch?.branchNameAr || "الفرع الرئيسي");
-        } else if (f.fieldKey === "location" || f.fieldKey === "area") {
-          row.push(reg.regionNameAr || "الرياض");
-        } else if (f.fieldType === "currency") {
-          row.push((idx + 1) * 15400);
-        } else if (f.fieldType === "date") {
-          row.push("2026-05-15");
-        } else if (
-          f.fieldType === "integer" ||
-          f.fieldType === "decimal" ||
-          f.fieldType === "percentage"
-        ) {
-          row.push(10 * (idx + 1));
-        } else if (
-          f.fieldType === "select" &&
-          f.options &&
-          f.options.length > 0
-        ) {
-          row.push(f.options[0].value);
-        } else {
-          row.push(f.isReadOnly ? "بيانات من النظام" : "");
-        }
-      });
-
-      sampleRows.push(row);
-    });
-
-    const aoa = [headers, ...sampleRows];
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Template");
-    const safeTitle = (currentRequest.requestCode || "Campaign").replace(
-      /[^a-zA-Z0-9_-]/g,
-      "_",
-    );
-    XLSX.writeFile(wb, `${safeTitle}_Import_Template.xlsx`);
   };
 
   // Generate Realistic Demo Dataset matching the selected request's fields
   const handleLoadDemoData = () => {
     if (!currentRequest) return;
-
-    const demoHeaders: string[] = [
-      "RegionNo",
-      "RepNo",
-      "BranchName",
-      "CustomerNo",
-      "CustomerName",
-      "Area",
-    ];
-    requestFields.forEach((f) => {
-      if (!demoHeaders.includes(f.fieldKey)) {
-        demoHeaders.push(f.fieldKey);
-      }
+    const {
+      demoHeaders,
+      demoRows,
+      fileName: generatedFileName,
+    } = generateDemoDataset({
+      currentRequest,
+      requestFields,
+      regions,
+      branches,
+      users,
     });
 
-    const demoRows: Record<string, any>[] = [];
-    const availableRegions: {
-      regionNo: string;
-      regionNameAr: string;
-      branchId?: string;
-    }[] =
-      regions.length > 0
-        ? regions
-        : [
-            {
-              regionNo: "101",
-              regionNameAr: "الرياض",
-              branchId: branches[0]?.branchId,
-            },
-          ];
-
-    const sampleCustomers = [
-      {
-        no: "CUST-5011",
-        name: "شركة التوريدات الوطنية الكبرى",
-        area: "حي العليا",
-      },
-      {
-        no: "CUST-5012",
-        name: "أسواق النور التجارية المحدودة",
-        area: "حي الملز",
-      },
-      {
-        no: "CUST-5013",
-        name: "مركز الأندلس للمواد الاستهلاكية",
-        area: "حي الروضة",
-      },
-      {
-        no: "CUST-5014",
-        name: "مؤسسة البركة للمبيعات والتوزيع",
-        area: "حي الصحافة",
-      },
-      { no: "CUST-5015", name: "مجمع التميز التجاري", area: "حي النسيم" },
-    ];
-
-    sampleCustomers.forEach((cust, idx) => {
-      const reg = availableRegions[idx % availableRegions.length];
-      const rep = users.find(
-        (u) =>
-          u.regionNo === reg.regionNo ||
-          u.allowedRegionNos?.includes(reg.regionNo),
-      );
-      const branch =
-        branches.find((b) => b.branchId === reg.branchId) || branches[0];
-
-      const row: Record<string, any> = {
-        RegionNo: reg.regionNo,
-        RepNo: rep?.repNo || `REP-${reg.regionNo}`,
-        BranchName: branch?.branchNameAr || "الفرع الرئيسي",
-        CustomerNo: cust.no,
-        CustomerName: cust.name,
-        Area: cust.area,
-      };
-
-      requestFields.forEach((f) => {
-        if (f.fieldKey === "customer_no") row[f.fieldKey] = cust.no;
-        else if (f.fieldKey === "customer_name") row[f.fieldKey] = cust.name;
-        else if (f.fieldKey === "branch_name")
-          row[f.fieldKey] = branch?.branchNameAr || "الفرع الرئيسي";
-        else if (f.fieldKey === "location") row[f.fieldKey] = cust.area;
-        else if (f.fieldKey === "debit_balance" || f.fieldType === "currency")
-          row[f.fieldKey] = (idx + 1) * 12500;
-        else if (f.fieldKey === "last_deal_date" || f.fieldType === "date")
-          row[f.fieldKey] = "2026-04-20";
-        else if (f.fieldKey === "inactivity_reason") row[f.fieldKey] = "";
-        else if (f.defaultValue !== undefined) row[f.fieldKey] = f.defaultValue;
-        else row[f.fieldKey] = "";
-      });
-
-      demoRows.push(row);
-    });
-
-    setFileName(`Demo_${currentRequest.requestCode}_Dataset.xlsx`);
+    setFileName(generatedFileName);
     setFileHeaders(demoHeaders);
     setRawRows(demoRows);
     const { sysMap, fMap } = autoMapColumns(demoHeaders, requestFields);
