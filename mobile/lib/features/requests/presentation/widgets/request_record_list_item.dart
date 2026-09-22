@@ -141,7 +141,7 @@ class RequestRecordListItem extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${isArabic ? "رقم العميل" : "Customer No"}: ${record.customerNo}',
+                          '${isArabic ? "المعرف" : "ID"}: ${record.targetId}',
                           style: TextStyle(
                             color: Colors.grey.shade600,
                             fontSize: 12,
@@ -240,7 +240,7 @@ class RequestRecordListItem extends StatelessWidget {
                   if (hasPhone) ...[
                     IconButton.filledTonal(
                       icon: const Icon(Icons.phone, size: 16),
-                      tooltip: isArabic ? 'اتصال بالعميل' : 'Call Customer',
+                      tooltip: isArabic ? 'اتصال' : 'Call',
                       visualDensity: VisualDensity.compact,
                       onPressed: () => _makePhoneCall(context, record.phone!),
                     ),
@@ -257,7 +257,7 @@ class RequestRecordListItem extends StatelessWidget {
                   ],
                   const Spacer(),
                   Text(
-                    isArabic ? 'فتح الاستبيان' : 'Open Form',
+                    isArabic ? 'فتح النموذج' : 'Open Form',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,

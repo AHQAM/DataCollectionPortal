@@ -19,13 +19,13 @@ export const UserImportCredentialsTable: React.FC<
         <div className="flex-1">
           <h3 className="text-sm font-extrabold text-emerald-950">
             {lang === "ar"
-              ? "تم استيراد حسابات المناديب بنجاح!"
-              : "Representatives imported successfully!"}
+              ? "تم استيراد حسابات المستخدمين بنجاح!"
+              : "Users imported successfully!"}
           </h3>
           <p className="text-xs text-emerald-800 mt-1 leading-relaxed">
             {lang === "ar"
-              ? `تم إنشاء (${importedCredentials.length}) حساب مندوب بكلمات مرور مؤقتة لمرة واحدة. يمكنك تنزيل كشف البيانات الآن لتسليمه للمناديب يدوياً.`
-              : `Created (${importedCredentials.length}) representative accounts with temporary passwords. You can download the credentials sheet now.`}
+              ? `تم إنشاء (${importedCredentials.length}) حساب مستخدم بكلمات مرور مؤقتة لمرة واحدة. يمكنك تنزيل كشف البيانات الآن لتسليمه للمستخدمين يدوياً.`
+              : `Created (${importedCredentials.length}) user accounts with temporary passwords. You can download the credentials sheet now.`}
           </p>
         </div>
         <button
@@ -62,10 +62,10 @@ export const UserImportCredentialsTable: React.FC<
               <tr>
                 <th className="px-3 py-2 text-start w-10">#</th>
                 <th className="px-3 py-2 text-start">
-                  {lang === "ar" ? "اسم المندوب" : "Rep Name"}
+                  {lang === "ar" ? "اسم المستخدم" : "User Name"}
                 </th>
                 <th className="px-3 py-2 text-start">
-                  {lang === "ar" ? "رقم المندوب (المعرف)" : "Username / Rep No"}
+                  {lang === "ar" ? "رقم المستخدم (اسم الدخول)" : "Username / User No"}
                 </th>
                 <th className="px-3 py-2 text-start">
                   {lang === "ar" ? "الفرع" : "Branch"}
@@ -85,7 +85,7 @@ export const UserImportCredentialsTable: React.FC<
                     {idx + 1}
                   </td>
                   <td className="px-3 py-2 font-bold text-slate-900">
-                    {cred.repNameAr}
+                    {cred.userNameAr}
                   </td>
                   <td className="px-3 py-2 font-mono font-bold text-purple-900">
                     #{cred.username}

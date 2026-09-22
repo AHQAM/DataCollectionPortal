@@ -150,10 +150,10 @@ export const ImportStepPreview: React.FC<Props> = ({
                   {lang === "ar" ? "المنطقة" : "Region"}
                 </th>
                 <th className="p-2 text-start">
-                  {lang === "ar" ? "رقم العميل" : "Customer No"}
+                  {lang === "ar" ? "معرف السجل" : "Record ID"}
                 </th>
                 <th className="p-2 text-start">
-                  {lang === "ar" ? "اسم العميل" : "Customer Name"}
+                  {lang === "ar" ? "الجهة المستهدفة / السجل" : "Target / Name"}
                 </th>
                 {requestFields.slice(0, 4).map((f) => (
                   <th key={f.fieldId} className="p-2 text-start">
@@ -166,10 +166,16 @@ export const ImportStepPreview: React.FC<Props> = ({
               {validRows.slice(0, 5).map((row, idx) => {
                 const regVal = row[systemColMap.regionNo];
                 const custNoVal =
-                  row[systemColMap.customerNo || fieldColMap["customer_no"]];
+                  row[
+                    systemColMap.targetId ||
+                      fieldColMap["target_id"] ||
+                      fieldColMap["customer_no"]
+                  ];
                 const custNameVal =
                   row[
-                    systemColMap.customerName || fieldColMap["customer_name"]
+                    systemColMap.targetName ||
+                      fieldColMap["target_name"] ||
+                      fieldColMap["customer_name"]
                   ];
 
                 return (

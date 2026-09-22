@@ -2,8 +2,8 @@ import { User } from "../../../types";
 import { getXLSX } from "../../../utils/excel";
 
 export interface ParsedRepRow {
-  repNo: string;
-  repName: string;
+  userNo: string;
+  userName: string;
   branchName: string;
   phone?: string;
   isExisting: boolean;
@@ -14,7 +14,7 @@ export interface ParsedRepRow {
 
 export interface ImportedCredential {
   username: string;
-  repNameAr: string;
+  userNameAr: string;
   branchName?: string;
   allowedRegionNos: string[];
   password: string;
@@ -22,110 +22,110 @@ export interface ImportedCredential {
 
 export const REAL_SAMPLE_DATASET = [
   {
-    repNo: "1030102",
-    repName: "نادر محمد شاهر غالب",
+    userNo: "1030102",
+    userName: "نادر محمد شاهر غالب",
     branch: "جدة",
     phone: "0501112233",
   },
   {
-    repNo: "1030104",
-    repName: "نادر محمد شاهر غالب",
+    userNo: "1030104",
+    userName: "نادر محمد شاهر غالب",
     branch: "جدة",
     phone: "0501112233",
   },
   {
-    repNo: "1030104",
-    repName: "محمد محمود عبدالعزيز نصر",
+    userNo: "1030104",
+    userName: "محمد محمود عبدالعزيز نصر",
     branch: "جدة",
     phone: "0502223344",
   },
   {
-    repNo: "1030201",
-    repName: "محمد محمود عبدالعزيز نصر",
+    userNo: "1030201",
+    userName: "محمد محمود عبدالعزيز نصر",
     branch: "جدة",
     phone: "0502223344",
   },
   {
-    repNo: "1030202",
-    repName: "محمود حسن بركات محمود بركات",
+    userNo: "1030202",
+    userName: "محمود حسن بركات محمود بركات",
     branch: "جدة",
     phone: "0503334455",
   },
   {
-    repNo: "1030203",
-    repName: "سالم عبدالحكيم عبدالله عبدالاله",
+    userNo: "1030203",
+    userName: "سالم عبدالحكيم عبدالله عبدالاله",
     branch: "جدة",
     phone: "0504445566",
   },
   {
-    repNo: "1030301",
-    repName: "سالم عبدالحكيم عبدالله عبدالاله",
+    userNo: "1030301",
+    userName: "سالم عبدالحكيم عبدالله عبدالاله",
     branch: "جدة",
     phone: "0504445566",
   },
   {
-    repNo: "1030302",
-    repName: "سالم عبدالحكيم عبدالله عبدالاله",
+    userNo: "1030302",
+    userName: "سالم عبدالحكيم عبدالله عبدالاله",
     branch: "جدة",
     phone: "0504445566",
   },
   {
-    repNo: "1030303",
-    repName: "بشير علي حسين المراني",
+    userNo: "1030303",
+    userName: "بشير علي حسين المراني",
     branch: "جدة",
     phone: "0505556677",
   },
   {
-    repNo: "1030304",
-    repName: "سامي غالب عبده علي",
+    userNo: "1030304",
+    userName: "سامي غالب عبده علي",
     branch: "جدة",
     phone: "0506667788",
   },
   {
-    repNo: "1040101",
-    repName: "محمد العزي علي الجرادي",
+    userNo: "1040101",
+    userName: "محمد العزي علي الجرادي",
     branch: "المدينة",
     phone: "0507778899",
   },
   {
-    repNo: "1040102",
-    repName: "عارف سمير الحاج احمد",
+    userNo: "1040102",
+    userName: "عارف سمير الحاج احمد",
     branch: "المدينة",
     phone: "0508889900",
   },
   {
-    repNo: "1040201",
-    repName: "راشد علي ناجي الحربي",
+    userNo: "1040201",
+    userName: "راشد علي ناجي الحربي",
     branch: "المدينة",
     phone: "0509990011",
   },
   {
-    repNo: "1040202",
-    repName: "محمد شاكر حسانين ابراهيم",
+    userNo: "1040202",
+    userName: "محمد شاكر حسانين ابراهيم",
     branch: "المدينة",
     phone: "0501234567",
   },
   {
-    repNo: "1040204",
-    repName: "عبدالغني علي حسين محمد",
+    userNo: "1040204",
+    userName: "عبدالغني علي حسين محمد",
     branch: "المدينة",
     phone: "0502345678",
   },
   {
-    repNo: "1040301",
-    repName: "زاهر نجيب طاهر حسن",
+    userNo: "1040301",
+    userName: "زاهر نجيب طاهر حسن",
     branch: "المدينة",
     phone: "0503456789",
   },
   {
-    repNo: "1040302",
-    repName: "وليد عبده محمد الوجيه",
+    userNo: "1040302",
+    userName: "وليد عبده محمد الوجيه",
     branch: "المدينة",
     phone: "0504567890",
   },
   {
-    repNo: "1040304",
-    repName: "ايمن عبدالحكيم عبود صالح",
+    userNo: "1040304",
+    userName: "ايمن عبدالحكيم عبود صالح",
     branch: "المدينة",
     phone: "0505678901",
   },
@@ -134,16 +134,16 @@ export const REAL_SAMPLE_DATASET = [
 export async function downloadSampleTemplate(): Promise<void> {
   const XLSX = await getXLSX();
   const sampleData = REAL_SAMPLE_DATASET.map((item) => ({
-    "رقم_المندوب (المعرف)": item.repNo,
-    اسم_المندوب: item.repName,
+    "رقم_المستخدم (المعرف)": item.userNo,
+    اسم_المستخدم: item.userName,
     الفرع: item.branch,
     رقم_الجوال: item.phone,
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(sampleData);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "المناديب");
-  XLSX.writeFile(workbook, "نموذج_استيراد_المناديب_المعتمد.xlsx");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "المستخدمين");
+  XLSX.writeFile(workbook, "نموذج_استيراد_المستخدمين_المعتمد.xlsx");
 }
 
 export async function downloadCredentialsExcel(
@@ -153,8 +153,8 @@ export async function downloadCredentialsExcel(
   const XLSX = await getXLSX();
 
   const data = credentials.map((c) => ({
-    "اسم المندوب": c.repNameAr,
-    "رقم المندوب (المعرف)": c.username,
+    "اسم المستخدم": c.userNameAr,
+    "رقم المستخدم (اسم الدخول)": c.username,
     الفرع: c.branchName || "",
     "المناطق المصرحة": c.allowedRegionNos.join(", "),
     "كلمة المرور المؤقتة": c.password,
@@ -172,8 +172,8 @@ export async function downloadCredentialsExcel(
 
 export function groupAndProcessRows(
   rawList: {
-    repNo: string;
-    repName: string;
+    userNo: string;
+    userName: string;
     branchName: string;
     phone?: string;
   }[],
@@ -183,8 +183,8 @@ export function groupAndProcessRows(
   const repMap = new Map<
     string,
     {
-      repNo: string;
-      repName: string;
+      userNo: string;
+      userName: string;
       branchName: string;
       phone?: string;
       regions: Set<string>;
@@ -192,14 +192,14 @@ export function groupAndProcessRows(
   >();
 
   rawList.forEach((row) => {
-    const cleanName = row.repName.trim();
-    const cleanNo = row.repNo.trim();
+    const cleanName = row.userName.trim();
+    const cleanNo = row.userNo.trim();
     const key = cleanName.toLowerCase();
 
     if (!repMap.has(key)) {
       repMap.set(key, {
-        repNo: cleanNo,
-        repName: cleanName,
+        userNo: cleanNo,
+        userName: cleanName,
         branchName: row.branchName,
         phone: row.phone,
         regions: new Set<string>(),
@@ -221,12 +221,12 @@ export function groupAndProcessRows(
   const groupedRows: ParsedRepRow[] = [];
   repMap.forEach((val) => {
     const assignedRegions = Array.from(val.regions);
-    const primaryNo = assignedRegions[0] || val.repNo;
+    const primaryNo = assignedRegions[0] || val.userNo;
     const isExisting = existingUsers.some(
       (u) =>
         u.username === primaryNo ||
         u.regionNo === primaryNo ||
-        (u.repNameAr && u.repNameAr.trim() === val.repName.trim()) ||
+        (u.userNameAr && u.userNameAr.trim() === val.userName.trim()) ||
         assignedRegions.some((r) => u.allowedRegionNos?.includes(r)),
     );
 
@@ -236,16 +236,16 @@ export function groupAndProcessRows(
     if (!primaryNo) {
       isValid = false;
       validationError =
-        lang === "ar" ? "رقم المندوب/المنطقة مفقود" : "Rep number is missing";
-    } else if (!val.repName) {
+        lang === "ar" ? "رقم المستخدم/المنطقة مفقود" : "User number is missing";
+    } else if (!val.userName) {
       isValid = false;
       validationError =
-        lang === "ar" ? "اسم المندوب مفقود" : "Rep name is missing";
+        lang === "ar" ? "اسم المستخدم مفقود" : "User name is missing";
     }
 
     groupedRows.push({
-      repNo: primaryNo,
-      repName: val.repName,
+      userNo: primaryNo,
+      userName: val.userName,
       branchName:
         val.branchName?.trim() ||
         (lang === "ar" ? "الفرع الرئيسي" : "Main Branch"),
@@ -263,8 +263,8 @@ export function groupAndProcessRows(
 
 export function parseExcelRows(jsonRows: any[]): {
   rawList: {
-    repNo: string;
-    repName: string;
+    userNo: string;
+    userName: string;
     branchName: string;
     phone?: string;
   }[];
@@ -275,6 +275,10 @@ export function parseExcelRows(jsonRows: any[]): {
   const rawList = jsonRows.map((row) => {
     const keys = Object.keys(row);
     let rawRepNoVal =
+      row["رقم_المستخدم (المعرف)"] ??
+      row["رقم_المستخدم"] ??
+      row["رقم المستخدم"] ??
+      row["معرف المستخدم"] ??
       row["رقم_المندوب (المعرف)"] ??
       row["رقم_المندوب"] ??
       row["رقم المندوب"] ??
@@ -289,6 +293,8 @@ export function parseExcelRows(jsonRows: any[]): {
       (keys[0] ? row[keys[0]] : "");
 
     let rawRepNameVal =
+      row["اسم_المستخدم"] ??
+      row["اسم المستخدم"] ??
       row["اسم_المندوب"] ??
       row["اسم المندوب"] ??
       row["الاسم"] ??
@@ -339,8 +345,8 @@ export function parseExcelRows(jsonRows: any[]): {
     }
 
     return {
-      repNo: strNo,
-      repName: strName,
+      userNo: strNo,
+      userName: strName,
       branchName: String(branchVal || "").trim(),
       phone: phoneVal ? String(phoneVal).trim() : undefined,
     };

@@ -60,9 +60,9 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
     if (context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
         throw new functions.https.HttpsError("permission-denied", "ليس لديك الصلاحيات الكافية. | Insufficient permissions.");
     }
-    const { email, role, branchId, repNameAr, repNameEn, mobileNo, allowedRegionNos, } = data;
+    const { email, role, branchId, userNameAr, userNameEn, mobileNo, allowedRegionNos, } = data;
     // 3. Validate Inputs
-    if (!email || !role || !repNameAr) {
+    if (!email || !role || !userNameAr) {
         throw new functions.https.HttpsError("invalid-argument", "بيانات المستخدم غير مكتملة. | Missing required fields.");
     }
     if (role !== roles_1.USER_ROLES.SUPERVISOR && role !== roles_1.USER_ROLES.ADMIN) {
@@ -74,7 +74,7 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
         const userRecord = await admin.auth().createUser({
             email: email,
             password: temporaryPassword,
-            displayName: repNameAr,
+            displayName: userNameAr,
         });
         const userId = userRecord.uid;
         // 5. Set Custom Claims
@@ -95,8 +95,8 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
             role: role,
             branchId: branchId || null,
             allowedRegionNos: allowedRegionNos || [email],
-            repNameAr: repNameAr,
-            repNameEn: repNameEn || "",
+            userNameAr: userNameAr,
+            userNameEn: userNameEn || "",
             mobileNo: mobileNo || "",
             passwordHash: passwordHash,
             mustChangePassword: true,

@@ -95,8 +95,8 @@ export const AssignmentsOverviewModal: React.FC<
             <div className="flex items-center justify-between px-1 text-slate-500 font-bold text-[11px]">
               <span>
                 {lang === "ar"
-                  ? `إجمالي التكليفات: ${reqAssignments.length} مندوب`
-                  : `Total: ${reqAssignments.length} reps`}
+                  ? `إجمالي التكليفات: ${reqAssignments.length} مستخدم`
+                  : `Total: ${reqAssignments.length} users`}
               </span>
               <span>
                 {lang === "ar"
@@ -128,8 +128,8 @@ export const AssignmentsOverviewModal: React.FC<
                         <span>
                           {rep
                             ? lang === "ar"
-                              ? rep.repNameAr
-                              : rep.repNameEn || rep.repNameAr
+                              ? rep.userNameAr
+                              : rep.userNameEn || rep.userNameAr
                             : asg.userId}
                         </span>
                         <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-purple-100 text-purple-900 font-bold">

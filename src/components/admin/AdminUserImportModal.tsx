@@ -61,8 +61,8 @@ export const AdminUserImportModal: React.FC<Props> = ({
 
   const handleLoadDemoData = () => {
     const rawList = REAL_SAMPLE_DATASET.map((item) => ({
-      repNo: item.repNo,
-      repName: item.repName,
+      userNo: item.userNo,
+      userName: item.userName,
       branchName: item.branch,
       phone: item.phone,
     }));
@@ -145,13 +145,13 @@ export const AdminUserImportModal: React.FC<Props> = ({
         : `BR-${encodeURIComponent(exactBranchName).replace(/%/g, "").slice(0, 12)}`;
 
       return {
-        userId: `USER-${r.repNo}`,
-        username: r.repNo,
-        regionNo: r.repNo,
-        repNo: r.repNo.startsWith("REP-") ? r.repNo : `REP-${r.repNo}`,
-        repNameAr: r.repName,
-        repNameEn: r.repName,
-        email: `rep${r.repNo}@salescollection.sa`,
+        userId: `USER-${r.userNo}`,
+        username: r.userNo,
+        regionNo: r.userNo,
+        userNo: r.userNo.startsWith("REP-") ? r.userNo : `REP-${r.userNo}`,
+        userNameAr: r.userName,
+        userNameEn: r.userName,
+        email: `rep${r.userNo}@salescollection.sa`,
         mobile: r.phone || "+966500000000",
         branchId,
         branchNameAr: exactBranchName,
@@ -160,7 +160,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
         allowedRegionNos:
           r.assignedRegions && r.assignedRegions.length > 0
             ? r.assignedRegions
-            : [r.repNo],
+            : [r.userNo],
         mustChangePassword: true,
         isActive: true,
         failedLoginCount: 0,

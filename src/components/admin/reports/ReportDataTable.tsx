@@ -113,10 +113,10 @@ export const ReportDataTable: React.FC<Props> = ({
           <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "العميل" : "Customer"}
+                {lang === "ar" ? "الجهة المستهدفة / السجل" : "Target Entity / Record"}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "المنطقة والمندوب" : "Region & Rep"}
+                {lang === "ar" ? "المنطقة والمستخدم" : "Region & User"}
               </th>
               <th className="px-4 py-3 text-start">
                 {lang === "ar" ? "الفرع" : "Branch"}
@@ -157,16 +157,16 @@ export const ReportDataTable: React.FC<Props> = ({
                   >
                     <td className="px-4 py-3.5">
                       <div className="font-bold text-slate-900 group-hover:text-purple-900 transition-colors">
-                        {r.customerName}
+                        {r.targetName}
                       </div>
                       <div className="text-[10px] text-slate-400 font-mono">
-                        {r.customerNo}
+                        {r.targetId}
                       </div>
                     </td>
 
                     <td className="px-4 py-3.5">
                       <div className="font-bold text-slate-800">
-                        {r.repName || "-"}
+                        {r.userName || "-"}
                       </div>
                       <span className="text-[10px] font-mono text-purple-700">
                         #{r.assignedRegionNo || r.regionNo || "-"}

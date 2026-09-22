@@ -33,7 +33,7 @@ describe("useRecordOps Hook", () => {
         {
           recordId: "r1",
           requestId: "req1",
-          customerNo: "CUST-001",
+          targetId: "CUST-001",
           activityId: "act1",
         } as any,
       ],

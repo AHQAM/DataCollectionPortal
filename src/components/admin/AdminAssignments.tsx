@@ -38,6 +38,13 @@ export const AdminAssignments: React.FC = () => {
 
   const repUsers = users.filter((u) => u.role === "REP");
 
+  const activeReq = requests.find((r) => r.requestId === selectedReqId);
+  const targetEntityLabel =
+    (lang === "ar"
+      ? activeReq?.targetEntityLabelAr
+      : activeReq?.targetEntityLabelEn) ||
+    (lang === "ar" ? "الجهة المستهدفة / السجل" : "Target Entity / Record");
+
   // Filter records by request, branch, search
   const filteredRecords = records.filter((r) => {
     if (selectedReqId && r.requestId !== selectedReqId) return false;
@@ -46,10 +53,10 @@ export const AdminAssignments: React.FC = () => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchCust =
-        r.customerName.toLowerCase().includes(q) ||
-        r.customerNo.toLowerCase().includes(q);
+        r.targetName.toLowerCase().includes(q) ||
+        r.targetId.toLowerCase().includes(q);
       const matchRep =
-        r.repName.toLowerCase().includes(q) || r.assignedRegionNo.includes(q);
+        r.userName.toLowerCase().includes(q) || r.assignedRegionNo.includes(q);
       if (!matchCust && !matchRep) return false;
     }
     return true;
@@ -87,8 +94,8 @@ export const AdminAssignments: React.FC = () => {
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             {lang === "ar"
-              ? "متابعة توزيع السجلات على المناديب وإمكانية نقل السجلات المعلقة بين المناديب مع توثيق الأسباب"
-              : "Monitor record allocation across reps with audited record reassignment"}
+              ? "متابعة توزيع السجلات على المستخدمين وإمكانية نقل السجلات المعلقة مع توثيق الأسباب"
+              : "Track record assignments across users and reassign pending records with full audit trail"}
           </p>
         </div>
 
@@ -117,8 +124,8 @@ export const AdminAssignments: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={
               lang === "ar"
-                ? "بحث باسم العميل، المندوب، المنطقة..."
-                : "Search customer, rep, region..."
+                ? `بحث بـ ${targetEntityLabel}، المستخدم، المنطقة...`
+                : `Search ${targetEntityLabel}, user, region...`
             }
             className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
@@ -150,19 +157,19 @@ export const AdminAssignments: React.FC = () => {
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "العميل" : "Customer"}
+                  {targetEntityLabel}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "المنطقة الحالية" : "Region"}
+                  {lang === "ar" ? "المنطقة" : "Region"}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "المندوب المسند" : "Assigned Rep"}
+                  {lang === "ar" ? "المستخدم المسند" : "Assigned User"}
                 </th>
                 <th className="px-4 py-3 text-start">
                   {lang === "ar" ? "الفرع" : "Branch"}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "قيمة المخزون" : "Inventory"}
+                  {lang === "ar" ? "الموقع / الحي" : "Area / Location"}
                 </th>
                 <th className="px-4 py-3 text-start">
                   {lang === "ar" ? "الحالة" : "Status"}
@@ -183,10 +190,10 @@ export const AdminAssignments: React.FC = () => {
                   >
                     <td className="px-4 py-3.5">
                       <div className="font-extrabold text-slate-900">
-                        {r.customerName}
+                        {r.targetName}
                       </div>
                       <div className="text-[10px] text-slate-400 font-mono">
-                        {r.customerNo} • {r.area || "الرياض"}
+                        {r.targetId} • {r.area || "الرياض"}
                       </div>
                     </td>
 
@@ -197,17 +204,15 @@ export const AdminAssignments: React.FC = () => {
                     </td>
 
                     <td className="px-4 py-3.5 font-bold text-slate-800">
-                      {r.repName}
+                      {r.userName}
                     </td>
 
                     <td className="px-4 py-3.5 text-slate-600">
                       {r.branchName}
                     </td>
 
-                    <td className="px-4 py-3.5 font-mono text-slate-700">
-                      {r.inventoryValue
-                        ? `${r.inventoryValue.toLocaleString()} ر.س`
-                        : "-"}
+                    <td className="px-4 py-3.5 text-slate-600">
+                      {r.area || "-"}
                     </td>
 
                     <td className="px-4 py-3.5">
@@ -245,7 +250,7 @@ export const AdminAssignments: React.FC = () => {
                         >
                           <ArrowRightLeft className="w-3 h-3" />
                           <span>
-                            {lang === "ar" ? "نقل المندوب" : "Reassign"}
+                            {lang === "ar" ? "نقل التكليف" : "Reassign"}
                           </span>
                         </button>
                       ) : (
@@ -269,8 +274,8 @@ export const AdminAssignments: React.FC = () => {
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
               <h3 className="font-extrabold text-sm text-slate-900">
                 {lang === "ar"
-                  ? "إعادة توجيه سجل العميل"
-                  : "Reassign Customer Record"}
+                  ? "إعادة توجيه السجل"
+                  : "Reassign Record"}
               </h3>
               <button
                 onClick={() => setReassignModalRecord(null)}
@@ -282,10 +287,11 @@ export const AdminAssignments: React.FC = () => {
 
             <div className="p-3 bg-slate-50 rounded-xl mb-3 space-y-1">
               <div className="font-bold text-slate-900">
-                {reassignModalRecord.customerName}
+                {reassignModalRecord.targetName}
               </div>
               <div className="text-[11px] text-slate-500">
-                المندوب الحالي: {reassignModalRecord.repName} (المنطقة #
+                {lang === "ar" ? "المستخدم الحالي: " : "Current User: "}
+                {reassignModalRecord.userName} ({lang === "ar" ? "المنطقة #" : "Region #"}
                 {reassignModalRecord.assignedRegionNo})
               </div>
             </div>
@@ -294,8 +300,8 @@ export const AdminAssignments: React.FC = () => {
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
                   {lang === "ar"
-                    ? "المندوب والمنطقة البديلة المستهدفة:"
-                    : "Target Representative & Region:"}
+                    ? "المستخدم والمنطقة البديلة المستهدفة:"
+                    : "Target User & Region:"}
                 </label>
                 <select
                   value={targetRepId}
@@ -305,7 +311,7 @@ export const AdminAssignments: React.FC = () => {
                 >
                   {repUsers.map((u) => (
                     <option key={u.userId} value={u.userId}>
-                      {u.repNameAr} - المنطقة #{u.regionNo} ({u.branchNameAr})
+                      {u.userNameAr} - المنطقة #{u.regionNo} ({u.branchNameAr})
                     </option>
                   ))}
                 </select>
@@ -323,7 +329,7 @@ export const AdminAssignments: React.FC = () => {
                   onChange={(e) => setReassignReason(e.target.value)}
                   placeholder={
                     lang === "ar"
-                      ? "مثال: إجازة المندوب الأصلي، إعادة توزيع جغرافي..."
+                      ? "مثال: إجازة المستخدم الأصلي، إعادة توزيع جغرافي..."
                       : "e.g. Vacation coverage"
                   }
                   className="w-full p-2 rounded-xl border border-slate-300"

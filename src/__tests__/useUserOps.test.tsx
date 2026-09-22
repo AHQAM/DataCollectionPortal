@@ -26,8 +26,8 @@ describe("useUserOps Hook", () => {
       users: [
         {
           userId: "u1",
-          repNameAr: "علي",
-          repNameEn: "Ali",
+          userNameAr: "علي",
+          userNameEn: "Ali",
           role: "REP",
           branchId: "b1",
           isActive: true,
@@ -52,7 +52,7 @@ describe("useUserOps Hook", () => {
       const hook = useUserOps();
       const userObj = {
         userId: "u1",
-        repNameAr: "محمد",
+        userNameAr: "محمد",
         role: "REP",
         isActive: true,
       } as any;
@@ -69,7 +69,7 @@ describe("useUserOps Hook", () => {
 
       // Optimistic update
       const users = useDataStore.getState().users;
-      expect(users.find((u) => u.userId === "u1")?.repNameAr).toBe("محمد");
+      expect(users.find((u) => u.userId === "u1")?.userNameAr).toBe("محمد");
     });
 
     it("returns failure, does not log audit, and rolls back local state when update fails", async () => {
@@ -80,7 +80,7 @@ describe("useUserOps Hook", () => {
       const hook = useUserOps();
       const userObj = {
         userId: "u1",
-        repNameAr: "محمد",
+        userNameAr: "محمد",
         role: "REP",
         isActive: true,
       } as any;
@@ -92,7 +92,7 @@ describe("useUserOps Hook", () => {
 
       // Rollback expected
       const users = useDataStore.getState().users;
-      expect(users.find((u) => u.userId === "u1")?.repNameAr).toBe("علي");
+      expect(users.find((u) => u.userId === "u1")?.userNameAr).toBe("علي");
     });
   });
 
@@ -107,7 +107,7 @@ describe("useUserOps Hook", () => {
       const res = await hook.addUser({
         role: "ADMIN",
         regionNo: "admin@test.com",
-        repNameAr: "المدير",
+        userNameAr: "المدير",
       });
 
       expect(res.success).toBe(true);
@@ -129,8 +129,8 @@ describe("useUserOps Hook", () => {
       const hook = useUserOps();
       const res = await hook.addUser({
         role: "REP",
-        repNo: "R123",
-        repNameAr: "مندوب جديد",
+        userNo: "R123",
+        userNameAr: "مندوب جديد",
       });
 
       expect(res.success).toBe(true);

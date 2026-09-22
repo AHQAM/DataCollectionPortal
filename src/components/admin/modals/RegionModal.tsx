@@ -109,8 +109,8 @@ export const RegionModal: React.FC<RegionModalProps> = ({
             />
             <span className="text-[10px] text-slate-400 mt-1 block">
               {lang === "ar"
-                ? "يُستخدم كرقم دخول للمندوب الميداني وكرمز للمنطقة في ملفات الإكسل"
-                : "Used by rep to login and matches Region No column in Excel"}
+                ? "يُستخدم كرقم دخول للمستخدم الميداني وكرمز للمنطقة في ملفات الإكسل"
+                : "Used by field user to login and matches Region No column in Excel"}
             </span>
           </div>
 

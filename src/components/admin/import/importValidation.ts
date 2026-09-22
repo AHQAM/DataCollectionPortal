@@ -27,32 +27,52 @@ export function autoMapColumns(
       lower.includes("رقم_مندوب") ||
       lower.includes("رقم المندوب")
     ) {
-      sysMap.repNo = h;
+      sysMap.userNo = h;
     } else if (
       lower.includes("repname") ||
       lower.includes("اسم_مندوب") ||
       lower.includes("اسم المندوب") ||
       lower.includes("المندوب")
     ) {
-      sysMap.repName = h;
+      sysMap.userName = h;
     } else if (lower.includes("branch") || lower.includes("فرع")) {
       sysMap.branchName = h;
     } else if (
+      lower === "targetid" ||
+      lower === "target_id" ||
+      lower === "recordid" ||
+      lower === "record_id" ||
+      lower === "record_no" ||
       lower === "customerno" ||
       lower === "customer_no" ||
       lower === "cust_no" ||
+      lower.includes("رقم_السجل") ||
+      lower.includes("رقم السجل") ||
+      lower.includes("معرف_الجهة") ||
+      lower.includes("معرف الجهة") ||
+      lower.includes("معرف السجل") ||
+      lower.includes("معرف_السجل") ||
       lower.includes("رقم_عميل") ||
       lower.includes("رقم العميل")
     ) {
-      sysMap.customerNo = h;
+      sysMap.targetId = h;
     } else if (
+      lower === "targetname" ||
+      lower === "target_name" ||
+      lower === "recordname" ||
+      lower === "record_name" ||
       lower === "customername" ||
       lower === "customer_name" ||
       lower === "cust_name" ||
+      lower.includes("اسم_الجهة") ||
+      lower.includes("اسم الجهة") ||
+      lower.includes("الجهة المستهدفة") ||
+      lower.includes("اسم_السجل") ||
+      lower.includes("اسم السجل") ||
       lower.includes("اسم_عميل") ||
       lower.includes("اسم العميل")
     ) {
-      sysMap.customerName = h;
+      sysMap.targetName = h;
     } else if (
       lower.includes("area") ||
       lower.includes("مدينة") ||
@@ -101,9 +121,14 @@ export function validateImportRows(
   rawRows.forEach((row, idx) => {
     const rowNum = idx + 2;
     const regCol = systemColMap.regionNo;
-    const custNoCol = systemColMap.customerNo || fieldColMap["customer_no"];
+    const custNoCol =
+      systemColMap.targetId ||
+      fieldColMap["target_id"] ||
+      fieldColMap["customer_no"];
     const custNameCol =
-      systemColMap.customerName || fieldColMap["customer_name"];
+      systemColMap.targetName ||
+      fieldColMap["target_name"] ||
+      fieldColMap["customer_name"];
 
     const regVal = String(row[regCol] || "").trim();
     const custNoVal = String(row[custNoCol] || "").trim();
@@ -112,7 +137,7 @@ export function validateImportRows(
     if (!regVal) {
       invalid.push({
         row: rowNum,
-        reasonAr: "رقم المنطقة مفقود (إلزامي لتوجيه السجل للمندوب)",
+        reasonAr: "رقم المنطقة مفقود (إلزامي لتوجيه السجل للمستخدم)",
         reasonEn: "Region Number is required for assignment",
         data: row,
       });
@@ -122,8 +147,8 @@ export function validateImportRows(
     if (!custNoVal && !custNameVal) {
       invalid.push({
         row: rowNum,
-        reasonAr: "رقم واسم العميل مفقودان",
-        reasonEn: "Customer Number or Name is required",
+        reasonAr: "معرف أو اسم السجل/الجهة المستهدفة مفقود",
+        reasonEn: "Record ID or Target Entity Name is required",
         data: row,
       });
       return;
@@ -133,8 +158,8 @@ export function validateImportRows(
     if (seenCustomers.has(dedupeKey)) {
       invalid.push({
         row: rowNum,
-        reasonAr: `العميل (${custNoVal || custNameVal}) مكرر في هذا الملف لنفس الطلب`,
-        reasonEn: `Duplicate Customer (${custNoVal || custNameVal}) in file`,
+        reasonAr: `السجل (${custNoVal || custNameVal}) مكرر في هذا الملف لنفس الطلب`,
+        reasonEn: `Duplicate record (${custNoVal || custNameVal}) in file`,
         data: row,
       });
       return;

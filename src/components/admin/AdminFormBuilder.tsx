@@ -37,6 +37,8 @@ export const AdminFormBuilder: React.FC<Props> = ({
     updateSelectedField,
     handleSaveAll,
     handleLoadInactiveCustomersPreset,
+    handleLoadGeneralSurveyPreset,
+    handleLoadAssetAuditPreset,
   } = useFormBuilder(initialFields, requestId, updateRequestFields);
 
   return (
@@ -50,6 +52,8 @@ export const AdminFormBuilder: React.FC<Props> = ({
         onBack={onBack}
         onOpenImportWizard={onOpenImportWizard}
         handleLoadInactiveCustomersPreset={handleLoadInactiveCustomersPreset}
+        handleLoadGeneralSurveyPreset={handleLoadGeneralSurveyPreset}
+        handleLoadAssetAuditPreset={handleLoadAssetAuditPreset}
         handleSaveAll={handleSaveAll}
         saveSuccess={saveSuccess}
       />

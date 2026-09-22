@@ -46,27 +46,27 @@ export const BranchStatsHeader: React.FC<BranchStatsHeaderProps> = ({
 
       <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
         <div className="text-[11px] text-slate-500 font-bold">
-          {lang === "ar" ? "المشرفين والمندوبين" : "Supervisors & Reps"}
+          {lang === "ar" ? "المشرفين والمستخدمين" : "Supervisors & Users"}
         </div>
         <div className="text-2xl font-black text-slate-900 mt-1">
           {users.length}
         </div>
         <div className="text-[10px] text-slate-400 font-semibold mt-1">
           {users.filter((u) => u.role === "REP").length}{" "}
-          {lang === "ar" ? "مندوب ميداني" : "Reps"}
+          {lang === "ar" ? "مستخدم ميداني" : "Field Users"}
         </div>
       </div>
 
       <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
         <div className="text-[11px] text-slate-500 font-bold">
-          {lang === "ar" ? "سجلات العملاء" : "Customer Records"}
+          {lang === "ar" ? "سجلات البيانات" : "Data Records"}
         </div>
         <div className="text-2xl font-black text-slate-900 mt-1">
           {records.length}
         </div>
         <div className="text-[10px] text-blue-700 font-semibold mt-1">
           {records.filter((r) => r.recordStatus === "Completed").length}{" "}
-          {lang === "ar" ? "زيارة مكتملة" : "Completed"}
+          {lang === "ar" ? "مكتملة" : "Completed"}
         </div>
       </div>
     </div>

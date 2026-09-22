@@ -47,9 +47,9 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
       assignmentId: "UNASSIGNED",
       assignedUserId: context.auth.uid,
       assignedRegionNo: userData?.regionNo || context.auth.token.regionNo || "",
-      customerNo: formData.customerNo || formData.storeNo || recordId,
-      customerName:
-        formData.customerName ||
+      targetId: formData.targetId || formData.storeNo || recordId,
+      targetName:
+        formData.targetName ||
         formData.storeName ||
         formData.clientName ||
         "عميل ميداني",
@@ -60,10 +60,10 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
         "",
       branchName: userData?.branchNameAr || "",
       regionNo: userData?.regionNo || context.auth.token.regionNo || "",
-      repNo: userData?.repNo || userData?.username || "",
-      repName:
-        userData?.repNameAr ||
-        userData?.repNameEn ||
+      userNo: userData?.userNo || userData?.username || "",
+      userName:
+        userData?.userNameAr ||
+        userData?.userNameEn ||
         context.auth.token.name ||
         "",
       rawData: formData,
@@ -211,19 +211,19 @@ export const saveDraftResponse = functions.https.onCall(
         assignedUserId: context.auth.uid,
         assignedRegionNo:
           userData?.regionNo || context.auth.token.regionNo || "",
-        customerNo: formData.customerNo || formData.storeNo || recordId,
-        customerName:
-          formData.customerName ||
+        targetId: formData.targetId || formData.storeNo || recordId,
+        targetName:
+          formData.targetName ||
           formData.storeName ||
           formData.clientName ||
           "مسودة عميل",
         branchId: userData?.branchId || context.auth.token.branchId || "",
         branchName: userData?.branchNameAr || "",
         regionNo: userData?.regionNo || context.auth.token.regionNo || "",
-        repNo: userData?.repNo || userData?.username || "",
-        repName:
-          userData?.repNameAr ||
-          userData?.repNameEn ||
+        userNo: userData?.userNo || userData?.username || "",
+        userName:
+          userData?.userNameAr ||
+          userData?.userNameEn ||
           context.auth.token.name ||
           "",
         rawData: formData,

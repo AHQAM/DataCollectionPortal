@@ -15,7 +15,7 @@ export const logAudit = (
     logId: "LOG-" + Math.random().toString(36).substring(2, 9).toUpperCase(),
     userId: actor?.userId || "SYSTEM",
     userRole: actor?.role || "ADMIN",
-    userName: actor?.repNameAr || "نظام",
+    userName: actor?.userNameAr || "نظام",
     action,
     entityType,
     entityId,

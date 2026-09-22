@@ -41,8 +41,8 @@ class RequestRecordsHeader extends StatelessWidget {
           TextField(
             decoration: InputDecoration(
               hintText: isArabic
-                  ? 'بحث باسم العميل، رقم العميل، أو المنطقة...'
-                  : 'Search by customer, number, or area...',
+                  ? 'بحث بالاسم، الرقم، أو المنطقة...'
+                  : 'Search by name, ID, or area...',
               prefixIcon: const Icon(Icons.search, size: 20),
               isDense: true,
               contentPadding: const EdgeInsets.symmetric(

@@ -69,10 +69,10 @@ export const AdminUsers: React.FC = () => {
     if (roleFilter !== "ALL" && u.role !== roleFilter) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchNameAr = u.repNameAr.toLowerCase().includes(q);
-      const matchNameEn = (u.repNameEn || "").toLowerCase().includes(q);
+      const matchNameAr = u.userNameAr.toLowerCase().includes(q);
+      const matchNameEn = (u.userNameEn || "").toLowerCase().includes(q);
       const matchReg = u.regionNo.includes(q);
-      const matchRepNo = (u.repNo || "").toLowerCase().includes(q);
+      const matchRepNo = (u.userNo || "").toLowerCase().includes(q);
       if (!matchNameAr && !matchNameEn && !matchReg && !matchRepNo)
         return false;
     }
@@ -104,9 +104,9 @@ export const AdminUsers: React.FC = () => {
       await createUser({
         role: newRole,
         regionNo: newRegionNo.trim(), // For REP: region number (login). For Admin/Supervisor: email.
-        repNo: newRepNo.trim() || undefined,
-        repNameAr: newRepNameAr.trim(),
-        repNameEn: newRepNameEn.trim() || undefined,
+        userNo: newRepNo.trim() || undefined,
+        userNameAr: newRepNameAr.trim(),
+        userNameEn: newRepNameEn.trim() || undefined,
         branchId: newBranchId,
         allowedRegionNos:
           newAllowedRegions.length > 0
@@ -167,7 +167,7 @@ export const AdminUsers: React.FC = () => {
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "المستخدم / المندوب" : "User"}
+                  {lang === "ar" ? "المستخدم" : "User"}
                 </th>
                 <th className="px-4 py-3 text-start">
                   {lang === "ar" ? "رقم المنطقة (اسم الدخول)" : "Region No"}
@@ -262,8 +262,8 @@ export const AdminUsers: React.FC = () => {
         onSuccess={(count) =>
           showToast(
             lang === "ar"
-              ? `تم استيراد ${count} مندوب بنجاح (كلمات مرور مؤقتة مع إلزام التغيير فوراً)`
-              : `Imported ${count} representatives successfully (temporary passwords, change required)`,
+              ? `تم استيراد ${count} مستخدم بنجاح (كلمات مرور مؤقتة مع إلزام التغيير فوراً)`
+              : `Imported ${count} users successfully (temporary passwords, change required)`,
           )
         }
       />

@@ -58,8 +58,8 @@ export const AuthPortal: React.FC = () => {
               <div>
                 <h1 className="text-base font-black tracking-tight text-white">
                   {lang === "ar"
-                    ? "منصة جمع البيانات الميدانية والمبيعات"
-                    : "Field Sales Collection Hub"}
+                    ? "بوابة جمع البيانات الميدانية"
+                    : "Field Data Collection Portal"}
                 </h1>
                 <p className="text-[11px] text-purple-200 mt-0.5 flex items-center gap-1.5 font-medium">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />

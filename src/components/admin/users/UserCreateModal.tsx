@@ -66,7 +66,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
           <h2 className="font-extrabold text-sm text-slate-900">
             {lang === "ar"
-              ? "إضافة مستخدم / مندوب جديد"
+              ? "إضافة مستخدم جديد"
               : "Create New User Account"}
           </h2>
           <button
@@ -90,8 +90,8 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
               >
                 <option value="REP">
                   {lang === "ar"
-                    ? "مندوب مبيعات ميداني (REP)"
-                    : "Field Representative"}
+                    ? "مستخدم ميداني / جامع بيانات (REP)"
+                    : "Field User / Data Collector"}
                 </option>
                 <option value="SUPERVISOR">
                   {lang === "ar"
@@ -154,7 +154,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
             {newRole === "REP" && (
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  {lang === "ar" ? "رقم المندوب الوظيفي" : "Rep No"}
+                  {lang === "ar" ? "رقم المستخدم الوظيفي" : "User No"}
                 </label>
                 <input
                   type="text"
@@ -170,8 +170,8 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
           <div>
             <label className="block font-bold text-slate-700 mb-1">
               {lang === "ar"
-                ? "اسم المندوب (بالعربية)"
-                : "Representative Name (Arabic)"}
+                ? "اسم المستخدم (بالعربية)"
+                : "User Name (Arabic)"}
             </label>
             <input
               type="text"
@@ -186,8 +186,8 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
           <div>
             <label className="block font-bold text-slate-700 mb-1">
               {lang === "ar"
-                ? "اسم المندوب (بالإنجليزية)"
-                : "Representative Name (English)"}
+                ? "اسم المستخدم (بالإنجليزية)"
+                : "User Name (English)"}
             </label>
             <input
               type="text"
@@ -202,7 +202,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
           <div>
             <label className="block font-bold text-slate-700 mb-1">
               {lang === "ar"
-                ? "المناطق المصرح للمندوب العمل بها (تعدد المناطق):"
+                ? "المناطق المصرح للمستخدم العمل بها (تعدد المناطق):"
                 : "Authorized Regions:"}
             </label>
             <div className="flex flex-wrap gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 max-h-32 overflow-y-auto">

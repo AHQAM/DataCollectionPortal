@@ -31,8 +31,8 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
         </h1>
         <p className="text-xs text-slate-500 mt-1">
           {lang === "ar"
-            ? "إضافة فروع الشركة، وتحديد المناطق الميدانية لكل فرع، وربط المندوبين والمشرفين بها ديناميكياً"
-            : "Add company branches, define regional sales zones, and link field representatives seamlessly"}
+            ? "إضافة فروع المنشأة، وتحديد المناطق الميدانية لكل فرع، وربط المستخدمين والمشرفين بها ديناميكياً"
+            : "Add organization branches, define field regions, and link field users and supervisors seamlessly"}
         </p>
       </div>
 

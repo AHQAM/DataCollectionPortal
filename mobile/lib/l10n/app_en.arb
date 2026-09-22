@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appName": "Sales Collection Hub",
+  "appName": "Field Data Collection Hub",
   "loginTitle": "Login",
   "regionNumber": "Region Number",
   "regionNumberHint": "Enter your region number",

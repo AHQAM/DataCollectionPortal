@@ -111,8 +111,8 @@ export const AdminLayout: React.FC = () => {
     },
     {
       id: "users",
-      labelAr: "المستخدمين والمناديب",
-      labelEn: "Users & Reps",
+      labelAr: "المستخدمين",
+      labelEn: "Users",
       icon: Users,
     },
     {
@@ -301,11 +301,11 @@ export const AdminLayout: React.FC = () => {
             <div className="p-3.5 border-t border-slate-200/80 bg-slate-50/70">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-purple-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                  {currentUser?.repNameAr.charAt(0) || "م"}
+                  {currentUser?.userNameAr.charAt(0) || "م"}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="font-extrabold text-xs text-slate-900 truncate">
-                    {currentUser?.repNameAr}
+                    {currentUser?.userNameAr}
                   </div>
                   <div className="text-[10px] text-purple-700 font-bold truncate">
                     {currentUser?.role === "ADMIN"
@@ -363,11 +363,11 @@ export const AdminLayout: React.FC = () => {
         <div className="p-3.5 border-t border-slate-200/80 bg-slate-50/50">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-purple-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-              {currentUser?.repNameAr.charAt(0) || "م"}
+              {currentUser?.userNameAr.charAt(0) || "م"}
             </div>
             <div className="min-w-0 flex-1">
               <div className="font-extrabold text-xs text-slate-900 truncate">
-                {currentUser?.repNameAr}
+                {currentUser?.userNameAr}
               </div>
               <div className="text-[10px] text-purple-700 font-bold truncate">
                 {currentUser?.role === "ADMIN"

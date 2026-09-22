@@ -18,8 +18,8 @@ export const DashboardBanner: React.FC<DashboardBannerProps> = ({
         </span>
         <h1 className="text-xl md:text-2xl font-extrabold mt-1">
           {lang === "ar"
-            ? "منظومة جمع بيانات المبيعات الميدانية"
-            : "Field Sales Collection Platform"}
+            ? "بوابة جمع البيانات الميدانية"
+            : "Dynamic Data Collection Portal"}
         </h1>
         <p className="text-xs text-purple-200/90 mt-1 max-w-xl">
           {lang === "ar"

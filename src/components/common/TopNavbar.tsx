@@ -94,8 +94,8 @@ export const TopNavbar: React.FC = () => {
             <div className="font-extrabold text-base sm:text-lg leading-tight tracking-wide flex items-center gap-2">
               <span>
                 {lang === "ar"
-                  ? "منصة جمع بيانات المبيعات"
-                  : "Sales Collection Hub"}
+                  ? "بوابة جمع البيانات الميدانية"
+                  : "Field Data Collection Portal"}
               </span>
               <span className="hidden md:inline-block text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-purple-800 text-purple-200 border border-purple-600/40">
                 Enterprise v2.4
@@ -193,8 +193,8 @@ export const TopNavbar: React.FC = () => {
                               )}
                               <span className="truncate">
                                 {lang === "ar"
-                                  ? u.repNameAr
-                                  : u.repNameEn || u.repNameAr}
+                                  ? u.userNameAr
+                                  : u.userNameEn || u.userNameAr}
                               </span>
                             </div>
                             <div className="text-[10px] text-slate-500 truncate">
@@ -206,9 +206,9 @@ export const TopNavbar: React.FC = () => {
                                   ? lang === "ar"
                                     ? `مشرف • ${u.branchNameAr || u.branchId}`
                                     : `Supervisor • ${u.branchNameEn || u.branchNameAr || u.branchId}`
-                                  : lang === "ar"
-                                    ? `مندوب • منطقة ${u.regionNo} • ${u.branchNameAr || u.branchId}`
-                                    : `Rep • Region ${u.regionNo} • ${u.branchNameEn || u.branchNameAr || u.branchId}`}
+                                   : lang === "ar"
+                                     ? `مستخدم • منطقة ${u.regionNo} • ${u.branchNameAr || u.branchId}`
+                                     : `User • Region ${u.regionNo} • ${u.branchNameEn || u.branchNameAr || u.branchId}`}
                             </div>
                           </div>
                           {(() => {

@@ -23,9 +23,9 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
   return (
     <tr className="hover:bg-slate-50/80 transition-all">
       <td className="px-4 py-3.5">
-        <div className="font-extrabold text-slate-900">{user.repNameAr}</div>
+        <div className="font-extrabold text-slate-900">{user.userNameAr}</div>
         <div className="text-[10px] text-slate-400 font-mono">
-          {user.repNo || user.role} • {user.repNameEn || ""}
+          {user.userNo || user.role} • {user.userNameEn || ""}
         </div>
       </td>
 

@@ -120,26 +120,30 @@ export const ImportStepMapping: React.FC<Props> = ({
             </select>
           </div>
 
-          {/* Customer No */}
+          {/* Customer / Target ID */}
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
             <div className="flex items-center justify-between mb-1">
               <label className="font-extrabold text-slate-800">
                 {lang === "ar"
-                  ? "رقم العميل (المعرف الفريد)"
-                  : "Customer Number"}
+                  ? "معرف السجل / الكيان (المعرف الفريد)"
+                  : "Record / Target ID"}
               </label>
               <span className="text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">
                 {lang === "ar" ? "معرف السجل" : "Key ID"}
               </span>
             </div>
             <select
-              value={systemColMap.customerNo || ""}
+              value={systemColMap.targetId || ""}
               onChange={(e) =>
-                setSystemColMap({ ...systemColMap, customerNo: e.target.value })
+                setSystemColMap({ ...systemColMap, targetId: e.target.value })
               }
               className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900"
             >
-              <option value="">-- اختر عمود رقم العميل --</option>
+              <option value="">
+                {lang === "ar"
+                  ? "-- اختر عمود معرف السجل / الكيان --"
+                  : "-- Select Target / Record ID Column --"}
+              </option>
               {fileHeaders.map((h) => (
                 <option key={h} value={h}>
                   عمود: {h}
@@ -148,24 +152,30 @@ export const ImportStepMapping: React.FC<Props> = ({
             </select>
           </div>
 
-          {/* Customer Name */}
+          {/* Customer / Target Name */}
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
             <div className="flex items-center justify-between mb-1">
               <label className="font-extrabold text-slate-800">
-                {lang === "ar" ? "اسم العميل / المتجر" : "Customer Name"}
+                {lang === "ar"
+                  ? "اسم الجهة المستهدفة / السجل"
+                  : "Target Entity / Record Name"}
               </label>
             </div>
             <select
-              value={systemColMap.customerName || ""}
+              value={systemColMap.targetName || ""}
               onChange={(e) =>
                 setSystemColMap({
                   ...systemColMap,
-                  customerName: e.target.value,
+                  targetName: e.target.value,
                 })
               }
               className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900"
             >
-              <option value="">-- اختر عمود اسم العميل --</option>
+              <option value="">
+                {lang === "ar"
+                  ? "-- اختر عمود اسم الجهة / السجل --"
+                  : "-- Select Target / Record Name Column --"}
+              </option>
               {fileHeaders.map((h) => (
                 <option key={h} value={h}>
                   عمود: {h}
@@ -186,7 +196,11 @@ export const ImportStepMapping: React.FC<Props> = ({
               }
               className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900"
             >
-              <option value="">-- تلقائي من بيانات المندوب والمنطقة --</option>
+              <option value="">
+                {lang === "ar"
+                  ? "-- تلقائي من بيانات المستخدم والمنطقة --"
+                  : "-- Auto from user & region --"}
+              </option>
               {fileHeaders.map((h) => (
                 <option key={h} value={h}>
                   عمود: {h}
@@ -199,13 +213,13 @@ export const ImportStepMapping: React.FC<Props> = ({
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
             <label className="block font-bold text-slate-800 mb-1">
               {lang === "ar"
-                ? "رقم المندوب (اختياري)"
-                : "Rep Number (Optional)"}
+                ? "رقم المستخدم الوظيفي (اختياري)"
+                : "User Number (Optional)"}
             </label>
             <select
-              value={systemColMap.repNo || ""}
+              value={systemColMap.userNo || ""}
               onChange={(e) =>
-                setSystemColMap({ ...systemColMap, repNo: e.target.value })
+                setSystemColMap({ ...systemColMap, userNo: e.target.value })
               }
               className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900"
             >
@@ -256,8 +270,8 @@ export const ImportStepMapping: React.FC<Props> = ({
           </h3>
           <span className="text-[11px] text-slate-500">
             {lang === "ar"
-              ? "الحقول المعلمة بـ (للعرض فقط) ستظهر للمندوب كمرجع من الإكسل ولا يمكنه تعديلها"
-              : "Read-only fields will be displayed to the rep without edit permission"}
+              ? "الحقول المعلمة بـ (للعرض فقط) ستظهر للمستخدم كمرجع من الإكسل ولا يمكنه تعديلها"
+              : "Read-only fields will be displayed to the user without edit permission"}
           </span>
         </div>
 

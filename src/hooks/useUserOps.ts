@@ -14,14 +14,14 @@ export const useUserOps = () => {
       dataStore.updateUserLocal(user);
       try {
         await userApi.updateUser(user.userId, {
-          repNameAr: user.repNameAr,
-          repNameEn: user.repNameEn,
+          userNameAr: user.userNameAr,
+          userNameEn: user.userNameEn,
           email: user.email,
           mobile: user.mobile,
           branchId: user.branchId,
           regionNo: user.regionNo,
           allowedRegionNos: user.allowedRegionNos,
-          repNo: user.repNo,
+          userNo: user.userNo,
           role: user.role,
           isActive: user.isActive,
           maxAllowedDevices: user.maxAllowedDevices,
@@ -52,8 +52,8 @@ export const useUserOps = () => {
             email: user.regionNo,
             role: user.role,
             branchId: user.branchId || defaultBranch?.branchId || null,
-            repNameAr: user.repNameAr || "مستخدم جديد",
-            repNameEn: user.repNameEn || "",
+            userNameAr: user.userNameAr || "مستخدم جديد",
+            userNameEn: user.userNameEn || "",
             mobileNo: user.mobileNo || user.mobile || "",
             allowedRegionNos: user.allowedRegionNos || [user.regionNo],
           });
@@ -72,15 +72,15 @@ export const useUserOps = () => {
 
       try {
         const res = await userApi.createUser({
-          username: user.regionNo || user.repNo || "",
+          username: user.regionNo || user.userNo || "",
           regionNo: user.regionNo || "",
           allowedRegionNos:
             user.allowedRegionNos || (user.regionNo ? [user.regionNo] : []),
-          repNo: user.repNo || `REP-${Date.now().toString().slice(-4)}`,
-          repNameAr:
-            user.repNameAr ||
+          userNo: user.userNo || `REP-${Date.now().toString().slice(-4)}`,
+          userNameAr:
+            user.userNameAr ||
             (lang === "ar" ? "مندوب جديد" : "New Representative"),
-          repNameEn: user.repNameEn || "",
+          userNameEn: user.userNameEn || "",
           branchId: user.branchId || defaultBranch?.branchId || "",
           role: "REP",
           mobileNo: user.mobileNo || user.mobile || "",
@@ -90,7 +90,7 @@ export const useUserOps = () => {
 
         if (res.success) {
           logAudit("USER_CREATED_VIA_CF", "User", res.userId, {
-            repNo: user.repNo,
+            userNo: user.userNo,
           });
         }
         return { success: res.success, data: res };

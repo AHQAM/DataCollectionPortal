@@ -64,11 +64,15 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
         <div className="font-semibold text-slate-700">
           {req.requestType === "per_record"
             ? lang === "ar"
-              ? "لكل عميل/سجل"
-              : "Per Record"
+              ? req.targetEntityLabelAr
+                ? `لكل ${req.targetEntityLabelAr}`
+                : "لكل سجل"
+              : req.targetEntityLabelEn
+                ? `Per ${req.targetEntityLabelEn}`
+                : "Per Record"
             : lang === "ar"
-              ? "لكل مندوب"
-              : "Per Rep"}
+              ? "لكل مستخدم"
+              : "Per User"}
         </div>
         <span
           className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5 ${

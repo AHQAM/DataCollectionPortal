@@ -305,8 +305,8 @@ export const authenticateWithRegionPassword = functions.https.onCall(
         allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
         sessionVersion: (userData.sessionVersion || 0) + 0, // Keep current version
         mustChangePassword: userData.mustChangePassword || false,
-        repNameAr: userData.repNameAr || null,
-        repNameEn: userData.repNameEn || null,
+        userNameAr: userData.userNameAr || null,
+        userNameEn: userData.userNameEn || null,
       };
 
       // 9. Ensure Firebase Auth user exists with correct claims
@@ -318,7 +318,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
         if (e.code === "auth/user-not-found") {
           await admin.auth().createUser({
             uid: userId,
-            displayName: userData.repNameAr || userData.username,
+            displayName: userData.userNameAr || userData.username,
           });
           await admin.auth().setCustomUserClaims(userId, customClaims);
         } else {
@@ -348,9 +348,9 @@ export const authenticateWithRegionPassword = functions.https.onCall(
         userId,
         token,
         mustChangePassword: userData.mustChangePassword || false,
-        repNameAr: userData.repNameAr,
-        repNameEn: userData.repNameEn || null,
-        repNo: userData.repNo || userData.regionNo,
+        userNameAr: userData.userNameAr,
+        userNameEn: userData.userNameEn || null,
+        userNo: userData.userNo || userData.regionNo,
         role: userData.role,
         allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
         branchId: userData.branchId,

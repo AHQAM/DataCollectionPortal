@@ -120,6 +120,8 @@ export const AdminRequests: React.FC<Props> = ({
     descriptionEn?: string;
     priority: RequestPriority;
     requestType: RequestType;
+    targetEntityLabelAr?: string;
+    targetEntityLabelEn?: string;
     dueAt: string;
     targetBranches: string[];
     targetRegions: string[];
@@ -136,6 +138,8 @@ export const AdminRequests: React.FC<Props> = ({
           descriptionEn: data.descriptionEn || data.descriptionAr || "",
           priority: data.priority,
           requestType: data.requestType,
+          targetEntityLabelAr: data.targetEntityLabelAr,
+          targetEntityLabelEn: data.targetEntityLabelEn,
           dueAt: new Date(data.dueAt).toISOString(),
           dueDate: data.dueAt,
           targetBranches: data.targetBranches,

@@ -58,12 +58,12 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
             <div className="p-5 bg-gradient-to-r from-slate-50 via-purple-50/20 to-white border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-purple-900 text-white font-black flex items-center justify-center text-base shadow-sm">
-                  {supervisor.repNameAr.slice(0, 2)}
+                  {supervisor.userNameAr.slice(0, 2)}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-black text-slate-900">
-                      {supervisor.repNameAr}
+                      {supervisor.userNameAr}
                     </h3>
                     <span className="px-2 py-0.5 rounded-md bg-purple-100 text-purple-900 text-[10px] font-extrabold">
                       {lang === "ar" ? "مشرف ميداني" : "Supervisor"}
@@ -78,7 +78,7 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                     <span>
                       {lang === "ar" ? "الرقم الوظيفي: " : "Emp No: "}
                       <strong className="text-slate-800 font-mono">
-                        {supervisor.repNo || supervisor.username}
+                        {supervisor.userNo || supervisor.username}
                       </strong>
                     </span>
                     <span>•</span>

@@ -106,7 +106,7 @@ export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
         </div>
         <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
           <span>
-            {lang === "ar" ? "مندوب مبيعات معتمد" : "authorized reps"}
+            {lang === "ar" ? "مستخدم معتمد" : "authorized users"}
           </span>
           {lockedUsersCount > 0 && (
             <span className="text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded">

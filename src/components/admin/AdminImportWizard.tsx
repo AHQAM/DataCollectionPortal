@@ -62,11 +62,11 @@ export const AdminImportWizard: React.FC<Props> = ({
   // System and Dynamic Column Mappings
   const [systemColMap, setSystemColMap] = useState<Record<string, string>>({
     regionNo: "RegionNo",
-    customerNo: "CustomerNo",
-    customerName: "CustomerName",
+    targetId: "CustomerNo",
+    targetName: "CustomerName",
     branchName: "BranchName",
-    repNo: "RepNo",
-    repName: "RepName",
+    userNo: "RepNo",
+    userName: "RepName",
     area: "Area",
   });
 

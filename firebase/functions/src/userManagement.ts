@@ -25,9 +25,9 @@ export const createUser = functions.https.onCall(async (data, context) => {
     username,
     regionNo,
     allowedRegionNos,
-    repNo,
-    repNameAr,
-    repNameEn,
+    userNo,
+    userNameAr,
+    userNameEn,
     email,
     mobile,
     branchId,
@@ -35,10 +35,10 @@ export const createUser = functions.https.onCall(async (data, context) => {
   } = data;
 
   // Validation
-  if (!username || !regionNo || !repNameAr || !branchId || !role) {
+  if (!username || !regionNo || !userNameAr || !branchId || !role) {
     throw new functions.https.HttpsError(
       "invalid-argument",
-      "الحقول المطلوبة: اسم المستخدم، رقم المنطقة، اسم المندوب، الفرع، الدور. | Required: username, regionNo, repNameAr, branchId, role.",
+      "الحقول المطلوبة: اسم المستخدم، رقم المنطقة، اسم المندوب، الفرع، الدور. | Required: username, regionNo, userNameAr, branchId, role.",
     );
   }
 
@@ -73,9 +73,9 @@ export const createUser = functions.https.onCall(async (data, context) => {
       username: String(username).trim(),
       regionNo: String(regionNo).trim(),
       allowedRegionNos: allowedRegionNos || [String(regionNo).trim()],
-      repNo: repNo || String(regionNo).trim(),
-      repNameAr: repNameAr.trim(),
-      repNameEn: repNameEn?.trim() || null,
+      userNo: userNo || String(regionNo).trim(),
+      userNameAr: userNameAr.trim(),
+      userNameEn: userNameEn?.trim() || null,
       email: email?.trim() || null,
       mobile: mobile?.trim() || null,
       branchId,
@@ -114,7 +114,7 @@ export const createUser = functions.https.onCall(async (data, context) => {
         regionNo,
         role,
         branchId,
-        repNameAr,
+        userNameAr,
       },
     });
 
@@ -122,8 +122,8 @@ export const createUser = functions.https.onCall(async (data, context) => {
       success: true,
       userId,
       temporaryPassword,
-      messageAr: `تم إنشاء المستخدم ${repNameAr} بنجاح.`,
-      messageEn: `User ${repNameAr} created successfully.`,
+      messageAr: `تم إنشاء المستخدم ${userNameAr} بنجاح.`,
+      messageEn: `User ${userNameAr} created successfully.`,
     };
   } catch (error: any) {
     if (error instanceof functions.https.HttpsError) {
@@ -162,14 +162,14 @@ export const updateUser = functions.https.onCall(async (data, context) => {
 
   // Whitelist allowed update fields
   const ALLOWED_FIELDS = [
-    "repNameAr",
-    "repNameEn",
+    "userNameAr",
+    "userNameEn",
     "email",
     "mobile",
     "branchId",
     "regionNo",
     "allowedRegionNos",
-    "repNo",
+    "userNo",
     "role",
     "isActive",
     "maxAllowedDevices",
@@ -378,7 +378,7 @@ export const importUsersBatch = functions.https.onCall(
         errors: [] as string[],
         temporaryPasswords: [] as Array<{
           username: string;
-          repNameAr: string;
+          userNameAr: string;
           branchName?: string;
           allowedRegionNos: string[];
           password: string;
@@ -390,7 +390,7 @@ export const importUsersBatch = functions.https.onCall(
       for (const user of users) {
         const username = String(user.username || user.regionNo).trim();
 
-        if (!username || !user.repNameAr || !user.branchId) {
+        if (!username || !user.userNameAr || !user.branchId) {
           results.errors.push(
             `Skipped: Missing required fields for ${username}`,
           );
@@ -438,9 +438,9 @@ export const importUsersBatch = functions.https.onCall(
           username,
           regionNo: String(user.regionNo || username).trim(),
           allowedRegionNos: allowedRegions,
-          repNo: user.repNo || username,
-          repNameAr: user.repNameAr.trim(),
-          repNameEn: user.repNameEn?.trim() || null,
+          userNo: user.userNo || username,
+          userNameAr: user.userNameAr.trim(),
+          userNameEn: user.userNameEn?.trim() || null,
           email: user.email?.trim() || null,
           mobile: user.mobile?.trim() || null,
           branchId: user.branchId,
@@ -469,7 +469,7 @@ export const importUsersBatch = functions.https.onCall(
         existingUsernames.add(username);
         results.temporaryPasswords.push({
           username,
-          repNameAr: user.repNameAr.trim(),
+          userNameAr: user.userNameAr.trim(),
           branchName: user.branchNameAr || user.branchId,
           allowedRegionNos: allowedRegions,
           password: temporaryPassword,

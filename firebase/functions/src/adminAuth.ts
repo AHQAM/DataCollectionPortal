@@ -39,14 +39,14 @@ export const createAdminSupervisorUser = functions.https.onCall(
       email,
       role,
       branchId,
-      repNameAr,
-      repNameEn,
+      userNameAr,
+      userNameEn,
       mobileNo,
       allowedRegionNos,
     } = data;
 
     // 3. Validate Inputs
-    if (!email || !role || !repNameAr) {
+    if (!email || !role || !userNameAr) {
       throw new functions.https.HttpsError(
         "invalid-argument",
         "بيانات المستخدم غير مكتملة. | Missing required fields.",
@@ -66,7 +66,7 @@ export const createAdminSupervisorUser = functions.https.onCall(
       const userRecord = await admin.auth().createUser({
         email: email,
         password: temporaryPassword,
-        displayName: repNameAr,
+        displayName: userNameAr,
       });
 
       const userId = userRecord.uid;
@@ -92,8 +92,8 @@ export const createAdminSupervisorUser = functions.https.onCall(
         role: role,
         branchId: branchId || null,
         allowedRegionNos: allowedRegionNos || [email],
-        repNameAr: repNameAr,
-        repNameEn: repNameEn || "",
+        userNameAr: userNameAr,
+        userNameEn: userNameEn || "",
         mobileNo: mobileNo || "",
         passwordHash: passwordHash,
         mustChangePassword: true,

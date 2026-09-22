@@ -45,8 +45,8 @@ class _RequestRecordsScreenState extends ConsumerState<RequestRecordsScreen> {
             ),
             Text(
               isArabic
-                  ? 'سجلات العملاء والمتاجر المسندة'
-                  : 'Assigned Customer Records',
+                  ? 'السجلات والجهات المسندة'
+                  : 'Assigned Records & Entities',
               style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.normal,

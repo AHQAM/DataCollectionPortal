@@ -68,7 +68,7 @@ describe("User Management Cloud Functions", () => {
           {
             username: "user1",
             regionNo: "101",
-            repNameAr: "مندوب",
+            userNameAr: "مندوب",
             branchId: "B1",
             role: "UNKNOWN_ROLE",
           },

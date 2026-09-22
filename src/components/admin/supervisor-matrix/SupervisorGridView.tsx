@@ -68,9 +68,9 @@ export const SupervisorGridView: React.FC<SupervisorGridViewProps> = ({
                   className="hover:bg-purple-50/20 transition-colors"
                 >
                   <td className="p-3 font-bold text-slate-900 sticky start-0 bg-white shadow-xs z-10">
-                    <div>{sup.repNameAr}</div>
+                    <div>{sup.userNameAr}</div>
                     <div className="text-[10px] font-mono text-slate-400 font-normal">
-                      {sup.repNo || sup.username}
+                      {sup.userNo || sup.username}
                     </div>
                   </td>
                   <td className="p-3 text-center font-black text-purple-900 font-mono">

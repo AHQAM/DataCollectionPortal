@@ -60,7 +60,7 @@ export const userApi = {
       updatedCount: number;
       temporaryPasswords: Array<{
         username: string;
-        repNameAr: string;
+        userNameAr: string;
         branchName: string;
         allowedRegionNos: string[];
         password: string;

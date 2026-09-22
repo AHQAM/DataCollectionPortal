@@ -24,6 +24,8 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
   const [editDescAr, setEditDescAr] = useState("");
   const [editPriority, setEditPriority] = useState<RequestPriority>("Normal");
   const [editDueAt, setEditDueAt] = useState("");
+  const [editTargetEntityLabelAr, setEditTargetEntityLabelAr] = useState("");
+  const [editTargetEntityLabelEn, setEditTargetEntityLabelEn] = useState("");
   const [editTargetScope, setEditTargetScope] = useState<"ALL" | "SPECIFIC">(
     "ALL",
   );
@@ -41,6 +43,8 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
       setEditDescAr(request.descriptionAr || "");
       setEditPriority(request.priority || "Normal");
       setEditDueAt(request.dueAt ? request.dueAt.split("T")[0] : "");
+      setEditTargetEntityLabelAr(request.targetEntityLabelAr || "");
+      setEditTargetEntityLabelEn(request.targetEntityLabelEn || "");
 
       const tBranches = request.targetBranches || [];
       const tRegions = request.targetRegions || [];
@@ -68,6 +72,8 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
       titleEn: editTitleEn.trim() || editTitleAr.trim(),
       descriptionAr: editDescAr,
       priority: editPriority,
+      targetEntityLabelAr: editTargetEntityLabelAr.trim() || undefined,
+      targetEntityLabelEn: editTargetEntityLabelEn.trim() || undefined,
       dueAt: new Date(editDueAt).toISOString(),
       dueDate: editDueAt,
       targetBranches: editTargetScope === "ALL" ? [] : editSelectedBranchIds,
@@ -162,6 +168,41 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
               onChange={(e) => setEditTitleEn(e.target.value)}
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">
+                {lang === "ar"
+                  ? "تسمية الجهة المستهدفة (بالعربية)"
+                  : "Target Entity Label (Arabic)"}
+              </label>
+              <input
+                type="text"
+                value={editTargetEntityLabelAr}
+                onChange={(e) => setEditTargetEntityLabelAr(e.target.value)}
+                placeholder={
+                  lang === "ar"
+                    ? "مثال: العميل، المتجر، المدرسة..."
+                    : "e.g. Customer, Store, School..."
+                }
+                className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">
+                {lang === "ar"
+                  ? "تسمية الجهة المستهدفة (بالإنجليزية)"
+                  : "Target Entity Label (English)"}
+              </label>
+              <input
+                type="text"
+                value={editTargetEntityLabelEn}
+                onChange={(e) => setEditTargetEntityLabelEn(e.target.value)}
+                placeholder="e.g. Customer, Store, Facility..."
+                className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
+              />
+            </div>
           </div>
 
           <div>

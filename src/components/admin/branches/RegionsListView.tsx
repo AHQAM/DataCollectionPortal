@@ -107,12 +107,12 @@ export const RegionsListView: React.FC<RegionsListViewProps> = ({
                         <div className="flex items-center gap-1.5">
                           <Users className="w-3.5 h-3.5 text-slate-400" />
                           <span className="font-bold text-slate-800">
-                            {assignedRep.repNameAr}
+                            {assignedRep.userNameAr}
                           </span>
                         </div>
                       ) : (
                         <span className="text-slate-400 italic text-[11px]">
-                          {lang === "ar" ? "غير مسند لمندوب" : "Unassigned"}
+                          {lang === "ar" ? "غير مسند لمستخدم" : "Unassigned"}
                         </span>
                       )}
                     </td>
@@ -121,7 +121,7 @@ export const RegionsListView: React.FC<RegionsListViewProps> = ({
                         {regRecords.length}
                       </span>{" "}
                       <span className="text-[10px] text-slate-400">
-                        {lang === "ar" ? "عميل" : "clients"}
+                        {lang === "ar" ? "سجل" : "records"}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-center">

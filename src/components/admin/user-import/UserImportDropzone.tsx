@@ -50,8 +50,8 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
           <Info className="w-4 h-4 text-purple-700 shrink-0" />
           <span>
             {lang === "ar"
-              ? "الأعمدة: [رقم_المندوب (المعرف)] و [اسم_المندوب] و [الفرع] و [رقم_الجوال]"
-              : "Columns: [Rep_Number (ID)], [Rep_Name], [Branch], [Phone]"}
+              ? "الأعمدة: [رقم_المستخدم (المعرف)] و [اسم_المستخدم] و [الفرع] و [رقم_الجوال]"
+              : "Columns: [User_Number (ID)], [User_Name], [Branch], [Phone]"}
           </span>
         </div>
 
@@ -90,8 +90,8 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
           <ArrowUpDown className="w-4 h-4 text-emerald-600 shrink-0" />
           <div className="font-bold">
             {lang === "ar"
-              ? "ذكاء النظام: تم الكشف تلقائياً عن تبديل في محتوى العمودين A و B (تم تصحيح رقم المندوب واسم المندوب تلقائياً دون أي أخطاء)!"
-              : "Auto-detected swapped columns A & B: Successfully corrected Rep No and Rep Name!"}
+              ? "ذكاء النظام: تم الكشف تلقائياً عن تبديل في محتوى العمودين A و B (تم تصحيح رقم المستخدم واسم المستخدم تلقائياً دون أي أخطاء)!"
+              : "Auto-detected swapped columns A & B: Successfully corrected User No and User Name!"}
           </div>
         </div>
       )}
@@ -137,8 +137,8 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
         </p>
         <p className="text-[11px] text-slate-400 mt-1">
           {lang === "ar"
-            ? "يتعرف المعالج تلقائياً على الأعمدة المتبادلة ويدمج صفوف نفس المندوب تلقائياً"
-            : "Auto detects swapped columns and merges multi-region representative rows"}
+            ? "يتعرف المعالج تلقائياً على الأعمدة المتبادلة ويدمج صفوف نفس المستخدم تلقائياً"
+            : "Smart mapping auto-detects swapped columns and merges rows for the same user"}
         </p>
       </div>
     </div>

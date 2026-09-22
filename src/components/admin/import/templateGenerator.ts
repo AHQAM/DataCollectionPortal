@@ -64,7 +64,7 @@ export async function downloadCustomTemplate({
 
     const row: any[] = [
       reg.regionNo,
-      rep?.repNo || `REP-${reg.regionNo}`,
+      rep?.userNo || `REP-${reg.regionNo}`,
       branch?.branchNameAr || "الفرع الرئيسي",
     ];
 

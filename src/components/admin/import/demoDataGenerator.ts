@@ -97,7 +97,7 @@ export function generateDemoDataset({
 
     const row: Record<string, any> = {
       RegionNo: reg.regionNo,
-      RepNo: rep?.repNo || `REP-${reg.regionNo}`,
+      RepNo: rep?.userNo || `REP-${reg.regionNo}`,
       BranchName: branch?.branchNameAr || "الفرع الرئيسي",
       CustomerNo: cust.no,
       CustomerName: cust.name,

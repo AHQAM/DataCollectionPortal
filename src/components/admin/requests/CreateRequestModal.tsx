@@ -17,6 +17,8 @@ interface CreateRequestModalProps {
     descriptionEn?: string;
     priority: RequestPriority;
     requestType: RequestType;
+    targetEntityLabelAr?: string;
+    targetEntityLabelEn?: string;
     dueAt: string;
     targetBranches: string[];
     targetRegions: string[];
@@ -40,6 +42,8 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
   const [newDescEn, setNewDescEn] = useState("");
   const [newPriority, setNewPriority] = useState<RequestPriority>("Normal");
   const [newType, setNewType] = useState<RequestType>("per_record");
+  const [newTargetEntityLabelAr, setNewTargetEntityLabelAr] = useState("");
+  const [newTargetEntityLabelEn, setNewTargetEntityLabelEn] = useState("");
   const [newDueAt, setNewDueAt] = useState(
     new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0],
   );
@@ -69,6 +73,8 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
       descriptionEn: newDescEn || newDescAr,
       priority: newPriority,
       requestType: newType,
+      targetEntityLabelAr: newTargetEntityLabelAr.trim() || undefined,
+      targetEntityLabelEn: newTargetEntityLabelEn.trim() || undefined,
       dueAt: newDueAt,
       targetBranches: newTargetScope === "ALL" ? [] : newSelectedBranchIds,
       targetRegions: newTargetScope === "ALL" ? [] : newSelectedRegionNos,
@@ -179,13 +185,13 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
               >
                 <option value="per_record">
                   {lang === "ar"
-                    ? "استجابة لكل عميل/سجل"
-                    : "Per Customer/Record"}
+                    ? "استجابة لكل سجل / جهة مستهدفة"
+                    : "Per Record / Target Entity"}
                 </option>
                 <option value="per_rep">
                   {lang === "ar"
-                    ? "استجابة واحدة لكل مندوب"
-                    : "Per Representative"}
+                    ? "استجابة واحدة لكل مستخدم"
+                    : "Per User"}
                 </option>
                 <option value="per_region">
                   {lang === "ar" ? "استجابة لكل منطقة" : "Per Region"}
@@ -203,6 +209,41 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 onChange={(e) => setNewDueAt(e.target.value)}
                 className="w-full h-10 px-3 rounded-xl border border-slate-300"
                 required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">
+                {lang === "ar"
+                  ? "تسمية الجهة المستهدفة (بالعربية - اختياري)"
+                  : "Target Entity Label (Arabic)"}
+              </label>
+              <input
+                type="text"
+                value={newTargetEntityLabelAr}
+                onChange={(e) => setNewTargetEntityLabelAr(e.target.value)}
+                placeholder={
+                  lang === "ar"
+                    ? "مثال: العميل، المتجر، المدرسة، العيادة..."
+                    : "e.g. Customer, Store, School..."
+                }
+                className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">
+                {lang === "ar"
+                  ? "تسمية الجهة المستهدفة (بالإنجليزية - اختياري)"
+                  : "Target Entity Label (English)"}
+              </label>
+              <input
+                type="text"
+                value={newTargetEntityLabelEn}
+                onChange={(e) => setNewTargetEntityLabelEn(e.target.value)}
+                placeholder="e.g. Customer, Store, Facility..."
+                className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               />
             </div>
           </div>
@@ -358,7 +399,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
               />
               <span>
                 {lang === "ar"
-                  ? "السماح للمندوب بتعديل السجل بعد الاعتماد"
+                  ? "السماح للمستخدم بتعديل السجل بعد الاعتماد"
                   : "Allow editing after submit"}
               </span>
             </label>

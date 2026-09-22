@@ -100,7 +100,7 @@ export const ReportFilters: React.FC<Props> = ({
 
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {lang === "ar" ? "بحث بالعميل أو المندوب" : "Search Customer / Rep"}
+          {lang === "ar" ? "بحث بالسجل أو المستخدم" : "Search Record / User"}
         </label>
         <div className="relative">
           <input

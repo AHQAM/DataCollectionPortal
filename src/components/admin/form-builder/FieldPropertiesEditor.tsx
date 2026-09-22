@@ -124,7 +124,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
                     : ""
                 }
               >
-                {lang === "ar" ? "حقل إلزامي من المندوب" : "Required from Rep"}
+                {lang === "ar" ? "حقل إلزامي من المستخدم" : "Required from User"}
               </span>
             </label>
           </div>
@@ -153,15 +153,15 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
               <Lock className="w-3.5 h-3.5 text-amber-700" />
               <span>
                 {lang === "ar"
-                  ? "حقل للعرض فقط (بيانات مستوردة عبر الإكسل - غير قابلة للتعديل من المندوب)"
-                  : "Read-Only Field (Imported via Excel - Non-editable by rep)"}
+                  ? "حقل للعرض فقط (بيانات مستوردة عبر الإكسل - غير قابلة للتعديل من المستخدم)"
+                  : "Read-Only Field (Imported via Excel - Non-editable by user)"}
               </span>
             </div>
           </label>
           <p className="text-[11px] text-amber-800/90 leading-relaxed ps-6">
             {lang === "ar"
-              ? "عند تفعيل هذا الخيار، يتم استيراد القيمة (مثل: رقم العميل، اسم العميل، الفرع، الموقع، المديونية، تاريخ آخر تعامل) من ملف الإكسل وتظهر للمندوب كمرجع ثابت بدون إمكانية التعديل، بينما يقوم بتعبأة الحقول الأخرى مثل سبب عدم الشراء."
-              : "When enabled, this value is imported from Excel (e.g. Customer No, Name, Branch, Location, Debt, Last Deal Date) and shown to the rep as read-only, allowing them to fill other fields like Reason for No Purchase."}
+              ? "عند تفعيل هذا الخيار، يتم استيراد القيمة (مثل: رقم السجل، اسم الجهة، الفرع، الموقع) من ملف الإكسل وتظهر للمستخدم كمرجع ثابت بدون إمكانية التعديل، بينما يقوم بتعبئة الحقول الأخرى."
+              : "When enabled, this value is imported from Excel (e.g. Record ID, Target Name, Branch, Location) and shown to the user as read-only, allowing them to fill other fields."}
           </p>
         </div>
 
@@ -227,8 +227,8 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-800">
                 {lang === "ar"
-                  ? "خيارات القائمة المتاحة للمندوب"
-                  : "Dropdown Options"}
+                  ? "خيارات القائمة المتاحة للمستخدم"
+                  : "Options Available to User"}
               </span>
               <button
                 type="button"

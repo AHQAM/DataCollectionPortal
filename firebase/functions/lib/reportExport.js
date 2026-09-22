@@ -118,12 +118,12 @@ exports.exportReport = functions.https.onCall(async (data, context) => {
         const baseCols = [
             rec.recordId,
             rec.recordStatus,
-            rec.customerNo,
-            rec.customerName,
+            rec.targetId,
+            rec.targetName,
             rec.regionNo,
             rec.branchName,
-            rec.repNo,
-            rec.repName,
+            rec.userNo,
+            rec.userName,
         ];
         const dynamicCols = dynamicHeaders.map((k) => resp[k] !== undefined ? resp[k] : "");
         return [...baseCols, ...dynamicCols].map(escapeCsv).join(",");

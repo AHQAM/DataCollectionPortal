@@ -1,8 +1,8 @@
 class RecordModel {
   final String recordId;
   final String requestId;
-  final String customerNo;
-  final String customerName;
+  final String targetId;
+  final String targetName;
   final String assignedRegionNo;
   final String branchName;
   final String repName;
@@ -15,11 +15,16 @@ class RecordModel {
   final Map<String, dynamic> rawData;
   final DateTime? updatedAt;
 
+  // Backward-compatibility getters
+  String get customerNo => targetId;
+  String get customerName => targetName;
+  String get userName => repName;
+
   const RecordModel({
     required this.recordId,
     required this.requestId,
-    required this.customerNo,
-    required this.customerName,
+    required this.targetId,
+    required this.targetName,
     required this.assignedRegionNo,
     this.branchName = '',
     this.repName = '',
@@ -70,16 +75,23 @@ class RecordModel {
       return null;
     }
 
+    final tId = (data['targetId'] ?? data['customerNo'] ?? '').toString();
+    final tName = (data['targetName'] ??
+            data['customerName'] ??
+            data['targetId'] ??
+            data['customerNo'] ??
+            'سجل')
+        .toString();
+
     return RecordModel(
       recordId: id,
       requestId: (data['requestId'] ?? '').toString(),
-      customerNo: (data['customerNo'] ?? '').toString(),
-      customerName: (data['customerName'] ?? data['customerNo'] ?? 'عميل')
-          .toString(),
+      targetId: tId,
+      targetName: tName,
       assignedRegionNo: (data['assignedRegionNo'] ?? data['regionNo'] ?? '')
           .toString(),
       branchName: (data['branchName'] ?? '').toString(),
-      repName: (data['repName'] ?? '').toString(),
+      repName: (data['repName'] ?? data['userName'] ?? '').toString(),
       recordStatus: (data['recordStatus'] ?? 'Pending').toString(),
       completionPercent: (data['completionPercent'] as num?)?.toInt() ?? 0,
       inventoryValue: (data['inventoryValue'] as num?)?.toDouble(),

@@ -40,9 +40,9 @@ export const AdminSupervisorMatrix: React.FC = () => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchName =
-        sup.repNameAr.toLowerCase().includes(q) ||
-        (sup.repNameEn || "").toLowerCase().includes(q);
-      const matchNo = (sup.repNo || "").toLowerCase().includes(q);
+        sup.userNameAr.toLowerCase().includes(q) ||
+        (sup.userNameEn || "").toLowerCase().includes(q);
+      const matchNo = (sup.userNo || "").toLowerCase().includes(q);
       const matchUsername = sup.username.toLowerCase().includes(q);
       if (!matchName && !matchNo && !matchUsername) return false;
     }
@@ -62,8 +62,8 @@ export const AdminSupervisorMatrix: React.FC = () => {
     updateUser({ ...supervisor, allowedRegionNos: updated });
     showToast(
       lang === "ar"
-        ? `تم تحديث صلاحيات المشرف ${supervisor.repNameAr}`
-        : `Updated permissions for ${supervisor.repNameAr}`,
+        ? `تم تحديث صلاحيات المشرف ${supervisor.userNameAr}`
+        : `Updated permissions for ${supervisor.userNameAr}`,
     );
   };
 
@@ -78,8 +78,8 @@ export const AdminSupervisorMatrix: React.FC = () => {
     updateUser({ ...supervisor, allowedRegionNos: combined });
     showToast(
       lang === "ar"
-        ? `تم منح الإشراف على كافة مناطق الفرع للمشرف ${supervisor.repNameAr}`
-        : `Assigned all branch regions to ${supervisor.repNameAr}`,
+        ? `تم منح الإشراف على كافة مناطق الفرع للمشرف ${supervisor.userNameAr}`
+        : `Assigned all branch regions to ${supervisor.userNameAr}`,
     );
   };
 
@@ -94,8 +94,8 @@ export const AdminSupervisorMatrix: React.FC = () => {
     updateUser({ ...supervisor, allowedRegionNos: filtered });
     showToast(
       lang === "ar"
-        ? `تم إلغاء مناطق هذا الفرع للمشرف ${supervisor.repNameAr}`
-        : `Removed branch regions from ${supervisor.repNameAr}`,
+        ? `تم إلغاء مناطق هذا الفرع للمشرف ${supervisor.userNameAr}`
+        : `Removed branch regions from ${supervisor.userNameAr}`,
     );
   };
 
@@ -104,8 +104,8 @@ export const AdminSupervisorMatrix: React.FC = () => {
     updateUser({ ...supervisor, allowedRegionNos: [] });
     showToast(
       lang === "ar"
-        ? `تم مسح كافة المناطق للمشرف ${supervisor.repNameAr}`
-        : `Cleared all assigned regions for ${supervisor.repNameAr}`,
+        ? `تم مسح كافة المناطق للمشرف ${supervisor.userNameAr}`
+        : `Cleared all assigned regions for ${supervisor.userNameAr}`,
     );
   };
 
@@ -115,30 +115,30 @@ export const AdminSupervisorMatrix: React.FC = () => {
     updateUser({ ...supervisor, allowedRegionNos: allNos });
     showToast(
       lang === "ar"
-        ? `تم منح الإشراف على جميع مناطق المملكة للمشرف ${supervisor.repNameAr}`
-        : `Granted full coverage to ${supervisor.repNameAr}`,
+        ? `تم منح الإشراف على جميع مناطق المملكة للمشرف ${supervisor.userNameAr}`
+        : `Granted full coverage to ${supervisor.userNameAr}`,
     );
   };
 
   // Create new supervisor
   const handleCreateSupervisor = (data: {
-    repNameAr: string;
-    repNameEn: string;
-    repNo: string;
+    userNameAr: string;
+    userNameEn: string;
+    userNo: string;
     branchId: string;
     mobile: string;
   }) => {
     const branch = branches.find((b) => b.branchId === data.branchId);
-    const generatedUsername = `sup_${data.repNo || Date.now().toString().slice(-4)}`;
+    const generatedUsername = `sup_${data.userNo || Date.now().toString().slice(-4)}`;
 
     const newSupervisor: User = {
       userId: `usr_${Date.now()}`,
       username: generatedUsername,
       regionNo: "",
       allowedRegionNos: [],
-      repNo: data.repNo,
-      repNameAr: data.repNameAr,
-      repNameEn: data.repNameEn,
+      userNo: data.userNo,
+      userNameAr: data.userNameAr,
+      userNameEn: data.userNameEn,
       branchId: data.branchId,
       branchNameAr: branch?.branchNameAr,
       branchNameEn: branch?.branchNameEn,
@@ -158,8 +158,8 @@ export const AdminSupervisorMatrix: React.FC = () => {
     setShowAddSupervisorModal(false);
     showToast(
       lang === "ar"
-        ? `تمت إضافة المشرف ${data.repNameAr} بنجاح إلى ماستر داتا المستخدمين`
-        : `Supervisor ${data.repNameAr} created successfully`,
+        ? `تمت إضافة المشرف ${data.userNameAr} بنجاح إلى ماستر داتا المستخدمين`
+        : `Supervisor ${data.userNameAr} created successfully`,
     );
   };
 

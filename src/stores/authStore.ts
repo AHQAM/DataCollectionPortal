@@ -20,9 +20,9 @@ interface AuthResponseData {
   uid?: string;
   regionNo: string;
   allowedRegionNos?: string[];
-  repNo?: string;
-  repNameAr?: string;
-  repNameEn?: string;
+  userNo?: string;
+  userNameAr?: string;
+  userNameEn?: string;
   branchId: string;
   role: User["role"];
   mustChangePassword?: boolean;
@@ -148,9 +148,9 @@ export const useAuthStore = create<AuthStore>((set, get) => {
               username: trimmedInput,
               regionNo: data.regionNo,
               allowedRegionNos: data.allowedRegionNos || [data.regionNo],
-              repNo: data.repNo || data.regionNo,
-              repNameAr: data.repNameAr || trimmedInput,
-              repNameEn: data.repNameEn || undefined,
+              userNo: data.userNo || data.regionNo,
+              userNameAr: data.userNameAr || trimmedInput,
+              userNameEn: data.userNameEn || undefined,
               branchId: data.branchId,
               role: data.role,
               mustChangePassword: Boolean(data.mustChangePassword),

@@ -180,8 +180,8 @@ export const BroadcastNotificationModal: React.FC<
                   { id: "ALL", labelAr: "الجميع", labelEn: "All" },
                   {
                     id: "REPRESENTATIVES",
-                    labelAr: "المندوبين",
-                    labelEn: "Reps",
+                    labelAr: "المستخدمين الميدانيين",
+                    labelEn: "Field Users",
                   },
                   {
                     id: "SUPERVISORS",
@@ -217,7 +217,11 @@ export const BroadcastNotificationModal: React.FC<
                 required
                 value={titleAr}
                 onChange={(e) => setTitleAr(e.target.value)}
-                placeholder="مثال: تنبيه هام لجميع المندوبين"
+                placeholder={
+                  lang === "ar"
+                    ? "مثال: تنبيه هام لجميع المستخدمين الميدانيين"
+                    : "e.g. Important notice to all field users"
+                }
                 className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-slate-50 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent font-medium"
               />
             </div>

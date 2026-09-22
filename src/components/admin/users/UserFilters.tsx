@@ -28,8 +28,8 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
             <span className="text-purple-700">👤</span>
             <span>
               {lang === "ar"
-                ? "إدارة المستخدمين والمندوبين"
-                : "Users & Representatives"}
+                ? "إدارة المستخدمين"
+                : "User Management"}
             </span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -70,8 +70,8 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={
               lang === "ar"
-                ? "بحث باسم المندوب، رقم المنطقة..."
-                : "Search by name, region..."
+                ? "بحث باسم المستخدم، رقم المنطقة..."
+                : "Search by user name, region..."
             }
             className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
@@ -81,7 +81,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
         <div className="flex gap-1.5 text-xs">
           {[
             { key: "ALL", labelAr: "الكل", labelEn: "All" },
-            { key: "REP", labelAr: "المناديب فقط", labelEn: "Reps" },
+            { key: "REP", labelAr: "المستخدمين الميدانيين", labelEn: "Field Users" },
             { key: "SUPERVISOR", labelAr: "المشرفين", labelEn: "Supervisors" },
             { key: "ADMIN", labelAr: "المدراء", labelEn: "Admins" },
           ].map((tab) => (

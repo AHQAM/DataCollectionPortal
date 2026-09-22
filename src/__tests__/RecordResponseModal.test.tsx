@@ -25,9 +25,9 @@ describe("RecordResponseModal Component", () => {
   const mockRecord: RecordItem = {
     recordId: "rec_1",
     requestId: "req_1",
-    customerNo: "C-001",
-    customerName: "Acme Corp",
-    repName: "John Doe",
+    targetId: "C-001",
+    targetName: "Acme Corp",
+    userName: "John Doe",
     assignedRegionNo: "REG-1",
     branchName: "Main Branch",
     branchId: "b_1",

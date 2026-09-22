@@ -63,8 +63,8 @@ const MainAppContent: React.FC = () => {
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
           <span className="font-semibold text-slate-700">
             {lang === "ar"
-              ? "منصة جمع البيانات الميدانية والمبيعات"
-              : "Field Sales Collection Hub"}
+              ? "منصة جمع البيانات الميدانية"
+              : "Field Data Collection Hub"}
           </span>
           <span className="text-slate-400 font-mono">v2.4.0 Enterprise</span>
         </div>

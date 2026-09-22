@@ -100,7 +100,7 @@ export const useRecordOps = () => {
         );
         if (res.success) {
           logAudit("RECORD_COMPLETED", "Record", recordId, {
-            customerNo: targetRecord?.customerNo,
+            targetId: targetRecord?.targetId,
             values,
           });
           return {

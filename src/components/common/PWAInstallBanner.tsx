@@ -139,8 +139,8 @@ export const PWAInstallBanner: React.FC<Props> = ({
           <div className="truncate">
             <div className="text-xs font-extrabold truncate">
               {lang === "ar"
-                ? "تطبيق المندوب الميداني (PWA)"
-                : "Field Representative App"}
+                ? "تطبيق جمع البيانات الميداني (PWA)"
+                : "Field Collection App (PWA)"}
             </div>
             <div className="text-[10px] text-purple-200 truncate">
               {lang === "ar"

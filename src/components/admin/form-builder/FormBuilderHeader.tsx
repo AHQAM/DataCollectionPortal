@@ -18,6 +18,8 @@ interface FormBuilderHeaderProps {
   onBack: () => void;
   onOpenImportWizard?: (requestId: string) => void;
   handleLoadInactiveCustomersPreset: () => void;
+  handleLoadGeneralSurveyPreset: () => void;
+  handleLoadAssetAuditPreset: () => void;
   handleSaveAll: () => void;
   saveSuccess: boolean;
 }
@@ -30,6 +32,8 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
   onBack,
   onOpenImportWizard,
   handleLoadInactiveCustomersPreset,
+  handleLoadGeneralSurveyPreset,
+  handleLoadAssetAuditPreset,
   handleSaveAll,
   saveSuccess,
 }) => {
@@ -102,23 +106,41 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
             </button>
           )}
 
-          <button
-            type="button"
-            onClick={handleLoadInactiveCustomersPreset}
-            className="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
-            title={
-              lang === "ar"
-                ? "إدراج حقول متابعة المديونيات وانقطاع العملاء (مع حقول للعرض فقط)"
-                : "Insert Customer Inactivity & Debt Preset"
-            }
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>
-              {lang === "ar"
-                ? "إدراج حقول المديونيات وأسباب عدم الشراء"
-                : "Insert Debt & Inactivity Fields"}
-            </span>
-          </button>
+          <div className="relative inline-flex items-center">
+            <select
+              defaultValue=""
+              onChange={(e) => {
+                if (e.target.value === "general") handleLoadGeneralSurveyPreset();
+                else if (e.target.value === "asset") handleLoadAssetAuditPreset();
+                else if (e.target.value === "debt")
+                  handleLoadInactiveCustomersPreset();
+                e.target.value = "";
+              }}
+              className="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition-all shadow-2xs cursor-pointer appearance-none pe-7"
+            >
+              <option value="" disabled>
+                {lang === "ar"
+                  ? "✨ إدراج نموذج جاهز..."
+                  : "✨ Load Form Preset..."}
+              </option>
+              <option value="general">
+                {lang === "ar"
+                  ? "استبيان ومسح ميداني عام"
+                  : "General Field Survey"}
+              </option>
+              <option value="asset">
+                {lang === "ar"
+                  ? "جرد وتدقيق أصول ومواقع"
+                  : "Asset & Facility Audit"}
+              </option>
+              <option value="debt">
+                {lang === "ar"
+                  ? "زيارات ومتابعة مديونيات"
+                  : "Customer Debt & Inactivity"}
+              </option>
+            </select>
+            <Sparkles className="w-3.5 h-3.5 text-amber-600 absolute end-2 pointer-events-none" />
+          </div>
 
           {saveSuccess && (
             <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 flex items-center gap-1 animate-in fade-in">
@@ -159,13 +181,13 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="font-bold">
               {lang === "ar"
-                ? `النموذج منشور حالياً ومتاح للمندوبين (الإصدار v${currentRequest.formSchemaVersion || 1})`
+                ? `النموذج منشور حالياً ومتاح للمستخدمين (الإصدار v${currentRequest.formSchemaVersion || 1})`
                 : `Campaign is currently Published & Live (Version v${currentRequest.formSchemaVersion || 1})`}
             </span>
             <span className="text-emerald-700 hidden sm:inline">
               —{" "}
               {lang === "ar"
-                ? "يمكنك إضافة أعمدة أو تعديل الحقول في أي وقت، وسيتم فوراً ترقية الإصدار وتحديث النموذج على أجهزة المندوبين دون المساس بالبيانات المحفوظة مسبقاً."
+                ? "يمكنك إضافة أعمدة أو تعديل الحقول في أي وقت، وسيتم فوراً ترقية الإصدار وتحديث النموذج على أجهزة المستخدمين دون المساس بالبيانات المحفوظة مسبقاً."
                 : "You can add columns or edit fields anytime. Changes will auto-bump the schema version and reflect on mobile devices without losing existing records."}
             </span>
           </div>

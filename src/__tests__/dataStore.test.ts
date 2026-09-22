@@ -36,9 +36,9 @@ describe("useDataStore", () => {
       {
         userId: "u1",
         username: "101",
-        repNo: "101",
-        repNameAr: "أحمد علي",
-        repNameEn: "Ahmed Ali",
+        userNo: "101",
+        userNameAr: "أحمد علي",
+        userNameEn: "Ahmed Ali",
         role: "REP",
         branchId: "b1",
         regionNo: "101",
@@ -56,15 +56,15 @@ describe("useDataStore", () => {
 
     useDataStore.getState().setUsers(mockUsers);
     expect(useDataStore.getState().users).toHaveLength(1);
-    expect(useDataStore.getState().users[0].repNameAr).toBe("أحمد علي");
+    expect(useDataStore.getState().users[0].userNameAr).toBe("أحمد علي");
 
     // Update user locally
     const updatedUser: User = {
       ...mockUsers[0],
-      repNameAr: "أحمد علي المحدث",
+      userNameAr: "أحمد علي المحدث",
     };
     useDataStore.getState().updateUserLocal(updatedUser);
-    expect(useDataStore.getState().users[0].repNameAr).toBe("أحمد علي المحدث");
+    expect(useDataStore.getState().users[0].userNameAr).toBe("أحمد علي المحدث");
   });
 
   it("updates requests and records correctly", () => {
@@ -106,13 +106,13 @@ describe("useDataStore", () => {
       assignmentId: "asgn-1",
       assignedUserId: "u1",
       assignedRegionNo: "101",
-      customerNo: "CUST-100",
-      customerName: "مؤسسة الرياض",
+      targetId: "CUST-100",
+      targetName: "مؤسسة الرياض",
       branchId: "b1",
       branchName: "الرياض",
       regionNo: "101",
-      repNo: "101",
-      repName: "أحمد علي",
+      userNo: "101",
+      userName: "أحمد علي",
       rawData: {},
       recordStatus: "Pending",
       completionPercent: 0,
@@ -122,7 +122,7 @@ describe("useDataStore", () => {
 
     useDataStore.getState().setRecords([mockRecord]);
     expect(useDataStore.getState().records).toHaveLength(1);
-    expect(useDataStore.getState().records[0].customerName).toBe(
+    expect(useDataStore.getState().records[0].targetName).toBe(
       "مؤسسة الرياض",
     );
   });

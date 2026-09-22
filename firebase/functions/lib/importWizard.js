@@ -114,23 +114,23 @@ exports.commitImport = functions.https.onCall(async (data, context) => {
                 (u.allowedRegionNos && u.allowedRegionNos.includes(regionVal)))
             : undefined;
         // 2. Resolve Customer Identification
-        const custNoKey = mapping["customerNo"] || mapping["customer_no"] || "CustomerNo";
-        const customerNo = String(row[custNoKey] ||
-            row["customerNo"] ||
+        const custNoKey = mapping["targetId"] || mapping["customer_no"] || "CustomerNo";
+        const targetId = String(row[custNoKey] ||
+            row["targetId"] ||
             row["CustomerNo"] ||
             row["رقم العميل"] ||
             row["رقم_العميل"] ||
             `CUST-${1000 + idx + 1}`).trim();
         // Duplicate detection key (RequestId + RegionNo + CustomerNo)
-        const dupKey = `${requestId}_${regionVal}_${customerNo}`;
+        const dupKey = `${requestId}_${regionVal}_${targetId}`;
         if (duplicateKeys.has(dupKey)) {
             skippedCount++;
             return; // Skip duplicate within the same batch
         }
         duplicateKeys.add(dupKey);
-        const custNameKey = mapping["customerName"] || mapping["customer_name"] || "CustomerName";
-        const customerName = String(row[custNameKey] ||
-            row["customerName"] ||
+        const custNameKey = mapping["targetName"] || mapping["customer_name"] || "CustomerName";
+        const targetName = String(row[custNameKey] ||
+            row["targetName"] ||
             row["CustomerName"] ||
             row["اسم العميل"] ||
             row["اسم_العميل"] ||
@@ -150,18 +150,18 @@ exports.commitImport = functions.https.onCall(async (data, context) => {
             "").trim();
         const branchId = matchedUser?.branchId || defaultBranch?.branchId || "BR-01";
         // 4. Resolve Rep
-        const repNameCol = mapping["repName"] || "RepName";
-        const repName = String(row[repNameCol] ||
+        const repNameCol = mapping["userName"] || "RepName";
+        const userName = String(row[repNameCol] ||
             row["RepName"] ||
             row["اسم المندوب"] ||
             row["المندوب"] ||
-            matchedUser?.repNameAr ||
+            matchedUser?.userNameAr ||
             "").trim();
-        const repNoCol = mapping["repNo"] || "RepNo";
-        const repNo = String(row[repNoCol] ||
+        const repNoCol = mapping["userNo"] || "RepNo";
+        const userNo = String(row[repNoCol] ||
             row["RepNo"] ||
             row["رقم المندوب"] ||
-            matchedUser?.repNo ||
+            matchedUser?.userNo ||
             (regionVal ? `REP-${regionVal}` : "")).trim();
         // 5. Build dynamic field values and rawData for this record
         const rowRawData = { ...row };
@@ -174,10 +174,10 @@ exports.commitImport = functions.https.onCall(async (data, context) => {
             }
             if (val === undefined &&
                 (f.fieldKey === "customer_no" || f.fieldKey === "cust_no"))
-                val = customerNo;
+                val = targetId;
             if (val === undefined &&
                 (f.fieldKey === "customer_name" || f.fieldKey === "cust_name"))
-                val = customerName;
+                val = targetName;
             if (val === undefined &&
                 (f.fieldKey === "branch_name" || f.fieldKey === "branch"))
                 val = branchName;
@@ -202,17 +202,13 @@ exports.commitImport = functions.https.onCall(async (data, context) => {
             assignmentId: regionVal ? `ASG-${regionVal}-${requestId}` : "UNASSIGNED",
             assignedUserId: matchedUser ? matchedUser.userId : "UNASSIGNED",
             assignedRegionNo: regionVal || "UNASSIGNED",
-            customerNo,
-            customerName,
+            targetId,
+            targetName,
             branchId,
             branchName,
             regionNo: regionVal || "UNASSIGNED",
-            repNo,
-            repName,
-            inventoryValue: Number(rowResponses["debit_balance"] ||
-                rowResponses["inventory_value"] ||
-                row[mapping["inventoryValue"]] ||
-                0) || 0,
+            userNo,
+            userName,
             area: String(row[mapping["area"]] ||
                 row["Area"] ||
                 row["المنطقة"] ||

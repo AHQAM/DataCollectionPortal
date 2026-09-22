@@ -128,9 +128,9 @@ export interface User {
   username: string; // Region number (e.g., '101') or 'ADMIN'
   regionNo: string;
   allowedRegionNos: string[];
-  repNo: string;
-  repNameAr: string;
-  repNameEn?: string;
+  userNo: string;
+  userNameAr: string;
+  userNameEn?: string;
   email?: string;
   mobile?: string;
   mobileNo?: string;
@@ -210,6 +210,8 @@ export interface RequestItem {
   targetBranches?: string[];
   targetRegions?: string[];
   activityId?: string;
+  targetEntityLabelAr?: string;
+  targetEntityLabelEn?: string;
 }
 
 export interface RequestTemplate {
@@ -254,15 +256,14 @@ export interface RecordItem {
   assignmentId: string;
   assignedUserId: string;
   assignedRegionNo: string;
-  customerNo: string;
-  customerName: string;
+  targetId?: string;
+  targetName?: string;
   branchId: string;
   branchName: string;
   regionNo: string;
-  repNo: string;
-  repName: string;
+  userNo: string;
+  userName: string;
   area?: string;
-  inventoryValue?: number;
   rawData: Record<string, any>;
   recordStatus: RecordStatus;
   completionPercent: number;
@@ -343,8 +344,8 @@ export interface NotificationItem {
 export interface DeviceBinding {
   bindingId: string;
   userId: string;
-  repNameAr: string;
-  repName?: string;
+  userNameAr: string;
+  userName?: string;
   regionNo: string;
   deviceIdHash: string;
   devicePlatform: "Android" | "iOS" | "Web";
@@ -369,7 +370,7 @@ export interface PasswordResetRequest {
   resetRequestId: string;
   userId: string;
   regionNo: string;
-  repNameAr?: string;
+  userNameAr?: string;
   requestNotes?: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   requestedAt: string;

@@ -29,7 +29,7 @@ export const AdminDeviceManager: React.FC = () => {
     if (statusFilter !== "ALL" && b.status !== statusFilter) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchName = b.repNameAr.toLowerCase().includes(q);
+      const matchName = b.userNameAr.toLowerCase().includes(q);
       const matchReg = b.regionNo.includes(q);
       const matchDevice = (b.deviceLabel || "").toLowerCase().includes(q);
       const matchUuid = (b.deviceIdHash || "").toLowerCase().includes(q);
@@ -47,13 +47,13 @@ export const AdminDeviceManager: React.FC = () => {
             <Smartphone className="w-5 h-5 text-purple-700" />
             <span>
               {lang === "ar"
-                ? "مركز أمان وربط أجهزة المناديب"
-                : "Device Binding & Security Center"}
+                ? "مركز أمان وربط أجهزة المستخدمين"
+                : "User Device Binding & Security"}
             </span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             {lang === "ar"
-              ? "تأمين تسجيل الدخول وحصر كل مندوب على هاتف ذكي معتمد برقم UUID فريد"
+              ? "تأمين تسجيل الدخول وحصر كل مستخدم على هاتف ذكي معتمد برقم UUID فريد"
               : "Enforce single-device binding and approve phone replacements with UUID validation"}
           </p>
         </div>
@@ -75,8 +75,8 @@ export const AdminDeviceManager: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={
               lang === "ar"
-                ? "بحث باسم المندوب، طراز الهاتف، UUID..."
-                : "Search by rep, model, UUID..."
+                ? "بحث باسم المستخدم، طراز الهاتف، UUID..."
+                : "Search by user, model, UUID..."
             }
             className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
@@ -120,7 +120,7 @@ export const AdminDeviceManager: React.FC = () => {
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "المندوب والمنطقة" : "Representative"}
+                  {lang === "ar" ? "المستخدم والمنطقة" : "User & Region"}
                 </th>
                 <th className="px-4 py-3 text-start">
                   {lang === "ar" ? "طراز الهاتف والنظام" : "Device & OS"}
@@ -157,7 +157,7 @@ export const AdminDeviceManager: React.FC = () => {
                     >
                       <td className="px-4 py-3.5">
                         <div className="font-extrabold text-slate-900">
-                          {b.repNameAr}
+                          {b.userNameAr}
                         </div>
                         <div className="text-[10px] text-purple-700 font-mono font-bold">
                           المنطقة #{b.regionNo}

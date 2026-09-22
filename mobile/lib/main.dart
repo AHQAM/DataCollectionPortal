@@ -203,7 +203,7 @@ class _SalesCollectionAppState extends ConsumerState<SalesCollectionApp> {
     final fcmService = ref.watch(fcmServiceProvider);
 
     return MaterialApp.router(
-      title: 'Sales Collection Hub',
+      title: 'Field Data Collection Hub',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
 

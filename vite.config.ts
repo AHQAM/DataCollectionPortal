@@ -14,10 +14,10 @@ export default defineConfig(() => {
         includeAssets: ["favicon.ico", "apple-touch-icon.png", "icon.svg"],
         manifest: {
           id: "/",
-          name: "منصة جمع بيانات المبيعات | Sales Collection Hub",
-          short_name: "جمع المبيعات",
+          name: "منصة جمع البيانات الميدانية | Field Data Collection Hub",
+          short_name: "جمع البيانات",
           description:
-            "تطبيق المندوب الميداني لجمع بيانات المبيعات ومتابعة العملاء وتعبئة النماذج",
+            "تطبيق جمع البيانات الميدانية واستطلاع السجلات والجهات المستهدفة وتعبئة النماذج",
           theme_color: "#3b0764",
           background_color: "#f8fafc",
           display: "standalone",

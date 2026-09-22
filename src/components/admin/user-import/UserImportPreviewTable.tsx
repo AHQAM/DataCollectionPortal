@@ -31,8 +31,8 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
           <Users className="w-4 h-4 text-purple-700" />
           <span>
             {lang === "ar"
-              ? `تمت معالجة ${totalRawRows} صفاً في الملف ➔ ${parsedRows.length} حساب مندوب معتمد`
-              : `${totalRawRows} rows in file ➔ ${parsedRows.length} distinct reps`}
+              ? `تمت معالجة ${totalRawRows} صفاً في الملف ➔ ${parsedRows.length} حساب مستخدم معتمد`
+              : `${totalRawRows} rows in file ➔ ${parsedRows.length} distinct users`}
           </span>
         </div>
 
@@ -40,11 +40,11 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
           {multiRegionCount > 0 && (
             <span className="px-2 py-0.5 rounded-md bg-purple-100 text-purple-900 border border-purple-200">
               {multiRegionCount}{" "}
-              {lang === "ar" ? "مندوب متعدد المناطق" : "Multi-Region Reps"}
+              {lang === "ar" ? "مستخدم متعدد المناطق" : "Multi-Region Users"}
             </span>
           )}
           <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
-            {newCount} {lang === "ar" ? "مندوب جديد" : "New Reps"}
+            {newCount} {lang === "ar" ? "مستخدم جديد" : "New Users"}
           </span>
           {existingCount > 0 && (
             <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800">
@@ -60,10 +60,10 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
             <tr>
               <th className="px-3 py-2.5 text-start w-10">#</th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "رقم المندوب (المعرف)" : "Rep ID"}
+                {lang === "ar" ? "رقم المستخدم (المعرف)" : "User ID"}
               </th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "اسم المندوب" : "Rep Name"}
+                {lang === "ar" ? "اسم المستخدم" : "User Name"}
               </th>
               <th className="px-3 py-2.5 text-start">
                 {lang === "ar" ? "المناطق المصرحة" : "Assigned Regions"}
@@ -93,12 +93,12 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
 
                 <td className="px-3 py-2">
                   <span className="font-mono font-extrabold text-xs bg-purple-100 text-purple-900 px-2 py-0.5 rounded-lg border border-purple-200">
-                    #{row.repNo || "---"}
+                    #{row.userNo || "---"}
                   </span>
                 </td>
 
                 <td className="px-3 py-2 font-bold text-slate-900">
-                  {row.repName || (
+                  {row.userName || (
                     <span className="text-rose-600 font-normal">اسم مفقود</span>
                   )}
                 </td>

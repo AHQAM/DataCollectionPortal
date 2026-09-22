@@ -6,9 +6,9 @@ interface AddSupervisorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: {
-    repNameAr: string;
-    repNameEn: string;
-    repNo: string;
+    userNameAr: string;
+    userNameEn: string;
+    userNo: string;
     branchId: string;
     mobile: string;
   }) => void;
@@ -36,9 +36,9 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      repNameAr: newSupNameAr,
-      repNameEn: newSupNameEn,
-      repNo: newSupNo,
+      userNameAr: newSupNameAr,
+      userNameEn: newSupNameEn,
+      userNo: newSupNo,
       branchId: newSupBranchId || branches[0]?.branchId || "",
       mobile: newSupMobile,
     });

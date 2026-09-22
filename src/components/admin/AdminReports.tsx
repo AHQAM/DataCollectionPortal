@@ -43,10 +43,10 @@ export const AdminReports: React.FC = () => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchCustomer =
-        r.customerName?.toLowerCase().includes(q) ||
-        r.customerNo?.toLowerCase().includes(q);
+        r.targetName?.toLowerCase().includes(q) ||
+        r.targetId?.toLowerCase().includes(q);
       const matchRep =
-        r.repName?.toLowerCase().includes(q) ||
+        r.userName?.toLowerCase().includes(q) ||
         r.assignedRegionNo?.toLowerCase().includes(q);
       if (!matchCustomer && !matchRep) return false;
     }
@@ -119,10 +119,10 @@ export const AdminReports: React.FC = () => {
         "رمز الطلب / Code": currentRequest?.requestCode || "",
         "اسم الحملة / Campaign": currentRequest?.titleAr || "",
         "رقم المنطقة / Region": r.assignedRegionNo || r.regionNo || "",
-        "المندوب / Rep": r.repName || "",
+        "المستخدم / User": r.userName || "",
         "الفرع / Branch": r.branchName || "",
-        "رقم العميل / Customer No": r.customerNo || "",
-        "اسم العميل / Customer Name": r.customerName || "",
+        "معرف السجل / Record ID": r.targetId || "",
+        "اسم الجهة المستهدفة / Target Entity": r.targetName || "",
         "الحالة / Status": r.recordStatus || "",
         "تاريخ التحديث / Updated":
           r.submittedAt || r.updatedAt
@@ -156,10 +156,10 @@ export const AdminReports: React.FC = () => {
       const row: Record<string, any> = {
         RequestCode: currentRequest?.requestCode || "",
         RegionNo: r.assignedRegionNo || r.regionNo || "",
-        RepName: r.repName || "",
+        RepName: r.userName || "",
         BranchName: r.branchName || "",
-        CustomerNo: r.customerNo || "",
-        CustomerName: r.customerName || "",
+        CustomerNo: r.targetId || "",
+        CustomerName: r.targetName || "",
         Status: r.recordStatus || "",
         UpdatedAt: r.submittedAt || r.updatedAt || "",
       };
