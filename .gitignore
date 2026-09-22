@@ -12,6 +12,7 @@ logcat.txt
 firebase/public/assets/
 firebase/public/sw.js
 firebase/public/workbox-*.js
+firebase/functions/lib/
 
 # Flutter / Dart
 .dart_tool/

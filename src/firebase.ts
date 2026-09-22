@@ -36,31 +36,33 @@ if (typeof window !== "undefined" && firebaseConfig.apiKey) {
     import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY ||
     import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY;
   if (recaptchaKey) {
-    if (import.meta.env.DEV) {
-      // Allow debug token for development and staging tests
-      // @ts-ignore
-      self.FIREBASE_APPCHECK_DEBUG_TOKEN =
-        import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
-    }
-    try {
-      const {
-        initializeAppCheck,
-        ReCaptchaEnterpriseProvider,
-        ReCaptchaV3Provider,
-      } = await import("firebase/app-check");
+    (async () => {
+      if (import.meta.env.DEV) {
+        // Allow debug token for development and staging tests
+        // @ts-ignore
+        self.FIREBASE_APPCHECK_DEBUG_TOKEN =
+          import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
+      }
+      try {
+        const {
+          initializeAppCheck,
+          ReCaptchaEnterpriseProvider,
+          ReCaptchaV3Provider,
+        } = await import("firebase/app-check");
 
-      const isV3 = import.meta.env.VITE_RECAPTCHA_PROVIDER === "v3";
-      const provider = isV3
-        ? new ReCaptchaV3Provider(recaptchaKey)
-        : new ReCaptchaEnterpriseProvider(recaptchaKey);
+        const isV3 = import.meta.env.VITE_RECAPTCHA_PROVIDER === "v3";
+        const provider = isV3
+          ? new ReCaptchaV3Provider(recaptchaKey)
+          : new ReCaptchaEnterpriseProvider(recaptchaKey);
 
-      initializeAppCheck(app, {
-        provider,
-        isTokenAutoRefreshEnabled: true,
-      });
-    } catch (e) {
-      console.warn("Firebase App Check initialization failed:", e);
-    }
+        initializeAppCheck(app, {
+          provider,
+          isTokenAutoRefreshEnabled: true,
+        });
+      } catch (e) {
+        console.warn("Firebase App Check initialization failed:", e);
+      }
+    })();
   }
 }
 
