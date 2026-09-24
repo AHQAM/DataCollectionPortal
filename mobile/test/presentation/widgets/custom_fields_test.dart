@@ -189,11 +189,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         createTestApp(
-          LocationFormField(
-            field: field,
-            isArabic: true,
-            onChanged: (_) {},
-          ),
+          LocationFormField(field: field, isArabic: true, onChanged: (_) {}),
         ),
       );
 
@@ -202,4 +198,3 @@ void main() {
     });
   });
 }
-
