@@ -127,4 +127,57 @@ describe("useFirestoreSync Hook", () => {
       rec1: { q1: "yes" },
     });
   });
+
+  it("processes deviceBindings and passwordResetRequests for ADMIN", () => {
+    useAuthStore.setState({
+      currentUser: { userId: "admin1", role: "ADMIN" } as any,
+    });
+
+    const callbacks: Record<string, Function> = {};
+    const errorCallbacks: Record<string, Function> = {};
+
+    (onSnapshot as any).mockImplementation(
+      (queryRef: string, callback: Function, errorCb?: Function) => {
+        callbacks[queryRef] = callback;
+        if (errorCb) errorCallbacks[queryRef] = errorCb;
+        return vi.fn();
+      },
+    );
+
+    renderHook(() => useFirestoreSync());
+
+    // Trigger deviceBindings callback
+    expect(callbacks["deviceBindings"]).toBeDefined();
+    const mockBinding = {
+      id: "b1",
+      data: () => ({ bindingId: "bind1", userId: "u1", deviceId: "dev1" }),
+    };
+    callbacks["deviceBindings"]({
+      forEach: (cb: any) => [mockBinding].forEach(cb),
+    });
+    expect(useDataStore.getState().deviceBindings).toEqual([
+      { bindingId: "bind1", userId: "u1", deviceId: "dev1" },
+    ]);
+
+    // Trigger passwordResetRequests callback
+    expect(callbacks["passwordResetRequests"]).toBeDefined();
+    const mockReset = {
+      id: "r1",
+      data: () => ({ requestId: "rst1", userId: "u1", status: "PENDING" }),
+    };
+    callbacks["passwordResetRequests"]({
+      forEach: (cb: any) => [mockReset].forEach(cb),
+    });
+    expect(useDataStore.getState().passwordResetRequests).toEqual([
+      { requestId: "rst1", userId: "u1", status: "PENDING" },
+    ]);
+
+    // Error callbacks should log error without throwing
+    const spyError = vi.spyOn(console, "error").mockImplementation(() => {});
+    if (errorCallbacks["deviceBindings"]) {
+      errorCallbacks["deviceBindings"](new Error("Permission denied"));
+      expect(spyError).toHaveBeenCalled();
+    }
+    spyError.mockRestore();
+  });
 });

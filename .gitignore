@@ -2,6 +2,9 @@ node_modules/
 build/
 dist/
 coverage/
+playwright-report/
+test-results/
+lighthouse*.json
 .DS_Store
 *.log
 .env*
@@ -20,3 +23,7 @@ mobile/.dart_tool/
 mobile/build/
 mobile/.flutter-plugins
 mobile/.flutter-plugins-dependencies
+
+# Firebase CLI cache
+.firebase/
+firebase/.firebase/

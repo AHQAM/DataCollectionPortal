@@ -133,3 +133,72 @@ export const createAdminSupervisorUser = functions.https.onCall(
     }
   },
 );
+
+/**
+ * Cloud Function: auditPrivilegedUsers
+ *
+ * Scans all users with elevated privileges (ADMIN, SUPERVISOR)
+ * to verify alignment between Auth Custom Claims and Firestore user documents,
+ * detecting any privilege creep or unauthorized role accumulation.
+ */
+export const auditPrivilegedUsers = functions.https.onCall(
+  async (data, context) => {
+    verifyAppCheck(context);
+
+    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "صلاحية المسؤول مطلوبة لإجراء تدقيق الصلاحيات. | Admin permission required.",
+      );
+    }
+
+    const privilegedSnapshot = await db
+      .collection("users")
+      .where("role", "in", [USER_ROLES.ADMIN, USER_ROLES.SUPERVISOR])
+      .get();
+
+    const auditResults: any[] = [];
+
+    for (const doc of privilegedSnapshot.docs) {
+      const userData = doc.data();
+      let authUser: admin.auth.UserRecord | null = null;
+      let hasClaimMismatch = false;
+
+      try {
+        authUser = await admin.auth().getUser(doc.id);
+        const tokenRole = authUser.customClaims?.role;
+        hasClaimMismatch = tokenRole !== userData.role;
+      } catch {
+        // User exists in Firestore but not in Auth, or vice versa
+      }
+
+      auditResults.push({
+        userId: doc.id,
+        userNameAr: userData.userNameAr,
+        email: userData.username || userData.email,
+        role: userData.role,
+        branchId: userData.branchId,
+        customClaimRole: authUser?.customClaims?.role || null,
+        hasClaimMismatch,
+        isActive: userData.isActive,
+        lastSignInTime: authUser?.metadata.lastSignInTime || null,
+        creationTime: authUser?.metadata.creationTime || null,
+      });
+    }
+
+    await logAuditSafe({
+      userId: context.auth.uid,
+      userRole: context.auth.token.role,
+      action: "IAM_PRIVILEGE_AUDIT_EXECUTED",
+      entityType: "IAM",
+      entityId: "SECURITY_AUDIT",
+      details: { auditedCount: auditResults.length },
+    });
+
+    return {
+      success: true,
+      auditedAt: new Date().toISOString(),
+      privilegedUsers: auditResults,
+    };
+  },
+);

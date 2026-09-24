@@ -81,12 +81,20 @@ class MonitoringService {
     }
 
     // If Sentry SDK is loaded on window (e.g. via script or future package), forward to it
-    const win = typeof window !== "undefined" ? (window as any) : null;
-    if (
-      win &&
-      win.Sentry &&
-      typeof win.Sentry.captureException === "function"
-    ) {
+    interface SentryWindowClient {
+      captureException?: (
+        err: unknown,
+        context?: { extra?: Record<string, unknown> },
+      ) => void;
+    }
+    const win =
+      typeof window !== "undefined"
+        ? (window as Window & {
+            Sentry?: SentryWindowClient;
+            dataLayer?: unknown[];
+          })
+        : null;
+    if (win?.Sentry && typeof win.Sentry.captureException === "function") {
       try {
         win.Sentry.captureException(errObj, { extra: context });
       } catch (e) {

@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "landsurvey-ebb3b"
+    "default": "landsurvey-ebb3b",
+    "production": "landsurvey-ebb3b",
+    "staging": "datacollectionportal-staging"
   }
 }

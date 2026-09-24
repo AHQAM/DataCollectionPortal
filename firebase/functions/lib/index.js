@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSystemHealth = exports.wipeDemoData = exports.saveDraftResponse = exports.submitResponse = exports.exportReport = exports.sendBroadcastNotification = exports.exportDataToExternalSystem = exports.commitImport = exports.importDataPreview = exports.reassignRecords = exports.saveRequestFields = exports.deleteRequest = exports.cloneRequest = exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = exports.importBranchesAndRegions = exports.deleteRegion = exports.updateRegion = exports.createRegion = exports.deleteBranch = exports.updateBranch = exports.createBranch = exports.forceLogoutUser = exports.rejectDeviceReplacement = exports.replaceDevice = exports.releaseDeviceBinding = exports.releaseDevice = exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = exports.createAdminSupervisorUser = exports.authenticateWithRegionPassword = void 0;
+exports.getSystemHealth = exports.wipeDemoData = exports.saveDraftResponse = exports.submitResponse = exports.exportReport = exports.sendBroadcastNotification = exports.exportDataToExternalSystem = exports.commitImport = exports.importDataPreview = exports.reassignRecords = exports.saveRequestFields = exports.deleteRequest = exports.cloneRequest = exports.reopenRequest = exports.archiveRequest = exports.closeRequest = exports.publishRequest = exports.updateDraftRequest = exports.createRequest = exports.importBranchesAndRegions = exports.deleteRegion = exports.updateRegion = exports.createRegion = exports.deleteBranch = exports.updateBranch = exports.createBranch = exports.forceLogoutUser = exports.rejectDeviceReplacement = exports.replaceDevice = exports.releaseDeviceBinding = exports.releaseDevice = exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = exports.auditPrivilegedUsers = exports.createAdminSupervisorUser = exports.authenticateWithRegionPassword = void 0;
 const admin = __importStar(require("firebase-admin"));
 admin.initializeApp();
 // Authentication
@@ -41,6 +41,7 @@ var auth_1 = require("./auth");
 Object.defineProperty(exports, "authenticateWithRegionPassword", { enumerable: true, get: function () { return auth_1.authenticateWithRegionPassword; } });
 var adminAuth_1 = require("./adminAuth");
 Object.defineProperty(exports, "createAdminSupervisorUser", { enumerable: true, get: function () { return adminAuth_1.createAdminSupervisorUser; } });
+Object.defineProperty(exports, "auditPrivilegedUsers", { enumerable: true, get: function () { return adminAuth_1.auditPrivilegedUsers; } });
 // Password Management
 var passwordManagement_1 = require("./passwordManagement");
 Object.defineProperty(exports, "changePassword", { enumerable: true, get: function () { return passwordManagement_1.changePassword; } });

@@ -43,6 +43,12 @@ jobs:
           VITE_RECAPTCHA_V3_SITE_KEY: ${{ secrets.VITE_RECAPTCHA_V3_SITE_KEY }}
           VITE_APP_VERSION: "1.0.0"
 
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E Smoke Tests
+        run: npm run test:e2e
+
       - name: Build
         run: npm run build
         env:

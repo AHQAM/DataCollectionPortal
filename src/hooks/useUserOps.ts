@@ -13,7 +13,7 @@ export const useUserOps = () => {
       const prevUser = dataStore.users.find((u) => u.userId === user.userId);
       dataStore.updateUserLocal(user);
       try {
-        await userApi.updateUser(user.userId, {
+        const res = await userApi.updateUser(user.userId, {
           userNameAr: user.userNameAr,
           userNameEn: user.userNameEn,
           email: user.email,
@@ -26,6 +26,11 @@ export const useUserOps = () => {
           isActive: user.isActive,
           maxAllowedDevices: user.maxAllowedDevices,
         });
+
+        if (res?.success === false) {
+          throw new Error("Failed to update user on server");
+        }
+
         logAudit("USER_UPDATED", "User", user.userId, {
           role: user.role,
           active: user.isActive,
@@ -102,7 +107,10 @@ export const useUserOps = () => {
 
     deactivateUser: async (userId: string) => {
       try {
-        await userApi.deactivateUser(userId);
+        const res = await userApi.deactivateUser(userId);
+        if (res?.success === false) {
+          throw new Error("Failed to deactivate user");
+        }
         logAudit("USER_DEACTIVATED_CF", "User", userId, {});
         return { success: true };
       } catch (err: any) {
