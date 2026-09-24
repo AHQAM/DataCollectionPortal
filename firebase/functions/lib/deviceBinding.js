@@ -35,8 +35,8 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.rejectDeviceReplacement = exports.forceLogoutUser = exports.replaceDevice = exports.releaseDevice = void 0;
 const db_1 = require("./config/db");
-const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const gen2_1 = require("./config/gen2");
 const auditLogger_1 = require("./auditLogger");
 const roles_1 = require("./roles");
 /**
@@ -46,23 +46,23 @@ const roles_1 = require("./roles");
  * Revokes Firebase refresh tokens and disables old FCM token.
  * Next successful login will bind the new device.
  */
-exports.releaseDevice = functions.https.onCall(async (data, context) => {
+exports.releaseDevice = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Only administrators can release devices.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Only administrators can release devices.");
     }
-    const { targetUserId, reason } = data;
+    const { targetUserId, reason } = data || {};
     if (!targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | Missing targetUserId.");
+        throw new gen2_1.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | Missing targetUserId.");
     }
     try {
         const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
-            throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
+            throw new gen2_1.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
         }
         const userData = userDoc.data();
         if (userData.deviceBindingStatus !== "BOUND") {
-            throw new functions.https.HttpsError("failed-precondition", "الحساب غير مرتبط بجهاز حالياً. | User account does not have an active bound device.");
+            throw new gen2_1.HttpsError("failed-precondition", "الحساب غير مرتبط بجهاز حالياً. | User account does not have an active bound device.");
         }
         // Release device on user record
         await userRef.update({
@@ -118,11 +118,11 @@ exports.releaseDevice = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Release device error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 /**
@@ -131,19 +131,19 @@ exports.releaseDevice = functions.https.onCall(async (data, context) => {
  * Admin-only: Marks current device for replacement.
  * The next login from any device will be accepted and bound.
  */
-exports.replaceDevice = functions.https.onCall(async (data, context) => {
+exports.replaceDevice = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { targetUserId, reason } = data;
     if (!targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
+        throw new gen2_1.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
     try {
         const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
-            throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
+            throw new gen2_1.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
         }
         // Set status to UNBOUND — next login binds new device
         await userRef.update({
@@ -194,11 +194,11 @@ exports.replaceDevice = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Replace device error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 /**
@@ -207,13 +207,13 @@ exports.replaceDevice = functions.https.onCall(async (data, context) => {
  * Admin-only: Revokes a user's Firebase refresh tokens,
  * forcing them to re-authenticate on next app launch.
  */
-exports.forceLogoutUser = functions.https.onCall(async (data, context) => {
+exports.forceLogoutUser = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { targetUserId, reason } = data;
     if (!targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
+        throw new gen2_1.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
     try {
         // Revoke all refresh tokens
@@ -256,11 +256,11 @@ exports.forceLogoutUser = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Force logout error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 /**
@@ -268,13 +268,13 @@ exports.forceLogoutUser = functions.https.onCall(async (data, context) => {
  *
  * Admin-only: Rejects a pending device replacement request.
  */
-exports.rejectDeviceReplacement = functions.https.onCall(async (data, context) => {
+exports.rejectDeviceReplacement = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { bindingId, targetUserId, reason } = data || {};
     if (!bindingId && !targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف الربط أو معرف المستخدم مطلوب. | bindingId or targetUserId required.");
+        throw new gen2_1.HttpsError("invalid-argument", "معرف الربط أو معرف المستخدم مطلوب. | bindingId or targetUserId required.");
     }
     try {
         let targetDoc = null;
@@ -320,10 +320,10 @@ exports.rejectDeviceReplacement = functions.https.onCall(async (data, context) =
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError)
+        if (error instanceof gen2_1.HttpsError)
             throw error;
         console.error("Reject device replacement error:", error);
-        throw new functions.https.HttpsError("internal", "Internal server error.");
+        throw new gen2_1.HttpsError("internal", "Internal server error.");
     }
 });
 //# sourceMappingURL=deviceBinding.js.map

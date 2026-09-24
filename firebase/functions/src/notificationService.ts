@@ -1,6 +1,6 @@
 import { db } from "./config/db";
 import { USER_ROLES } from "./roles";
-import * as functions from "firebase-functions";
+import { onCallGen2, HttpsError } from "./config/gen2";
 import * as admin from "firebase-admin";
 
 // Internal helper for pushing FCM notifications and saving to Firestore
@@ -118,23 +118,24 @@ export const sendNotificationInternal = async (
 };
 
 // Callable for Admin to send manual broadcast
-export const sendBroadcastNotification = functions.https.onCall(
+export const sendBroadcastNotification = onCallGen2(
   async (data, context) => {
     if (
       !context.auth ||
       (context.auth.token.role !== USER_ROLES.ADMIN &&
         context.auth.token.role !== USER_ROLES.SUPERVISOR)
     ) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "permission-denied",
         "Only admins or supervisors can send broadcasts.",
       );
     }
 
-    const { targetAudience, titleAr, titleEn, bodyAr, bodyEn, payload } = data;
+    const { targetAudience, titleAr, titleEn, bodyAr, bodyEn, payload } =
+      data || {};
 
     if (!titleAr || !titleEn || !bodyAr || !bodyEn) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "Missing title or body.",
       );

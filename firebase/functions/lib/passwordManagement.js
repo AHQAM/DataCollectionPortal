@@ -35,8 +35,8 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.adminUnlockAccount = exports.adminResetPassword = exports.requestPasswordReset = exports.changePassword = void 0;
 const db_1 = require("./config/db");
-const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const gen2_1 = require("./config/gen2");
 const auditLogger_1 = require("./auditLogger");
 const roles_1 = require("./roles");
 const auth_1 = require("./auth");
@@ -48,27 +48,27 @@ const auth_1 = require("./auth");
  * prevents reuse of immediately previous password, and
  * sets mustChangePassword to false.
  */
-exports.changePassword = functions.https.onCall(async (data, context) => {
+exports.changePassword = (0, gen2_1.onCallGen2)(async (data, context) => {
     // Must be authenticated
     if (!context.auth) {
-        throw new functions.https.HttpsError("unauthenticated", "يجب تسجيل الدخول أولاً. | Authentication required.");
+        throw new gen2_1.HttpsError("unauthenticated", "يجب تسجيل الدخول أولاً. | Authentication required.");
     }
     const { currentPassword, newPassword } = data;
     if (!currentPassword || !newPassword) {
-        throw new functions.https.HttpsError("invalid-argument", "كلمة المرور الحالية والجديدة مطلوبة. | Current and new password are required.");
+        throw new gen2_1.HttpsError("invalid-argument", "كلمة المرور الحالية والجديدة مطلوبة. | Current and new password are required.");
     }
     if (typeof newPassword !== "string" || newPassword.length < 6) {
-        throw new functions.https.HttpsError("invalid-argument", "كلمة المرور يجب أن تكون 6 أحرف على الأقل. | Password must be at least 6 characters.");
+        throw new gen2_1.HttpsError("invalid-argument", "كلمة المرور يجب أن تكون 6 أحرف على الأقل. | Password must be at least 6 characters.");
     }
     if (newPassword.length > 128) {
-        throw new functions.https.HttpsError("invalid-argument", "كلمة المرور طويلة جداً. | Password is too long.");
+        throw new gen2_1.HttpsError("invalid-argument", "كلمة المرور طويلة جداً. | Password is too long.");
     }
     const userId = context.auth.uid;
     try {
         const userRef = db_1.db.collection("users").doc(userId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
-            throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
+            throw new gen2_1.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
         }
         const userData = userDoc.data();
         // Verify current password
@@ -81,12 +81,12 @@ exports.changePassword = functions.https.onCall(async (data, context) => {
                 entityType: "AUTH",
                 entityId: userId,
             });
-            throw new functions.https.HttpsError("unauthenticated", "كلمة المرور الحالية غير صحيحة. | Current password is incorrect.");
+            throw new gen2_1.HttpsError("unauthenticated", "كلمة المرور الحالية غير صحيحة. | Current password is incorrect.");
         }
         // Prevent reuse of current password
         const isSameAsCurrent = await (0, auth_1.verifyPassword)(newPassword, userData.passwordHash);
         if (isSameAsCurrent) {
-            throw new functions.https.HttpsError("invalid-argument", "لا يمكن استخدام نفس كلمة المرور الحالية. | Cannot reuse current password.");
+            throw new gen2_1.HttpsError("invalid-argument", "لا يمكن استخدام نفس كلمة المرور الحالية. | Cannot reuse current password.");
         }
         // Hash new password
         const newHash = await (0, auth_1.hashPassword)(newPassword);
@@ -123,11 +123,11 @@ exports.changePassword = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Change password error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 /**
@@ -136,10 +136,10 @@ exports.changePassword = functions.https.onCall(async (data, context) => {
  * Allows a representative to submit a password reset request
  * from the login screen. Admin will review and action it.
  */
-exports.requestPasswordReset = functions.https.onCall(async (data, _context) => {
+exports.requestPasswordReset = (0, gen2_1.onCallGen2)(async (data, _context) => {
     const { regionNo, notes, mobile } = data;
     if (!regionNo) {
-        throw new functions.https.HttpsError("invalid-argument", "رقم المنطقة مطلوب. | Region number is required.");
+        throw new gen2_1.HttpsError("invalid-argument", "رقم المنطقة مطلوب. | Region number is required.");
     }
     try {
         // Find the user (don't reveal if user exists via error message)
@@ -184,11 +184,11 @@ exports.requestPasswordReset = functions.https.onCall(async (data, _context) => 
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Password reset request error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 /**
@@ -198,26 +198,26 @@ exports.requestPasswordReset = functions.https.onCall(async (data, _context) => 
  * Resets to a caller-provided temporary password and sets mustChangePassword = true.
  * Revokes existing refresh tokens.
  */
-exports.adminResetPassword = functions.https.onCall(async (data, context) => {
+exports.adminResetPassword = (0, gen2_1.onCallGen2)(async (data, context) => {
     // Admin-only check
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { targetUserId, resetRequestId, temporaryPassword } = data;
     if (!targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
+        throw new gen2_1.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
     if (typeof temporaryPassword !== "string" ||
         temporaryPassword.length < 12 ||
         temporaryPassword.length > 128) {
-        throw new functions.https.HttpsError("invalid-argument", "كلمة المرور المؤقتة مطلوبة ويجب أن تكون 12 حرفاً على الأقل. | A temporary password of at least 12 characters is required.");
+        throw new gen2_1.HttpsError("invalid-argument", "كلمة المرور المؤقتة مطلوبة ويجب أن تكون 12 حرفاً على الأقل. | A temporary password of at least 12 characters is required.");
     }
     const adminId = context.auth.uid;
     try {
         const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
-            throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
+            throw new gen2_1.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
         }
         const userData = userDoc.data();
         const newHash = await (0, auth_1.hashPassword)(temporaryPassword);
@@ -285,11 +285,11 @@ exports.adminResetPassword = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Admin reset password error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 /**
@@ -298,19 +298,19 @@ exports.adminResetPassword = functions.https.onCall(async (data, context) => {
  * Admin-only function to unlock a locked user account.
  * Resets failed login count and clears lockout timer.
  */
-exports.adminUnlockAccount = functions.https.onCall(async (data, context) => {
+exports.adminUnlockAccount = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { targetUserId } = data;
     if (!targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
+        throw new gen2_1.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
     try {
         const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
-            throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
+            throw new gen2_1.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
         }
         await userRef.update({
             failedLoginCount: 0,
@@ -331,11 +331,11 @@ exports.adminUnlockAccount = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Unlock account error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 //# sourceMappingURL=passwordManagement.js.map

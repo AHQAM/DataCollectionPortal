@@ -1,16 +1,16 @@
 import { db } from "./config/db";
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError } from "./config/gen2";
 import { USER_ROLES } from "./roles";
 import { logAuditSafe } from "./auditLogger";
 
-export const exportReport = functions.https.onCall(async (data, context) => {
+export const exportReport = onCallGen2(async (data, context) => {
   if (
     !context.auth ||
     (context.auth.token.role !== USER_ROLES.ADMIN &&
       context.auth.token.role !== USER_ROLES.SUPERVISOR)
   ) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "Only admins or supervisors can export reports.",
     );
@@ -18,21 +18,21 @@ export const exportReport = functions.https.onCall(async (data, context) => {
 
   const callerRole = context.auth.token.role;
   const callerBranchId = context.auth.token.branchId;
-  const { requestId, branchId, status } = data;
+  const { requestId, branchId, status } = data || {};
   if (
     callerRole === USER_ROLES.SUPERVISOR &&
     branchId &&
     branchId !== "ALL" &&
     branchId !== callerBranchId
   ) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "Branch is outside your scope.",
     );
   }
 
   if (!requestId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Missing requestId.",
     );

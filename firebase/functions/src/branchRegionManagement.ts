@@ -1,14 +1,14 @@
 import { db as firestoreDb } from "./config/db";
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError, CallableContextCompat } from "./config/gen2";
 import { logAuditSafe } from "./auditLogger";
 import { USER_ROLES } from "./roles";
 
 const db = () => firestoreDb;
 
-const checkAdmin = (context: functions.https.CallableContext) => {
+const checkAdmin = (context: CallableContextCompat) => {
   if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "صلاحية المسؤول مطلوبة. | Admin permission required.",
     );
@@ -18,12 +18,12 @@ const checkAdmin = (context: functions.https.CallableContext) => {
 /**
  * createBranch
  */
-export const createBranch = functions.https.onCall(async (data, context) => {
+export const createBranch = onCallGen2(async (data, context) => {
   checkAdmin(context);
   const { branchId, branchNameAr, branchNameEn } = data || {};
 
   if (!branchId || !branchNameAr) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Missing required branch fields.",
     );
@@ -34,7 +34,7 @@ export const createBranch = functions.https.onCall(async (data, context) => {
   const existing = await branchRef.get();
 
   if (existing.exists) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "already-exists",
       "Branch ID already exists.",
     );
@@ -65,12 +65,12 @@ export const createBranch = functions.https.onCall(async (data, context) => {
 /**
  * updateBranch
  */
-export const updateBranch = functions.https.onCall(async (data, context) => {
+export const updateBranch = onCallGen2(async (data, context) => {
   checkAdmin(context);
   const { branchId, updates } = data || {};
 
   if (!branchId || !updates || typeof updates !== "object") {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Missing required branch update fields.",
     );
@@ -79,7 +79,7 @@ export const updateBranch = functions.https.onCall(async (data, context) => {
   const branchRef = db().collection("branches").doc(branchId);
   const existing = await branchRef.get();
   if (!existing.exists) {
-    throw new functions.https.HttpsError("not-found", "Branch not found.");
+    throw new HttpsError("not-found", "Branch not found.");
   }
 
   const payload: Record<string, any> = {
@@ -109,12 +109,12 @@ export const updateBranch = functions.https.onCall(async (data, context) => {
 /**
  * deleteBranch - Enforces relational integrity
  */
-export const deleteBranch = functions.https.onCall(async (data, context) => {
+export const deleteBranch = onCallGen2(async (data, context) => {
   checkAdmin(context);
   const { branchId } = data || {};
 
   if (!branchId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Branch ID required.",
     );
@@ -127,7 +127,7 @@ export const deleteBranch = functions.https.onCall(async (data, context) => {
     .limit(1)
     .get();
   if (!regionsSnap.empty) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "failed-precondition",
       "لا يمكن حذف الفرع لأنه مرتبط بمناطق حالية. | Cannot delete branch linked to existing regions.",
     );
@@ -140,7 +140,7 @@ export const deleteBranch = functions.https.onCall(async (data, context) => {
     .limit(1)
     .get();
   if (!usersSnap.empty) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "failed-precondition",
       "لا يمكن حذف الفرع لأنه مسند لمستخدمين. | Cannot delete branch assigned to users.",
     );
@@ -167,12 +167,12 @@ export const deleteBranch = functions.https.onCall(async (data, context) => {
 /**
  * createRegion
  */
-export const createRegion = functions.https.onCall(async (data, context) => {
+export const createRegion = onCallGen2(async (data, context) => {
   checkAdmin(context);
   const { regionNo, regionNameAr, regionNameEn, branchId } = data || {};
 
   if (!regionNo || !regionNameAr || !branchId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Missing required region fields.",
     );
@@ -183,7 +183,7 @@ export const createRegion = functions.https.onCall(async (data, context) => {
   const existing = await regionRef.get();
 
   if (existing.exists) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "already-exists",
       "Region number already exists.",
     );
@@ -216,12 +216,12 @@ export const createRegion = functions.https.onCall(async (data, context) => {
 /**
  * updateRegion
  */
-export const updateRegion = functions.https.onCall(async (data, context) => {
+export const updateRegion = onCallGen2(async (data, context) => {
   checkAdmin(context);
   const { regionNo, updates } = data || {};
 
   if (!regionNo || !updates || typeof updates !== "object") {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Missing required region update fields.",
     );
@@ -230,7 +230,7 @@ export const updateRegion = functions.https.onCall(async (data, context) => {
   const regionRef = db().collection("regions").doc(regionNo);
   const existing = await regionRef.get();
   if (!existing.exists) {
-    throw new functions.https.HttpsError("not-found", "Region not found.");
+    throw new HttpsError("not-found", "Region not found.");
   }
 
   const payload: Record<string, any> = {
@@ -262,12 +262,12 @@ export const updateRegion = functions.https.onCall(async (data, context) => {
 /**
  * deleteRegion - Enforces relational integrity
  */
-export const deleteRegion = functions.https.onCall(async (data, context) => {
+export const deleteRegion = onCallGen2(async (data, context) => {
   checkAdmin(context);
   const { regionNo } = data || {};
 
   if (!regionNo) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Region number required.",
     );
@@ -280,7 +280,7 @@ export const deleteRegion = functions.https.onCall(async (data, context) => {
     .limit(1)
     .get();
   if (!usersSnap.empty) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "failed-precondition",
       "لا يمكن حذف المنطقة لأنها مسندة لمندوبين. | Cannot delete region assigned to reps.",
     );
@@ -293,7 +293,7 @@ export const deleteRegion = functions.https.onCall(async (data, context) => {
     .limit(1)
     .get();
   if (!asgSnap.empty) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "failed-precondition",
       "لا يمكن حذف المنطقة لوجود إسنادات نشطة عليها. | Cannot delete region with active assignments.",
     );
@@ -319,13 +319,13 @@ export const deleteRegion = functions.https.onCall(async (data, context) => {
 /**
  * importBranchesAndRegions
  */
-export const importBranchesAndRegions = functions.https.onCall(
+export const importBranchesAndRegions = onCallGen2(
   async (data, context) => {
     checkAdmin(context);
     const { branches = [], regions = [] } = data || {};
 
     if (!Array.isArray(branches) || !Array.isArray(regions)) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "Invalid payload arrays.",
       );

@@ -36,7 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendBroadcastNotification = exports.sendNotificationInternal = void 0;
 const db_1 = require("./config/db");
 const roles_1 = require("./roles");
-const functions = __importStar(require("firebase-functions"));
+const gen2_1 = require("./config/gen2");
 const admin = __importStar(require("firebase-admin"));
 // Internal helper for pushing FCM notifications and saving to Firestore
 const sendNotificationInternal = async (userId, titleAr, titleEn, bodyAr, bodyEn, data) => {
@@ -125,15 +125,15 @@ const sendNotificationInternal = async (userId, titleAr, titleEn, bodyAr, bodyEn
 };
 exports.sendNotificationInternal = sendNotificationInternal;
 // Callable for Admin to send manual broadcast
-exports.sendBroadcastNotification = functions.https.onCall(async (data, context) => {
+exports.sendBroadcastNotification = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth ||
         (context.auth.token.role !== roles_1.USER_ROLES.ADMIN &&
             context.auth.token.role !== roles_1.USER_ROLES.SUPERVISOR)) {
-        throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can send broadcasts.");
+        throw new gen2_1.HttpsError("permission-denied", "Only admins or supervisors can send broadcasts.");
     }
-    const { targetAudience, titleAr, titleEn, bodyAr, bodyEn, payload } = data;
+    const { targetAudience, titleAr, titleEn, bodyAr, bodyEn, payload } = data || {};
     if (!titleAr || !titleEn || !bodyAr || !bodyEn) {
-        throw new functions.https.HttpsError("invalid-argument", "Missing title or body.");
+        throw new gen2_1.HttpsError("invalid-argument", "Missing title or body.");
     }
     let usersQuery = db_1.db
         .collection("users")

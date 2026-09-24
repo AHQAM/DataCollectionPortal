@@ -34,8 +34,8 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.auditPrivilegedUsers = exports.createAdminSupervisorUser = void 0;
-const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const gen2_1 = require("./config/gen2");
 const db_1 = require("./config/db");
 const crypto_1 = require("crypto");
 const auditLogger_1 = require("./auditLogger");
@@ -49,24 +49,24 @@ const appCheck_1 = require("./config/appCheck");
  * Creates the Firebase Auth account with a one-time temporary password and custom claims,
  * and creates the Firestore user document.
  */
-exports.createAdminSupervisorUser = functions.https.onCall(async (data, context) => {
+exports.createAdminSupervisorUser = (0, gen2_1.onCallGen2)(async (data, context) => {
     // 0. Verify App Check (if enabled)
     (0, appCheck_1.verifyAppCheck)(context);
     // 1. Verify Caller Authentication
     if (!context.auth) {
-        throw new functions.https.HttpsError("unauthenticated", "يجب تسجيل الدخول لإجراء هذه العملية. | Must be logged in.");
+        throw new gen2_1.HttpsError("unauthenticated", "يجب تسجيل الدخول لإجراء هذه العملية. | Must be logged in.");
     }
     // 2. Verify Caller Authorization (Must be an ADMIN)
     if (context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "ليس لديك الصلاحيات الكافية. | Insufficient permissions.");
+        throw new gen2_1.HttpsError("permission-denied", "ليس لديك الصلاحيات الكافية. | Insufficient permissions.");
     }
     const { email, role, branchId, userNameAr, userNameEn, mobileNo, allowedRegionNos, } = data;
     // 3. Validate Inputs
     if (!email || !role || !userNameAr) {
-        throw new functions.https.HttpsError("invalid-argument", "بيانات المستخدم غير مكتملة. | Missing required fields.");
+        throw new gen2_1.HttpsError("invalid-argument", "بيانات المستخدم غير مكتملة. | Missing required fields.");
     }
     if (role !== roles_1.USER_ROLES.SUPERVISOR && role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("invalid-argument", "يمكن إنشاء حسابات مشرفين ومدراء فقط عبر هذه الدالة. | Can only create Supervisor/Admin.");
+        throw new gen2_1.HttpsError("invalid-argument", "يمكن إنشاء حسابات مشرفين ومدراء فقط عبر هذه الدالة. | Can only create Supervisor/Admin.");
     }
     try {
         // 4. Create Native Firebase Auth User
@@ -122,9 +122,9 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
     catch (error) {
         console.error("Error creating user:", error);
         if (error.code === "auth/email-already-exists") {
-            throw new functions.https.HttpsError("already-exists", "البريد الإلكتروني مسجل مسبقاً. | Email already exists.");
+            throw new gen2_1.HttpsError("already-exists", "البريد الإلكتروني مسجل مسبقاً. | Email already exists.");
         }
-        throw new functions.https.HttpsError("internal", "حدث خطأ أثناء إنشاء المستخدم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ أثناء إنشاء المستخدم. | Internal server error.");
     }
 });
 /**
@@ -134,10 +134,10 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
  * to verify alignment between Auth Custom Claims and Firestore user documents,
  * detecting any privilege creep or unauthorized role accumulation.
  */
-exports.auditPrivilegedUsers = functions.https.onCall(async (data, context) => {
+exports.auditPrivilegedUsers = (0, gen2_1.onCallGen2)(async (data, context) => {
     (0, appCheck_1.verifyAppCheck)(context);
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة لإجراء تدقيق الصلاحيات. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة لإجراء تدقيق الصلاحيات. | Admin permission required.");
     }
     const privilegedSnapshot = await db_1.db
         .collection("users")

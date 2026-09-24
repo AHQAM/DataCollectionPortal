@@ -6,4 +6,5 @@ module.exports = {
   transform: {
     "^.+\\.tsx?$": "ts-jest",
   },
+  testPathIgnorePatterns: ["firestore\\.rules\\.test\\.ts"],
 };

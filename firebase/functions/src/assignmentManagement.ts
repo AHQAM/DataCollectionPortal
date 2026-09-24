@@ -1,32 +1,32 @@
 import { db } from "./config/db";
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError, CallableContextCompat } from "./config/gen2";
 import { sendNotificationInternal } from "./notificationService";
 import { USER_ROLES } from "./roles";
 
-const checkAdminOrSupervisor = (context: functions.https.CallableContext) => {
+const checkAdminOrSupervisor = (context: CallableContextCompat) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "unauthenticated",
       "User must be authenticated.",
     );
   }
   const role = context.auth.token.role;
   if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "Only admins or supervisors can perform this action.",
     );
   }
 };
 
-export const reassignRecords = functions.https.onCall(async (data, context) => {
+export const reassignRecords = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
 
-  const { recordIds, newUserId } = data;
+  const { recordIds, newUserId } = data || {};
 
   if (!recordIds || !Array.isArray(recordIds) || !newUserId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "recordIds array and newUserId are required.",
     );
@@ -37,11 +37,11 @@ export const reassignRecords = functions.https.onCall(async (data, context) => {
   const userDoc = await userRef.get();
 
   if (!userDoc.exists) {
-    throw new functions.https.HttpsError("not-found", "Target user not found.");
+    throw new HttpsError("not-found", "Target user not found.");
   }
 
   if (userDoc.data()?.role !== USER_ROLES.REP) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Target user must be a representative.",
     );

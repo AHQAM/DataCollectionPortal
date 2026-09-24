@@ -1,6 +1,6 @@
 import { db } from "./config/db";
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError } from "./config/gen2";
 import { logAuditSafe } from "./auditLogger";
 import { USER_ROLES } from "./roles";
 
@@ -11,18 +11,18 @@ import { USER_ROLES } from "./roles";
  * Revokes Firebase refresh tokens and disables old FCM token.
  * Next successful login will bind the new device.
  */
-export const releaseDevice = functions.https.onCall(async (data, context) => {
+export const releaseDevice = onCallGen2(async (data, context) => {
   if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "صلاحية المسؤول مطلوبة. | Only administrators can release devices.",
     );
   }
 
-  const { targetUserId, reason } = data;
+  const { targetUserId, reason } = data || {};
 
   if (!targetUserId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "معرف المستخدم مطلوب. | Missing targetUserId.",
     );
@@ -33,7 +33,7 @@ export const releaseDevice = functions.https.onCall(async (data, context) => {
     const userDoc = await userRef.get();
 
     if (!userDoc.exists) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "not-found",
         "المستخدم غير موجود. | User not found.",
       );
@@ -42,7 +42,7 @@ export const releaseDevice = functions.https.onCall(async (data, context) => {
     const userData = userDoc.data()!;
 
     if (userData.deviceBindingStatus !== "BOUND") {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "failed-precondition",
         "الحساب غير مرتبط بجهاز حالياً. | User account does not have an active bound device.",
       );
@@ -107,11 +107,11 @@ export const releaseDevice = functions.https.onCall(async (data, context) => {
         "Device released successfully. A new device will be bound on next login.",
     };
   } catch (error: any) {
-    if (error instanceof functions.https.HttpsError) {
+    if (error instanceof HttpsError) {
       throw error;
     }
     console.error("Release device error:", error);
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "internal",
       "حدث خطأ في الخادم. | Internal server error.",
     );
@@ -124,9 +124,9 @@ export const releaseDevice = functions.https.onCall(async (data, context) => {
  * Admin-only: Marks current device for replacement.
  * The next login from any device will be accepted and bound.
  */
-export const replaceDevice = functions.https.onCall(async (data, context) => {
+export const replaceDevice = onCallGen2(async (data, context) => {
   if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "صلاحية المسؤول مطلوبة. | Admin permission required.",
     );
@@ -135,7 +135,7 @@ export const replaceDevice = functions.https.onCall(async (data, context) => {
   const { targetUserId, reason } = data;
 
   if (!targetUserId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "معرف المستخدم مطلوب. | User ID is required.",
     );
@@ -146,7 +146,7 @@ export const replaceDevice = functions.https.onCall(async (data, context) => {
     const userDoc = await userRef.get();
 
     if (!userDoc.exists) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "not-found",
         "المستخدم غير موجود. | User not found.",
       );
@@ -206,11 +206,11 @@ export const replaceDevice = functions.https.onCall(async (data, context) => {
         "Device replacement approved. New device will bind on next login.",
     };
   } catch (error: any) {
-    if (error instanceof functions.https.HttpsError) {
+    if (error instanceof HttpsError) {
       throw error;
     }
     console.error("Replace device error:", error);
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "internal",
       "حدث خطأ في الخادم. | Internal server error.",
     );
@@ -223,9 +223,9 @@ export const replaceDevice = functions.https.onCall(async (data, context) => {
  * Admin-only: Revokes a user's Firebase refresh tokens,
  * forcing them to re-authenticate on next app launch.
  */
-export const forceLogoutUser = functions.https.onCall(async (data, context) => {
+export const forceLogoutUser = onCallGen2(async (data, context) => {
   if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "صلاحية المسؤول مطلوبة. | Admin permission required.",
     );
@@ -234,7 +234,7 @@ export const forceLogoutUser = functions.https.onCall(async (data, context) => {
   const { targetUserId, reason } = data;
 
   if (!targetUserId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "معرف المستخدم مطلوب. | User ID is required.",
     );
@@ -284,11 +284,11 @@ export const forceLogoutUser = functions.https.onCall(async (data, context) => {
       messageEn: "User logged out successfully.",
     };
   } catch (error: any) {
-    if (error instanceof functions.https.HttpsError) {
+    if (error instanceof HttpsError) {
       throw error;
     }
     console.error("Force logout error:", error);
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "internal",
       "حدث خطأ في الخادم. | Internal server error.",
     );
@@ -300,10 +300,10 @@ export const forceLogoutUser = functions.https.onCall(async (data, context) => {
  *
  * Admin-only: Rejects a pending device replacement request.
  */
-export const rejectDeviceReplacement = functions.https.onCall(
+export const rejectDeviceReplacement = onCallGen2(
   async (data, context) => {
     if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required.",
       );
@@ -312,7 +312,7 @@ export const rejectDeviceReplacement = functions.https.onCall(
     const { bindingId, targetUserId, reason } = data || {};
 
     if (!bindingId && !targetUserId) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "معرف الربط أو معرف المستخدم مطلوب. | bindingId or targetUserId required.",
       );
@@ -365,9 +365,9 @@ export const rejectDeviceReplacement = functions.https.onCall(
         messageEn: "Device replacement request rejected.",
       };
     } catch (error: any) {
-      if (error instanceof functions.https.HttpsError) throw error;
+      if (error instanceof HttpsError) throw error;
       console.error("Reject device replacement error:", error);
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "internal",
         "Internal server error.",
       );

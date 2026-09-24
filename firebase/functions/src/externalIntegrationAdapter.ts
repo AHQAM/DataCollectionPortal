@@ -1,5 +1,5 @@
-import * as functions from "firebase-functions";
 import { db } from "./config/db";
+import { onCallGen2, HttpsError } from "./config/gen2";
 
 /**
  * externalIntegrationAdapter
@@ -15,26 +15,26 @@ import { db } from "./config/db";
  */
 
 // Example Callable Function: Export specific Request data to an external API
-export const exportDataToExternalSystem = functions.https.onCall(
+export const exportDataToExternalSystem = onCallGen2(
   async (data, context) => {
     // 1. Verify Authentication & Authorization
     if (!context.auth) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "unauthenticated",
         "User must be authenticated.",
       );
     }
     const claims = context.auth.token;
     if (claims.role !== "Admin") {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "permission-denied",
         "Only Admins can export data to external systems.",
       );
     }
 
-    const { requestId, targetSystem } = data;
+    const { requestId, targetSystem } = data || {};
     if (!requestId || !targetSystem) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "requestId and targetSystem are required.",
       );
@@ -44,7 +44,7 @@ export const exportDataToExternalSystem = functions.https.onCall(
     const requestDoc = await db.collection("requests").doc(requestId).get();
 
     if (!requestDoc.exists) {
-      throw new functions.https.HttpsError("not-found", "Request not found.");
+      throw new HttpsError("not-found", "Request not found.");
     }
 
     // const requestData = requestDoc.data();

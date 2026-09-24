@@ -1,7 +1,7 @@
 import { db } from "./config/db";
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as bcrypt from "bcrypt";
+import { onCallGen2, HttpsError } from "./config/gen2";
 import { logAuditSafe } from "./auditLogger";
 import { USER_ROLES } from "./roles";
 import { hashPassword, verifyPassword } from "./auth";
@@ -14,10 +14,10 @@ import { hashPassword, verifyPassword } from "./auth";
  * prevents reuse of immediately previous password, and
  * sets mustChangePassword to false.
  */
-export const changePassword = functions.https.onCall(async (data, context) => {
+export const changePassword = onCallGen2(async (data, context) => {
   // Must be authenticated
   if (!context.auth) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "unauthenticated",
       "يجب تسجيل الدخول أولاً. | Authentication required.",
     );
@@ -26,21 +26,21 @@ export const changePassword = functions.https.onCall(async (data, context) => {
   const { currentPassword, newPassword } = data;
 
   if (!currentPassword || !newPassword) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "كلمة المرور الحالية والجديدة مطلوبة. | Current and new password are required.",
     );
   }
 
   if (typeof newPassword !== "string" || newPassword.length < 6) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "كلمة المرور يجب أن تكون 6 أحرف على الأقل. | Password must be at least 6 characters.",
     );
   }
 
   if (newPassword.length > 128) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "كلمة المرور طويلة جداً. | Password is too long.",
     );
@@ -53,7 +53,7 @@ export const changePassword = functions.https.onCall(async (data, context) => {
     const userDoc = await userRef.get();
 
     if (!userDoc.exists) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "not-found",
         "المستخدم غير موجود. | User not found.",
       );
@@ -76,7 +76,7 @@ export const changePassword = functions.https.onCall(async (data, context) => {
         entityId: userId,
       });
 
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "unauthenticated",
         "كلمة المرور الحالية غير صحيحة. | Current password is incorrect.",
       );
@@ -89,7 +89,7 @@ export const changePassword = functions.https.onCall(async (data, context) => {
     );
 
     if (isSameAsCurrent) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "لا يمكن استخدام نفس كلمة المرور الحالية. | Cannot reuse current password.",
       );
@@ -134,11 +134,11 @@ export const changePassword = functions.https.onCall(async (data, context) => {
       messageEn: "Password changed successfully.",
     };
   } catch (error: any) {
-    if (error instanceof functions.https.HttpsError) {
+    if (error instanceof HttpsError) {
       throw error;
     }
     console.error("Change password error:", error);
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "internal",
       "حدث خطأ في الخادم. | Internal server error.",
     );
@@ -151,12 +151,12 @@ export const changePassword = functions.https.onCall(async (data, context) => {
  * Allows a representative to submit a password reset request
  * from the login screen. Admin will review and action it.
  */
-export const requestPasswordReset = functions.https.onCall(
+export const requestPasswordReset = onCallGen2(
   async (data, _context) => {
     const { regionNo, notes, mobile } = data;
 
     if (!regionNo) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "رقم المنطقة مطلوب. | Region number is required.",
       );
@@ -210,11 +210,11 @@ export const requestPasswordReset = functions.https.onCall(
           "Password reset request submitted. Admin will review your request.",
       };
     } catch (error: any) {
-      if (error instanceof functions.https.HttpsError) {
+      if (error instanceof HttpsError) {
         throw error;
       }
       console.error("Password reset request error:", error);
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "internal",
         "حدث خطأ في الخادم. | Internal server error.",
       );
@@ -229,11 +229,11 @@ export const requestPasswordReset = functions.https.onCall(
  * Resets to a caller-provided temporary password and sets mustChangePassword = true.
  * Revokes existing refresh tokens.
  */
-export const adminResetPassword = functions.https.onCall(
+export const adminResetPassword = onCallGen2(
   async (data, context) => {
     // Admin-only check
     if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required.",
       );
@@ -242,7 +242,7 @@ export const adminResetPassword = functions.https.onCall(
     const { targetUserId, resetRequestId, temporaryPassword } = data;
 
     if (!targetUserId) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "معرف المستخدم مطلوب. | User ID is required.",
       );
@@ -253,7 +253,7 @@ export const adminResetPassword = functions.https.onCall(
       temporaryPassword.length < 12 ||
       temporaryPassword.length > 128
     ) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "كلمة المرور المؤقتة مطلوبة ويجب أن تكون 12 حرفاً على الأقل. | A temporary password of at least 12 characters is required.",
       );
@@ -266,7 +266,7 @@ export const adminResetPassword = functions.https.onCall(
       const userDoc = await userRef.get();
 
       if (!userDoc.exists) {
-        throw new functions.https.HttpsError(
+        throw new HttpsError(
           "not-found",
           "المستخدم غير موجود. | User not found.",
         );
@@ -345,11 +345,11 @@ export const adminResetPassword = functions.https.onCall(
         messageEn: "Password reset successfully.",
       };
     } catch (error: any) {
-      if (error instanceof functions.https.HttpsError) {
+      if (error instanceof HttpsError) {
         throw error;
       }
       console.error("Admin reset password error:", error);
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "internal",
         "حدث خطأ في الخادم. | Internal server error.",
       );
@@ -363,10 +363,10 @@ export const adminResetPassword = functions.https.onCall(
  * Admin-only function to unlock a locked user account.
  * Resets failed login count and clears lockout timer.
  */
-export const adminUnlockAccount = functions.https.onCall(
+export const adminUnlockAccount = onCallGen2(
   async (data, context) => {
     if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required.",
       );
@@ -375,7 +375,7 @@ export const adminUnlockAccount = functions.https.onCall(
     const { targetUserId } = data;
 
     if (!targetUserId) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "معرف المستخدم مطلوب. | User ID is required.",
       );
@@ -386,7 +386,7 @@ export const adminUnlockAccount = functions.https.onCall(
       const userDoc = await userRef.get();
 
       if (!userDoc.exists) {
-        throw new functions.https.HttpsError(
+        throw new HttpsError(
           "not-found",
           "المستخدم غير موجود. | User not found.",
         );
@@ -412,11 +412,11 @@ export const adminUnlockAccount = functions.https.onCall(
         messageEn: "Account unlocked successfully.",
       };
     } catch (error: any) {
-      if (error instanceof functions.https.HttpsError) {
+      if (error instanceof HttpsError) {
         throw error;
       }
       console.error("Unlock account error:", error);
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "internal",
         "حدث خطأ في الخادم. | Internal server error.",
       );

@@ -35,33 +35,33 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.saveRequestFields = void 0;
 const db_1 = require("./config/db");
-const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const gen2_1 = require("./config/gen2");
 const roles_1 = require("./roles");
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
-        throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
+        throw new gen2_1.HttpsError("unauthenticated", "User must be authenticated.");
     }
     const role = context.auth.token.role;
     if (role !== roles_1.USER_ROLES.ADMIN && role !== roles_1.USER_ROLES.SUPERVISOR) {
-        throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
+        throw new gen2_1.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
     }
 };
-exports.saveRequestFields = functions.https.onCall(async (data, context) => {
+exports.saveRequestFields = (0, gen2_1.onCallGen2)(async (data, context) => {
     checkAdminOrSupervisor(context);
-    const { requestId, fields } = data;
+    const { requestId, fields } = data || {};
     if (!requestId || !fields || !Array.isArray(fields)) {
-        throw new functions.https.HttpsError("invalid-argument", "requestId and a fields array are required.");
+        throw new gen2_1.HttpsError("invalid-argument", "requestId and a fields array are required.");
     }
     // Validate the request exists and is in draft state
     const requestRef = db_1.db.collection("requests").doc(requestId);
     const requestDoc = await requestRef.get();
     if (!requestDoc.exists) {
-        throw new functions.https.HttpsError("not-found", "Request not found.");
+        throw new gen2_1.HttpsError("not-found", "Request not found.");
     }
     if (requestDoc.data()?.status !== "draft" &&
         requestDoc.data()?.status !== "Draft") {
-        throw new functions.https.HttpsError("failed-precondition", "Can only edit fields for draft requests.");
+        throw new gen2_1.HttpsError("failed-precondition", "Can only edit fields for draft requests.");
     }
     const batch = db_1.db.batch();
     // Delete existing fields first to avoid orphans

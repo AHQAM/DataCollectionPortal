@@ -1,6 +1,6 @@
 import { db } from "./config/db";
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError } from "./config/gen2";
 import { logAuditSafe } from "./auditLogger";
 import { USER_ROLES } from "./roles";
 
@@ -10,9 +10,9 @@ import { USER_ROLES } from "./roles";
  * Super-Admin only: Wipes demo/test responses and resets records/assignments.
  * Requires strict confirmation token: 'CONFIRM_WIPE_DEMO_DATA'
  */
-export const wipeDemoData = functions.https.onCall(async (data, context) => {
+export const wipeDemoData = onCallGen2(async (data, context) => {
   if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "صلاحية المسؤول مطلوبة. | Admin permission required.",
     );
@@ -21,7 +21,7 @@ export const wipeDemoData = functions.https.onCall(async (data, context) => {
   const { confirmationToken, wipeBranchesAndRegions } = data || {};
 
   if (confirmationToken !== "CONFIRM_WIPE_DEMO_DATA") {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "رمز التأكيد غير صحيح. | Invalid confirmation token.",
     );
@@ -102,8 +102,8 @@ export const wipeDemoData = functions.https.onCall(async (data, context) => {
       messageEn: "Demo data wiped and records reset successfully.",
     };
   } catch (error: any) {
-    if (error instanceof functions.https.HttpsError) throw error;
+    if (error instanceof HttpsError) throw error;
     console.error("Wipe demo data error:", error);
-    throw new functions.https.HttpsError("internal", "Internal server error.");
+    throw new HttpsError("internal", "Internal server error.");
   }
 });

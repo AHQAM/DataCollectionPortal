@@ -1,5 +1,5 @@
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError } from "./config/gen2";
 import { db } from "./config/db";
 import { randomBytes } from "crypto";
 import { logAuditSafe } from "./auditLogger";
@@ -14,14 +14,14 @@ import { verifyAppCheck } from "./config/appCheck";
  * Creates the Firebase Auth account with a one-time temporary password and custom claims,
  * and creates the Firestore user document.
  */
-export const createAdminSupervisorUser = functions.https.onCall(
+export const createAdminSupervisorUser = onCallGen2(
   async (data, context) => {
     // 0. Verify App Check (if enabled)
     verifyAppCheck(context);
 
     // 1. Verify Caller Authentication
     if (!context.auth) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "unauthenticated",
         "يجب تسجيل الدخول لإجراء هذه العملية. | Must be logged in.",
       );
@@ -29,7 +29,7 @@ export const createAdminSupervisorUser = functions.https.onCall(
 
     // 2. Verify Caller Authorization (Must be an ADMIN)
     if (context.auth.token.role !== USER_ROLES.ADMIN) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "permission-denied",
         "ليس لديك الصلاحيات الكافية. | Insufficient permissions.",
       );
@@ -47,14 +47,14 @@ export const createAdminSupervisorUser = functions.https.onCall(
 
     // 3. Validate Inputs
     if (!email || !role || !userNameAr) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "بيانات المستخدم غير مكتملة. | Missing required fields.",
       );
     }
 
     if (role !== USER_ROLES.SUPERVISOR && role !== USER_ROLES.ADMIN) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "يمكن إنشاء حسابات مشرفين ومدراء فقط عبر هذه الدالة. | Can only create Supervisor/Admin.",
       );
@@ -121,12 +121,12 @@ export const createAdminSupervisorUser = functions.https.onCall(
     } catch (error: any) {
       console.error("Error creating user:", error);
       if (error.code === "auth/email-already-exists") {
-        throw new functions.https.HttpsError(
+        throw new HttpsError(
           "already-exists",
           "البريد الإلكتروني مسجل مسبقاً. | Email already exists.",
         );
       }
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "internal",
         "حدث خطأ أثناء إنشاء المستخدم. | Internal server error.",
       );
@@ -141,12 +141,12 @@ export const createAdminSupervisorUser = functions.https.onCall(
  * to verify alignment between Auth Custom Claims and Firestore user documents,
  * detecting any privilege creep or unauthorized role accumulation.
  */
-export const auditPrivilegedUsers = functions.https.onCall(
+export const auditPrivilegedUsers = onCallGen2(
   async (data, context) => {
     verifyAppCheck(context);
 
     if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة لإجراء تدقيق الصلاحيات. | Admin permission required.",
       );

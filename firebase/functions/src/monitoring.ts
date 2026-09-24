@@ -1,15 +1,14 @@
 import { db } from "./config/db";
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError } from "./config/gen2";
 import { USER_ROLES } from "./roles";
 
-export const getSystemHealth = functions.https.onCall(async (data, context) => {
+export const getSystemHealth = onCallGen2(async (data, context) => {
   if (
     !context.auth ||
     (context.auth.token.role !== USER_ROLES.ADMIN &&
       context.auth.token.role !== USER_ROLES.SUPERVISOR)
   ) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "Only admins or supervisors can check system health.",
     );

@@ -35,33 +35,33 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reassignRecords = void 0;
 const db_1 = require("./config/db");
-const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const gen2_1 = require("./config/gen2");
 const notificationService_1 = require("./notificationService");
 const roles_1 = require("./roles");
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
-        throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
+        throw new gen2_1.HttpsError("unauthenticated", "User must be authenticated.");
     }
     const role = context.auth.token.role;
     if (role !== roles_1.USER_ROLES.ADMIN && role !== roles_1.USER_ROLES.SUPERVISOR) {
-        throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
+        throw new gen2_1.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
     }
 };
-exports.reassignRecords = functions.https.onCall(async (data, context) => {
+exports.reassignRecords = (0, gen2_1.onCallGen2)(async (data, context) => {
     checkAdminOrSupervisor(context);
-    const { recordIds, newUserId } = data;
+    const { recordIds, newUserId } = data || {};
     if (!recordIds || !Array.isArray(recordIds) || !newUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "recordIds array and newUserId are required.");
+        throw new gen2_1.HttpsError("invalid-argument", "recordIds array and newUserId are required.");
     }
     // Check if new user exists and is a representative
     const userRef = db_1.db.collection("users").doc(newUserId);
     const userDoc = await userRef.get();
     if (!userDoc.exists) {
-        throw new functions.https.HttpsError("not-found", "Target user not found.");
+        throw new gen2_1.HttpsError("not-found", "Target user not found.");
     }
     if (userDoc.data()?.role !== roles_1.USER_ROLES.REP) {
-        throw new functions.https.HttpsError("invalid-argument", "Target user must be a representative.");
+        throw new gen2_1.HttpsError("invalid-argument", "Target user must be a representative.");
     }
     const batch = db_1.db.batch();
     // Load records and verify they can be reassigned

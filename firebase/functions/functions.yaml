@@ -12,75 +12,81 @@ endpoints:
     callableTrigger: {}
     entryPoint: authenticateWithRegionPassword
   createAdminSupervisorUser:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: createAdminSupervisorUser
   auditPrivilegedUsers:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: auditPrivilegedUsers
   changePassword:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: changePassword
   requestPasswordReset:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: requestPasswordReset
   adminResetPassword:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: adminResetPassword
   adminUnlockAccount:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: adminUnlockAccount
   createUser:
@@ -132,147 +138,159 @@ endpoints:
     callableTrigger: {}
     entryPoint: importUsersBatch
   releaseDevice:
-    platform: gcfv1
-    labels: &ref_0 {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: &ref_0 {}
     callableTrigger: &ref_1 {}
     entryPoint: releaseDevice
   releaseDeviceBinding:
-    platform: gcfv1
-    labels: *ref_0
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: *ref_0
     callableTrigger: *ref_1
     entryPoint: releaseDeviceBinding
   replaceDevice:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: replaceDevice
   rejectDeviceReplacement:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: rejectDeviceReplacement
   forceLogoutUser:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: forceLogoutUser
   createBranch:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: createBranch
   updateBranch:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: updateBranch
   deleteBranch:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: deleteBranch
   createRegion:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: createRegion
   updateRegion:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: updateRegion
   deleteRegion:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: deleteRegion
   importBranchesAndRegions:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: importBranchesAndRegions
   createRequest:
@@ -372,27 +390,29 @@ endpoints:
     callableTrigger: {}
     entryPoint: deleteRequest
   saveRequestFields:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: saveRequestFields
   reassignRecords:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: reassignRecords
   importDataPreview:
@@ -420,39 +440,42 @@ endpoints:
     callableTrigger: {}
     entryPoint: commitImport
   exportDataToExternalSystem:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: exportDataToExternalSystem
   sendBroadcastNotification:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: sendBroadcastNotification
   exportReport:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: exportReport
   submitResponse:
@@ -480,27 +503,29 @@ endpoints:
     callableTrigger: {}
     entryPoint: saveDraftResponse
   wipeDemoData:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: wipeDemoData
   getSystemHealth:
-    platform: gcfv1
-    labels: {}
     availableMemoryMb: null
     timeoutSeconds: null
     minInstances: null
     maxInstances: null
     ingressSettings: null
+    concurrency: null
     serviceAccountEmail: null
     vpc: null
+    platform: gcfv2
+    labels: {}
     callableTrigger: {}
     entryPoint: getSystemHealth
 specVersion: v1alpha1

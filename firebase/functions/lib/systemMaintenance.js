@@ -35,8 +35,8 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.wipeDemoData = void 0;
 const db_1 = require("./config/db");
-const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const gen2_1 = require("./config/gen2");
 const auditLogger_1 = require("./auditLogger");
 const roles_1 = require("./roles");
 /**
@@ -45,13 +45,13 @@ const roles_1 = require("./roles");
  * Super-Admin only: Wipes demo/test responses and resets records/assignments.
  * Requires strict confirmation token: 'CONFIRM_WIPE_DEMO_DATA'
  */
-exports.wipeDemoData = functions.https.onCall(async (data, context) => {
+exports.wipeDemoData = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { confirmationToken, wipeBranchesAndRegions } = data || {};
     if (confirmationToken !== "CONFIRM_WIPE_DEMO_DATA") {
-        throw new functions.https.HttpsError("invalid-argument", "رمز التأكيد غير صحيح. | Invalid confirmation token.");
+        throw new gen2_1.HttpsError("invalid-argument", "رمز التأكيد غير صحيح. | Invalid confirmation token.");
     }
     try {
         // 1. Delete all responses
@@ -123,10 +123,10 @@ exports.wipeDemoData = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError)
+        if (error instanceof gen2_1.HttpsError)
             throw error;
         console.error("Wipe demo data error:", error);
-        throw new functions.https.HttpsError("internal", "Internal server error.");
+        throw new gen2_1.HttpsError("internal", "Internal server error.");
     }
 });
 //# sourceMappingURL=systemMaintenance.js.map
