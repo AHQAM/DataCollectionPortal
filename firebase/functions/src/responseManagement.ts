@@ -97,13 +97,27 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
   const now = admin.firestore.FieldValue.serverTimestamp();
 
   await db.runTransaction(async (transaction) => {
+    // --- STEP 1: ALL READS MUST OCCUR BEFORE ANY WRITES ---
+    const recordDoc = await transaction.get(recordRef);
+    const isDocNew = !recordDoc.exists;
+    const currentRecData = isDocNew ? recData : recordDoc.data()!;
+
+    let asgDoc: FirebaseFirestore.DocumentSnapshot | null = null;
+    let asgRef: FirebaseFirestore.DocumentReference | null = null;
+    const assignmentId = currentRecData.assignmentId;
+    if (assignmentId && assignmentId !== "UNASSIGNED") {
+      asgRef = db.collection("assignments").doc(assignmentId);
+      asgDoc = await transaction.get(asgRef);
+    }
+
+    // --- STEP 2: ALL WRITES AFTER ALL READS ---
     // 1. Save response data
     transaction.set(
       responseRef,
       {
         responseId: responseRef.id,
         requestId,
-        activityId: activityId || recData.activityId || requestId,
+        activityId: activityId || currentRecData.activityId || requestId,
         recordId,
         submittedBy: context.auth!.uid,
         data: formData,
@@ -114,7 +128,7 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
     );
 
     // 2. Update or create record
-    if (isNewRecord) {
+    if (isDocNew) {
       transaction.set(recordRef, {
         ...recData,
         lastSavedAt: now,
@@ -134,33 +148,28 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
     }
 
     // 3. Atomically update assignment progress if assigned
-    const assignmentId = recData.assignmentId;
-    if (assignmentId && assignmentId !== "UNASSIGNED") {
-      const asgRef = db.collection("assignments").doc(assignmentId);
-      const asgDoc = await transaction.get(asgRef);
-      if (asgDoc.exists) {
-        const asgData = asgDoc.data()!;
-        const total = asgData.totalRecords || 1;
-        // Only increment if record wasn't already Submitted/Completed
-        if (
-          recData.recordStatus !== "Submitted" &&
-          recData.recordStatus !== "Completed"
-        ) {
-          const newCompleted = (asgData.completedRecords || 0) + 1;
-          const newPending = Math.max(0, total - newCompleted);
-          const progressPercent = Math.min(
-            100,
-            Math.round((newCompleted / total) * 100),
-          );
-          transaction.update(asgRef, {
-            completedRecords: newCompleted,
-            pendingRecords: newPending,
-            progressPercent,
-            completedAt: newCompleted >= total ? now : null,
-            lastActivityAt: now,
-            updatedAt: now,
-          });
-        }
+    if (asgRef && asgDoc && asgDoc.exists) {
+      const asgData = asgDoc.data()!;
+      const total = asgData.totalRecords || 1;
+      // Concurrency protection: Only increment if record wasn't already Submitted/Completed
+      if (
+        currentRecData.recordStatus !== "Submitted" &&
+        currentRecData.recordStatus !== "Completed"
+      ) {
+        const newCompleted = (asgData.completedRecords || 0) + 1;
+        const newPending = Math.max(0, total - newCompleted);
+        const progressPercent = Math.min(
+          100,
+          Math.round((newCompleted / total) * 100),
+        );
+        transaction.update(asgRef, {
+          completedRecords: newCompleted,
+          pendingRecords: newPending,
+          progressPercent,
+          completedAt: newCompleted >= total ? now : null,
+          lastActivityAt: now,
+          updatedAt: now,
+        });
       }
     }
   });
@@ -238,12 +247,17 @@ export const saveDraftResponse = functions.https.onCall(
     const now = admin.firestore.FieldValue.serverTimestamp();
 
     await db.runTransaction(async (transaction) => {
+      // 1. ALL READS FIRST
+      const recordDoc = await transaction.get(recordRef);
+      const isExisting = recordDoc.exists;
+
+      // 2. ALL WRITES AFTER READS
       transaction.set(
         responseRef,
         {
           responseId: responseRef.id,
-          requestId: requestId || record.data()?.requestId || "",
-          activityId: activityId || record.data()?.activityId || "",
+          requestId: requestId || recordDoc.data()?.requestId || "",
+          activityId: activityId || recordDoc.data()?.activityId || "",
           recordId,
           savedBy: context.auth!.uid,
           data: formData,
@@ -252,7 +266,7 @@ export const saveDraftResponse = functions.https.onCall(
         { merge: true },
       );
 
-      if (isNewRecord && recData) {
+      if (!isExisting && recData) {
         transaction.set(recordRef, {
           ...recData,
           draftSavedAt: now,
@@ -260,7 +274,7 @@ export const saveDraftResponse = functions.https.onCall(
           lastSavedBy: context.auth!.uid,
           updatedAt: now,
         });
-      } else if (record.exists) {
+      } else if (isExisting) {
         transaction.update(recordRef, {
           recordStatus: "DraftSaved",
           completionPercent: 50,

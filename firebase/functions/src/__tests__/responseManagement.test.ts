@@ -2,10 +2,32 @@ import fft from "firebase-functions-test";
 
 const testEnv = fft();
 
+let hasWritten = false;
+
 const mockTransaction = {
-  set: jest.fn(),
-  update: jest.fn(),
-  get: jest.fn(),
+  set: jest.fn(() => {
+    hasWritten = true;
+  }),
+  update: jest.fn(() => {
+    hasWritten = true;
+  }),
+  get: jest.fn((ref) => {
+    if (hasWritten) {
+      throw new Error(
+        "Firestore transactions require all reads to be executed before all writes.",
+      );
+    }
+    return Promise.resolve({
+      exists: true,
+      data: () => ({
+        recordId: "rec-1",
+        requestId: "req-1",
+        assignedUserId: "rep-1",
+        assignmentId: "asg-1",
+        recordStatus: "In Progress",
+      }),
+    });
+  }),
 };
 
 jest.mock("../config/db", () => {
@@ -57,6 +79,7 @@ describe("Response Management Cloud Functions & Concurrency", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    hasWritten = false;
     wrappedSubmitResponse = testEnv.wrap(submitResponse);
     wrappedSaveDraftResponse = testEnv.wrap(saveDraftResponse);
   });
@@ -85,9 +108,25 @@ describe("Response Management Cloud Functions & Concurrency", () => {
     });
 
     it("executes atomic transaction to save response and complete record", async () => {
-      mockTransaction.get.mockResolvedValueOnce({
-        exists: true,
-        data: () => ({ totalRecords: 5, completedRecords: 1 }),
+      hasWritten = false;
+      mockTransaction.get.mockImplementation(async () => {
+        if (hasWritten) {
+          throw new Error(
+            "Firestore transactions require all reads to be executed before all writes.",
+          );
+        }
+        return {
+          exists: true,
+          data: () => ({
+            recordId: "rec-1",
+            requestId: "req-1",
+            assignedUserId: "rep-1",
+            assignmentId: "asg-1",
+            recordStatus: "In Progress",
+            totalRecords: 5,
+            completedRecords: 1,
+          }),
+        };
       });
 
       const result = await wrappedSubmitResponse(
@@ -105,10 +144,73 @@ describe("Response Management Cloud Functions & Concurrency", () => {
       expect(mockTransaction.update).toHaveBeenCalled();
     });
 
+    it("strictly enforces read-before-write ordering and avoids double-increment on race conditions", async () => {
+      hasWritten = false;
+      let isAlreadySubmitted = false;
+
+      mockTransaction.get.mockImplementation(async () => {
+        if (hasWritten) {
+          throw new Error(
+            "Firestore transactions require all reads to be executed before all writes.",
+          );
+        }
+        return {
+          exists: true,
+          data: () => ({
+            recordId: "rec-1",
+            requestId: "req-1",
+            assignedUserId: "rep-1",
+            assignmentId: "asg-1",
+            recordStatus: isAlreadySubmitted ? "Submitted" : "In Progress",
+            totalRecords: 10,
+            completedRecords: 2,
+          }),
+        };
+      });
+
+      // Rep 1 submits first
+      const res1 = await wrappedSubmitResponse(
+        { requestId: "req-1", recordId: "rec-1", formData: { seq: 1 } },
+        { auth: { uid: "rep-1", token: { role: "REP" } } },
+      );
+      expect(res1.success).toBe(true);
+      expect(mockTransaction.update).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ completedRecords: 3 }),
+      );
+
+      // Rep 2 submits concurrently for the same record (now detected as already Submitted)
+      hasWritten = false;
+      isAlreadySubmitted = true;
+      mockTransaction.update.mockClear();
+
+      const res2 = await wrappedSubmitResponse(
+        { requestId: "req-1", recordId: "rec-1", formData: { seq: 2 } },
+        { auth: { uid: "rep-1", token: { role: "REP" } } },
+      );
+      expect(res2.success).toBe(true);
+      // Assignment update should not have been called to avoid double increment
+      const assignmentUpdates = mockTransaction.update.mock.calls.filter(
+        (call: any[]) => call[1] && "completedRecords" in call[1],
+      );
+      expect(assignmentUpdates.length).toBe(0);
+    });
+
     it("handles concurrent submissions safely through transaction retries", async () => {
-      mockTransaction.get.mockResolvedValue({
-        exists: true,
-        data: () => ({ totalRecords: 10, completedRecords: 2 }),
+      hasWritten = false;
+      mockTransaction.get.mockImplementation(async () => {
+        return {
+          exists: true,
+          data: () => ({
+            recordId: "rec-1",
+            requestId: "req-1",
+            assignedUserId: "rep-1",
+            assignmentId: "asg-1",
+            recordStatus: "In Progress",
+            totalRecords: 10,
+            completedRecords: 2,
+          }),
+        };
       });
 
       // Simulate 3 concurrent submissions from different devices/reps

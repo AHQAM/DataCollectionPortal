@@ -36,9 +36,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.db = exports.DATABASE_ID = void 0;
 const admin = __importStar(require("firebase-admin"));
 const firestore_1 = require("firebase-admin/firestore");
-exports.DATABASE_ID = process.env.FIRESTORE_DATABASE_ID || "datacollectionportal";
+const isStaging = process.env.GCLOUD_PROJECT === "datacollectionportal-staging" ||
+    process.env.FIREBASE_CONFIG?.includes("datacollectionportal-staging");
+exports.DATABASE_ID = process.env.FIRESTORE_DATABASE_ID ||
+    (isStaging ? "(default)" : "datacollectionportal");
 if (admin.apps.length === 0) {
     admin.initializeApp();
 }
-exports.db = (0, firestore_1.getFirestore)(exports.DATABASE_ID);
+exports.db = exports.DATABASE_ID === "(default)" ? (0, firestore_1.getFirestore)() : (0, firestore_1.getFirestore)(exports.DATABASE_ID);
 //# sourceMappingURL=db.js.map

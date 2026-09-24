@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { AppSettings, NotificationItem } from "../types";
 import { DEFAULT_APP_SETTINGS } from "../data/seedData";
+import i18n from "../i18n";
 import {
   sendBrowserNotification,
   requestBrowserNotificationPermission,
@@ -46,10 +47,17 @@ export const useUIStore = create<UIStore>((set, get) => {
       localStorage.setItem(`${STORAGE_PREFIX}lang`, newLang);
       document.documentElement.lang = newLang;
       document.documentElement.dir = newLang === "ar" ? "rtl" : "ltr";
+      if (i18n && typeof i18n.changeLanguage === "function") {
+        i18n.changeLanguage(newLang);
+      }
       set({ lang: newLang, dir: newLang === "ar" ? "rtl" : "ltr" });
     },
     t: (key, defaultAr, defaultEn) => {
       const { lang } = get();
+      if (i18n && typeof i18n.t === "function") {
+        const translated = i18n.t(key, { lng: lang });
+        if (translated && translated !== key) return translated;
+      }
       if (lang === "en") return defaultEn || key;
       return defaultAr || key;
     },

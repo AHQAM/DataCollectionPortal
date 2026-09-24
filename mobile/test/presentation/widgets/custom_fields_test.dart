@@ -7,6 +7,8 @@ import 'package:mobile/features/forms/presentation/widgets/fields/yes_no_form_fi
 import 'package:mobile/features/forms/presentation/widgets/fields/text_input_field.dart';
 import 'package:mobile/features/forms/presentation/widgets/fields/barcode_form_field.dart';
 import 'package:mobile/features/forms/presentation/widgets/fields/location_form_field.dart';
+import 'package:mobile/features/forms/presentation/widgets/fields/photo_form_field.dart';
+import 'package:mobile/features/forms/presentation/widgets/fields/signature_form_field.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 Widget createTestApp(Widget child) {
@@ -172,6 +174,32 @@ void main() {
       await tester.enterText(find.byType(TextFormField), '6281001234567');
       expect(enteredBarcode, '6281001234567');
     });
+
+    testWidgets('validates required field when input is empty', (
+      WidgetTester tester,
+    ) async {
+      final formKey = GlobalKey<FormState>();
+
+      await tester.pumpWidget(
+        createTestApp(
+          Form(
+            key: formKey,
+            child: BarcodeFormField(
+              field: field,
+              isArabic: true,
+              onChanged: (_) {},
+              onSaved: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      final isValid = formKey.currentState!.validate();
+      await tester.pumpAndSettle();
+
+      expect(isValid, isFalse);
+      expect(find.text('يرجى إدخال رمز الباركود'), findsOneWidget);
+    });
   });
 
   group('LocationFormField Widget Tests', () {
@@ -195,6 +223,67 @@ void main() {
 
       expect(find.text('الموقع الجغرافي'), findsOneWidget);
       expect(find.byIcon(Icons.my_location), findsOneWidget);
+    });
+  });
+
+  group('PhotoFormField Widget Tests', () {
+    const field = FormFieldModel(
+      id: 'photo_1',
+      fieldKey: 'photo_1',
+      type: 'photo',
+      labelAr: 'صورة واجهة المتجر',
+      labelEn: 'Storefront Photo',
+      isRequired: true,
+    );
+
+    testWidgets('renders photo field label and camera icon', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestApp(
+          PhotoFormField(
+            field: field,
+            isArabic: true,
+            requestId: 'req-1',
+            recordId: 'rec-1',
+            onChanged: (_) {},
+          ),
+        ),
+      );
+
+      expect(find.text('صورة واجهة المتجر'), findsOneWidget);
+      expect(find.byIcon(Icons.camera_alt), findsWidgets);
+    });
+  });
+
+  group('SignatureFormField Widget Tests', () {
+    const field = FormFieldModel(
+      id: 'sig_1',
+      fieldKey: 'sig_1',
+      type: 'signature',
+      labelAr: 'توقيع المستلم',
+      labelEn: 'Recipient Signature',
+      isRequired: true,
+    );
+
+    testWidgets('renders signature canvas and action controls', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestApp(
+          SignatureFormField(
+            field: field,
+            isArabic: true,
+            requestId: 'req-1',
+            recordId: 'rec-1',
+            onChanged: (_) {},
+          ),
+        ),
+      );
+
+      expect(find.text('توقيع المستلم'), findsOneWidget);
+      expect(find.byIcon(Icons.draw), findsOneWidget);
+      expect(find.text('مسح'), findsOneWidget);
     });
   });
 }

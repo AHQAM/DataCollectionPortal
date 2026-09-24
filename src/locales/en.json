@@ -1,0 +1,80 @@
+{
+  "common": {
+    "appTitle": "Field Data Collection Portal",
+    "version": "v2.4.0 Enterprise",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "submitting": "Submitting...",
+    "save": "Save",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search...",
+    "filter": "Filter",
+    "refresh": "Refresh",
+    "close": "Close",
+    "back": "Back",
+    "export": "Export",
+    "import": "Import",
+    "actions": "Actions",
+    "status": "Status",
+    "details": "Details",
+    "date": "Date",
+    "notes": "Notes",
+    "offlineNotice": "Offline mode active. Operations will automatically sync when connection is restored.",
+    "all": "All"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "requests": "Requests & Projects",
+    "branches": "Branches & Regions",
+    "users": "User Management",
+    "reports": "Reports & Analytics",
+    "auditLogs": "Audit Logs",
+    "deviceBindings": "Device Governance",
+    "supervisorMatrix": "Supervisor Matrix",
+    "archive": "Archive",
+    "settings": "System Settings"
+  },
+  "auth": {
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "email": "Email Address",
+    "password": "Password",
+    "regionNo": "Region No / Account",
+    "rememberMe": "Remember Me",
+    "forgotPassword": "Forgot Password?",
+    "mustChangePassword": "Password change required to proceed",
+    "invalidCredentials": "Invalid credentials provided.",
+    "accountLocked": "Account temporarily locked due to failed attempts.",
+    "deviceMismatch": "Account is bound to another physical device. Contact supervisor to unbind."
+  },
+  "status": {
+    "draft": "Draft",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "submitted": "Submitted",
+    "completed": "Completed",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "archived": "Archived",
+    "closed": "Closed",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "roles": {
+    "admin": "System Administrator",
+    "supervisor": "Branch Supervisor",
+    "rep": "Field Representative"
+  },
+  "topNavbar": {
+    "subTitle": "Dynamic Fields & Custom Auth Platform",
+    "qaSwitcher": "Quick Role Switcher (QA)",
+    "qaModalTitle": "Switch Account for QA / Demo",
+    "broadcast": "Broadcast Push Notification",
+    "notifications": "System Notifications",
+    "logout": "Logout"
+  }
+}
