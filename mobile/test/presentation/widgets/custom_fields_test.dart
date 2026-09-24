@@ -5,6 +5,8 @@ import 'package:mobile/features/forms/domain/form_field_model.dart';
 import 'package:mobile/features/forms/presentation/widgets/fields/rating_form_field.dart';
 import 'package:mobile/features/forms/presentation/widgets/fields/yes_no_form_field.dart';
 import 'package:mobile/features/forms/presentation/widgets/fields/text_input_field.dart';
+import 'package:mobile/features/forms/presentation/widgets/fields/barcode_form_field.dart';
+import 'package:mobile/features/forms/presentation/widgets/fields/location_form_field.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 Widget createTestApp(Widget child) {
@@ -135,6 +137,64 @@ void main() {
 
       await tester.enterText(find.byType(TextFormField), 'بقالة الأمانة');
       expect(enteredText, 'بقالة الأمانة');
+    });
+  });
+
+  group('BarcodeFormField Widget Tests', () {
+    const field = FormFieldModel(
+      id: 'barcode_1',
+      fieldKey: 'barcode_1',
+      type: 'barcode',
+      labelAr: 'باركود المنتج',
+      labelEn: 'Product Barcode',
+      isRequired: true,
+    );
+
+    testWidgets('renders barcode icon and enters barcode text', (
+      WidgetTester tester,
+    ) async {
+      String? enteredBarcode;
+
+      await tester.pumpWidget(
+        createTestApp(
+          BarcodeFormField(
+            field: field,
+            isArabic: true,
+            onChanged: (val) => enteredBarcode = val,
+            onSaved: (_) {},
+          ),
+        ),
+      );
+
+      expect(find.text('باركود المنتج'), findsWidgets);
+      expect(find.byIcon(Icons.qr_code_scanner), findsOneWidget);
+
+      await tester.enterText(find.byType(TextFormField), '6281001234567');
+      expect(enteredBarcode, '6281001234567');
+    });
+  });
+
+  group('LocationFormField Widget Tests', () {
+    const field = FormFieldModel(
+      id: 'loc_1',
+      fieldKey: 'loc_1',
+      type: 'location',
+      labelAr: 'الموقع الجغرافي',
+      labelEn: 'GPS Location',
+      isRequired: false,
+    );
+
+    testWidgets('renders location field header and GPS action button', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestApp(
+          LocationFormField(field: field, isArabic: true, onChanged: (_) {}),
+        ),
+      );
+
+      expect(find.text('الموقع الجغرافي'), findsOneWidget);
+      expect(find.byIcon(Icons.my_location), findsOneWidget);
     });
   });
 }

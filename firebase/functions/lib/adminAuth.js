@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAdminSupervisorUser = void 0;
+exports.auditPrivilegedUsers = exports.createAdminSupervisorUser = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const db_1 = require("./config/db");
@@ -126,5 +126,61 @@ exports.createAdminSupervisorUser = functions.https.onCall(async (data, context)
         }
         throw new functions.https.HttpsError("internal", "حدث خطأ أثناء إنشاء المستخدم. | Internal server error.");
     }
+});
+/**
+ * Cloud Function: auditPrivilegedUsers
+ *
+ * Scans all users with elevated privileges (ADMIN, SUPERVISOR)
+ * to verify alignment between Auth Custom Claims and Firestore user documents,
+ * detecting any privilege creep or unauthorized role accumulation.
+ */
+exports.auditPrivilegedUsers = functions.https.onCall(async (data, context) => {
+    (0, appCheck_1.verifyAppCheck)(context);
+    if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
+        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة لإجراء تدقيق الصلاحيات. | Admin permission required.");
+    }
+    const privilegedSnapshot = await db_1.db
+        .collection("users")
+        .where("role", "in", [roles_1.USER_ROLES.ADMIN, roles_1.USER_ROLES.SUPERVISOR])
+        .get();
+    const auditResults = [];
+    for (const doc of privilegedSnapshot.docs) {
+        const userData = doc.data();
+        let authUser = null;
+        let hasClaimMismatch = false;
+        try {
+            authUser = await admin.auth().getUser(doc.id);
+            const tokenRole = authUser.customClaims?.role;
+            hasClaimMismatch = tokenRole !== userData.role;
+        }
+        catch {
+            // User exists in Firestore but not in Auth, or vice versa
+        }
+        auditResults.push({
+            userId: doc.id,
+            userNameAr: userData.userNameAr,
+            email: userData.username || userData.email,
+            role: userData.role,
+            branchId: userData.branchId,
+            customClaimRole: authUser?.customClaims?.role || null,
+            hasClaimMismatch,
+            isActive: userData.isActive,
+            lastSignInTime: authUser?.metadata.lastSignInTime || null,
+            creationTime: authUser?.metadata.creationTime || null,
+        });
+    }
+    await (0, auditLogger_1.logAuditSafe)({
+        userId: context.auth.uid,
+        userRole: context.auth.token.role,
+        action: "IAM_PRIVILEGE_AUDIT_EXECUTED",
+        entityType: "IAM",
+        entityId: "SECURITY_AUDIT",
+        details: { auditedCount: auditResults.length },
+    });
+    return {
+        success: true,
+        auditedAt: new Date().toISOString(),
+        privilegedUsers: auditResults,
+    };
 });
 //# sourceMappingURL=adminAuth.js.map

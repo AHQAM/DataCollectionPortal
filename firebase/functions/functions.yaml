@@ -23,6 +23,18 @@ endpoints:
     vpc: null
     callableTrigger: {}
     entryPoint: createAdminSupervisorUser
+  auditPrivilegedUsers:
+    platform: gcfv1
+    labels: {}
+    availableMemoryMb: null
+    timeoutSeconds: null
+    minInstances: null
+    maxInstances: null
+    ingressSettings: null
+    serviceAccountEmail: null
+    vpc: null
+    callableTrigger: {}
+    entryPoint: auditPrivilegedUsers
   changePassword:
     platform: gcfv1
     labels: {}

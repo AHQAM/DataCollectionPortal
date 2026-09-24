@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { initMonitoring } from "./utils/monitoring.ts";
-
+import "./i18n";
 initMonitoring();
 
 createRoot(document.getElementById("root")!).render(

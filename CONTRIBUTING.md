@@ -13,6 +13,14 @@ npm run format:check   # Verify formatting in CI
 npm run format:fix     # Automatically fix formatting
 ```
 
+### 2. Commit Message Integrity
+
+We enforce data-backed commit messages. Any commit claiming a fix, refactor, or optimization must cite measurable outcomes.
+
+- **Bad:** "Fixed bugs" or "Refactored forms"
+- **Good:** "Refactored Admin layout (3 files changed, coverage +1.2%)"
+- **Rule:** Do not describe just the intent. Describe the actual result.
+
 ### 2. Type Checking
 
 TypeScript types must compile with zero errors:

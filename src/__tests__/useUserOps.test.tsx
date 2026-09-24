@@ -47,7 +47,7 @@ describe("useUserOps Hook", () => {
 
   describe("updateUser", () => {
     it("returns success and logs audit when update succeeds", async () => {
-      (userApi.updateUser as any).mockResolvedValueOnce(undefined);
+      (userApi.updateUser as any).mockResolvedValueOnce({ success: true });
 
       const hook = useUserOps();
       const userObj = {
@@ -146,7 +146,7 @@ describe("useUserOps Hook", () => {
 
   describe("deactivateUser", () => {
     it("deactivates and logs", async () => {
-      (userApi.deactivateUser as any).mockResolvedValueOnce(undefined);
+      (userApi.deactivateUser as any).mockResolvedValueOnce({ success: true });
 
       const hook = useUserOps();
       const res = await hook.deactivateUser("u1");

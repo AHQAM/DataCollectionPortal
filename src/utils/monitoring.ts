@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/react";
+
 /**
  * Web Monitoring & Telemetry Service
  * Supports Sentry integration via VITE_SENTRY_DSN, with a robust fallback
@@ -24,10 +26,29 @@ class MonitoringService {
     this.dsn = import.meta.env.VITE_SENTRY_DSN;
 
     if (this.dsn && typeof window !== "undefined") {
-      // If Sentry DSN is present, we initialize Sentry if available or dynamically loaded
-      console.info(
-        "[Monitoring] Sentry DSN detected, initializing monitoring.",
-      );
+      try {
+        Sentry.init({
+          dsn: this.dsn,
+          environment: import.meta.env.MODE || "development",
+          release: import.meta.env.VITE_APP_VERSION || "1.0.0",
+          integrations: [
+            Sentry.browserTracingIntegration(),
+            Sentry.replayIntegration({
+              maskAllText: false,
+              blockAllMedia: false,
+            }),
+          ],
+          tracesSampleRate: import.meta.env.PROD ? 0.2 : 1.0,
+          replaysSessionSampleRate: 0.1,
+          replaysOnErrorSampleRate: 1.0,
+        });
+        console.info(
+          "[Monitoring] Sentry initialized with DSN:",
+          this.dsn.slice(0, 15) + "...",
+        );
+      } catch (err) {
+        console.warn("[Monitoring] Sentry initialization error:", err);
+      }
     } else {
       console.info(
         "[Monitoring] Initialized in local telemetry mode (VITE_SENTRY_DSN not set).",
@@ -80,15 +101,10 @@ class MonitoringService {
       console.error("[Monitoring:Capture]", report);
     }
 
-    // If Sentry SDK is loaded on window (e.g. via script or future package), forward to it
-    const win = typeof window !== "undefined" ? (window as any) : null;
-    if (
-      win &&
-      win.Sentry &&
-      typeof win.Sentry.captureException === "function"
-    ) {
+    // Forward to Sentry if initialized
+    if (this.dsn) {
       try {
-        win.Sentry.captureException(errObj, { extra: context });
+        Sentry.captureException(errObj, { extra: context });
       } catch (e) {
         console.warn("[Monitoring] Sentry dispatch failed:", e);
       }
