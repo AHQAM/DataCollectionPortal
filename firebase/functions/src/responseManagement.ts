@@ -1,12 +1,12 @@
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError } from "./config/gen2";
 import { db } from "./config/db";
 import { USER_ROLES } from "./roles";
 import { logAuditSafe } from "./auditLogger";
 
-export const submitResponse = functions.https.onCall(async (data, context) => {
+export const submitResponse = onCallGen2(async (data, context) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "unauthenticated",
       "Authentication required.",
     );
@@ -20,7 +20,7 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
     typeof formData !== "object" ||
     Array.isArray(formData)
   ) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Invalid response payload.",
     );
@@ -35,7 +35,7 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
   if (isNewRecord) {
     const requestDoc = await db.collection("requests").doc(requestId).get();
     if (!requestDoc.exists) {
-      throw new functions.https.HttpsError("not-found", "Request not found.");
+      throw new HttpsError("not-found", "Request not found.");
     }
     const reqData = requestDoc.data()!;
     const userDoc = await db.collection("users").doc(context.auth.uid).get();
@@ -85,7 +85,7 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
         recData.assignedUserId &&
         recData.assignedUserId !== context.auth.uid
       ) {
-        throw new functions.https.HttpsError(
+        throw new HttpsError(
           "permission-denied",
           "Record is not assigned to this user.",
         );
@@ -186,10 +186,10 @@ export const submitResponse = functions.https.onCall(async (data, context) => {
   return { success: true, responseId: responseRef.id };
 });
 
-export const saveDraftResponse = functions.https.onCall(
+export const saveDraftResponse = onCallGen2(
   async (data, context) => {
     if (!context.auth) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "unauthenticated",
         "Authentication required.",
       );
@@ -197,7 +197,7 @@ export const saveDraftResponse = functions.https.onCall(
 
     const { requestId, recordId, activityId, formData } = data || {};
     if (!recordId || !formData || typeof formData !== "object") {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "Invalid draft payload.",
       );

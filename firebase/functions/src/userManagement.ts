@@ -1,5 +1,5 @@
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError } from "./config/gen2";
 import { db } from "./config/db";
 import { v4 as uuidv4 } from "uuid";
 import { randomBytes } from "crypto";
@@ -13,9 +13,9 @@ import { USER_ROLES } from "./roles";
  * Admin-only function to create a new user (REP or SUPERVISOR).
  * Hashes the default password and sets mustChangePassword = true.
  */
-export const createUser = functions.https.onCall(async (data, context) => {
+export const createUser = onCallGen2(async (data, context) => {
   if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "صلاحية المسؤول مطلوبة. | Admin permission required.",
     );
@@ -36,14 +36,14 @@ export const createUser = functions.https.onCall(async (data, context) => {
 
   // Validation
   if (!username || !regionNo || !userNameAr || !branchId || !role) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "الحقول المطلوبة: اسم المستخدم، رقم المنطقة، اسم المندوب، الفرع، الدور. | Required: username, regionNo, userNameAr, branchId, role.",
     );
   }
 
   if (![USER_ROLES.REP, USER_ROLES.SUPERVISOR].includes(role)) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "الدور يجب أن يكون REP أو SUPERVISOR. | Role must be REP or SUPERVISOR.",
     );
@@ -58,7 +58,7 @@ export const createUser = functions.https.onCall(async (data, context) => {
       .get();
 
     if (!existing.empty) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "already-exists",
         `اسم المستخدم ${username} مستخدم بالفعل. | Username ${username} already exists.`,
       );
@@ -126,11 +126,11 @@ export const createUser = functions.https.onCall(async (data, context) => {
       messageEn: `User ${userNameAr} created successfully.`,
     };
   } catch (error: any) {
-    if (error instanceof functions.https.HttpsError) {
+    if (error instanceof HttpsError) {
       throw error;
     }
     console.error("Create user error:", error);
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "internal",
       "حدث خطأ في الخادم. | Internal server error.",
     );
@@ -143,9 +143,9 @@ export const createUser = functions.https.onCall(async (data, context) => {
  * Admin-only function to update user profile fields.
  * Cannot update password through this function — use changePassword or adminResetPassword.
  */
-export const updateUser = functions.https.onCall(async (data, context) => {
+export const updateUser = onCallGen2(async (data, context) => {
   if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "صلاحية المسؤول مطلوبة. | Admin permission required.",
     );
@@ -154,7 +154,7 @@ export const updateUser = functions.https.onCall(async (data, context) => {
   const { targetUserId, updates } = data;
 
   if (!targetUserId || !updates) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "معرف المستخدم والتحديثات مطلوبة. | User ID and updates are required.",
     );
@@ -180,7 +180,7 @@ export const updateUser = functions.https.onCall(async (data, context) => {
     const userDoc = await userRef.get();
 
     if (!userDoc.exists) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "not-found",
         "المستخدم غير موجود. | User not found.",
       );
@@ -194,7 +194,7 @@ export const updateUser = functions.https.onCall(async (data, context) => {
     }
 
     if (Object.keys(safeUpdates).length === 0) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "لا توجد حقول صالحة للتحديث. | No valid fields to update.",
       );
@@ -241,11 +241,11 @@ export const updateUser = functions.https.onCall(async (data, context) => {
       messageEn: "User updated successfully.",
     };
   } catch (error: any) {
-    if (error instanceof functions.https.HttpsError) {
+    if (error instanceof HttpsError) {
       throw error;
     }
     console.error("Update user error:", error);
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "internal",
       "حدث خطأ في الخادم. | Internal server error.",
     );
@@ -257,9 +257,9 @@ export const updateUser = functions.https.onCall(async (data, context) => {
  *
  * Admin-only soft-delete: deactivates a user, revokes sessions.
  */
-export const deactivateUser = functions.https.onCall(async (data, context) => {
+export const deactivateUser = onCallGen2(async (data, context) => {
   if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "صلاحية المسؤول مطلوبة. | Admin permission required.",
     );
@@ -268,7 +268,7 @@ export const deactivateUser = functions.https.onCall(async (data, context) => {
   const { targetUserId, reason } = data;
 
   if (!targetUserId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "معرف المستخدم مطلوب. | User ID is required.",
     );
@@ -276,7 +276,7 @@ export const deactivateUser = functions.https.onCall(async (data, context) => {
 
   // Prevent self-deactivation
   if (targetUserId === context.auth.uid) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "failed-precondition",
       "لا يمكنك تعطيل حسابك الخاص. | Cannot deactivate your own account.",
     );
@@ -287,7 +287,7 @@ export const deactivateUser = functions.https.onCall(async (data, context) => {
     const userDoc = await userRef.get();
 
     if (!userDoc.exists) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "not-found",
         "المستخدم غير موجود. | User not found.",
       );
@@ -322,11 +322,11 @@ export const deactivateUser = functions.https.onCall(async (data, context) => {
       messageEn: "Account deactivated successfully.",
     };
   } catch (error: any) {
-    if (error instanceof functions.https.HttpsError) {
+    if (error instanceof HttpsError) {
       throw error;
     }
     console.error("Deactivate user error:", error);
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "internal",
       "حدث خطأ في الخادم. | Internal server error.",
     );
@@ -339,10 +339,10 @@ export const deactivateUser = functions.https.onCall(async (data, context) => {
  * Admin-only batch user creation from import.
  * Each user gets a unique temporary password and mustChangePassword = true.
  */
-export const importUsersBatch = functions.https.onCall(
+export const importUsersBatch = onCallGen2(
   async (data, context) => {
     if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "permission-denied",
         "صلاحية المسؤول مطلوبة. | Admin permission required.",
       );
@@ -351,14 +351,14 @@ export const importUsersBatch = functions.https.onCall(
     const { users } = data;
 
     if (!Array.isArray(users) || users.length === 0) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "قائمة المستخدمين مطلوبة. | Users list is required.",
       );
     }
 
     if (users.length > 100) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "الحد الأقصى 100 مستخدم في الدفعة الواحدة. | Maximum 100 users per batch.",
       );
@@ -502,11 +502,11 @@ export const importUsersBatch = functions.https.onCall(
         messageEn: `${results.created} users created successfully.`,
       };
     } catch (error: any) {
-      if (error instanceof functions.https.HttpsError) {
+      if (error instanceof HttpsError) {
         throw error;
       }
       console.error("Import users batch error:", error);
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "internal",
         "حدث خطأ في الخادم. | Internal server error.",
       );

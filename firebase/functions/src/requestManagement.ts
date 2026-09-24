@@ -1,28 +1,28 @@
 import { db } from "./config/db";
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { v4 as uuidv4 } from "uuid";
+import { onCallGen2, HttpsError, CallableContextCompat } from "./config/gen2";
 import { sendNotificationInternal } from "./notificationService";
 import { USER_ROLES } from "./roles";
 import { logAuditSafe } from "./auditLogger";
 
-const checkAdminOrSupervisor = (context: functions.https.CallableContext) => {
+const checkAdminOrSupervisor = (context: CallableContextCompat) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "unauthenticated",
       "User must be authenticated.",
     );
   }
   const role = context.auth.token.role;
   if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "Only admins or supervisors can perform this action.",
     );
   }
 };
 
-export const createRequest = functions.https.onCall(async (data, context) => {
+export const createRequest = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
 
   const {
@@ -43,7 +43,7 @@ export const createRequest = functions.https.onCall(async (data, context) => {
   } = data;
 
   if (!titleAr) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Title (Ar) is required.",
     );
@@ -92,13 +92,13 @@ export const createRequest = functions.https.onCall(async (data, context) => {
   return { success: true, requestId: requestId, activityId: requestId };
 });
 
-export const updateDraftRequest = functions.https.onCall(
+export const updateDraftRequest = onCallGen2(
   async (data, context) => {
     checkAdminOrSupervisor(context);
 
     const { requestId, updates } = data;
     if (!requestId || !updates) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "requestId and updates are required.",
       );
@@ -108,14 +108,14 @@ export const updateDraftRequest = functions.https.onCall(
     const requestDoc = await requestRef.get();
 
     if (!requestDoc.exists) {
-      throw new functions.https.HttpsError("not-found", "Request not found.");
+      throw new HttpsError("not-found", "Request not found.");
     }
 
     if (
       requestDoc.data()?.status !== "Draft" &&
       requestDoc.data()?.status !== "draft"
     ) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "failed-precondition",
         "Can only update draft requests.",
       );
@@ -130,12 +130,12 @@ export const updateDraftRequest = functions.https.onCall(
   },
 );
 
-export const publishRequest = functions.https.onCall(async (data, context) => {
+export const publishRequest = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
 
   const { requestId } = data;
   if (!requestId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "requestId is required.",
     );
@@ -145,7 +145,7 @@ export const publishRequest = functions.https.onCall(async (data, context) => {
   const requestDoc = await requestRef.get();
 
   if (!requestDoc.exists) {
-    throw new functions.https.HttpsError("not-found", "Request not found.");
+    throw new HttpsError("not-found", "Request not found.");
   }
 
   const requestData = requestDoc.data()!;
@@ -237,12 +237,12 @@ export const publishRequest = functions.https.onCall(async (data, context) => {
   return { success: true };
 });
 
-export const closeRequest = functions.https.onCall(async (data, context) => {
+export const closeRequest = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
 
   const { requestId } = data;
   if (!requestId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "requestId is required.",
     );
@@ -257,12 +257,12 @@ export const closeRequest = functions.https.onCall(async (data, context) => {
   return { success: true };
 });
 
-export const archiveRequest = functions.https.onCall(async (data, context) => {
+export const archiveRequest = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
 
   const { requestId } = data;
   if (!requestId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "requestId is required.",
     );
@@ -277,12 +277,12 @@ export const archiveRequest = functions.https.onCall(async (data, context) => {
   return { success: true };
 });
 
-export const reopenRequest = functions.https.onCall(async (data, context) => {
+export const reopenRequest = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
 
   const { requestId } = data;
   if (!requestId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "requestId is required.",
     );
@@ -296,12 +296,12 @@ export const reopenRequest = functions.https.onCall(async (data, context) => {
   return { success: true };
 });
 
-export const cloneRequest = functions.https.onCall(async (data, context) => {
+export const cloneRequest = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
 
   const { requestId } = data;
   if (!requestId) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "requestId is required.",
     );
@@ -311,7 +311,7 @@ export const cloneRequest = functions.https.onCall(async (data, context) => {
   const srcDoc = await srcRef.get();
 
   if (!srcDoc.exists) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "not-found",
       "Source request not found.",
     );
@@ -374,11 +374,11 @@ export const cloneRequest = functions.https.onCall(async (data, context) => {
   };
 });
 
-export const deleteRequest = functions.https.onCall(async (data, context) => {
+export const deleteRequest = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
   const { requestId } = data || {};
   if (!requestId || typeof requestId !== "string") {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "requestId is required.",
     );
@@ -387,7 +387,7 @@ export const deleteRequest = functions.https.onCall(async (data, context) => {
   const requestRef = db.collection("requests").doc(requestId);
   const requestDoc = await requestRef.get();
   if (!requestDoc.exists) {
-    throw new functions.https.HttpsError("not-found", "Request not found.");
+    throw new HttpsError("not-found", "Request not found.");
   }
 
   // Batch delete fields, assignments, records, and the request itself

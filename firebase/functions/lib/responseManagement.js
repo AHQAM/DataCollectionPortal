@@ -34,14 +34,14 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.saveDraftResponse = exports.submitResponse = void 0;
-const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const gen2_1 = require("./config/gen2");
 const db_1 = require("./config/db");
 const roles_1 = require("./roles");
 const auditLogger_1 = require("./auditLogger");
-exports.submitResponse = functions.https.onCall(async (data, context) => {
+exports.submitResponse = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth) {
-        throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
+        throw new gen2_1.HttpsError("unauthenticated", "Authentication required.");
     }
     const { requestId, recordId, activityId, formData, submittedAt } = data || {};
     if (typeof requestId !== "string" ||
@@ -49,7 +49,7 @@ exports.submitResponse = functions.https.onCall(async (data, context) => {
         !formData ||
         typeof formData !== "object" ||
         Array.isArray(formData)) {
-        throw new functions.https.HttpsError("invalid-argument", "Invalid response payload.");
+        throw new gen2_1.HttpsError("invalid-argument", "Invalid response payload.");
     }
     const recordRef = db_1.db.collection("records").doc(recordId);
     const record = await recordRef.get();
@@ -58,7 +58,7 @@ exports.submitResponse = functions.https.onCall(async (data, context) => {
     if (isNewRecord) {
         const requestDoc = await db_1.db.collection("requests").doc(requestId).get();
         if (!requestDoc.exists) {
-            throw new functions.https.HttpsError("not-found", "Request not found.");
+            throw new gen2_1.HttpsError("not-found", "Request not found.");
         }
         const reqData = requestDoc.data();
         const userDoc = await db_1.db.collection("users").doc(context.auth.uid).get();
@@ -102,7 +102,7 @@ exports.submitResponse = functions.https.onCall(async (data, context) => {
         if (userRole !== roles_1.USER_ROLES.ADMIN && userRole !== roles_1.USER_ROLES.SUPERVISOR) {
             if (recData.assignedUserId &&
                 recData.assignedUserId !== context.auth.uid) {
-                throw new functions.https.HttpsError("permission-denied", "Record is not assigned to this user.");
+                throw new gen2_1.HttpsError("permission-denied", "Record is not assigned to this user.");
             }
         }
     }
@@ -183,13 +183,13 @@ exports.submitResponse = functions.https.onCall(async (data, context) => {
     });
     return { success: true, responseId: responseRef.id };
 });
-exports.saveDraftResponse = functions.https.onCall(async (data, context) => {
+exports.saveDraftResponse = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth) {
-        throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
+        throw new gen2_1.HttpsError("unauthenticated", "Authentication required.");
     }
     const { requestId, recordId, activityId, formData } = data || {};
     if (!recordId || !formData || typeof formData !== "object") {
-        throw new functions.https.HttpsError("invalid-argument", "Invalid draft payload.");
+        throw new gen2_1.HttpsError("invalid-argument", "Invalid draft payload.");
     }
     const recordRef = db_1.db.collection("records").doc(recordId);
     const record = await recordRef.get();

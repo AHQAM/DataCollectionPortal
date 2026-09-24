@@ -35,28 +35,28 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commitImport = exports.importDataPreview = void 0;
 const db_1 = require("./config/db");
-const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const gen2_1 = require("./config/gen2");
 const notificationService_1 = require("./notificationService");
 const roles_1 = require("./roles");
 const MAX_IMPORT_ROWS = 2000;
 const MAX_IMPORT_FILENAME_LENGTH = 255;
 const checkAdminOrSupervisor = (context) => {
     if (!context.auth) {
-        throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
+        throw new gen2_1.HttpsError("unauthenticated", "User must be authenticated.");
     }
     const role = context.auth.token.role;
     if (role !== roles_1.USER_ROLES.ADMIN && role !== roles_1.USER_ROLES.SUPERVISOR) {
-        throw new functions.https.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
+        throw new gen2_1.HttpsError("permission-denied", "Only admins or supervisors can perform this action.");
     }
 };
-exports.importDataPreview = functions.https.onCall(async (data, context) => {
+exports.importDataPreview = (0, gen2_1.onCallGen2)(async (data, context) => {
     checkAdminOrSupervisor(context);
     // Optional: Just return a preview of first 5 rows and mapping hints
     // Can be implemented if Admin UI wants backend processing for CSV
     return { success: true, message: "Preview generated" };
 });
-exports.commitImport = functions.https.onCall(async (data, context) => {
+exports.commitImport = (0, gen2_1.onCallGen2)(async (data, context) => {
     checkAdminOrSupervisor(context);
     const { requestId, importedRows, mapping, fileName, lang } = data;
     if (typeof requestId !== "string" ||
@@ -66,17 +66,17 @@ exports.commitImport = functions.https.onCall(async (data, context) => {
         !mapping ||
         typeof mapping !== "object" ||
         Array.isArray(mapping)) {
-        throw new functions.https.HttpsError("invalid-argument", "Missing required fields.");
+        throw new gen2_1.HttpsError("invalid-argument", "Missing required fields.");
     }
     if (fileName !== undefined &&
         (typeof fileName !== "string" ||
             fileName.length === 0 ||
             fileName.length > MAX_IMPORT_FILENAME_LENGTH)) {
-        throw new functions.https.HttpsError("invalid-argument", "Invalid import file name.");
+        throw new gen2_1.HttpsError("invalid-argument", "Invalid import file name.");
     }
     const requestDoc = await db_1.db.collection("requests").doc(requestId).get();
     if (!requestDoc.exists) {
-        throw new functions.https.HttpsError("not-found", "Request not found.");
+        throw new gen2_1.HttpsError("not-found", "Request not found.");
     }
     // Fetch all dependencies
     const usersSnap = await db_1.db.collection("users").get();

@@ -1,28 +1,28 @@
 import { db } from "./config/db";
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError, CallableContextCompat } from "./config/gen2";
 import { sendNotificationInternal } from "./notificationService";
 import { USER_ROLES } from "./roles";
 const MAX_IMPORT_ROWS = 2000;
 const MAX_IMPORT_FILENAME_LENGTH = 255;
 
-const checkAdminOrSupervisor = (context: functions.https.CallableContext) => {
+const checkAdminOrSupervisor = (context: CallableContextCompat) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "unauthenticated",
       "User must be authenticated.",
     );
   }
   const role = context.auth.token.role;
   if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "permission-denied",
       "Only admins or supervisors can perform this action.",
     );
   }
 };
 
-export const importDataPreview = functions.https.onCall(
+export const importDataPreview = onCallGen2(
   async (data, context) => {
     checkAdminOrSupervisor(context);
     // Optional: Just return a preview of first 5 rows and mapping hints
@@ -31,7 +31,7 @@ export const importDataPreview = functions.https.onCall(
   },
 );
 
-export const commitImport = functions.https.onCall(async (data, context) => {
+export const commitImport = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
 
   const { requestId, importedRows, mapping, fileName, lang } = data;
@@ -45,7 +45,7 @@ export const commitImport = functions.https.onCall(async (data, context) => {
     typeof mapping !== "object" ||
     Array.isArray(mapping)
   ) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Missing required fields.",
     );
@@ -57,7 +57,7 @@ export const commitImport = functions.https.onCall(async (data, context) => {
       fileName.length === 0 ||
       fileName.length > MAX_IMPORT_FILENAME_LENGTH)
   ) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Invalid import file name.",
     );
@@ -65,7 +65,7 @@ export const commitImport = functions.https.onCall(async (data, context) => {
 
   const requestDoc = await db.collection("requests").doc(requestId).get();
   if (!requestDoc.exists) {
-    throw new functions.https.HttpsError("not-found", "Request not found.");
+    throw new HttpsError("not-found", "Request not found.");
   }
 
   // Fetch all dependencies

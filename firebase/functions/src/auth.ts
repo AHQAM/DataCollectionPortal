@@ -1,5 +1,5 @@
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { onCallGen2, HttpsError } from "./config/gen2";
 import { db } from "./config/db";
 import * as bcrypt from "bcrypt";
 import { logAuditSafe } from "./auditLogger";
@@ -21,7 +21,7 @@ const LOCKOUT_MINUTES = 15;
  * - Custom claims include role, allowedRegionNos, branchId, sessionVersion
  * - All login attempts are audit logged
  */
-export const authenticateWithRegionPassword = functions.https.onCall(
+export const authenticateWithRegionPassword = onCallGen2(
   async (data, context) => {
     const {
       regionNo,
@@ -34,14 +34,14 @@ export const authenticateWithRegionPassword = functions.https.onCall(
 
     // Input validation
     if (!regionNo || !password || !installationDeviceId) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "Missing required fields.",
       );
     }
 
     if (typeof regionNo !== "string" || typeof password !== "string") {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "Invalid input types.",
       );
@@ -50,7 +50,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
     // Basic rate limiting: reject very rapid requests
     // In production, use Firebase App Check + Cloud Armor / API Gateway
     if (password.length > 128) {
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "invalid-argument",
         "Password exceeds maximum length.",
       );
@@ -75,7 +75,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
           details: { regionNo, platform },
         });
 
-        throw new functions.https.HttpsError(
+        throw new HttpsError(
           "unauthenticated",
           "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
         );
@@ -86,7 +86,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
       const userId = userDoc.id;
 
       if (!["REP", "SUPERVISOR", "ADMIN"].includes(userData.role)) {
-        throw new functions.https.HttpsError(
+        throw new HttpsError(
           "unauthenticated",
           "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
         );
@@ -102,7 +102,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
           entityId: userId,
         });
 
-        throw new functions.https.HttpsError(
+        throw new HttpsError(
           "permission-denied",
           "الحساب غير مفعل. يرجى التواصل مع الإدارة. | Account is deactivated. Please contact administration.",
         );
@@ -128,7 +128,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
             details: { remainingMinutes },
           });
 
-          throw new functions.https.HttpsError(
+          throw new HttpsError(
             "permission-denied",
             `الحساب مقفل مؤقتاً. حاول بعد ${remainingMinutes} دقيقة. | Account is temporarily locked. Try again in ${remainingMinutes} minutes.`,
           );
@@ -140,7 +140,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
       if (!passwordHash) {
         // No password hash stored — this shouldn't happen in production
         console.error(`User ${userId} has no passwordHash set`);
-        throw new functions.https.HttpsError(
+        throw new HttpsError(
           "internal",
           "حدث خطأ في إعدادات الحساب. | Account configuration error.",
         );
@@ -186,7 +186,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
           },
         });
 
-        throw new functions.https.HttpsError(
+        throw new HttpsError(
           "unauthenticated",
           "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
         );
@@ -212,7 +212,7 @@ export const authenticateWithRegionPassword = functions.https.onCall(
               details: { platform, appVersion },
             });
 
-            throw new functions.https.HttpsError(
+            throw new HttpsError(
               "permission-denied",
               "هذا الحساب مرتبط بجهاز آخر. يرجى التواصل مع الإدارة لفك ارتباط الجهاز. | This account is linked to another device. Please contact the administrator to release the device.",
             );
@@ -358,11 +358,11 @@ export const authenticateWithRegionPassword = functions.https.onCall(
         sessionVersion: userData.sessionVersion || 0,
       };
     } catch (error: any) {
-      if (error instanceof functions.https.HttpsError) {
+      if (error instanceof HttpsError) {
         throw error;
       }
       console.error("Authentication error:", error);
-      throw new functions.https.HttpsError(
+      throw new HttpsError(
         "internal",
         "حدث خطأ في الخادم. | Internal server error.",
       );

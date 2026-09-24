@@ -34,8 +34,8 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = void 0;
-const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const gen2_1 = require("./config/gen2");
 const db_1 = require("./config/db");
 const uuid_1 = require("uuid");
 const crypto_1 = require("crypto");
@@ -48,17 +48,17 @@ const roles_1 = require("./roles");
  * Admin-only function to create a new user (REP or SUPERVISOR).
  * Hashes the default password and sets mustChangePassword = true.
  */
-exports.createUser = functions.https.onCall(async (data, context) => {
+exports.createUser = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { username, regionNo, allowedRegionNos, userNo, userNameAr, userNameEn, email, mobile, branchId, role, } = data;
     // Validation
     if (!username || !regionNo || !userNameAr || !branchId || !role) {
-        throw new functions.https.HttpsError("invalid-argument", "الحقول المطلوبة: اسم المستخدم، رقم المنطقة، اسم المندوب، الفرع، الدور. | Required: username, regionNo, userNameAr, branchId, role.");
+        throw new gen2_1.HttpsError("invalid-argument", "الحقول المطلوبة: اسم المستخدم، رقم المنطقة، اسم المندوب، الفرع، الدور. | Required: username, regionNo, userNameAr, branchId, role.");
     }
     if (![roles_1.USER_ROLES.REP, roles_1.USER_ROLES.SUPERVISOR].includes(role)) {
-        throw new functions.https.HttpsError("invalid-argument", "الدور يجب أن يكون REP أو SUPERVISOR. | Role must be REP or SUPERVISOR.");
+        throw new gen2_1.HttpsError("invalid-argument", "الدور يجب أن يكون REP أو SUPERVISOR. | Role must be REP or SUPERVISOR.");
     }
     try {
         // Check for duplicate username
@@ -68,7 +68,7 @@ exports.createUser = functions.https.onCall(async (data, context) => {
             .limit(1)
             .get();
         if (!existing.empty) {
-            throw new functions.https.HttpsError("already-exists", `اسم المستخدم ${username} مستخدم بالفعل. | Username ${username} already exists.`);
+            throw new gen2_1.HttpsError("already-exists", `اسم المستخدم ${username} مستخدم بالفعل. | Username ${username} already exists.`);
         }
         const temporaryPassword = (0, crypto_1.randomBytes)(9).toString("base64url");
         const passwordHash = await (0, auth_1.hashPassword)(temporaryPassword);
@@ -129,11 +129,11 @@ exports.createUser = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Create user error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 /**
@@ -142,13 +142,13 @@ exports.createUser = functions.https.onCall(async (data, context) => {
  * Admin-only function to update user profile fields.
  * Cannot update password through this function — use changePassword or adminResetPassword.
  */
-exports.updateUser = functions.https.onCall(async (data, context) => {
+exports.updateUser = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { targetUserId, updates } = data;
     if (!targetUserId || !updates) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم والتحديثات مطلوبة. | User ID and updates are required.");
+        throw new gen2_1.HttpsError("invalid-argument", "معرف المستخدم والتحديثات مطلوبة. | User ID and updates are required.");
     }
     // Whitelist allowed update fields
     const ALLOWED_FIELDS = [
@@ -168,7 +168,7 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
         const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
-            throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
+            throw new gen2_1.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
         }
         const safeUpdates = {};
         for (const [key, value] of Object.entries(updates)) {
@@ -177,7 +177,7 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
             }
         }
         if (Object.keys(safeUpdates).length === 0) {
-            throw new functions.https.HttpsError("invalid-argument", "لا توجد حقول صالحة للتحديث. | No valid fields to update.");
+            throw new gen2_1.HttpsError("invalid-argument", "لا توجد حقول صالحة للتحديث. | No valid fields to update.");
         }
         safeUpdates.updatedAt = admin.firestore.FieldValue.serverTimestamp();
         await userRef.update(safeUpdates);
@@ -217,11 +217,11 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Update user error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 /**
@@ -229,23 +229,23 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
  *
  * Admin-only soft-delete: deactivates a user, revokes sessions.
  */
-exports.deactivateUser = functions.https.onCall(async (data, context) => {
+exports.deactivateUser = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { targetUserId, reason } = data;
     if (!targetUserId) {
-        throw new functions.https.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
+        throw new gen2_1.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
     // Prevent self-deactivation
     if (targetUserId === context.auth.uid) {
-        throw new functions.https.HttpsError("failed-precondition", "لا يمكنك تعطيل حسابك الخاص. | Cannot deactivate your own account.");
+        throw new gen2_1.HttpsError("failed-precondition", "لا يمكنك تعطيل حسابك الخاص. | Cannot deactivate your own account.");
     }
     try {
         const userRef = db_1.db.collection("users").doc(targetUserId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
-            throw new functions.https.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
+            throw new gen2_1.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
         }
         await userRef.update({
             isActive: false,
@@ -275,11 +275,11 @@ exports.deactivateUser = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Deactivate user error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 /**
@@ -288,16 +288,16 @@ exports.deactivateUser = functions.https.onCall(async (data, context) => {
  * Admin-only batch user creation from import.
  * Each user gets a unique temporary password and mustChangePassword = true.
  */
-exports.importUsersBatch = functions.https.onCall(async (data, context) => {
+exports.importUsersBatch = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
-        throw new functions.https.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
+        throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
     const { users } = data;
     if (!Array.isArray(users) || users.length === 0) {
-        throw new functions.https.HttpsError("invalid-argument", "قائمة المستخدمين مطلوبة. | Users list is required.");
+        throw new gen2_1.HttpsError("invalid-argument", "قائمة المستخدمين مطلوبة. | Users list is required.");
     }
     if (users.length > 100) {
-        throw new functions.https.HttpsError("invalid-argument", "الحد الأقصى 100 مستخدم في الدفعة الواحدة. | Maximum 100 users per batch.");
+        throw new gen2_1.HttpsError("invalid-argument", "الحد الأقصى 100 مستخدم في الدفعة الواحدة. | Maximum 100 users per batch.");
     }
     try {
         // Check for duplicate usernames
@@ -411,11 +411,11 @@ exports.importUsersBatch = functions.https.onCall(async (data, context) => {
         };
     }
     catch (error) {
-        if (error instanceof functions.https.HttpsError) {
+        if (error instanceof gen2_1.HttpsError) {
             throw error;
         }
         console.error("Import users batch error:", error);
-        throw new functions.https.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });
 //# sourceMappingURL=userManagement.js.map
