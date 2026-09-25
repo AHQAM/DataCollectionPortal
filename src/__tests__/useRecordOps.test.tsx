@@ -62,9 +62,9 @@ describe("useRecordOps Hook", () => {
     });
 
     it("saves draft and logs audit when online", async () => {
-      (recordApi.saveDraftRecord as any).mockResolvedValueOnce({
+      vi.mocked(recordApi.saveDraftRecord).mockResolvedValueOnce({
         success: true,
-      });
+      } as any);
       const hook = useRecordOps();
       const res = await hook.saveDraftRecord("r1", { fieldA: 1 });
 
@@ -74,6 +74,7 @@ describe("useRecordOps Hook", () => {
         "r1",
         { fieldA: 1 },
         "act1",
+        expect.any(String),
       );
       expect(logAudit).toHaveBeenCalledWith(
         "RECORD_DRAFT_SAVED",
@@ -83,11 +84,30 @@ describe("useRecordOps Hook", () => {
       );
     });
 
+    it("handles conflict resolution when server draft is newer", async () => {
+      vi.mocked(recordApi.saveDraftRecord).mockResolvedValueOnce({
+        success: true,
+        conflict: true,
+        reason: "SERVER_NEWER",
+      });
+      const hook = useRecordOps();
+      const res = await hook.saveDraftRecord("r1", { fieldA: 1 });
+
+      expect(res.success).toBe(true);
+      expect(res.conflict).toBe(true);
+      expect(logAudit).toHaveBeenCalledWith(
+        "RECORD_DRAFT_CONFLICT_RESOLVED",
+        "Record",
+        "r1",
+        expect.objectContaining({ reason: "SERVER_NEWER" }),
+      );
+    });
+
     it("returns failure when api fails logically", async () => {
-      (recordApi.saveDraftRecord as any).mockResolvedValueOnce({
+      vi.mocked(recordApi.saveDraftRecord).mockResolvedValueOnce({
         success: false,
         message: "Server rejected draft",
-      });
+      } as any);
       const hook = useRecordOps();
       const res = await hook.saveDraftRecord("r1", { fieldA: 1 });
 
@@ -97,7 +117,7 @@ describe("useRecordOps Hook", () => {
     });
 
     it("returns failure when api fails with exception", async () => {
-      (recordApi.saveDraftRecord as any).mockRejectedValueOnce(
+      vi.mocked(recordApi.saveDraftRecord).mockRejectedValueOnce(
         new Error("API Error"),
       );
       const hook = useRecordOps();
@@ -111,7 +131,7 @@ describe("useRecordOps Hook", () => {
 
   describe("submitRecord", () => {
     it("submits record and logs audit", async () => {
-      (recordApi.submitRecord as any).mockResolvedValueOnce({ success: true });
+      vi.mocked(recordApi.submitRecord).mockResolvedValueOnce({ success: true } as any);
       const hook = useRecordOps();
       const res = await hook.submitRecord("r1", { fieldB: 2 });
 
@@ -121,6 +141,7 @@ describe("useRecordOps Hook", () => {
         "r1",
         { fieldB: 2 },
         "act1",
+        expect.any(String),
       );
       expect(logAudit).toHaveBeenCalledWith(
         "RECORD_COMPLETED",
@@ -130,11 +151,30 @@ describe("useRecordOps Hook", () => {
       );
     });
 
+    it("handles conflict resolution on submission when record is locked", async () => {
+      vi.mocked(recordApi.submitRecord).mockResolvedValueOnce({
+        success: true,
+        conflict: true,
+        reason: "RECORD_LOCKED",
+      });
+      const hook = useRecordOps();
+      const res = await hook.submitRecord("r1", { fieldB: 2 });
+
+      expect(res.success).toBe(true);
+      expect(res.conflict).toBe(true);
+      expect(logAudit).toHaveBeenCalledWith(
+        "RECORD_SUBMISSION_CONFLICT_RESOLVED",
+        "Record",
+        "r1",
+        expect.objectContaining({ reason: "RECORD_LOCKED" }),
+      );
+    });
+
     it("returns failure when api fails logically", async () => {
-      (recordApi.submitRecord as any).mockResolvedValueOnce({
+      vi.mocked(recordApi.submitRecord).mockResolvedValueOnce({
         success: false,
         message: "Invalid field",
-      });
+      } as any);
       const hook = useRecordOps();
       const res = await hook.submitRecord("r1", { fieldB: 2 });
 
@@ -144,7 +184,7 @@ describe("useRecordOps Hook", () => {
     });
 
     it("returns failure on exception", async () => {
-      (recordApi.submitRecord as any).mockRejectedValueOnce(
+      vi.mocked(recordApi.submitRecord).mockRejectedValueOnce(
         new Error("Network error"),
       );
       const hook = useRecordOps();
@@ -157,7 +197,7 @@ describe("useRecordOps Hook", () => {
 
   describe("reassignRecord", () => {
     it("reassigns and logs audit", async () => {
-      (recordApi.reassignRecord as any).mockResolvedValueOnce(undefined);
+      vi.mocked(recordApi.reassignRecord).mockResolvedValueOnce(undefined as any);
       const hook = useRecordOps();
       const res = await hook.reassignRecord("r1", "user2", "holiday");
 
@@ -172,7 +212,7 @@ describe("useRecordOps Hook", () => {
     });
 
     it("returns error on exception", async () => {
-      (recordApi.reassignRecord as any).mockRejectedValueOnce(
+      vi.mocked(recordApi.reassignRecord).mockRejectedValueOnce(
         new Error("Error"),
       );
       const hook = useRecordOps();
@@ -184,10 +224,10 @@ describe("useRecordOps Hook", () => {
 
   describe("commitImport", () => {
     it("commits import and logs audit", async () => {
-      (recordApi.commitImport as any).mockResolvedValueOnce({
+      vi.mocked(recordApi.commitImport).mockResolvedValueOnce({
         total: 10,
         created: 5,
-      });
+      } as any);
       const hook = useRecordOps();
       const res = await hook.commitImport("req1", [], {}, "test.csv");
 
@@ -208,7 +248,7 @@ describe("useRecordOps Hook", () => {
     });
 
     it("returns error on exception", async () => {
-      (recordApi.commitImport as any).mockRejectedValueOnce(new Error("Error"));
+      vi.mocked(recordApi.commitImport).mockRejectedValueOnce(new Error("Error"));
       const hook = useRecordOps();
       const res = await hook.commitImport("req1", [], {}, "test.csv");
 

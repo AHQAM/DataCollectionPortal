@@ -109,7 +109,7 @@ export default defineConfig(() => {
               "firebase/storage",
             ],
             "vendor-icons": ["lucide-react"],
-            "vendor-utils": ["zustand"],
+            "vendor-utils": ["zustand", "@tanstack/react-query"],
           },
         },
       },

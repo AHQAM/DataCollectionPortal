@@ -76,5 +76,14 @@
     "broadcast": "إرسال إشعار عام (FCM)",
     "notifications": "إشعارات النظام",
     "logout": "تسجيل الخروج"
+  },
+  "pwa": {
+    "installApp": "تثبيت التطبيق",
+    "installOnDevice": "تثبيت التطبيق على جهازك",
+    "install": "تثبيت",
+    "close": "إغلاق",
+    "offlineReady": "يعمل دون اتصال بالإنترنت",
+    "quickAccess": "وصول سريع من الشاشة الرئيسية",
+    "understood": "فهمت، حسناً"
   }
 }

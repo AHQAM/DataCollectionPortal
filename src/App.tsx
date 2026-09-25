@@ -1,9 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense, lazy } from "react";
 import { AppProvider, useApp } from "./context/AppContext";
 import { TopNavbar } from "./components/common/TopNavbar";
-import { AuthPortal } from "./components/common/AuthPortal";
-import { AdminLayout } from "./components/admin/AdminLayout";
 import ErrorBoundary from "./components/ErrorBoundary";
+
+const AuthPortal = lazy(() =>
+  import("./components/common/AuthPortal").then((m) => ({ default: m.AuthPortal })),
+);
+const AdminLayout = lazy(() =>
+  import("./components/admin/AdminLayout").then((m) => ({ default: m.AdminLayout })),
+);
 
 const MainAppContent: React.FC = () => {
   const { lang, dir, currentUser, authReady, setIsOnline, syncOfflineQueue } =
@@ -44,7 +49,17 @@ const MainAppContent: React.FC = () => {
   }
 
   if (!currentUser) {
-    return <AuthPortal />;
+    return (
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-slate-100 text-slate-700">
+            جاري تحميل الواجهة...
+          </div>
+        }
+      >
+        <AuthPortal />
+      </Suspense>
+    );
   }
 
   return (
@@ -54,7 +69,15 @@ const MainAppContent: React.FC = () => {
 
       {/* Main View Mode Container */}
       <div className="flex-1">
-        <AdminLayout />
+        <Suspense
+          fallback={
+            <div className="flex h-full items-center justify-center text-slate-500">
+              جاري تحميل لوحة التحكم...
+            </div>
+          }
+        >
+          <AdminLayout />
+        </Suspense>
       </div>
 
       {/* Global Brand & Security Compliance Footer */}

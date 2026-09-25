@@ -17,10 +17,10 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       thresholds: {
-        lines: 23,
-        functions: 17,
-        branches: 11,
-        statements: 23,
+        lines: 40,
+        functions: 35,
+        branches: 23,
+        statements: 39,
       },
       include: ["src/**/*.ts", "src/**/*.tsx"],
       exclude: [

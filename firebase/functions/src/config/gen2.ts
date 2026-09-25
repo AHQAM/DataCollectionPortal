@@ -1,4 +1,5 @@
 import { onCall, CallableOptions, HttpsError } from "firebase-functions/v2/https";
+import { verifyAppCheck } from "./appCheck";
 
 export { HttpsError };
 
@@ -24,8 +25,17 @@ export function onCallGen2<TData = any, TResp = any>(
     context: CallableContextCompat,
   ) => Promise<TResp> | TResp,
 ) {
+  const defaultOptions: CallableOptions = {
+    cors: true,
+    maxInstances: 100, // Prevent DDoS billing spikes
+    memory: "256MiB",
+    concurrency: 80, // Minimize cold starts
+  };
+
   const options: CallableOptions =
-    typeof optionsOrHandler === "function" ? { cors: true } : optionsOrHandler;
+    typeof optionsOrHandler === "function"
+      ? defaultOptions
+      : { ...defaultOptions, ...optionsOrHandler };
   const handler =
     typeof optionsOrHandler === "function"
       ? optionsOrHandler
@@ -34,6 +44,7 @@ export function onCallGen2<TData = any, TResp = any>(
   return onCall(options, async (req: any, ctx?: any) => {
     // 1. Direct invocation from test runners passing (data, context)
     if (ctx && ctx.auth !== undefined) {
+      verifyAppCheck(ctx);
       return handler(req, ctx);
     }
     // 2. Runtime invocation via Firebase / Cloud Run passing single CallableRequest
@@ -43,13 +54,17 @@ export function onCallGen2<TData = any, TResp = any>(
         req.auth !== undefined ||
         req.rawRequest !== undefined)
     ) {
-      return handler(req.data, {
+      const context: CallableContextCompat = {
         auth: req.auth,
         app: req.app,
         rawRequest: req.rawRequest,
-      });
+      };
+      verifyAppCheck(context);
+      return handler(req.data, context);
     }
     // 3. Fallback
-    return handler(req, ctx || {});
+    const fallbackContext = ctx || {};
+    verifyAppCheck(fallbackContext);
+    return handler(req, fallbackContext);
   });
 }

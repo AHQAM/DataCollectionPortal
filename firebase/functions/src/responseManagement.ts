@@ -4,6 +4,19 @@ import { db } from "./config/db";
 import { USER_ROLES } from "./roles";
 import { logAuditSafe } from "./auditLogger";
 
+function parseTimestampMillis(ts: any): number | null {
+  if (!ts) return null;
+  if (typeof ts.toMillis === "function") return ts.toMillis();
+  if (typeof ts.seconds === "number")
+    return ts.seconds * 1000 + Math.floor((ts.nanoseconds || 0) / 1000000);
+  if (typeof ts === "string") {
+    const parsed = Date.parse(ts);
+    return isNaN(parsed) ? null : parsed;
+  }
+  if (typeof ts === "number") return ts;
+  return null;
+}
+
 export const submitResponse = onCallGen2(async (data, context) => {
   if (!context.auth) {
     throw new HttpsError(
@@ -12,7 +25,7 @@ export const submitResponse = onCallGen2(async (data, context) => {
     );
   }
 
-  const { requestId, recordId, activityId, formData, submittedAt } = data || {};
+  const { requestId, recordId, activityId, formData, submittedAt, clientUpdatedAt } = data || {};
   if (
     typeof requestId !== "string" ||
     typeof recordId !== "string" ||
@@ -96,7 +109,7 @@ export const submitResponse = onCallGen2(async (data, context) => {
   const responseRef = db.collection("responses").doc(recordId);
   const now = admin.firestore.FieldValue.serverTimestamp();
 
-  await db.runTransaction(async (transaction) => {
+  const txResult = await db.runTransaction(async (transaction) => {
     // --- STEP 1: ALL READS MUST OCCUR BEFORE ANY WRITES ---
     const recordDoc = await transaction.get(recordRef);
     const isDocNew = !recordDoc.exists;
@@ -111,6 +124,48 @@ export const submitResponse = onCallGen2(async (data, context) => {
     }
 
     // --- STEP 2: ALL WRITES AFTER ALL READS ---
+    // Check Last-Write-Wins (LWW) conflict
+    let isConflict = false;
+    if (!isDocNew && clientUpdatedAt) {
+      const serverMs = parseTimestampMillis(
+        currentRecData.updatedAt || currentRecData.lastSavedAt,
+      );
+      const clientMs = parseTimestampMillis(clientUpdatedAt || submittedAt);
+      if (serverMs !== null && clientMs !== null && serverMs > clientMs) {
+        if (
+          currentRecData.recordStatus === "Submitted" ||
+          currentRecData.recordStatus === "Completed"
+        ) {
+          isConflict = true;
+        }
+      }
+    }
+
+    if (isConflict) {
+      transaction.set(
+        responseRef,
+        {
+          responseId: responseRef.id,
+          requestId,
+          activityId: activityId || currentRecData.activityId || requestId,
+          recordId,
+          submittedBy: context.auth!.uid,
+          data: formData,
+          submittedAt: submittedAt || now,
+          updatedAt: now,
+          conflict: true,
+          conflictReason: "SERVER_NEWER_SUBMISSION",
+        },
+        { merge: true },
+      );
+      return {
+        success: true,
+        conflict: true,
+        responseId: responseRef.id,
+        reason: "SERVER_NEWER_SUBMISSION",
+      };
+    }
+
     // 1. Save response data
     transaction.set(
       responseRef,
@@ -172,18 +227,32 @@ export const submitResponse = onCallGen2(async (data, context) => {
         });
       }
     }
+
+    return { success: true, responseId: responseRef.id };
   });
+
+  if (txResult?.conflict) {
+    await logAuditSafe({
+      userId: context.auth.uid,
+      userRole: context.auth.token.role || "REP",
+      action: "RECORD_SUBMISSION_CONFLICT_RESOLVED",
+      entityType: "RECORD",
+      entityId: recordId,
+      details: { requestId, reason: txResult.reason },
+    });
+    return txResult;
+  }
 
   await logAuditSafe({
     userId: context.auth.uid,
     userRole: context.auth.token.role || "REP",
-    action: "RECORD_SUBMITTED",
+    action: "RECORD_SUBMISSION_COMPLETED",
     entityType: "RECORD",
     entityId: recordId,
     details: { requestId, activityId, isNewRecord },
   });
 
-  return { success: true, responseId: responseRef.id };
+  return txResult || { success: true, responseId: responseRef.id };
 });
 
 export const saveDraftResponse = onCallGen2(
@@ -195,7 +264,7 @@ export const saveDraftResponse = onCallGen2(
       );
     }
 
-    const { requestId, recordId, activityId, formData } = data || {};
+    const { requestId, recordId, activityId, formData, clientUpdatedAt } = data || {};
     if (!recordId || !formData || typeof formData !== "object") {
       throw new HttpsError(
         "invalid-argument",
@@ -246,10 +315,37 @@ export const saveDraftResponse = onCallGen2(
     const responseRef = db.collection("responses").doc(recordId);
     const now = admin.firestore.FieldValue.serverTimestamp();
 
-    await db.runTransaction(async (transaction) => {
+    const txResult = await db.runTransaction(async (transaction) => {
       // 1. ALL READS FIRST
       const recordDoc = await transaction.get(recordRef);
       const isExisting = recordDoc.exists;
+
+      // Check conflict if existing
+      if (isExisting) {
+        const existingData = recordDoc.data() || {};
+        const existingStatus = existingData.recordStatus;
+        const isAlreadySubmitted =
+          existingStatus === "Submitted" || existingStatus === "Completed";
+
+        let isServerNewer = false;
+        if (clientUpdatedAt) {
+          const serverMs = parseTimestampMillis(
+            existingData.updatedAt || existingData.lastSavedAt,
+          );
+          const clientMs = parseTimestampMillis(clientUpdatedAt);
+          if (serverMs !== null && clientMs !== null && serverMs > clientMs) {
+            isServerNewer = true;
+          }
+        }
+
+        if (isAlreadySubmitted || isServerNewer) {
+          return {
+            success: true,
+            conflict: true,
+            reason: isAlreadySubmitted ? "RECORD_LOCKED" : "SERVER_NEWER",
+          };
+        }
+      }
 
       // 2. ALL WRITES AFTER READS
       transaction.set(
@@ -284,8 +380,22 @@ export const saveDraftResponse = onCallGen2(
           updatedAt: now,
         });
       }
+
+      return { success: true };
     });
 
-    return { success: true };
+    if (txResult?.conflict) {
+      await logAuditSafe({
+        userId: context.auth.uid,
+        userRole: context.auth.token.role || "REP",
+        action: "RECORD_DRAFT_CONFLICT_RESOLVED",
+        entityType: "RECORD",
+        entityId: recordId,
+        details: { requestId, reason: txResult.reason },
+      });
+    }
+
+    return txResult || { success: true };
   },
 );
+

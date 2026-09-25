@@ -35,7 +35,7 @@ describe("useSystemOps Hook", () => {
 
   describe("Device Operations", () => {
     it("approveDeviceReplacement succeeds and logs audit", async () => {
-      (deviceApi.replaceDevice as any).mockResolvedValueOnce(undefined);
+      vi.mocked(deviceApi.replaceDevice).mockResolvedValueOnce(undefined as any);
       const hook = useSystemOps();
       const res = await hook.approveDeviceReplacement("u1", "lost");
 
@@ -50,7 +50,7 @@ describe("useSystemOps Hook", () => {
     });
 
     it("releaseDeviceBinding succeeds and logs audit", async () => {
-      (deviceApi.releaseDevice as any).mockResolvedValueOnce(undefined);
+      vi.mocked(deviceApi.releaseDevice).mockResolvedValueOnce(undefined as any);
       const hook = useSystemOps();
       const res = await hook.releaseDeviceBinding("u1");
 
@@ -65,8 +65,8 @@ describe("useSystemOps Hook", () => {
     });
 
     it("rejectDeviceReplacement succeeds and logs audit", async () => {
-      (deviceApi.rejectDeviceReplacement as any).mockResolvedValueOnce(
-        undefined,
+      vi.mocked(deviceApi.rejectDeviceReplacement).mockResolvedValueOnce(
+        undefined as any,
       );
       const hook = useSystemOps();
       const res = await hook.rejectDeviceReplacement("b1", "denied");
@@ -81,27 +81,27 @@ describe("useSystemOps Hook", () => {
 
   describe("Password & Auth Operations", () => {
     it("requestPasswordReset succeeds", async () => {
-      (userApi.requestPasswordReset as any).mockResolvedValueOnce({
+      vi.mocked(userApi.requestPasswordReset).mockResolvedValueOnce({
         success: true,
-      });
+      } as any);
       const hook = useSystemOps();
       const res = await hook.requestPasswordReset("reg1");
       expect(res.success).toBe(true);
     });
 
     it("adminResetPassword succeeds", async () => {
-      (userApi.adminResetPassword as any).mockResolvedValueOnce({
+      vi.mocked(userApi.adminResetPassword).mockResolvedValueOnce({
         success: true,
-      });
+      } as any);
       const hook = useSystemOps();
       const res = await hook.adminResetPassword("u1", "pass123");
       expect(res.success).toBe(true);
     });
 
     it("adminUnlockAccount succeeds", async () => {
-      (userApi.adminUnlockAccount as any).mockResolvedValueOnce({
+      vi.mocked(userApi.adminUnlockAccount).mockResolvedValueOnce({
         success: true,
-      });
+      } as any);
       const hook = useSystemOps();
       const res = await hook.adminUnlockAccount("u1");
       expect(res.success).toBe(true);
@@ -123,7 +123,7 @@ describe("useSystemOps Hook", () => {
         fields: [{ requestId: "req1", fieldId: "f1" } as any],
       });
       useAuthStore.setState({ currentUser: { userId: "admin1" } as any });
-      (templateApi.saveTemplate as any).mockResolvedValueOnce(undefined);
+      vi.mocked(templateApi.saveTemplate).mockResolvedValueOnce(undefined as any);
 
       const hook = useSystemOps();
       const res = await hook.saveAsTemplate("req1", "ar", "en", "cat");
@@ -134,7 +134,7 @@ describe("useSystemOps Hook", () => {
 
   describe("System Maintenance", () => {
     it("wipeDemoDataForProduction calls systemApi", async () => {
-      (systemApi.wipeDemoData as any).mockResolvedValueOnce({ wiped: true });
+      vi.mocked(systemApi.wipeDemoData).mockResolvedValueOnce({ wiped: true } as any);
       const hook = useSystemOps();
       const res = await hook.wipeDemoDataForProduction();
       expect(res.success).toBe(true);

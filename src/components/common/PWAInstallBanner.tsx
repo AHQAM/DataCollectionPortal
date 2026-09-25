@@ -20,7 +20,7 @@ export const PWAInstallBanner: React.FC<Props> = ({
   variant = "banner",
   className = "",
 }) => {
-  const { lang } = useApp();
+  const { lang, t } = useApp();
   const { isInstallable, isInstalled, isStandalone, isIOS, install } =
     usePWAInstall();
   const [showIOSModal, setShowIOSModal] = useState(false);
@@ -53,10 +53,10 @@ export const PWAInstallBanner: React.FC<Props> = ({
         <button
           onClick={handleInstallClick}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-sm transition-all cursor-pointer ${className}`}
-          title={lang === "ar" ? "تثبيت التطبيق على جهازك" : "Install App"}
+          title={t("pwa.installOnDevice")}
         >
           <Download className="w-3.5 h-3.5" />
-          <span>{lang === "ar" ? "تثبيت التطبيق" : "Install App"}</span>
+          <span>{t("pwa.installApp")}</span>
         </button>
 
         {showIOSModal && (
@@ -93,7 +93,7 @@ export const PWAInstallBanner: React.FC<Props> = ({
             <button
               onClick={() => setIsDismissed(true)}
               className="p-1 text-purple-300 hover:text-white rounded-lg hover:bg-white/10"
-              title={lang === "ar" ? "إغلاق" : "Close"}
+              title={t("pwa.close")}
             >
               <X className="w-4 h-4" />
             </button>
@@ -111,9 +111,7 @@ export const PWAInstallBanner: React.FC<Props> = ({
                   ? lang === "ar"
                     ? "طريقة التثبيت على iPhone"
                     : "How to Install on iPhone"
-                  : lang === "ar"
-                    ? "تثبيت التطبيق الآن"
-                    : "Install App Now"}
+                  : t("pwa.installOnDevice")}
               </span>
             </button>
           </div>
@@ -157,12 +155,12 @@ export const PWAInstallBanner: React.FC<Props> = ({
             className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs shadow-xs flex items-center gap-1 transition-all cursor-pointer"
           >
             <Download className="w-3 h-3" />
-            <span>{lang === "ar" ? "تثبيت" : "Install"}</span>
+            <span>{t("pwa.install")}</span>
           </button>
           <button
             onClick={() => setIsDismissed(true)}
             className="p-1 rounded-md text-purple-300 hover:text-white hover:bg-white/10 transition-all"
-            title={lang === "ar" ? "إغلاق" : "Close"}
+            title={t("pwa.close")}
           >
             <X className="w-3.5 h-3.5" />
           </button>

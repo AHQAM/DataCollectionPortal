@@ -250,5 +250,68 @@ describe("Response Management Cloud Functions & Concurrency", () => {
       expect(db.runTransaction).toHaveBeenCalledTimes(1);
       expect(mockTransaction.set).toHaveBeenCalled();
     });
+
+    it("detects conflict and refuses to overwrite when record is already submitted or server is newer", async () => {
+      hasWritten = false;
+      mockTransaction.get.mockImplementation(async () => {
+        return {
+          exists: true,
+          data: () => ({
+            recordId: "rec-1",
+            requestId: "req-1",
+            assignedUserId: "rep-1",
+            assignmentId: "asg-1",
+            recordStatus: "Submitted",
+            updatedAt: "2026-09-24T20:00:00.000Z",
+          }),
+        };
+      });
+
+      const result = await wrappedSaveDraftResponse(
+        {
+          requestId: "req-1",
+          recordId: "rec-1",
+          formData: { draftQuestion: "Stale draft from offline" },
+          clientUpdatedAt: "2026-09-24T19:00:00.000Z", // Older than server
+        },
+        { auth: { uid: "rep-1", token: { role: "REP" } } },
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.conflict).toBe(true);
+      expect(result.reason).toBe("RECORD_LOCKED");
+    });
+
+    it("detects conflict and refuses to overwrite in-progress record when server updatedAt is newer", async () => {
+      hasWritten = false;
+      mockTransaction.get.mockImplementation(async () => {
+        return {
+          exists: true,
+          data: () => ({
+            recordId: "rec-1",
+            requestId: "req-1",
+            assignedUserId: "rep-1",
+            assignmentId: "asg-1",
+            recordStatus: "In Progress",
+            updatedAt: "2026-09-24T20:00:00.000Z",
+          }),
+        };
+      });
+
+      const result = await wrappedSaveDraftResponse(
+        {
+          requestId: "req-1",
+          recordId: "rec-1",
+          formData: { draftQuestion: "Stale draft from offline" },
+          clientUpdatedAt: "2026-09-24T19:00:00.000Z", // Older than server
+        },
+        { auth: { uid: "rep-1", token: { role: "REP" } } },
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.conflict).toBe(true);
+      expect(result.reason).toBe("SERVER_NEWER");
+    });
   });
 });
+

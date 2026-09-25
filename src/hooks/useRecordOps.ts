@@ -36,16 +36,32 @@ export const useRecordOps = () => {
       }
 
       try {
+        const clientUpdatedAt = new Date().toISOString();
         const res = await recordApi.saveDraftRecord(
           reqId,
           recordId,
           values,
           rec?.activityId || reqId,
+          clientUpdatedAt,
         );
         if (!res.success) {
           return {
             success: false,
             error: res.message || "Failed to save draft",
+          };
+        }
+        if (res.conflict) {
+          logAudit("RECORD_DRAFT_CONFLICT_RESOLVED", "Record", recordId, {
+            reason: res.reason,
+            isOffline: false,
+          });
+          return {
+            success: true,
+            conflict: true,
+            message:
+              lang === "ar"
+                ? "تنبيه: يوجد إصدار أحدث على الخادم، تم فض التعارض بنجاح."
+                : "Notice: A newer version exists on the server, conflict resolved.",
           };
         }
         logAudit("RECORD_DRAFT_SAVED", "Record", recordId, {
@@ -92,13 +108,29 @@ export const useRecordOps = () => {
       }
 
       try {
+        const clientUpdatedAt = new Date().toISOString();
         const res = await recordApi.submitRecord(
           reqId,
           recordId,
           values,
           targetRecord?.activityId || reqId,
+          clientUpdatedAt,
         );
         if (res.success) {
+          if (res.conflict) {
+            logAudit("RECORD_SUBMISSION_CONFLICT_RESOLVED", "Record", recordId, {
+              reason: res.reason,
+              targetId: targetRecord?.targetId,
+            });
+            return {
+              success: true,
+              conflict: true,
+              message:
+                lang === "ar"
+                  ? "تم حفظ الاستجابة مع رصد تعارض زمني وحله بنجاح."
+                  : "Response saved with timestamp conflict resolved.",
+            };
+          }
           logAudit("RECORD_COMPLETED", "Record", recordId, {
             targetId: targetRecord?.targetId,
             values,

@@ -139,12 +139,14 @@ export async function flushOfflineQueue(): Promise<{
   for (const item of items) {
     try {
       let res;
+      const clientUpdatedAt = new Date(item.createdAt).toISOString();
       if (item.isDraft) {
         res = await recordApi.saveDraftRecord(
           item.requestId,
           item.recordId,
           item.values,
           item.activityId,
+          clientUpdatedAt,
         );
       } else {
         res = await recordApi.submitRecord(
@@ -152,18 +154,28 @@ export async function flushOfflineQueue(): Promise<{
           item.recordId,
           item.values,
           item.activityId,
+          clientUpdatedAt,
         );
       }
 
       if (res && res.success) {
         await removeQueuedRecord(item.id);
         synced++;
-        logAudit(
-          item.isDraft ? "RECORD_DRAFT_SYNCED" : "RECORD_COMPLETED_SYNCED",
-          "Record",
-          item.recordId,
-          { queueId: item.id },
-        );
+        if (res.conflict) {
+          logAudit(
+            "RECORD_OFFLINE_CONFLICT_RESOLVED",
+            "Record",
+            item.recordId,
+            { queueId: item.id, reason: res.reason, isDraft: item.isDraft },
+          );
+        } else {
+          logAudit(
+            item.isDraft ? "RECORD_DRAFT_SYNCED" : "RECORD_COMPLETED_SYNCED",
+            "Record",
+            item.recordId,
+            { queueId: item.id },
+          );
+        }
       } else {
         failed++;
       }

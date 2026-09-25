@@ -29,7 +29,7 @@ describe("useRequestOps Hook", () => {
 
   // --- createRequest ---
   it("createRequest calls API and returns success", async () => {
-    (requestApi.createRequest as any).mockResolvedValue("new_req_id");
+    vi.mocked(requestApi.createRequest).mockResolvedValue("new_req_id");
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -49,7 +49,7 @@ describe("useRequestOps Hook", () => {
   });
 
   it("createRequest returns failure on error", async () => {
-    (requestApi.createRequest as any).mockRejectedValue(new Error("API Error"));
+    vi.mocked(requestApi.createRequest).mockRejectedValue(new Error("API Error"));
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -61,7 +61,7 @@ describe("useRequestOps Hook", () => {
 
   // --- updateRequest ---
   it("updateRequest calls API and returns success", async () => {
-    (requestApi.updateDraftRequest as any).mockResolvedValue(undefined);
+    vi.mocked(requestApi.updateDraftRequest).mockResolvedValue(undefined as any);
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -79,7 +79,7 @@ describe("useRequestOps Hook", () => {
   });
 
   it("updateRequest returns failure on error", async () => {
-    (requestApi.updateDraftRequest as any).mockRejectedValue(
+    vi.mocked(requestApi.updateDraftRequest).mockRejectedValue(
       new Error("API Error"),
     );
     const { result } = renderHook(() => useRequestOps());
@@ -94,7 +94,7 @@ describe("useRequestOps Hook", () => {
 
   // --- publishRequest ---
   it("publishRequest calls API and returns success", async () => {
-    (requestApi.publishRequest as any).mockResolvedValue(undefined);
+    vi.mocked(requestApi.publishRequest).mockResolvedValue(undefined as any);
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -110,7 +110,7 @@ describe("useRequestOps Hook", () => {
   });
 
   it("publishRequest returns failure on error", async () => {
-    (requestApi.publishRequest as any).mockRejectedValue(
+    vi.mocked(requestApi.publishRequest).mockRejectedValue(
       new Error("API Error"),
     );
     const { result } = renderHook(() => useRequestOps());
@@ -123,7 +123,7 @@ describe("useRequestOps Hook", () => {
 
   // --- closeRequest ---
   it("closeRequest calls API and returns success", async () => {
-    (requestApi.closeRequest as any).mockResolvedValue(undefined);
+    vi.mocked(requestApi.closeRequest).mockResolvedValue(undefined as any);
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -140,7 +140,7 @@ describe("useRequestOps Hook", () => {
 
   // --- archiveRequest ---
   it("archiveRequest calls API and returns success", async () => {
-    (requestApi.archiveRequest as any).mockResolvedValue(undefined);
+    vi.mocked(requestApi.archiveRequest).mockResolvedValue(undefined as any);
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -157,7 +157,7 @@ describe("useRequestOps Hook", () => {
 
   // --- reopenRequest ---
   it("reopenRequest calls API and returns success", async () => {
-    (requestApi.reopenRequest as any).mockResolvedValue(undefined);
+    vi.mocked(requestApi.reopenRequest).mockResolvedValue(undefined as any);
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -174,7 +174,7 @@ describe("useRequestOps Hook", () => {
 
   // --- cloneRequest ---
   it("cloneRequest calls API and returns success", async () => {
-    (requestApi.cloneRequest as any).mockResolvedValue("cloned_id");
+    vi.mocked(requestApi.cloneRequest).mockResolvedValue("cloned_id");
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -192,7 +192,7 @@ describe("useRequestOps Hook", () => {
 
   // --- deleteRequest ---
   it("deleteRequest calls API and returns success", async () => {
-    (requestApi.deleteRequest as any).mockResolvedValue(undefined);
+    vi.mocked(requestApi.deleteRequest).mockResolvedValue(undefined as any);
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -209,7 +209,7 @@ describe("useRequestOps Hook", () => {
 
   // --- updateRequestFields ---
   it("updateRequestFields calls API and returns success", async () => {
-    (requestApi.saveRequestFields as any).mockResolvedValue(undefined);
+    vi.mocked(requestApi.saveRequestFields).mockResolvedValue(undefined as any);
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -225,7 +225,7 @@ describe("useRequestOps Hook", () => {
   });
 
   it("updateRequestFields returns failure on error", async () => {
-    (requestApi.saveRequestFields as any).mockRejectedValue(
+    vi.mocked(requestApi.saveRequestFields).mockRejectedValue(
       new Error("API Error"),
     );
     const { result } = renderHook(() => useRequestOps());

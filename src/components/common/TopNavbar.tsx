@@ -92,23 +92,13 @@ export const TopNavbar: React.FC = () => {
           </div>
           <div>
             <div className="font-extrabold text-base sm:text-lg leading-tight tracking-wide flex items-center gap-2">
-              <span>
-                {t
-                  ? t("common.appTitle")
-                  : lang === "ar"
-                    ? "بوابة جمع البيانات الميدانية"
-                    : "Field Data Collection Portal"}
-              </span>
+              <span>{t("common.appTitle")}</span>
               <span className="hidden md:inline-block text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-purple-800 text-purple-200 border border-purple-600/40">
                 Enterprise v2.4
               </span>
             </div>
             <div className="text-[11px] text-purple-200/80 font-medium">
-              {t
-                ? t("topNavbar.subTitle")
-                : lang === "ar"
-                  ? "نظام الحقول الديناميكية والمصادقة المخصصة"
-                  : "Dynamic Fields & Custom Auth Platform"}
+              {t("topNavbar.subTitle")}
             </div>
           </div>
         </div>
@@ -143,17 +133,11 @@ export const TopNavbar: React.FC = () => {
                   setShowNotifMenu(false);
                 }}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-800/60 hover:bg-purple-700/70 border border-purple-600/50 text-white transition-all cursor-pointer"
-                title={
-                  t
-                    ? t("topNavbar.qaSwitcher")
-                    : lang === "ar"
-                      ? "تبديل الأدوار للتجربة السريعة (QA)"
-                      : "Quick Role Switcher (QA)"
-                }
+                title={t("topNavbar.qaSwitcher")}
               >
                 <UserCheck className="w-3.5 h-3.5 text-purple-300" />
                 <span className="hidden md:inline font-bold">
-                  {lang === "ar" ? "مدير النظام" : "Admin"}
+                  {t("roles.admin")}
                 </span>
               </button>
 
@@ -164,13 +148,7 @@ export const TopNavbar: React.FC = () => {
                   } mt-2 w-72 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 py-2 z-50 text-xs animate-in fade-in zoom-in-95 duration-150`}
                 >
                   <div className="px-3 py-1.5 font-bold text-slate-500 border-b border-slate-100 flex items-center justify-between">
-                    <span>
-                      {t
-                        ? t("topNavbar.qaModalTitle")
-                        : lang === "ar"
-                          ? "تبديل الحساب السريع لاختبار النظام"
-                          : "Switch Account for QA / Demo"}
-                    </span>
+                    <span>{t("topNavbar.qaModalTitle")}</span>
                     <span className="text-[10px] px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded">
                       QA Tools
                     </span>
@@ -264,13 +242,7 @@ export const TopNavbar: React.FC = () => {
             <button
               onClick={() => setShowBroadcastModal(true)}
               className="p-2 rounded-lg bg-purple-900/60 hover:bg-purple-800/80 border border-purple-700/50 text-amber-300 hover:text-amber-200 transition-all cursor-pointer"
-              title={
-                t
-                  ? t("topNavbar.broadcast")
-                  : lang === "ar"
-                    ? "إرسال إشعار عام (FCM)"
-                    : "Broadcast Push Notification"
-              }
+              title={t("topNavbar.broadcast")}
             >
               <Radio className="w-4 h-4" />
             </button>
@@ -301,15 +273,9 @@ export const TopNavbar: React.FC = () => {
                   } mt-2 w-80 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 p-3 z-50 text-xs animate-in fade-in zoom-in-95 duration-150`}
                 >
                   <div className="font-bold text-sm text-slate-800 pb-2 border-b border-slate-100 flex items-center justify-between">
-                    <span>
-                      {t
-                        ? t("topNavbar.notifications")
-                        : lang === "ar"
-                          ? "إشعارات النظام"
-                          : "System Notifications"}
-                    </span>
+                    <span>{t("topNavbar.notifications")}</span>
                     <span className="text-purple-600 text-xs font-semibold">
-                      {notifications.length} إشعار
+                      {notifications.length} {t("nav.notifications", "إشعار", "notifications")}
                     </span>
                   </div>
                   <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 mt-2">
@@ -344,13 +310,7 @@ export const TopNavbar: React.FC = () => {
             <button
               onClick={logout}
               className="p-2 rounded-lg bg-purple-900/60 hover:bg-rose-800/80 border border-purple-700/50 text-purple-200 hover:text-white transition-all cursor-pointer"
-              title={
-                t
-                  ? t("topNavbar.logout")
-                  : lang === "ar"
-                    ? "تسجيل الخروج"
-                    : "Logout"
-              }
+              title={t("topNavbar.logout")}
             >
               <LogOut className="w-4 h-4" />
             </button>

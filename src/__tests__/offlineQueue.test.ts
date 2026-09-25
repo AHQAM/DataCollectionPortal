@@ -135,12 +135,14 @@ describe("IndexedDB Offline Queue", () => {
       "rec-draft",
       { note: "draft note" },
       undefined,
+      expect.any(String),
     );
     expect(recordApi.submitRecord).toHaveBeenCalledWith(
       "req-1",
       "rec-submit",
       { note: "submitted note" },
       undefined,
+      expect.any(String),
     );
 
     // Queue should now be empty

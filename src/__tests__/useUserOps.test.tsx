@@ -47,7 +47,7 @@ describe("useUserOps Hook", () => {
 
   describe("updateUser", () => {
     it("returns success and logs audit when update succeeds", async () => {
-      (userApi.updateUser as any).mockResolvedValueOnce({ success: true });
+      vi.mocked(userApi.updateUser).mockResolvedValueOnce({ success: true } as any);
 
       const hook = useUserOps();
       const userObj = {
@@ -73,7 +73,7 @@ describe("useUserOps Hook", () => {
     });
 
     it("returns failure, does not log audit, and rolls back local state when update fails", async () => {
-      (userApi.updateUser as any).mockRejectedValueOnce(
+      vi.mocked(userApi.updateUser).mockRejectedValueOnce(
         new Error("Update failed"),
       );
 
@@ -98,10 +98,10 @@ describe("useUserOps Hook", () => {
 
   describe("addUser", () => {
     it("creates admin user and logs audit", async () => {
-      (userApi.createAdminSupervisorUser as any).mockResolvedValueOnce({
+      vi.mocked(userApi.createAdminSupervisorUser).mockResolvedValueOnce({
         success: true,
         userId: "new_u2",
-      });
+      } as any);
 
       const hook = useUserOps();
       const res = await hook.addUser({
@@ -121,10 +121,10 @@ describe("useUserOps Hook", () => {
     });
 
     it("creates rep user and logs audit", async () => {
-      (userApi.createUser as any).mockResolvedValueOnce({
+      vi.mocked(userApi.createUser).mockResolvedValueOnce({
         success: true,
         userId: "new_u3",
-      });
+      } as any);
 
       const hook = useUserOps();
       const res = await hook.addUser({
@@ -146,7 +146,7 @@ describe("useUserOps Hook", () => {
 
   describe("deactivateUser", () => {
     it("deactivates and logs", async () => {
-      (userApi.deactivateUser as any).mockResolvedValueOnce({ success: true });
+      vi.mocked(userApi.deactivateUser).mockResolvedValueOnce({ success: true } as any);
 
       const hook = useUserOps();
       const res = await hook.deactivateUser("u1");

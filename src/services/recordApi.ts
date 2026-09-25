@@ -7,7 +7,14 @@ export const recordApi = {
     recordId: string,
     formData: Record<string, any>,
     activityId?: string,
-  ): Promise<{ success: boolean; responseId?: string; message?: string }> => {
+    clientUpdatedAt?: string,
+  ): Promise<{
+    success: boolean;
+    responseId?: string;
+    message?: string;
+    conflict?: boolean;
+    reason?: string;
+  }> => {
     try {
       const fn = httpsCallable(functions, "submitResponse");
       const res = await fn({
@@ -15,10 +22,21 @@ export const recordApi = {
         recordId,
         activityId: activityId || requestId,
         formData,
-        submittedAt: new Date().toISOString(),
+        submittedAt: clientUpdatedAt || new Date().toISOString(),
+        clientUpdatedAt: clientUpdatedAt || new Date().toISOString(),
       });
-      const data = res.data as { success: boolean; responseId?: string };
-      return { success: data.success, responseId: data.responseId };
+      const data = res.data as {
+        success: boolean;
+        responseId?: string;
+        conflict?: boolean;
+        reason?: string;
+      };
+      return {
+        success: data.success,
+        responseId: data.responseId,
+        conflict: data.conflict,
+        reason: data.reason,
+      };
     } catch (err: any) {
       console.error("Error submitting record via Cloud Function:", err);
       return {
@@ -33,7 +51,13 @@ export const recordApi = {
     recordId: string,
     formData: Record<string, any>,
     activityId?: string,
-  ): Promise<{ success: boolean; message?: string }> => {
+    clientUpdatedAt?: string,
+  ): Promise<{
+    success: boolean;
+    message?: string;
+    conflict?: boolean;
+    reason?: string;
+  }> => {
     try {
       const fn = httpsCallable(functions, "saveDraftResponse");
       const res = await fn({
@@ -41,14 +65,24 @@ export const recordApi = {
         recordId,
         activityId: activityId || requestId,
         formData,
+        clientUpdatedAt: clientUpdatedAt || new Date().toISOString(),
       });
-      const data = res.data as { success: boolean };
-      return { success: data.success };
+      const data = res.data as {
+        success: boolean;
+        conflict?: boolean;
+        reason?: string;
+      };
+      return {
+        success: data.success,
+        conflict: data.conflict,
+        reason: data.reason,
+      };
     } catch (err: any) {
       console.error("Error saving draft via Cloud Function:", err);
       return { success: false, message: err.message || "Error saving draft" };
     }
   },
+
 
   reassignRecord: async (
     recordId: string,

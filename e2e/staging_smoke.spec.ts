@@ -80,4 +80,76 @@ test.describe("Staging Environment - E2E Smoke & Health Suite", () => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await expect(emailInput).toBeVisible();
   });
+
+  test("5. simulates offline mode and verifies IndexedDB queueing resilience during network partition", async ({
+    page,
+  }) => {
+    // 1. Simulate network disconnect
+    await page.context().setOffline(true);
+    const isOffline = await page.evaluate(() => {
+      window.dispatchEvent(new Event("offline"));
+      return !navigator.onLine;
+    });
+    expect(isOffline).toBe(true);
+
+    // 2. Validate IndexedDB offline storage is functional and can persist queued items
+    const idbOperational = await page.evaluate(async () => {
+      return new Promise<boolean>((resolve) => {
+        try {
+          const req = indexedDB.open("DataCollectionOfflineDB", 1);
+          req.onupgradeneeded = (e: any) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains("queued_records")) {
+              db.createObjectStore("queued_records", { keyPath: "id" });
+            }
+          };
+          req.onsuccess = () => {
+            const db = req.result;
+            const tx = db.transaction("queued_records", "readwrite");
+            const store = tx.objectStore("queued_records");
+            const testItem = {
+              id: "e2e_test_record_" + Date.now(),
+              recordId: "rec_e2e_1",
+              requestId: "req_e2e_1",
+              values: { field1: "offline_value" },
+              isDraft: true,
+              createdAt: Date.now(),
+              retryCount: 0,
+            };
+            store.add(testItem);
+            tx.oncomplete = () => {
+              const readTx = db.transaction("queued_records", "readonly");
+              const readReq = readTx.objectStore("queued_records").getAll();
+              readReq.onsuccess = () => {
+                const count = readReq.result.length;
+                db.close();
+                resolve(count > 0);
+              };
+              readReq.onerror = () => {
+                db.close();
+                resolve(false);
+              };
+            };
+            tx.onerror = () => {
+              db.close();
+              resolve(false);
+            };
+          };
+          req.onerror = () => resolve(false);
+        } catch {
+          resolve(false);
+        }
+      });
+    });
+    expect(idbOperational).toBe(true);
+
+    // 3. Restore network connectivity
+    await page.context().setOffline(false);
+    const isOnlineNow = await page.evaluate(() => {
+      window.dispatchEvent(new Event("online"));
+      return navigator.onLine;
+    });
+    expect(isOnlineNow).toBe(true);
+  });
 });
+

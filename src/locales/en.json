@@ -76,5 +76,14 @@
     "broadcast": "Broadcast Push Notification",
     "notifications": "System Notifications",
     "logout": "Logout"
+  },
+  "pwa": {
+    "installApp": "Install App",
+    "installOnDevice": "Install App on your device",
+    "install": "Install",
+    "close": "Close",
+    "offlineReady": "Works completely offline",
+    "quickAccess": "Fast home-screen access",
+    "understood": "Got it, thanks!"
   }
 }
