@@ -18,5 +18,5 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "exclude": ["firebase/functions", "mobile", "node_modules"]
+  "exclude": ["firebase/functions", "mobile", "node_modules", "scratch"]
 }
