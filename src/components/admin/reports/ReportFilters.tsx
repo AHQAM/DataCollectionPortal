@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Search } from "lucide-react";
 import { Branch, RequestItem } from "../../../types";
 
@@ -31,11 +32,15 @@ export const ReportFilters: React.FC<Props> = ({
   setSearchQuery,
   setSelectedAnalysisFieldKey,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {lang === "ar" ? "الطلب / الحملة" : "Request Campaign"}
+          {t("reports.filters.campaign", { lng: currentLang })}
         </label>
         <select
           value={selectedReqId}
@@ -47,7 +52,7 @@ export const ReportFilters: React.FC<Props> = ({
         >
           {requests.map((r) => (
             <option key={r.requestId} value={r.requestId}>
-              {r.requestCode} - {lang === "ar" ? r.titleAr : r.titleEn}
+              {r.requestCode} - {currentLang === "ar" ? r.titleAr : r.titleEn}
             </option>
           ))}
         </select>
@@ -55,7 +60,7 @@ export const ReportFilters: React.FC<Props> = ({
 
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {lang === "ar" ? "الفرع" : "Branch"}
+          {t("reports.filters.branch", { lng: currentLang })}
         </label>
         <select
           value={selectedBranchId}
@@ -63,11 +68,11 @@ export const ReportFilters: React.FC<Props> = ({
           className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold bg-white text-slate-800"
         >
           <option value="ALL">
-            {lang === "ar" ? "جميع الفروع" : "All Branches"}
+            {t("reports.filters.allBranches", { lng: currentLang })}
           </option>
           {branches.map((b) => (
             <option key={b.branchId} value={b.branchId}>
-              {lang === "ar" ? b.branchNameAr : b.branchNameEn}
+              {currentLang === "ar" ? b.branchNameAr : b.branchNameEn}
             </option>
           ))}
         </select>
@@ -75,7 +80,7 @@ export const ReportFilters: React.FC<Props> = ({
 
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {lang === "ar" ? "حالة السجل" : "Record Status"}
+          {t("reports.filters.recordStatus", { lng: currentLang })}
         </label>
         <select
           value={selectedStatus}
@@ -83,35 +88,35 @@ export const ReportFilters: React.FC<Props> = ({
           className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold bg-white text-slate-800"
         >
           <option value="ALL">
-            {lang === "ar" ? "جميع الحالات" : "All Statuses"}
+            {t("reports.filters.allStatuses", { lng: currentLang })}
           </option>
           <option value="Submitted">
-            {lang === "ar" ? "تم الإرسال" : "Submitted"}
+            {t("reports.filters.submitted", { lng: currentLang })}
           </option>
           <option value="Completed">
-            {lang === "ar" ? "مكتمل" : "Completed"}
+            {t("reports.filters.completed", { lng: currentLang })}
           </option>
           <option value="DraftSaved">
-            {lang === "ar" ? "مسودة محفوظة" : "Draft Saved"}
+            {t("reports.filters.draftSaved", { lng: currentLang })}
           </option>
-          <option value="Pending">{lang === "ar" ? "معلق" : "Pending"}</option>
+          <option value="Pending">
+            {t("reports.filters.pending", { lng: currentLang })}
+          </option>
         </select>
       </div>
 
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {lang === "ar" ? "بحث بالسجل أو المستخدم" : "Search Record / User"}
+          {t("reports.filters.searchLabel", { lng: currentLang })}
         </label>
         <div className="relative">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              lang === "ar"
-                ? "بحث بالاسم أو الكود..."
-                : "Search by name or code..."
-            }
+            placeholder={t("reports.filters.searchPlaceholder", {
+              lng: currentLang,
+            })}
             className="w-full h-10 px-3 ps-8 rounded-xl border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 text-xs font-semibold"
           />
           <Search className="w-3.5 h-3.5 text-slate-400 absolute start-2.5 top-3" />

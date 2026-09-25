@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Eye } from "lucide-react";
 import { RecordItem, RequestField } from "../../../types";
 
@@ -17,6 +18,10 @@ export const ReportDataTable: React.FC<Props> = ({
   recordResponses,
   setInspectingRecord,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   // Get field response value safely
   const getFieldValue = (record: RecordItem, field: RequestField) => {
     const resp = recordResponses[record.recordId] || record.rawData || {};
@@ -41,12 +46,8 @@ export const ReportDataTable: React.FC<Props> = ({
           }`}
         >
           {isTrue
-            ? lang === "ar"
-              ? "نعم"
-              : "Yes"
-            : lang === "ar"
-              ? "لا"
-              : "No"}
+            ? t("reports.table.yes", { lng: currentLang })
+            : t("reports.table.no", { lng: currentLang })}
         </span>
       );
     }
@@ -58,7 +59,7 @@ export const ReportDataTable: React.FC<Props> = ({
     ) {
       return (
         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">
-          📷 {lang === "ar" ? "صورة مرفقة" : "Photo"}
+          📷 {t("reports.table.photoAttached", { lng: currentLang })}
         </span>
       );
     }
@@ -66,7 +67,7 @@ export const ReportDataTable: React.FC<Props> = ({
     if (field.fieldType === "gps") {
       return (
         <span className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">
-          📍 {lang === "ar" ? "موقع GPS" : "GPS"}
+          📍 {t("reports.table.gpsLocation", { lng: currentLang })}
         </span>
       );
     }
@@ -78,7 +79,7 @@ export const ReportDataTable: React.FC<Props> = ({
       if (opt) {
         return (
           <span className="font-semibold text-slate-800">
-            {lang === "ar" ? opt.labelAr : opt.labelEn}
+            {currentLang === "ar" ? opt.labelAr : opt.labelEn}
           </span>
         );
       }
@@ -96,14 +97,13 @@ export const ReportDataTable: React.FC<Props> = ({
       <div className="p-4 border-b border-slate-100 flex items-center justify-between">
         <div>
           <span className="font-extrabold text-xs text-slate-900 block">
-            {lang === "ar"
-              ? `معاينة السجلات والاستجابات (${filteredRecords.length} سجل)`
-              : `Records & Responses Preview (${filteredRecords.length})`}
+            {t("reports.table.previewTitle", {
+              count: filteredRecords.length,
+              lng: currentLang,
+            })}
           </span>
           <span className="text-[11px] text-slate-400">
-            {lang === "ar"
-              ? 'انقر على أي سجل أو على زر "عرض" للاطلاع على كافة الإجابات والصور والإحداثيات'
-              : 'Click on any record or the "View" button to inspect all responses, photos, and coordinates'}
+            {t("reports.table.previewSubtitle", { lng: currentLang })}
           </span>
         </div>
       </div>
@@ -113,27 +113,27 @@ export const ReportDataTable: React.FC<Props> = ({
           <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
               <th className="px-4 py-3 text-start">
-                {lang === "ar"
-                  ? "الجهة المستهدفة / السجل"
-                  : "Target Entity / Record"}
+                {t("reports.table.targetEntity", { lng: currentLang })}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "المنطقة والمستخدم" : "Region & User"}
+                {t("reports.table.regionUser", { lng: currentLang })}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "الفرع" : "Branch"}
+                {t("reports.table.branch", { lng: currentLang })}
               </th>
               {/* Dynamic Form Field Columns */}
               {previewFields.map((field) => (
                 <th key={field.fieldId} className="px-4 py-3 text-start">
-                  {lang === "ar" ? field.fieldLabelAr : field.fieldLabelEn}
+                  {currentLang === "ar"
+                    ? field.fieldLabelAr
+                    : field.fieldLabelEn}
                 </th>
               ))}
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "الحالة" : "Status"}
+                {t("reports.table.status", { lng: currentLang })}
               </th>
               <th className="px-4 py-3 text-center">
-                {lang === "ar" ? "الإجراءات" : "Actions"}
+                {t("reports.table.actions", { lng: currentLang })}
               </th>
             </tr>
           </thead>
@@ -144,9 +144,7 @@ export const ReportDataTable: React.FC<Props> = ({
                   colSpan={5 + previewFields.length}
                   className="px-4 py-8 text-center text-slate-400 text-xs"
                 >
-                  {lang === "ar"
-                    ? "لا توجد سجلات مطابقة للفلتر المحدد"
-                    : "No records match the selected filter"}
+                  {t("reports.table.noRecords", { lng: currentLang })}
                 </td>
               </tr>
             ) : (
@@ -198,17 +196,11 @@ export const ReportDataTable: React.FC<Props> = ({
                         }`}
                       >
                         {r.recordStatus === "Submitted"
-                          ? lang === "ar"
-                            ? "تم الإرسال"
-                            : "Submitted"
+                          ? t("reports.table.submitted", { lng: currentLang })
                           : r.recordStatus === "Completed"
-                            ? lang === "ar"
-                              ? "مكتمل"
-                              : "Completed"
+                            ? t("reports.table.completed", { lng: currentLang })
                             : r.recordStatus === "DraftSaved"
-                              ? lang === "ar"
-                                ? "مسودة"
-                                : "Draft"
+                              ? t("reports.table.draft", { lng: currentLang })
                               : r.recordStatus}
                       </span>
                     </td>
@@ -223,7 +215,9 @@ export const ReportDataTable: React.FC<Props> = ({
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>
-                          {lang === "ar" ? "عرض الاستجابة" : "View Response"}
+                          {t("reports.table.viewResponse", {
+                            lng: currentLang,
+                          })}
                         </span>
                       </button>
                     </td>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { PieChart, BarChart3 } from "lucide-react";
 import { RequestField } from "../../../types";
 
@@ -33,44 +34,49 @@ export const ReportAnalysisCharts: React.FC<Props> = ({
   setSelectedAnalysisFieldKey,
   dynamicFieldCounts,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
       {/* KPI Cards Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-3.5 bg-purple-50/50 rounded-xl border border-purple-100">
           <span className="text-[11px] font-bold text-purple-700 block mb-1">
-            {lang === "ar" ? "إجمالي السجلات" : "Total Records"}
+            {t("reports.charts.totalRecords", { lng: currentLang })}
           </span>
           <div className="text-xl font-black text-purple-950">{totalCount}</div>
           <div className="text-[10px] text-slate-500 mt-1 flex items-center gap-1.5">
             <span className="text-emerald-700 font-bold">
               {submittedCount + completedCount}{" "}
-              {lang === "ar" ? "مكتمل/مرسل" : "Done"}
+              {t("reports.charts.done", { lng: currentLang })}
             </span>
             <span>•</span>
             <span className="text-amber-700">
-              {draftCount} {lang === "ar" ? "مسودة" : "Draft"}
+              {draftCount} {t("reports.charts.draft", { lng: currentLang })}
             </span>
           </div>
         </div>
 
         <div className="p-3.5 bg-emerald-50/50 rounded-xl border border-emerald-100">
           <span className="text-[11px] font-bold text-emerald-700 block mb-1">
-            {lang === "ar" ? "الاستجابات المستلمة" : "Responses Received"}
+            {t("reports.charts.responsesReceived", { lng: currentLang })}
           </span>
           <div className="text-xl font-black text-emerald-950">
             {responsesReceivedCount}
           </div>
           <div className="text-[10px] text-slate-500 mt-1">
-            {lang === "ar"
-              ? `من أصل ${totalCount} سجل`
-              : `Out of ${totalCount} records`}
+            {t("reports.charts.outOfRecords", {
+              total: totalCount,
+              lng: currentLang,
+            })}
           </div>
         </div>
 
         <div className="p-3.5 bg-blue-50/50 rounded-xl border border-blue-100">
           <span className="text-[11px] font-bold text-blue-700 block mb-1">
-            {lang === "ar" ? "نسبة الإنجاز" : "Completion Rate"}
+            {t("reports.charts.completionRate", { lng: currentLang })}
           </span>
           <div className="text-xl font-black text-blue-950">
             {completionRate}%
@@ -85,13 +91,13 @@ export const ReportAnalysisCharts: React.FC<Props> = ({
 
         <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
           <span className="text-[11px] font-bold text-slate-600 block mb-1">
-            {lang === "ar" ? "حقول النموذج" : "Form Fields"}
+            {t("reports.charts.formFields", { lng: currentLang })}
           </span>
           <div className="text-xl font-black text-slate-900">
             {choiceFields.length}
           </div>
           <div className="text-[10px] text-slate-400 mt-1">
-            {lang === "ar" ? "حقل مخصص بالحملة" : "Custom campaign fields"}
+            {t("reports.charts.customFields", { lng: currentLang })}
           </div>
         </div>
       </div>
@@ -103,16 +109,14 @@ export const ReportAnalysisCharts: React.FC<Props> = ({
             <div className="flex items-center gap-2">
               <PieChart className="w-4 h-4 text-purple-700" />
               <h2 className="font-extrabold text-xs text-slate-900">
-                {lang === "ar"
-                  ? "تحليل توزيع إجابات الحقول"
-                  : "Field Responses Distribution Analysis"}
+                {t("reports.charts.fieldDistribution", { lng: currentLang })}
               </h2>
             </div>
 
             {choiceFields.length > 1 && (
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-slate-500 font-bold">
-                  {lang === "ar" ? "الحقل:" : "Field:"}
+                  {t("reports.charts.field", { lng: currentLang })}
                 </span>
                 <select
                   value={selectedAnalysisFieldKey}
@@ -121,7 +125,7 @@ export const ReportAnalysisCharts: React.FC<Props> = ({
                 >
                   {choiceFields.map((f) => (
                     <option key={f.fieldKey} value={f.fieldKey}>
-                      {lang === "ar" ? f.fieldLabelAr : f.fieldLabelEn}
+                      {currentLang === "ar" ? f.fieldLabelAr : f.fieldLabelEn}
                     </option>
                   ))}
                 </select>
@@ -131,9 +135,13 @@ export const ReportAnalysisCharts: React.FC<Props> = ({
 
           {Object.keys(dynamicFieldCounts).length === 0 ? (
             <div className="p-4 bg-slate-50 rounded-xl text-center text-xs text-slate-400">
-              {lang === "ar"
-                ? `لا توجد استجابات مسجلة بعد للحقل (${activeAnalysisField?.fieldLabelAr}).`
-                : `No responses recorded yet for field (${activeAnalysisField?.fieldLabelEn}).`}
+              {t("reports.charts.noResponsesYet", {
+                field:
+                  currentLang === "ar"
+                    ? activeAnalysisField?.fieldLabelAr
+                    : activeAnalysisField?.fieldLabelEn,
+                lng: currentLang,
+              })}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 text-xs">
@@ -142,17 +150,13 @@ export const ReportAnalysisCharts: React.FC<Props> = ({
                   (o) => o.value === optVal || o.id === optVal,
                 );
                 const displayLabel = optMatch
-                  ? lang === "ar"
+                  ? currentLang === "ar"
                     ? optMatch.labelAr
                     : optMatch.labelEn
                   : optVal === "true"
-                    ? lang === "ar"
-                      ? "نعم"
-                      : "Yes"
+                    ? t("reports.charts.yes", { lng: currentLang })
                     : optVal === "false"
-                      ? lang === "ar"
-                        ? "لا"
-                        : "No"
+                      ? t("reports.charts.no", { lng: currentLang })
                       : optVal;
 
                 const percent = Math.round(
@@ -187,15 +191,13 @@ export const ReportAnalysisCharts: React.FC<Props> = ({
           <div className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-purple-700" />
             <h2 className="font-extrabold text-xs text-slate-900">
-              {lang === "ar"
-                ? "توزيع حالات السجلات"
-                : "Record Status Distribution"}
+              {t("reports.charts.statusDistribution", { lng: currentLang })}
             </h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
             <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-100 flex justify-between items-center">
               <span className="font-bold text-emerald-900">
-                {lang === "ar" ? "تم الإرسال" : "Submitted"}
+                {t("reports.charts.submitted", { lng: currentLang })}
               </span>
               <span className="font-black text-emerald-800">
                 {submittedCount}
@@ -203,19 +205,19 @@ export const ReportAnalysisCharts: React.FC<Props> = ({
             </div>
             <div className="p-2.5 bg-blue-50 rounded-xl border border-blue-100 flex justify-between items-center">
               <span className="font-bold text-blue-900">
-                {lang === "ar" ? "مكتمل" : "Completed"}
+                {t("reports.charts.completed", { lng: currentLang })}
               </span>
               <span className="font-black text-blue-800">{completedCount}</span>
             </div>
             <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-100 flex justify-between items-center">
               <span className="font-bold text-amber-900">
-                {lang === "ar" ? "مسودة" : "Draft"}
+                {t("reports.charts.draftStatus", { lng: currentLang })}
               </span>
               <span className="font-black text-amber-800">{draftCount}</span>
             </div>
             <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
               <span className="font-bold text-slate-700">
-                {lang === "ar" ? "معلق" : "Pending"}
+                {t("reports.charts.pending", { lng: currentLang })}
               </span>
               <span className="font-black text-slate-800">{pendingCount}</span>
             </div>

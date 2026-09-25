@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
 import { getXLSX } from "../../utils/excel";
 import { RecordItem, RequestField } from "../../types";
@@ -9,8 +10,11 @@ import { ReportAnalysisCharts } from "./reports/ReportAnalysisCharts";
 import { ReportDataTable } from "./reports/ReportDataTable";
 
 export const AdminReports: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { lang, requests, records, branches, recordResponses, fields } =
     useApp();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
 
   const [selectedReqId, setSelectedReqId] = useState<string>(
     requests.length > 0 ? requests[0].requestId : "",
@@ -198,16 +202,10 @@ export const AdminReports: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <FileSpreadsheet className="w-5 h-5 text-purple-700" />
-            <span>
-              {lang === "ar"
-                ? "مركز التقارير وتصدير إكسل"
-                : "Reports & Excel Export Center"}
-            </span>
+            <span>{t("reports.title", { lng: currentLang })}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {lang === "ar"
-              ? "استعراض الردود الميدانية، تفاصيل الاستجابات، وتصدير البيانات بصيغتي XLSX و CSV"
-              : "Inspect field responses, view complete answers, and export to Excel (.xlsx) and CSV"}
+            {t("reports.subtitle", { lng: currentLang })}
           </p>
         </div>
 
@@ -217,7 +215,7 @@ export const AdminReports: React.FC = () => {
             className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-300 flex items-center gap-1.5 transition-all cursor-pointer"
           >
             <Download className="w-4 h-4 text-slate-600" />
-            <span>{lang === "ar" ? "تصدير CSV" : "Export CSV"}</span>
+            <span>{t("reports.exportCsv", { lng: currentLang })}</span>
           </button>
 
           <button
@@ -225,9 +223,7 @@ export const AdminReports: React.FC = () => {
             className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
           >
             <Download className="w-4 h-4" />
-            <span>
-              {lang === "ar" ? "تصدير Excel كامل (.xlsx)" : "Export Full Excel"}
-            </span>
+            <span>{t("reports.exportFullExcel", { lng: currentLang })}</span>
           </button>
         </div>
       </div>

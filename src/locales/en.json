@@ -480,5 +480,62 @@
     "noBtn": "No",
     "currencyUnit": "SAR",
     "excelMockData": "[{{field}} from Excel]"
+  },
+  "reports": {
+    "title": "Reports & Excel Export Center",
+    "subtitle": "Inspect field responses, view complete answers, and export to Excel (.xlsx) and CSV",
+    "exportCsv": "Export CSV",
+    "exportFullExcel": "Export Full Excel",
+    "filters": {
+      "campaign": "Request Campaign",
+      "branch": "Branch",
+      "allBranches": "All Branches",
+      "recordStatus": "Record Status",
+      "allStatuses": "All Statuses",
+      "submitted": "Submitted",
+      "completed": "Completed",
+      "draftSaved": "Draft Saved",
+      "pending": "Pending",
+      "searchLabel": "Search Record / User",
+      "searchPlaceholder": "Search by name or code..."
+    },
+    "charts": {
+      "totalRecords": "Total Records",
+      "done": "Done",
+      "draft": "Draft",
+      "responsesReceived": "Responses Received",
+      "outOfRecords": "Out of {{total}} records",
+      "completionRate": "Completion Rate",
+      "formFields": "Form Fields",
+      "customFields": "Custom campaign fields",
+      "fieldDistribution": "Field Responses Distribution Analysis",
+      "field": "Field:",
+      "noResponsesYet": "No responses recorded yet for field ({{field}}).",
+      "statusDistribution": "Record Status Distribution",
+      "submitted": "Submitted",
+      "completed": "Completed",
+      "draftStatus": "Draft",
+      "pending": "Pending",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "table": {
+      "previewTitle": "Records & Responses Preview ({{count}})",
+      "previewSubtitle": "Click on any record or the \"View\" button to inspect all responses, photos, and coordinates",
+      "targetEntity": "Target Entity / Record",
+      "regionUser": "Region & User",
+      "branch": "Branch",
+      "status": "Status",
+      "actions": "Actions",
+      "noRecords": "No records match the selected filter",
+      "photoAttached": "Photo",
+      "gpsLocation": "GPS",
+      "viewResponse": "View Response",
+      "submitted": "Submitted",
+      "completed": "Completed",
+      "draft": "Draft",
+      "yes": "Yes",
+      "no": "No"
+    }
   }
 }

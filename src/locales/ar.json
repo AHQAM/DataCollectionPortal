@@ -480,5 +480,62 @@
     "noBtn": "لا",
     "currencyUnit": "ر.س",
     "excelMockData": "[بيانات {{field}} من ملف الإكسل]"
+  },
+  "reports": {
+    "title": "مركز التقارير وتصدير إكسل",
+    "subtitle": "استعراض الردود الميدانية، تفاصيل الاستجابات، وتصدير البيانات بصيغتي XLSX و CSV",
+    "exportCsv": "تصدير CSV",
+    "exportFullExcel": "تصدير Excel كامل (.xlsx)",
+    "filters": {
+      "campaign": "الطلب / الحملة",
+      "branch": "الفرع",
+      "allBranches": "جميع الفروع",
+      "recordStatus": "حالة السجل",
+      "allStatuses": "جميع الحالات",
+      "submitted": "تم الإرسال",
+      "completed": "مكتمل",
+      "draftSaved": "مسودة محفوظة",
+      "pending": "معلق",
+      "searchLabel": "بحث بالسجل أو المستخدم",
+      "searchPlaceholder": "بحث بالاسم أو الكود..."
+    },
+    "charts": {
+      "totalRecords": "إجمالي السجلات",
+      "done": "مكتمل/مرسل",
+      "draft": "مسودة",
+      "responsesReceived": "الاستجابات المستلمة",
+      "outOfRecords": "من أصل {{total}} سجل",
+      "completionRate": "نسبة الإنجاز",
+      "formFields": "حقول النموذج",
+      "customFields": "حقل مخصص بالحملة",
+      "fieldDistribution": "تحليل توزيع إجابات الحقول",
+      "field": "الحقل:",
+      "noResponsesYet": "لا توجد استجابات مسجلة بعد للحقل ({{field}}).",
+      "statusDistribution": "توزيع حالات السجلات",
+      "submitted": "تم الإرسال",
+      "completed": "مكتمل",
+      "draftStatus": "مسودة",
+      "pending": "معلق",
+      "yes": "نعم",
+      "no": "لا"
+    },
+    "table": {
+      "previewTitle": "معاينة السجلات والاستجابات ({{count}} سجل)",
+      "previewSubtitle": "انقر على أي سجل أو على زر \"عرض\" للاطلاع على كافة الإجابات والصور والإحداثيات",
+      "targetEntity": "الجهة المستهدفة / السجل",
+      "regionUser": "المنطقة والمستخدم",
+      "branch": "الفرع",
+      "status": "الحالة",
+      "actions": "الإجراءات",
+      "noRecords": "لا توجد سجلات مطابقة للفلتر المحدد",
+      "photoAttached": "صورة مرفقة",
+      "gpsLocation": "موقع GPS",
+      "viewResponse": "عرض الاستجابة",
+      "submitted": "تم الإرسال",
+      "completed": "مكتمل",
+      "draft": "مسودة",
+      "yes": "نعم",
+      "no": "لا"
+    }
   }
 }
