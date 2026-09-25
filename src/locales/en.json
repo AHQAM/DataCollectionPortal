@@ -537,5 +537,56 @@
       "yes": "Yes",
       "no": "No"
     }
+  },
+  "settings": {
+    "title": "System Settings & Security Policies",
+    "subtitle": "Configure authentication rules, account lockouts, and administrative contact channels",
+    "saved": "Settings Saved!",
+    "saveBtn": "Save System Settings",
+    "wipeSuccess": "All demo data wiped successfully! System is now a clean blank slate ready for production.",
+    "backupSuccess": "Database backup downloaded successfully!",
+    "security": {
+      "title": "Password & Lockout Security Policy",
+      "maxFailed": "Max Failed Attempts Before Lockout",
+      "maxFailedHelp": "Default: 3 attempts",
+      "lockoutDuration": "Automatic Lockout Duration (Minutes)",
+      "lockoutDurationHelp": "Default: 15 minutes",
+      "rulesTitle": "Enforced Security Rules:",
+      "rule1": "• A unique temporary password is generated for new accounts.",
+      "rule2": "• Password change is enforced upon first successful login.",
+      "rule3": "• Temporary password must be updated immediately.",
+      "rule4": "• Restrict account to a single authorized smartphone device (UUID)."
+    },
+    "support": {
+      "title": "Support Channels for Representatives",
+      "phone": "Phone",
+      "email": "Email",
+      "whatsapp": "WhatsApp"
+    },
+    "database": {
+      "title": "Database Management & Production Ops",
+      "adminControl": "Admin Control",
+      "records": "Customer Records",
+      "requests": "Collection Requests",
+      "branches": "Registered Branches",
+      "regions": "Regions & Reps",
+      "wipeBannerTitle": "Wipe Demo Data & Start Blank Slate for Live Production",
+      "wipeBannerDesc": "Purge mock customer records, sample collection requests, and test assignments to start with a pristine blank slate for company operations while keeping Admin active.",
+      "wipeBtn": "Wipe Demo Data",
+      "backupDesc": "Export full database backup & system settings as a JSON file for archiving.",
+      "exportBackup": "Export JSON Backup",
+      "devRestoreTitle": "Restore Default Seed Data",
+      "devRestoreDesc": "Development Tool: Restore mock records, requests, and sample branch data for demo testing.",
+      "confirmRestore": "Yes, Restore Seed Data",
+      "cancel": "Cancel",
+      "cancelWipe": "Cancel",
+      "restoreBtn": "Restore Initial Demo Data",
+      "wipeModalTitle": "Wipe Demo Data for Live Production",
+      "wipeModalDesc": "This will purge all mock customer records (20 records), sample collection requests, and test responses, giving you a completely clean blank slate for live company operations.",
+      "wipeCheckRecords": "Purge test records, requests & assignments (Blank Slate)",
+      "wipeCheckAdmin": "Preserve Admin user so login remains active",
+      "wipeBranchesCheckbox": "Also wipe demo branches & regions (to import your company Excel file)",
+      "confirmWipeBtn": "Confirm Wipe & Start Clean"
+    }
   }
 }

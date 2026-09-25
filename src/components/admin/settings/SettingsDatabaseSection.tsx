@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Database,
   AlertOctagon,
@@ -43,27 +44,27 @@ export const SettingsDatabaseSection: React.FC<
   showWipeModal,
   handleConfirmWipe,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <>
       <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
             <Database className="w-4 h-4 text-purple-700" />
-            <span>
-              {lang === "ar"
-                ? "إدارة قاعدة البيانات والتشغيل الفعلي"
-                : "Database Management & Production Ops"}
-            </span>
+            <span>{t("settings.database.title", { lng: currentLang })}</span>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">
-            {lang === "ar" ? "التحكم الإداري" : "Admin Control"}
+            {t("settings.database.adminControl", { lng: currentLang })}
           </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
             <div className="text-slate-500 text-[11px]">
-              {lang === "ar" ? "سجلات العملاء" : "Customer Records"}
+              {t("settings.database.records", { lng: currentLang })}
             </div>
             <div className="text-base font-black text-slate-800 mt-0.5">
               {recordsLength}
@@ -71,7 +72,7 @@ export const SettingsDatabaseSection: React.FC<
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
             <div className="text-slate-500 text-[11px]">
-              {lang === "ar" ? "طلبات الجمع" : "Collection Requests"}
+              {t("settings.database.requests", { lng: currentLang })}
             </div>
             <div className="text-base font-black text-slate-800 mt-0.5">
               {requestsLength}
@@ -79,7 +80,7 @@ export const SettingsDatabaseSection: React.FC<
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
             <div className="text-slate-500 text-[11px]">
-              {lang === "ar" ? "الفروع المسجلة" : "Registered Branches"}
+              {t("settings.database.branches", { lng: currentLang })}
             </div>
             <div className="text-base font-black text-slate-800 mt-0.5">
               {branchesLength}
@@ -87,7 +88,7 @@ export const SettingsDatabaseSection: React.FC<
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
             <div className="text-slate-500 text-[11px]">
-              {lang === "ar" ? "المناطق والمناديب" : "Regions & Reps"}
+              {t("settings.database.regions", { lng: currentLang })}
             </div>
             <div className="text-base font-black text-slate-800 mt-0.5">
               {regionsLength}
@@ -100,15 +101,11 @@ export const SettingsDatabaseSection: React.FC<
             <div className="flex items-center gap-2 text-rose-950 font-black text-xs">
               <AlertOctagon className="w-4 h-4 text-rose-600 shrink-0" />
               <span>
-                {lang === "ar"
-                  ? "تفريغ البيانات التجريبية والبدء بصفحة بيضاء للإنتاج الفعلي"
-                  : "Wipe Demo Data & Start Blank Slate for Live Production"}
+                {t("settings.database.wipeBannerTitle", { lng: currentLang })}
               </span>
             </div>
             <p className="text-[11px] text-slate-600 max-w-xl leading-relaxed">
-              {lang === "ar"
-                ? "مسح كافة سجلات العملاء التجريبية (20 سجل)، والطلبات النموذجية، والردود والتكليفات، للبدء بصفحة بيضاء نظيفة تماماً جاهزة للتشغيل الفعلي بالشركة مع إبقاء حساب المدير فعالاً."
-                : "Purge mock customer records, sample collection requests, and test assignments to start with a pristine blank slate for company operations while keeping Admin active."}
+              {t("settings.database.wipeBannerDesc", { lng: currentLang })}
             </p>
           </div>
 
@@ -121,17 +118,13 @@ export const SettingsDatabaseSection: React.FC<
             className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-md transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
-            <span>
-              {lang === "ar" ? "تفريغ البيانات التجريبية" : "Wipe Demo Data"}
-            </span>
+            <span>{t("settings.database.wipeBtn", { lng: currentLang })}</span>
           </button>
         </div>
 
         <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="text-slate-600 text-[11px]">
-            {lang === "ar"
-              ? "تصدير نسخة احتياطية كاملة من قاعدة البيانات والإعدادات كملف JSON للأرشفة والأمان."
-              : "Export full database backup & system settings as a JSON file for archiving."}
+            {t("settings.database.backupDesc", { lng: currentLang })}
           </div>
 
           <button
@@ -141,9 +134,7 @@ export const SettingsDatabaseSection: React.FC<
           >
             <Download className="w-4 h-4 text-purple-700" />
             <span>
-              {lang === "ar"
-                ? "تصدير نسخة احتياطية (JSON)"
-                : "Export JSON Backup"}
+              {t("settings.database.exportBackup", { lng: currentLang })}
             </span>
           </button>
         </div>
@@ -154,15 +145,11 @@ export const SettingsDatabaseSection: React.FC<
           <div className="flex items-center gap-2 text-xs font-extrabold text-slate-800">
             <RefreshCw className="w-4 h-4 text-slate-600" />
             <span>
-              {lang === "ar"
-                ? "استعادة البيانات النموذجية للتجربة (QA Demo Seed Data)"
-                : "Restore Default Seed Data"}
+              {t("settings.database.devRestoreTitle", { lng: currentLang })}
             </span>
           </div>
           <p className="text-xs text-slate-600 leading-relaxed">
-            {lang === "ar"
-              ? "أداة تطوير محلية: في حال رغبت في إعادة السجلات والطلبات النموذجية لاختبار دورة العمل والتجربة من جديد."
-              : "Development Tool: Restore mock records, requests, and sample branch data for demo testing."}
+            {t("settings.database.devRestoreDesc", { lng: currentLang })}
           </p>
 
           {showResetConfirm ? (
@@ -175,16 +162,14 @@ export const SettingsDatabaseSection: React.FC<
                 }}
                 className="px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md cursor-pointer"
               >
-                {lang === "ar"
-                  ? "نعم، استعادة البيانات النموذجية"
-                  : "Yes, Restore Seed Data"}
+                {t("settings.database.confirmRestore", { lng: currentLang })}
               </button>
               <button
                 type="button"
                 onClick={() => setShowResetConfirm(false)}
                 className="px-3 py-2 rounded-xl bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
               >
-                {lang === "ar" ? "إلغاء" : "Cancel"}
+                {t("settings.database.cancel", { lng: currentLang })}
               </button>
             </div>
           ) : (
@@ -195,9 +180,7 @@ export const SettingsDatabaseSection: React.FC<
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>
-                {lang === "ar"
-                  ? "استعادة البيانات النموذجية الأولية"
-                  : "Restore Initial Demo Data"}
+                {t("settings.database.restoreBtn", { lng: currentLang })}
               </span>
             </button>
           )}
@@ -212,14 +195,10 @@ export const SettingsDatabaseSection: React.FC<
                 <AlertOctagon className="w-8 h-8" />
               </div>
               <h3 className="text-lg font-black text-slate-900">
-                {lang === "ar"
-                  ? "تفريغ البيانات التجريبية والبدء بصفحة بيضاء"
-                  : "Wipe Demo Data for Live Production"}
+                {t("settings.database.wipeModalTitle", { lng: currentLang })}
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed max-w-md mx-auto">
-                {lang === "ar"
-                  ? "سيتم مسح كافة سجلات العملاء التجريبية (20 سجل)، والطلبات النموذجية، والردود والتكليفات، للبدء بصفحة بيضاء نظيفة تماماً جاهزة للتشغيل الفعلي بالشركة."
-                  : "This will purge all mock customer records (20 records), sample collection requests, and test responses, giving you a completely clean blank slate for live company operations."}
+                {t("settings.database.wipeModalDesc", { lng: currentLang })}
               </p>
             </div>
 
@@ -227,17 +206,15 @@ export const SettingsDatabaseSection: React.FC<
               <div className="font-extrabold text-rose-950 flex items-center gap-2">
                 <Check className="w-4 h-4 text-rose-600 shrink-0" />
                 <span>
-                  {lang === "ar"
-                    ? "مسح سجلات العملاء والطلبات والتكليفات التجريبية (صفحة بيضاء)"
-                    : "Purge test records, requests & assignments (Blank Slate)"}
+                  {t("settings.database.wipeCheckRecords", {
+                    lng: currentLang,
+                  })}
                 </span>
               </div>
               <div className="font-extrabold text-rose-950 flex items-center gap-2">
                 <Check className="w-4 h-4 text-rose-600 shrink-0" />
                 <span>
-                  {lang === "ar"
-                    ? "إبقاء حساب مدير النظام (Admin) فعالاً لعدم إغلاق الجلسة"
-                    : "Preserve Admin user so login remains active"}
+                  {t("settings.database.wipeCheckAdmin", { lng: currentLang })}
                 </span>
               </div>
 
@@ -250,9 +227,9 @@ export const SettingsDatabaseSection: React.FC<
                     className="mt-0.5 rounded text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer"
                   />
                   <span>
-                    {lang === "ar"
-                      ? "مسح الفروع والمناطق التجريبية أيضاً (لبدء استيراد ملف فروع شركتك من Excel)"
-                      : "Also wipe demo branches & regions (to import your company Excel file)"}
+                    {t("settings.database.wipeBranchesCheckbox", {
+                      lng: currentLang,
+                    })}
                   </span>
                 </label>
               </div>
@@ -264,7 +241,7 @@ export const SettingsDatabaseSection: React.FC<
                 onClick={() => setShowWipeModal(false)}
                 className="px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer"
               >
-                {lang === "ar" ? "تراجع وإلغاء" : "Cancel"}
+                {t("settings.database.cancelWipe", { lng: currentLang })}
               </button>
               <button
                 type="button"
@@ -273,9 +250,9 @@ export const SettingsDatabaseSection: React.FC<
               >
                 <Trash2 className="w-4 h-4" />
                 <span>
-                  {lang === "ar"
-                    ? "تأكيد التفريغ والبدء بصفحة بيضاء"
-                    : "Confirm Wipe & Start Clean"}
+                  {t("settings.database.confirmWipeBtn", {
+                    lng: currentLang,
+                  })}
                 </span>
               </button>
             </div>

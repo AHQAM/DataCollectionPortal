@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Shield } from "lucide-react";
 
 interface SettingsSecuritySectionProps {
@@ -18,23 +19,21 @@ export const SettingsSecuritySection: React.FC<
   lockoutDurationMinutes,
   setLockoutDurationMinutes,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
       <div className="flex items-center gap-2 text-xs font-extrabold text-purple-950 pb-2 border-b border-slate-100">
         <Shield className="w-4 h-4 text-purple-700" />
-        <span>
-          {lang === "ar"
-            ? "سياسة كلمات المرور وقفل الحسابات (القسم 5)"
-            : "Password & Lockout Security Policy"}
-        </span>
+        <span>{t("settings.security.title", { lng: currentLang })}</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === "ar"
-              ? "الحد الأقصى لمحاولات الدخول الخاطئة قبل القفل"
-              : "Max Failed Attempts Before Lockout"}
+            {t("settings.security.maxFailed", { lng: currentLang })}
           </label>
           <input
             type="number"
@@ -45,17 +44,13 @@ export const SettingsSecuritySection: React.FC<
             className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
           />
           <span className="text-[10px] text-slate-400 mt-1 block">
-            {lang === "ar"
-              ? "القيمة المعتمدة: 3 محاولات"
-              : "Default: 3 attempts"}
+            {t("settings.security.maxFailedHelp", { lng: currentLang })}
           </span>
         </div>
 
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === "ar"
-              ? "مدة قفل الحساب التلقائي (بالدقائق)"
-              : "Automatic Lockout Duration (Minutes)"}
+            {t("settings.security.lockoutDuration", { lng: currentLang })}
           </label>
           <input
             type="number"
@@ -66,30 +61,26 @@ export const SettingsSecuritySection: React.FC<
             className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
           />
           <span className="text-[10px] text-slate-400 mt-1 block">
-            {lang === "ar"
-              ? "القيمة المعتمدة: 15 دقيقة"
-              : "Default: 15 minutes"}
+            {t("settings.security.lockoutDurationHelp", { lng: currentLang })}
           </span>
         </div>
       </div>
 
       <div className="p-3 bg-purple-50/70 rounded-xl text-xs space-y-1 text-purple-950">
         <div className="font-bold">
-          {lang === "ar"
-            ? "القواعد الأمنية المطبقة إجبارياً:"
-            : "Enforced Security Rules:"}
+          {t("settings.security.rulesTitle", { lng: currentLang })}
         </div>
         <div className="text-[11px] text-slate-600">
-          • يتم إنشاء كلمة مرور مؤقتة وفريدة للحسابات الجديدة.
+          {t("settings.security.rule1", { lng: currentLang })}
         </div>
         <div className="text-[11px] text-slate-600">
-          • فرض تغيير كلمة المرور فور أول تسجيل دخول بنجاح.
+          {t("settings.security.rule2", { lng: currentLang })}
         </div>
         <div className="text-[11px] text-slate-600">
-          • يجب تغيير كلمة المرور المؤقتة عند أول تسجيل دخول.
+          {t("settings.security.rule3", { lng: currentLang })}
         </div>
         <div className="text-[11px] text-slate-600">
-          • حصر الحساب على هاتف ذكي واحد معتمد (UUID).
+          {t("settings.security.rule4", { lng: currentLang })}
         </div>
       </div>
     </div>
