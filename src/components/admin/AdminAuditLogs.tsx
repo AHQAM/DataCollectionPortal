@@ -1,17 +1,12 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
-import {
-  ShieldCheck,
-  Search,
-  Filter,
-  Clock,
-  Smartphone,
-  User as UserIcon,
-  FileText,
-} from "lucide-react";
+import { ShieldCheck, Search } from "lucide-react";
 
 export const AdminAuditLogs: React.FC = () => {
-  const { lang, t, auditLogs } = useApp();
+  const { auditLogs } = useApp();
+  const { t, i18n } = useTranslation();
+  const currentLang = (i18n.language as "ar" | "en") || "ar";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [actionFilter, setActionFilter] = useState<string>("ALL");
@@ -37,22 +32,15 @@ export const AdminAuditLogs: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-purple-700" />
-            <span>
-              {lang === "ar"
-                ? "سجل التدقيق والرقابة الأمنية (Audit Trail)"
-                : "Security Audit Trail"}
-            </span>
+            <span>{t("auditLogs.title")}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {lang === "ar"
-              ? "توثيق شامل لكافة العمليات، تسجيل الدخول، فك ارتباط الأجهزة، تعديل السجلات ونشر الحملات"
-              : "Tamper-evident logs of system actions, logins, device unbinding, and submissions"}
+            {t("auditLogs.subtitle")}
           </p>
         </div>
 
         <span className="text-xs font-bold bg-purple-50 text-purple-900 border border-purple-200 px-3 py-1.5 rounded-xl">
-          {auditLogs.length}{" "}
-          {lang === "ar" ? "عملية موثقة" : "logged operations"}
+          {t("auditLogs.operationsCount", { count: auditLogs.length })}
         </span>
       </div>
 
@@ -63,11 +51,7 @@ export const AdminAuditLogs: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              lang === "ar"
-                ? "بحث باسم المستخدم أو نوع العملية..."
-                : "Search logs..."
-            }
+            placeholder={t("auditLogs.searchPlaceholder")}
             className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
           <Search className="w-4 h-4 text-slate-400 absolute top-3 start-3" />
@@ -78,9 +62,7 @@ export const AdminAuditLogs: React.FC = () => {
           onChange={(e) => setActionFilter(e.target.value)}
           className="h-10 px-3 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700"
         >
-          <option value="ALL">
-            {lang === "ar" ? "جميع الإجراءات" : "All Actions"}
-          </option>
+          <option value="ALL">{t("auditLogs.allActions")}</option>
           <option value="USER_LOGIN">USER_LOGIN</option>
           <option value="DEVICE_BOUND">DEVICE_BOUND</option>
           <option value="DEVICE_RELEASED">DEVICE_RELEASED</option>
@@ -101,22 +83,22 @@ export const AdminAuditLogs: React.FC = () => {
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "التوقيت" : "Timestamp"}
+                  {t("auditLogs.thTimestamp")}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "المستخدم" : "User"}
+                  {t("auditLogs.thUser")}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "الإجراء" : "Action"}
+                  {t("auditLogs.thAction")}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "الكيان المتأثر" : "Target Entity"}
+                  {t("auditLogs.thTargetEntity")}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "معرّف الجهاز (UUID)" : "Device UUID"}
+                  {t("auditLogs.thDeviceUuid")}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "التفاصيل" : "Details"}
+                  {t("auditLogs.thDetails")}
                 </th>
               </tr>
             </thead>
@@ -129,7 +111,7 @@ export const AdminAuditLogs: React.FC = () => {
                   >
                     <td className="px-4 py-3 text-slate-500 whitespace-nowrap">
                       {new Date(log.createdAt).toLocaleString(
-                        lang === "ar" ? "ar-SA" : "en-US",
+                        currentLang === "ar" ? "ar-SA" : "en-US",
                       )}
                     </td>
 

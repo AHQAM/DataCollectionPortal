@@ -1,20 +1,12 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
-import {
-  Archive,
-  Search,
-  RotateCcw,
-  Download,
-  Clock,
-  Layers,
-  CheckCircle2,
-  Calendar,
-  Cloud,
-  FileSpreadsheet,
-} from "lucide-react";
+import { Archive, Search, RotateCcw, Calendar, Cloud } from "lucide-react";
 
 export const AdminArchive: React.FC = () => {
-  const { lang, t, requests, records, reopenRequest } = useApp();
+  const { requests, records, reopenRequest } = useApp();
+  const { t, i18n } = useTranslation();
+  const currentLang = (i18n.language as "ar" | "en") || "ar";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [exportNotice, setExportNotice] = useState<string | null>(null);
@@ -35,15 +27,17 @@ export const AdminArchive: React.FC = () => {
 
   const handleDriveBackup = (reqCode: string) => {
     setExportNotice(
-      lang === "ar"
-        ? `جاري مزامنة أرشيف الحملة ${reqCode} إلى Google Drive المؤسسي...`
-        : `Syncing campaign ${reqCode} to corporate Google Drive archive...`,
+      t("archive.syncingNotice", {
+        code: reqCode,
+        defaultValue: `Syncing campaign ${reqCode} to corporate Google Drive archive...`,
+      }),
     );
     setTimeout(() => {
       setExportNotice(
-        lang === "ar"
-          ? `تمت أرشفة وتأمين ملفات ${reqCode} على Google Drive بنجاح!`
-          : `Campaign ${reqCode} successfully secured on Google Drive!`,
+        t("archive.syncedNotice", {
+          code: reqCode,
+          defaultValue: `Campaign ${reqCode} successfully secured on Google Drive!`,
+        }),
       );
       setTimeout(() => setExportNotice(null), 3000);
     }, 1500);
@@ -56,22 +50,15 @@ export const AdminArchive: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Archive className="w-5 h-5 text-purple-700" />
-            <span>
-              {lang === "ar"
-                ? "الأرشيف التاريخي وسجل الحملات"
-                : "Historical Campaign Archive"}
-            </span>
+            <span>{t("archive.title")}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {lang === "ar"
-              ? "الاحتفاظ بكامل بيانات الحملات المكتملة وهيكل الحقول والاستجابات والنسخ الاحتياطي السحابي"
-              : "Permanent retention of completed campaign records, schema versions, and drive backup"}
+            {t("archive.subtitle")}
           </p>
         </div>
 
         <span className="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200">
-          {archivedRequests.length}{" "}
-          {lang === "ar" ? "حملة مؤرشفة" : "archived campaigns"}
+          {t("archive.campaignsCount", { count: archivedRequests.length })}
         </span>
       </div>
 
@@ -88,9 +75,7 @@ export const AdminArchive: React.FC = () => {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={
-            lang === "ar" ? "بحث في الأرشيف..." : "Search archive..."
-          }
+          placeholder={t("archive.searchPlaceholder")}
           className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
         />
         <Search className="w-4 h-4 text-slate-400 absolute top-3 start-3" />
@@ -101,11 +86,7 @@ export const AdminArchive: React.FC = () => {
         {filtered.length === 0 ? (
           <div className="col-span-2 bg-white rounded-2xl p-8 text-center text-slate-400 border border-slate-200">
             <Archive className="w-10 h-10 mx-auto mb-2 opacity-50" />
-            <div className="font-bold text-xs">
-              {lang === "ar"
-                ? "لا توجد حملات في الأرشيف حالياً"
-                : "No archived campaigns found"}
-            </div>
+            <div className="font-bold text-xs">{t("archive.noCampaigns")}</div>
           </div>
         ) : (
           filtered.map((req) => {
@@ -127,29 +108,32 @@ export const AdminArchive: React.FC = () => {
                       {req.requestCode}
                     </span>
                     <h2 className="font-extrabold text-sm text-slate-900 mt-1">
-                      {lang === "ar" ? req.titleAr : req.titleEn}
+                      {currentLang === "ar" ? req.titleAr : req.titleEn}
                     </h2>
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
-                    {lang === "ar" ? "مؤرشف" : "Archived"}
+                    {t("archive.statusArchived")}
                   </span>
                 </div>
 
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  {lang === "ar" ? req.descriptionAr : req.descriptionEn}
+                  {currentLang === "ar" ? req.descriptionAr : req.descriptionEn}
                 </p>
 
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5 text-purple-700" />
                     <span>
-                      {lang === "ar" ? "الأرشفة: " : "Archived: "}
-                      {new Date(req.updatedAt).toLocaleDateString()}
+                      {t("archive.archivedDate", {
+                        date: new Date(req.updatedAt).toLocaleDateString(),
+                      })}
                     </span>
                   </div>
                   <div className="font-bold text-slate-800">
-                    {completed}/{reqRecords.length}{" "}
-                    {lang === "ar" ? "سجل مكتمل" : "completed"}
+                    {t("archive.completedRecords", {
+                      completed,
+                      total: reqRecords.length,
+                    })}
                   </div>
                 </div>
 
@@ -159,19 +143,13 @@ export const AdminArchive: React.FC = () => {
                     className="flex-1 h-9 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 text-xs font-bold flex items-center justify-center gap-1.5 border border-purple-200"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    <span>
-                      {lang === "ar" ? "إعادة فتح الطلب" : "Reopen Request"}
-                    </span>
+                    <span>{t("archive.reopenRequest")}</span>
                   </button>
 
                   <button
                     onClick={() => handleDriveBackup(req.requestCode)}
                     className="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5"
-                    title={
-                      lang === "ar"
-                        ? "أرشفة سحابية على Google Drive"
-                        : "Sync to Google Drive"
-                    }
+                    title={t("archive.syncDriveTooltip")}
                   >
                     <Cloud className="w-3.5 h-3.5 text-purple-700" />
                     <span>Drive</span>
