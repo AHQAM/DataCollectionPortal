@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { X, Building, Check } from "lucide-react";
 import { Branch, Region, RequestType, RequestPriority } from "../../../types";
 
@@ -36,6 +37,10 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
   defaultCode,
   onSubmit,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   const [newTitleAr, setNewTitleAr] = useState("");
   const [newTitleEn, setNewTitleEn] = useState("");
   const [newDescAr, setNewDescAr] = useState("");
@@ -88,9 +93,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
       <div className="bg-white w-full max-w-xl rounded-2xl p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
           <h2 className="font-extrabold text-sm text-slate-900">
-            {lang === "ar"
-              ? "إنشاء طلب جديد / نشاط ميداني"
-              : "Create New Request / Field Activity"}
+            {t("requests.createModalTitle", { lng: currentLang })}
           </h2>
           <button
             onClick={onClose}
@@ -104,7 +107,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar" ? "رمز الطلب" : "Request Code"}
+                {t("requests.requestCodeLabel", { lng: currentLang })}
               </label>
               <input
                 type="text"
@@ -116,7 +119,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar" ? "الأولوية" : "Priority"}
+                {t("requests.priorityLabel", { lng: currentLang })}
               </label>
               <select
                 value={newPriority}
@@ -125,13 +128,17 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 }
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               >
-                <option value="low">{lang === "ar" ? "منخفضة" : "Low"}</option>
-                <option value="medium">
-                  {lang === "ar" ? "متوسطة" : "Medium"}
+                <option value="low">
+                  {t("requests.priorityLow", { lng: currentLang })}
                 </option>
-                <option value="high">{lang === "ar" ? "عالية" : "High"}</option>
+                <option value="medium">
+                  {t("requests.priorityMedium", { lng: currentLang })}
+                </option>
+                <option value="high">
+                  {t("requests.priorityHigh", { lng: currentLang })}
+                </option>
                 <option value="urgent">
-                  {lang === "ar" ? "حرجة / عاجلة" : "Urgent"}
+                  {t("requests.priorityUrgent", { lng: currentLang })}
                 </option>
               </select>
             </div>
@@ -139,16 +146,15 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "عنوان الطلب (بالعربية)"
-                : "Request Title (Arabic)"}{" "}
-              *
+              {t("requests.titleArLabel", { lng: currentLang })} *
             </label>
             <input
               type="text"
               value={newTitleAr}
               onChange={(e) => setNewTitleAr(e.target.value)}
-              placeholder="مثال: استبيان التحقق من توافر الأصناف الرئيسية..."
+              placeholder={t("requests.titleArPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               required
             />
@@ -156,19 +162,15 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "عنوان الطلب (بالإنجليزية - اختياري)"
-                : "Request Title (English - Optional)"}
+              {t("requests.titleEnLabel", { lng: currentLang })}
             </label>
             <input
               type="text"
               value={newTitleEn}
               onChange={(e) => setNewTitleEn(e.target.value)}
-              placeholder={
-                lang === "ar"
-                  ? "اختياري - يترك فارغاً إذا لم ترغب به"
-                  : "Optional"
-              }
+              placeholder={t("requests.titleEnPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
             />
           </div>
@@ -176,7 +178,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar" ? "نوع الطلب" : "Request Type"}
+                {t("requests.requestTypeLabel", { lng: currentLang })}
               </label>
               <select
                 value={newType}
@@ -184,22 +186,20 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 className="w-full h-10 px-3 rounded-xl border border-slate-300"
               >
                 <option value="per_record">
-                  {lang === "ar"
-                    ? "استجابة لكل سجل / جهة مستهدفة"
-                    : "Per Record / Target Entity"}
+                  {t("requests.typePerRecord", { lng: currentLang })}
                 </option>
                 <option value="per_rep">
-                  {lang === "ar" ? "استجابة واحدة لكل مستخدم" : "Per User"}
+                  {t("requests.typePerRep", { lng: currentLang })}
                 </option>
                 <option value="per_region">
-                  {lang === "ar" ? "استجابة لكل منطقة" : "Per Region"}
+                  {t("requests.typePerRegion", { lng: currentLang })}
                 </option>
               </select>
             </div>
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar" ? "تاريخ الاستحقاق" : "Due Date"}
+                {t("requests.dueDateLabel", { lng: currentLang })}
               </label>
               <input
                 type="date"
@@ -214,33 +214,29 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar"
-                  ? "تسمية الجهة المستهدفة (بالعربية - اختياري)"
-                  : "Target Entity Label (Arabic)"}
+                {t("requests.targetEntityLabelAr", { lng: currentLang })}
               </label>
               <input
                 type="text"
                 value={newTargetEntityLabelAr}
                 onChange={(e) => setNewTargetEntityLabelAr(e.target.value)}
-                placeholder={
-                  lang === "ar"
-                    ? "مثال: العميل، المتجر، المدرسة، العيادة..."
-                    : "e.g. Customer, Store, School..."
-                }
+                placeholder={t("requests.targetEntityLabelArPlaceholder", {
+                  lng: currentLang,
+                })}
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               />
             </div>
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar"
-                  ? "تسمية الجهة المستهدفة (بالإنجليزية - اختياري)"
-                  : "Target Entity Label (English)"}
+                {t("requests.targetEntityLabelEn", { lng: currentLang })}
               </label>
               <input
                 type="text"
                 value={newTargetEntityLabelEn}
                 onChange={(e) => setNewTargetEntityLabelEn(e.target.value)}
-                placeholder="e.g. Customer, Store, Facility..."
+                placeholder={t("requests.targetEntityLabelEnPlaceholder", {
+                  lng: currentLang,
+                })}
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               />
             </div>
@@ -248,15 +244,15 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "التعليمات والإرشادات (بالعربية)"
-                : "Instructions (Arabic)"}
+              {t("requests.instructionsArLabel", { lng: currentLang })}
             </label>
             <textarea
               rows={2}
               value={newDescAr}
               onChange={(e) => setNewDescAr(e.target.value)}
-              placeholder="اكتب تعليمات الزيارة الميدانية وتعبئة النموذج..."
+              placeholder={t("requests.instructionsArPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full p-2.5 rounded-xl border border-slate-300"
             />
           </div>
@@ -267,9 +263,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
               <div className="flex items-center gap-1.5 font-extrabold text-purple-950">
                 <Building className="w-4 h-4 text-purple-700" />
                 <span>
-                  {lang === "ar"
-                    ? "نطاق الفروع والمناطق المستهدفة"
-                    : "Target Branches & Zones"}
+                  {t("requests.targetBranchesAndZones", { lng: currentLang })}
                 </span>
               </div>
               <div className="flex gap-2">
@@ -282,9 +276,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                     className="text-purple-900"
                   />
                   <span>
-                    {lang === "ar"
-                      ? "كل الفروع والمناطق"
-                      : "All Branches & Zones"}
+                    {t("requests.allBranchesAndZones", { lng: currentLang })}
                   </span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
@@ -296,7 +288,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                     className="text-purple-900"
                   />
                   <span>
-                    {lang === "ar" ? "تحديد فروع ومناطق" : "Specific Branches"}
+                    {t("requests.specificBranches", { lng: currentLang })}
                   </span>
                 </label>
               </div>
@@ -306,9 +298,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
               <div className="space-y-2 pt-2 border-t border-purple-200/60 animate-in fade-in">
                 <div>
                   <div className="font-bold text-slate-600 text-[11px] mb-1">
-                    {lang === "ar"
-                      ? "اختر الفروع المستهدفة:"
-                      : "Select Target Branches:"}
+                    {t("requests.selectTargetBranches", { lng: currentLang })}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {branches.map((b) => {
@@ -334,7 +324,9 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                         >
                           {isSelected && <Check className="w-3 h-3" />}
                           <span>
-                            {lang === "ar" ? b.branchNameAr : b.branchNameEn}
+                            {currentLang === "ar"
+                              ? b.branchNameAr
+                              : b.branchNameEn || b.branchNameAr}
                           </span>
                         </button>
                       );
@@ -345,9 +337,9 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 {newSelectedBranchIds.length > 0 && (
                   <div className="pt-1">
                     <div className="font-bold text-slate-600 text-[11px] mb-1">
-                      {lang === "ar"
-                        ? "المناطق التابعة للفروع المختارة (اختياري):"
-                        : "Regions in Selected Branches:"}
+                      {t("requests.regionsInSelectedBranches", {
+                        lng: currentLang,
+                      })}
                     </div>
                     <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1 bg-white rounded-lg border border-slate-200">
                       {regions
@@ -376,7 +368,9 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                               }`}
                             >
                               {r.regionNo} -{" "}
-                              {lang === "ar" ? r.regionNameAr : r.regionNameEn}
+                              {currentLang === "ar"
+                                ? r.regionNameAr
+                                : r.regionNameEn || r.regionNameAr}
                             </button>
                           );
                         })}
@@ -396,9 +390,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 className="rounded text-purple-900"
               />
               <span>
-                {lang === "ar"
-                  ? "السماح للمستخدم بتعديل السجل بعد الاعتماد"
-                  : "Allow editing after submit"}
+                {t("requests.allowEditAfterSubmit", { lng: currentLang })}
               </span>
             </label>
 
@@ -410,9 +402,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 className="rounded text-purple-900"
               />
               <span>
-                {lang === "ar"
-                  ? "يتطلب اعتماد المشرف قبل الإغلاق النهائي"
-                  : "Require Supervisor Approval"}
+                {t("requests.requireSupervisorApproval", { lng: currentLang })}
               </span>
             </label>
           </div>
@@ -423,15 +413,13 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
               onClick={onClose}
               className="flex-1 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
             >
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+              {t("requests.cancel", { lng: currentLang })}
             </button>
             <button
               type="submit"
               className="flex-2 h-10 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-bold"
             >
-              {lang === "ar"
-                ? "إنشاء والانتقال لمصمم الحقول"
-                : "Create & Open Form Builder"}
+              {t("requests.createAndOpenFormBuilder", { lng: currentLang })}
             </button>
           </div>
         </form>

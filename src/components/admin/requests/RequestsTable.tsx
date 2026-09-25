@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { RequestItem, RequestField } from "../../../types";
 import { RequestTableRow } from "./RequestTableRow";
 
@@ -39,6 +40,10 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({
   onDelete,
   onViewResponses,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
       <div className="overflow-x-auto">
@@ -46,22 +51,22 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({
           <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "رمز وعنوان الطلب" : "Code & Title"}
+                {t("requests.colCodeAndTitle", { lng: currentLang })}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "النوع والأولوية" : "Type & Priority"}
+                {t("requests.colTypeAndPriority", { lng: currentLang })}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "تاريخ الاستحقاق" : "Due Date"}
+                {t("requests.colDueDate", { lng: currentLang })}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "السجلات" : "Records"}
+                {t("requests.colRecords", { lng: currentLang })}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "الحالة" : "Status"}
+                {t("requests.colStatus", { lng: currentLang })}
               </th>
               <th className="px-4 py-3 text-center">
-                {lang === "ar" ? "الإجراءات" : "Actions"}
+                {t("requests.colActions", { lng: currentLang })}
               </th>
             </tr>
           </thead>
@@ -72,7 +77,7 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({
                   colSpan={6}
                   className="px-4 py-8 text-center text-slate-400"
                 >
-                  {lang === "ar" ? "لا توجد طلبات" : "No requests found"}
+                  {t("requests.noRequests", { lng: currentLang })}
                 </td>
               </tr>
             ) : (

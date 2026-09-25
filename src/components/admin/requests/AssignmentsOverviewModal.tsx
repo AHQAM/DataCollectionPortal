@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { X, Users, FileSpreadsheet } from "lucide-react";
 import { RequestItem, Assignment, User, Branch } from "../../../types";
 
@@ -23,6 +24,10 @@ export const AssignmentsOverviewModal: React.FC<
   lang,
   onOpenImportWizard,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   if (!request) return null;
 
   const reqAssignments = assignments.filter(
@@ -37,13 +42,14 @@ export const AssignmentsOverviewModal: React.FC<
             <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
               <Users className="w-4 h-4 text-purple-700" />
               <span>
-                {lang === "ar"
-                  ? "تكليفات المناديب ونسب الإنجاز"
-                  : "Assigned Reps & Field Progress"}
+                {t("requests.assignedRepsModalTitle", { lng: currentLang })}
               </span>
             </h2>
             <div className="text-xs text-slate-500 mt-0.5">
-              {lang === "ar" ? request.titleAr : request.titleEn} (
+              {currentLang === "ar"
+                ? request.titleAr
+                : request.titleEn || request.titleAr}{" "}
+              (
               <span className="font-mono font-bold text-purple-700">
                 {request.requestCode}
               </span>
@@ -64,14 +70,10 @@ export const AssignmentsOverviewModal: React.FC<
               <Users className="w-6 h-6" />
             </div>
             <div className="font-bold text-slate-800 text-xs">
-              {lang === "ar"
-                ? "لم يتم تعيين مناديب أو عملاء لهذا الطلب بعد"
-                : "No representatives assigned to this request yet"}
+              {t("requests.noAssignedReps", { lng: currentLang })}
             </div>
             <p className="text-[11px] text-slate-500 max-w-md mx-auto">
-              {lang === "ar"
-                ? "يمكنك إدراج العملاء والتوزيع التلقائي على المناديب فوراً عبر معالج استيراد Excel."
-                : "You can import customers and auto-assign them to reps using the Excel Import Wizard."}
+              {t("requests.noAssignedRepsDesc", { lng: currentLang })}
             </p>
             <button
               type="button"
@@ -84,9 +86,7 @@ export const AssignmentsOverviewModal: React.FC<
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
               <span>
-                {lang === "ar"
-                  ? "فتح معالج استيراد Excel"
-                  : "Open Excel Import Wizard"}
+                {t("requests.openImportWizardBtn", { lng: currentLang })}
               </span>
             </button>
           </div>
@@ -94,14 +94,16 @@ export const AssignmentsOverviewModal: React.FC<
           <div className="space-y-3 text-xs">
             <div className="flex items-center justify-between px-1 text-slate-500 font-bold text-[11px]">
               <span>
-                {lang === "ar"
-                  ? `إجمالي التكليفات: ${reqAssignments.length} مستخدم`
-                  : `Total: ${reqAssignments.length} users`}
+                {t("requests.totalAssignmentsCount", {
+                  count: reqAssignments.length,
+                  lng: currentLang,
+                })}
               </span>
               <span>
-                {lang === "ar"
-                  ? `إجمالي السجلات: ${request.totalRecords || 0}`
-                  : `Total Records: ${request.totalRecords || 0}`}
+                {t("requests.totalRecordsCount", {
+                  count: request.totalRecords || 0,
+                  lng: currentLang,
+                })}
               </span>
             </div>
 
@@ -127,7 +129,7 @@ export const AssignmentsOverviewModal: React.FC<
                       <div className="font-extrabold text-slate-800 flex items-center gap-1.5">
                         <span>
                           {rep
-                            ? lang === "ar"
+                            ? currentLang === "ar"
                               ? rep.userNameAr
                               : rep.userNameEn || rep.userNameAr
                             : asg.userId}
@@ -138,9 +140,9 @@ export const AssignmentsOverviewModal: React.FC<
                       </div>
                       <div className="text-[11px] text-slate-400">
                         {branch
-                          ? lang === "ar"
+                          ? currentLang === "ar"
                             ? branch.branchNameAr
-                            : branch.branchNameEn
+                            : branch.branchNameEn || branch.branchNameAr
                           : asg.branchId}{" "}
                         • {asg.assignmentStatus}
                       </div>
@@ -150,10 +152,11 @@ export const AssignmentsOverviewModal: React.FC<
                       <div className="text-end">
                         <div className="font-bold text-slate-800">
                           {asg.completedRecords} / {asg.totalRecords}{" "}
-                          {lang === "ar" ? "سجل" : "records"}
+                          {t("requests.recordsUnit", { lng: currentLang })}
                         </div>
                         <div className="text-[10px] text-slate-400">
-                          {progress}% {lang === "ar" ? "إنجاز" : "done"}
+                          {progress}%{" "}
+                          {t("requests.doneUnit", { lng: currentLang })}
                         </div>
                       </div>
                       <div className="w-20 bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
@@ -182,7 +185,7 @@ export const AssignmentsOverviewModal: React.FC<
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer"
           >
-            {lang === "ar" ? "إغلاق" : "Close"}
+            {t("requests.closeBtn", { lng: currentLang })}
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
 import { RequestItem, RequestPriority, RequestType } from "../../types";
 import {
@@ -57,7 +58,6 @@ export const AdminRequests: React.FC<Props> = ({
   const {
     lang,
     dir,
-    t,
     requests,
     fields,
     branches,
@@ -74,6 +74,10 @@ export const AdminRequests: React.FC<Props> = ({
     deleteRequest,
     saveAsTemplate,
   } = useApp();
+
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
@@ -156,9 +160,7 @@ export const AdminRequests: React.FC<Props> = ({
       }
     } catch (err) {
       console.error("Error creating request:", err);
-      alert(
-        lang === "ar" ? "حدث خطأ أثناء إنشاء الطلب" : "Error creating request",
-      );
+      alert(t("requests.errorCreatingRequest", { lng: currentLang }));
     }
   };
 
@@ -171,9 +173,7 @@ export const AdminRequests: React.FC<Props> = ({
       setEditingRequest(null);
     } catch (err) {
       console.error("Error updating request:", err);
-      alert(
-        lang === "ar" ? "تعذر حفظ تعديلات الطلب" : "Error updating request",
-      );
+      alert(t("requests.errorUpdatingRequest", { lng: currentLang }));
     }
   };
 
@@ -187,9 +187,7 @@ export const AdminRequests: React.FC<Props> = ({
         "Custom",
       );
       setShowTemplateModal(null);
-      showToast(
-        lang === "ar" ? "تم حفظ القالب بنجاح" : "Template saved successfully",
-      );
+      showToast(t("requests.templateSavedSuccess", { lng: currentLang }));
     }
   };
 
@@ -197,16 +195,12 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_publish`);
     try {
       await publishRequest(requestId);
-      showToast(
-        lang === "ar" ? "تم نشر الطلب بنجاح" : "Request published successfully",
-      );
+      showToast(t("requests.requestPublishedSuccess", { lng: currentLang }));
     } catch (err: any) {
       const message =
         err?.details?.message ||
         err?.message ||
-        (lang === "ar"
-          ? "تعذر نشر الطلب. تحقق من حقول النموذج ثم حاول مرة أخرى."
-          : "The request could not be published. Check the form fields and try again.");
+        t("requests.publishFailedCheckFields", { lng: currentLang });
       alert(message);
     } finally {
       setActionLoadingId(null);
@@ -217,15 +211,10 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_close`);
     try {
       await closeRequest(requestId);
-      showToast(
-        lang === "ar" ? "تم إغلاق الطلب بنجاح" : "Request closed successfully",
-      );
+      showToast(t("requests.requestClosedSuccess", { lng: currentLang }));
     } catch (err: any) {
       alert(
-        err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء إغلاق الطلب"
-            : "Error closing request"),
+        err?.message || t("requests.errorClosingRequest", { lng: currentLang }),
       );
     } finally {
       setActionLoadingId(null);
@@ -236,17 +225,11 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_archive`);
     try {
       await archiveRequest(requestId);
-      showToast(
-        lang === "ar"
-          ? "تمت أرشفة الطلب بنجاح"
-          : "Request archived successfully",
-      );
+      showToast(t("requests.requestArchivedSuccess", { lng: currentLang }));
     } catch (err: any) {
       alert(
         err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء أرشفة الطلب"
-            : "Error archiving request"),
+          t("requests.errorArchivingRequest", { lng: currentLang }),
       );
     } finally {
       setActionLoadingId(null);
@@ -257,17 +240,11 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_reopen`);
     try {
       await reopenRequest(requestId);
-      showToast(
-        lang === "ar"
-          ? "تمت إعادة فتح الطلب بنجاح"
-          : "Request reopened successfully",
-      );
+      showToast(t("requests.requestReopenedSuccess", { lng: currentLang }));
     } catch (err: any) {
       alert(
         err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء إعادة فتح الطلب"
-            : "Error reopening request"),
+          t("requests.errorReopeningRequest", { lng: currentLang }),
       );
     } finally {
       setActionLoadingId(null);
@@ -278,17 +255,10 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_clone`);
     try {
       await cloneRequest(requestId);
-      showToast(
-        lang === "ar"
-          ? "تم استنساخ الطلب بنجاح"
-          : "Request cloned successfully",
-      );
+      showToast(t("requests.requestClonedSuccess", { lng: currentLang }));
     } catch (err: any) {
       alert(
-        err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء استنساخ الطلب"
-            : "Error cloning request"),
+        err?.message || t("requests.errorCloningRequest", { lng: currentLang }),
       );
     } finally {
       setActionLoadingId(null);
@@ -300,20 +270,14 @@ export const AdminRequests: React.FC<Props> = ({
     try {
       const res = await deleteRequest(requestId);
       if (res.success) {
-        showToast(
-          lang === "ar"
-            ? "تم حذف الطلب وجميع بياناته بنجاح"
-            : "Request deleted successfully",
-        );
+        showToast(t("requests.requestDeletedSuccess", { lng: currentLang }));
       } else {
-        alert(lang === "ar" ? "فشل حذف الطلب" : "Failed to delete request");
+        alert(t("requests.failedToDeleteRequest", { lng: currentLang }));
       }
     } catch (err: any) {
       alert(
         err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء حذف الطلب"
-            : "Error deleting request"),
+          t("requests.errorDeletingRequest", { lng: currentLang }),
       );
     } finally {
       setActionLoadingId(null);

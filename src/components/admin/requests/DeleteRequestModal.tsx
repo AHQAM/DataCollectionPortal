@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Trash2, Loader2 } from "lucide-react";
 import { RequestItem } from "../../../types";
 
@@ -17,7 +18,14 @@ export const DeleteRequestModal: React.FC<DeleteRequestModalProps> = ({
   lang,
   isDeleting,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   if (!request) return null;
+
+  const requestTitle =
+    currentLang === "ar" ? request.titleAr : request.titleEn || request.titleAr;
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
@@ -26,12 +34,14 @@ export const DeleteRequestModal: React.FC<DeleteRequestModalProps> = ({
           <Trash2 className="w-6 h-6" />
         </div>
         <h3 className="font-bold text-sm text-slate-900 text-center mb-1">
-          {lang === "ar" ? "تأكيد حذف الطلب بالكامل" : "Confirm Delete Request"}
+          {t("requests.confirmDeleteTitle", { lng: currentLang })}
         </h3>
         <p className="text-xs text-slate-500 text-center mb-4">
-          {lang === "ar"
-            ? `هل أنت متأكد من رغبتك في حذف "${request.titleAr}" (${request.requestCode}) وجميع التكليفات والحقول والسجلات التابعة له؟ لا يمكن التراجع عن هذا الإجراء.`
-            : `Are you sure you want to delete "${request.titleEn}" (${request.requestCode}) and all associated assignments, fields, and records? This action cannot be undone.`}
+          {t("requests.confirmDeleteDesc", {
+            title: requestTitle,
+            code: request.requestCode,
+            lng: currentLang,
+          })}
         </p>
 
         <div className="flex gap-2">
@@ -41,7 +51,7 @@ export const DeleteRequestModal: React.FC<DeleteRequestModalProps> = ({
             disabled={isDeleting}
             className="flex-1 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs disabled:opacity-50"
           >
-            {lang === "ar" ? "إلغاء" : "Cancel"}
+            {t("requests.cancel", { lng: currentLang })}
           </button>
           <button
             type="button"
@@ -50,7 +60,7 @@ export const DeleteRequestModal: React.FC<DeleteRequestModalProps> = ({
             className="flex-1 h-9 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50"
           >
             {isDeleting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-            <span>{lang === "ar" ? "نعم، احذف نهائياً" : "Yes, Delete"}</span>
+            <span>{t("requests.yesDelete", { lng: currentLang })}</span>
           </button>
         </div>
       </div>
