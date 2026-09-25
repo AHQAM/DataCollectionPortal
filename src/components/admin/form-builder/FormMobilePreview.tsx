@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { RequestField } from "../../../types";
 import { Eye, Lock } from "lucide-react";
 
@@ -15,6 +16,10 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
   previewValues,
   onPreviewValueChange,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   const isPreviewFieldVisible = (field: RequestField): boolean => {
     if (!field.visibilityRule) return true;
     const targetVal = previewValues[field.visibilityRule.targetFieldKey];
@@ -37,23 +42,17 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
       <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
         <span className="font-extrabold text-xs text-slate-800 flex items-center gap-1.5">
           <Eye className="w-4 h-4 text-purple-700" />
-          <span>
-            {lang === "ar"
-              ? "المعاينة التفاعلية الحية"
-              : "Live Interactive Preview"}
-          </span>
+          <span>{t("formBuilder.previewTitle", { lng: currentLang })}</span>
         </span>
         <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-          {lang === "ar" ? "مباشر" : "Live"}
+          {t("formBuilder.liveBadge", { lng: currentLang })}
         </span>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-3 pe-1">
         {formFields.length === 0 ? (
           <div className="p-8 text-center text-slate-400 text-xs">
-            {lang === "ar"
-              ? "النموذج فارغ. أضف حقولاً للبدء."
-              : "Form is empty. Add fields to start."}
+            {t("formBuilder.emptyForm", { lng: currentLang })}
           </div>
         ) : (
           formFields.map((f) => {
@@ -74,7 +73,9 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                 <div className="flex items-center justify-between mb-1">
                   <label className="font-bold text-slate-800 flex items-center gap-1">
                     <span>
-                      {lang === "ar" ? f.fieldLabelAr : f.fieldLabelEn}
+                      {currentLang === "ar"
+                        ? f.fieldLabelAr
+                        : f.fieldLabelEn || f.fieldLabelAr}
                     </span>
                     {f.isRequired && !isReadOnly && (
                       <span className="text-rose-600 font-bold mx-1">*</span>
@@ -83,7 +84,9 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                   {isReadOnly && (
                     <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 font-bold border border-amber-300 flex items-center gap-0.5">
                       <Lock className="w-2.5 h-2.5" />
-                      <span>{lang === "ar" ? "للعرض فقط" : "Read-only"}</span>
+                      <span>
+                        {t("formBuilder.readOnlyBadge", { lng: currentLang })}
+                      </span>
                     </span>
                   )}
                 </div>
@@ -96,17 +99,21 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                       String(f.defaultValue).trim() !== ""
                         ? String(f.defaultValue)
                         : f.fieldType === "currency"
-                          ? lang === "ar"
+                          ? currentLang === "ar"
                             ? "15,000 ر.س"
                             : "15,000 SAR"
                           : f.fieldType === "date"
                             ? "2026-06-01"
-                            : lang === "ar"
-                              ? `[بيانات ${f.fieldLabelAr} من ملف الإكسل]`
-                              : `[${f.fieldLabelEn || f.fieldKey} from Excel]`}
+                            : t("formBuilder.excelMockData", {
+                                field:
+                                  currentLang === "ar"
+                                    ? f.fieldLabelAr
+                                    : f.fieldLabelEn || f.fieldKey,
+                                lng: currentLang,
+                              })}
                     </span>
                     <span className="text-[9px] text-amber-700 font-medium">
-                      {lang === "ar" ? "مستورد من الإكسل" : "Excel Imported"}
+                      {t("formBuilder.excelImported", { lng: currentLang })}
                     </span>
                   </div>
                 ) : (
@@ -119,10 +126,16 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                         }
                         className="w-full h-8 px-2 rounded-lg border border-slate-300 text-xs"
                       >
-                        <option value="">-- اختر --</option>
+                        <option value="">
+                          {t("formBuilder.selectPlaceholder", {
+                            lng: currentLang,
+                          })}
+                        </option>
                         {(f.options || []).map((opt) => (
                           <option key={opt.id} value={opt.value}>
-                            {lang === "ar" ? opt.labelAr : opt.labelEn}
+                            {currentLang === "ar"
+                              ? opt.labelAr
+                              : opt.labelEn || opt.labelAr}
                           </option>
                         ))}
                       </select>
@@ -139,7 +152,7 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                               : "bg-slate-100 text-slate-700"
                           }`}
                         >
-                          {lang === "ar" ? "نعم" : "Yes"}
+                          {t("formBuilder.yesBtn", { lng: currentLang })}
                         </button>
                         <button
                           type="button"
@@ -152,7 +165,7 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                               : "bg-slate-100 text-slate-700"
                           }`}
                         >
-                          {lang === "ar" ? "لا" : "No"}
+                          {t("formBuilder.noBtn", { lng: currentLang })}
                         </button>
                       </div>
                     )}
@@ -179,7 +192,7 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                           className="w-full h-8 px-2 rounded-lg border border-slate-300 text-xs"
                         />
                         <span className="absolute top-1.5 end-2 text-[10px] text-slate-400 font-bold">
-                          ر.س
+                          {t("formBuilder.currencyUnit", { lng: currentLang })}
                         </span>
                       </div>
                     )}

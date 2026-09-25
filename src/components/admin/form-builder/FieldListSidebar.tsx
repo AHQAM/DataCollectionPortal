@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { RequestField, FieldType } from "../../../types";
 import { Plus, ChevronUp, ChevronDown, Lock } from "lucide-react";
 
@@ -19,21 +20,26 @@ export const FieldListSidebar: React.FC<FieldListSidebarProps> = ({
   onAddField,
   onMoveField,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <div className="lg:col-span-3 bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between max-h-[750px]">
       <div>
         <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
           <span className="font-extrabold text-xs text-slate-800">
-            {lang === "ar"
-              ? `حقول النموذج (${formFields.length})`
-              : `Form Fields (${formFields.length})`}
+            {t("formBuilder.fieldsCount", {
+              count: formFields.length,
+              lng: currentLang,
+            })}
           </span>
           <button
             onClick={() => onAddField("select")}
             className="text-xs font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 bg-purple-50 px-2 py-1 rounded-lg transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>{lang === "ar" ? "إضافة حقل" : "Add"}</span>
+            <span>{t("formBuilder.addField", { lng: currentLang })}</span>
           </button>
         </div>
 
@@ -56,7 +62,9 @@ export const FieldListSidebar: React.FC<FieldListSidebarProps> = ({
                       #{idx + 1}
                     </span>
                     <span className="font-bold truncate">
-                      {lang === "ar" ? field.fieldLabelAr : field.fieldLabelEn}
+                      {currentLang === "ar"
+                        ? field.fieldLabelAr
+                        : field.fieldLabelEn || field.fieldLabelAr}
                     </span>
                     {(field.readOnlyRule || field.isReadOnly) && (
                       <span
@@ -67,7 +75,9 @@ export const FieldListSidebar: React.FC<FieldListSidebarProps> = ({
                         }`}
                       >
                         <Lock className="w-2.5 h-2.5" />
-                        <span>{lang === "ar" ? "للعرض فقط" : "Read-only"}</span>
+                        <span>
+                          {t("formBuilder.readOnlyBadge", { lng: currentLang })}
+                        </span>
                       </span>
                     )}
                   </div>
@@ -105,9 +115,7 @@ export const FieldListSidebar: React.FC<FieldListSidebarProps> = ({
 
       <div className="pt-3 border-t border-slate-100 mt-2">
         <span className="text-[10px] text-slate-400 block text-center">
-          {lang === "ar"
-            ? "يدعم 24 نوع حقل وقواعد شرطية"
-            : "Supports 24 field types & conditions"}
+          {t("formBuilder.footerNote", { lng: currentLang })}
         </span>
       </div>
     </div>
