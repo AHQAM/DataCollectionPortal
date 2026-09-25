@@ -1,7 +1,6 @@
 import React from "react";
 import { ImportedCredential } from "./userImportParser";
 import { CheckCircle2, Download } from "lucide-react";
-import i18n from "../../../i18n";
 
 interface UserImportCredentialsTableProps {
   lang: string;
@@ -19,7 +18,9 @@ export const UserImportCredentialsTable: React.FC<
         <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
         <div className="flex-1">
           <h3 className="text-sm font-extrabold text-emerald-950">
-            {i18n.t("auto.usersImportedSuccessfully")}
+            {lang === "ar"
+              ? "تم استيراد حسابات المستخدمين بنجاح!"
+              : "Users imported successfully!"}
           </h3>
           <p className="text-xs text-emerald-800 mt-1 leading-relaxed">
             {lang === "ar"
@@ -33,7 +34,11 @@ export const UserImportCredentialsTable: React.FC<
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
         >
           <Download className="w-4 h-4" />
-          <span>{i18n.t("auto.downloadCredentialsExcel")}</span>
+          <span>
+            {lang === "ar"
+              ? "تنزيل كشف كلمات المرور (Excel)"
+              : "Download Credentials (Excel)"}
+          </span>
         </button>
       </div>
 
@@ -41,10 +46,14 @@ export const UserImportCredentialsTable: React.FC<
       <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
         <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
           <span className="text-xs font-bold text-slate-700">
-            {i18n.t("auto.temporaryCredentialsSheet")}
+            {lang === "ar"
+              ? "كشف بيانات الدخول المؤقتة:"
+              : "Temporary Credentials Sheet:"}
           </span>
           <span className="text-[11px] text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-            {i18n.t("auto.mustChangePasswordOn")}
+            {lang === "ar"
+              ? "يلزم تغيير كلمة المرور عند أول تسجيل دخول"
+              : "Must change password on first login"}
           </span>
         </div>
         <div className="max-h-72 overflow-y-auto">
@@ -53,19 +62,21 @@ export const UserImportCredentialsTable: React.FC<
               <tr>
                 <th className="px-3 py-2 text-start w-10">#</th>
                 <th className="px-3 py-2 text-start">
-                  {i18n.t("auto.userName")}
+                  {lang === "ar" ? "اسم المستخدم" : "User Name"}
                 </th>
                 <th className="px-3 py-2 text-start">
-                  {i18n.t("auto.usernameUserNo")}
+                  {lang === "ar"
+                    ? "رقم المستخدم (اسم الدخول)"
+                    : "Username / User No"}
                 </th>
                 <th className="px-3 py-2 text-start">
-                  {i18n.t("auto.branch")}
+                  {lang === "ar" ? "الفرع" : "Branch"}
                 </th>
                 <th className="px-3 py-2 text-start">
-                  {i18n.t("auto.regions")}
+                  {lang === "ar" ? "المناطق المصرحة" : "Regions"}
                 </th>
                 <th className="px-3 py-2 text-start">
-                  {i18n.t("auto.temporaryPassword")}
+                  {lang === "ar" ? "كلمة المرور المؤقتة" : "Temporary Password"}
                 </th>
               </tr>
             </thead>

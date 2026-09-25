@@ -45,17 +45,23 @@ export const AdminDeviceManager: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Smartphone className="w-5 h-5 text-purple-700" />
-            <span>{t("auto.userDeviceBindingSecurity")}</span>
+            <span>
+              {lang === "ar"
+                ? "مركز أمان وربط أجهزة المستخدمين"
+                : "User Device Binding & Security"}
+            </span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {t("auto.enforceSingledeviceBindingAnd")}
+            {lang === "ar"
+              ? "تأمين تسجيل الدخول وحصر كل مستخدم على هاتف ذكي معتمد برقم UUID فريد"
+              : "Enforce single-device binding and approve phone replacements with UUID validation"}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold bg-purple-50 text-purple-900 border border-purple-200 px-3 py-1.5 rounded-xl">
             {deviceBindings.filter((b) => b.status === "ACTIVE").length}{" "}
-            {t("auto.activeDevices")}
+            {lang === "ar" ? "جهاز نشط" : "Active Devices"}
           </span>
         </div>
       </div>
@@ -67,7 +73,11 @@ export const AdminDeviceManager: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("auto.searchByUserModel")}
+            placeholder={
+              lang === "ar"
+                ? "بحث باسم المستخدم، طراز الهاتف، UUID..."
+                : "Search by user, model, UUID..."
+            }
             className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
           <Search className="w-4 h-4 text-slate-400 absolute top-3 start-3" />
@@ -109,23 +119,33 @@ export const AdminDeviceManager: React.FC = () => {
           <table className="w-full text-start text-xs">
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-start">{t("auto.userRegion")}</th>
-                <th className="px-4 py-3 text-start">{t("auto.deviceOs")}</th>
                 <th className="px-4 py-3 text-start">
-                  {t("auto.installationUuid")}
+                  {lang === "ar" ? "المستخدم والمنطقة" : "User & Region"}
                 </th>
-                <th className="px-4 py-3 text-start">{t("auto.firstBound")}</th>
                 <th className="px-4 py-3 text-start">
-                  {t("auto.bindingStatus")}
+                  {lang === "ar" ? "طراز الهاتف والنظام" : "Device & OS"}
                 </th>
-                <th className="px-4 py-3 text-center">{t("auto.actions")}</th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "معرّف التثبيت (UUID)" : "Installation UUID"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "تاريخ أول ربط" : "First Bound"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "حالة الربط" : "Binding Status"}
+                </th>
+                <th className="px-4 py-3 text-center">
+                  {lang === "ar" ? "الإجراءات" : "Actions"}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredBindings.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-slate-400">
-                    {t("auto.noDeviceBindingsFound")}
+                    {lang === "ar"
+                      ? "لا توجد أجهزة مطابقة للفلتر"
+                      : "No device bindings found"}
                   </td>
                 </tr>
               ) : (
@@ -162,7 +182,9 @@ export const AdminDeviceManager: React.FC = () => {
                       </td>
 
                       <td className="px-4 py-3.5 text-slate-500">
-                        {new Date(b.boundAt).toLocaleDateString(t("auto.enus"))}
+                        {new Date(b.boundAt).toLocaleDateString(
+                          lang === "ar" ? "ar-SA" : "en-US",
+                        )}
                       </td>
 
                       <td className="px-4 py-3.5">
@@ -176,10 +198,16 @@ export const AdminDeviceManager: React.FC = () => {
                           }`}
                         >
                           {b.status === "ACTIVE"
-                            ? t("auto.activeBound")
+                            ? lang === "ar"
+                              ? "معتمد ونشط"
+                              : "Active Bound"
                             : b.status === "PENDING_REPLACEMENT"
-                              ? t("auto.pendingApproval")
-                              : t("auto.unbound")}
+                              ? lang === "ar"
+                                ? "بانتظار الموافقة"
+                                : "Pending Approval"
+                              : lang === "ar"
+                                ? "مفكوك"
+                                : "Unbound"}
                         </span>
                       </td>
 
@@ -189,9 +217,13 @@ export const AdminDeviceManager: React.FC = () => {
                             <button
                               onClick={() => releaseDeviceBinding(b.userId)}
                               className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px] border border-rose-200"
-                              title={t("auto.releaseDevice")}
+                              title={
+                                lang === "ar"
+                                  ? "فك الارتباط فوراً"
+                                  : "Release Device"
+                              }
                             >
-                              {t("auto.release")}
+                              {lang === "ar" ? "فك الارتباط" : "Release"}
                             </button>
                           )}
 
@@ -203,7 +235,7 @@ export const AdminDeviceManager: React.FC = () => {
                                 }
                                 className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px]"
                               >
-                                {t("auto.approve")}
+                                {lang === "ar" ? "موافقة" : "Approve"}
                               </button>
                               <button
                                 onClick={() =>
@@ -211,7 +243,7 @@ export const AdminDeviceManager: React.FC = () => {
                                 }
                                 className="px-2.5 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-[10px]"
                               >
-                                {t("auto.reject")}
+                                {lang === "ar" ? "رفض" : "Reject"}
                               </button>
                             </>
                           )}

@@ -7,7 +7,6 @@ import {
 } from "../../../types";
 import { Copy, Trash2, Lock } from "lucide-react";
 import { ALL_FIELD_TYPES } from "./formBuilderTypes";
-import i18n from "../../../i18n";
 
 interface FieldPropertiesEditorProps {
   lang: string;
@@ -30,7 +29,9 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
     return (
       <div className="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex items-center justify-center min-h-[400px]">
         <div className="p-8 text-center text-slate-400 text-xs">
-          {i18n.t("auto.selectAFieldTo")}
+          {lang === "ar"
+            ? "اختر حقلاً من القائمة الجانبية لتعديله"
+            : "Select a field to edit"}
         </div>
       </div>
     );
@@ -41,21 +42,23 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
       <div className="space-y-4 text-xs">
         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
           <span className="font-extrabold text-sm text-slate-900">
-            {i18n.t("auto.fieldSettingsRules")}
+            {lang === "ar"
+              ? "خصائص الحقل وقواعد الإلزام والشرطية"
+              : "Field Settings & Rules"}
           </span>
 
           <div className="flex items-center gap-1">
             <button
               onClick={() => onDuplicateField(selectedField)}
               className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
-              title={i18n.t("auto.duplicate")}
+              title={lang === "ar" ? "استنساخ الحقل" : "Duplicate"}
             >
               <Copy className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => onDeleteField(selectedField.fieldId)}
               className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition-colors cursor-pointer"
-              title={i18n.t("auto.delete")}
+              title={lang === "ar" ? "حذف الحقل" : "Delete"}
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -65,7 +68,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
         {/* Field Type Selector */}
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {i18n.t("auto.fieldType")}
+            {lang === "ar" ? "نوع الحقل (24 نوعاً متاحاً)" : "Field Type"}
           </label>
           <select
             value={selectedField.fieldType}
@@ -86,7 +89,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.fieldKeyUnique")}
+              {lang === "ar" ? "مفتاح الحقل البرمجي" : "Field Key (Unique)"}
             </label>
             <input
               type="text"
@@ -121,7 +124,9 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
                     : ""
                 }
               >
-                {i18n.t("auto.requiredFromUser")}
+                {lang === "ar"
+                  ? "حقل إلزامي من المستخدم"
+                  : "Required from User"}
               </span>
             </label>
           </div>
@@ -148,18 +153,24 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
             />
             <div className="flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-amber-700" />
-              <span>{i18n.t("auto.readonlyFieldImportedVia")}</span>
+              <span>
+                {lang === "ar"
+                  ? "حقل للعرض فقط (بيانات مستوردة عبر الإكسل - غير قابلة للتعديل من المستخدم)"
+                  : "Read-Only Field (Imported via Excel - Non-editable by user)"}
+              </span>
             </div>
           </label>
           <p className="text-[11px] text-amber-800/90 leading-relaxed ps-6">
-            {i18n.t("auto.whenEnabledThisValue")}
+            {lang === "ar"
+              ? "عند تفعيل هذا الخيار، يتم استيراد القيمة (مثل: رقم السجل، اسم الجهة، الفرع، الموقع) من ملف الإكسل وتظهر للمستخدم كمرجع ثابت بدون إمكانية التعديل، بينما يقوم بتعبئة الحقول الأخرى."
+              : "When enabled, this value is imported from Excel (e.g. Record ID, Target Name, Branch, Location) and shown to the user as read-only, allowing them to fill other fields."}
           </p>
         </div>
 
         {/* Labels AR & EN */}
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {i18n.t("auto.labelArabic")}
+            {lang === "ar" ? "تسمية الحقل بالعربية" : "Label (Arabic)"}
           </label>
           <input
             type="text"
@@ -171,7 +182,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
 
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {i18n.t("auto.labelEnglish")}
+            {lang === "ar" ? "تسمية الحقل بالإنجليزية" : "Label (English)"}
           </label>
           <input
             type="text"
@@ -185,7 +196,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.helpTextArabic")}
+              {lang === "ar" ? "نص إرشادي بالعربية" : "Help Text (Arabic)"}
             </label>
             <input
               type="text"
@@ -196,7 +207,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
           </div>
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.helpTextEnglish")}
+              {lang === "ar" ? "نص إرشادي بالإنجليزية" : "Help Text (English)"}
             </label>
             <input
               type="text"
@@ -217,7 +228,9 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-800">
-                {i18n.t("auto.optionsAvailableToUser")}
+                {lang === "ar"
+                  ? "خيارات القائمة المتاحة للمستخدم"
+                  : "Options Available to User"}
               </span>
               <button
                 type="button"
@@ -233,7 +246,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
                 }}
                 className="text-[10px] font-bold text-purple-700 bg-purple-100 hover:bg-purple-200 px-2 py-0.5 rounded cursor-pointer transition-colors"
               >
-                + {i18n.t("auto.addOption")}
+                + {lang === "ar" ? "إضافة خيار" : "Add Option"}
               </button>
             </div>
 
@@ -294,10 +307,14 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
         {/* Conditional Visibility Rule Builder */}
         <div className="p-3 bg-purple-50/50 rounded-xl border border-purple-100 space-y-2">
           <span className="font-bold text-purple-950 block">
-            {i18n.t("auto.conditionalVisibilityRule")}
+            {lang === "ar"
+              ? "قاعدة الظهور الشرطي (Conditional Visibility)"
+              : "Conditional Visibility Rule"}
           </span>
           <p className="text-[11px] text-slate-500">
-            {i18n.t("auto.showThisFieldOnly")}
+            {lang === "ar"
+              ? "إظهار هذا الحقل فقط إذا تحققت قيمة معينة في حقل آخر"
+              : "Show this field only when target field equals value"}
           </p>
 
           <div className="grid grid-cols-3 gap-2">
@@ -318,7 +335,9 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
               }}
               className="h-8 px-2 rounded border border-slate-300 text-[11px]"
             >
-              <option value="">{i18n.t("auto.noCondition")}</option>
+              <option value="">
+                {lang === "ar" ? "-- بدون شرط --" : "-- No Condition --"}
+              </option>
               {formFields
                 .filter((f) => f.fieldId !== selectedField.fieldId)
                 .map((f) => (

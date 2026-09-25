@@ -1,7 +1,6 @@
 import React from "react";
 import { Eye } from "lucide-react";
 import { RecordItem, RequestField } from "../../../types";
-import i18n from "../../../i18n";
 
 interface Props {
   lang: string;
@@ -41,7 +40,13 @@ export const ReportDataTable: React.FC<Props> = ({
               : "bg-slate-100 text-slate-600"
           }`}
         >
-          {isTrue ? i18n.t("auto.yes") : i18n.t("auto.no")}
+          {isTrue
+            ? lang === "ar"
+              ? "نعم"
+              : "Yes"
+            : lang === "ar"
+              ? "لا"
+              : "No"}
         </span>
       );
     }
@@ -53,7 +58,7 @@ export const ReportDataTable: React.FC<Props> = ({
     ) {
       return (
         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">
-          📷 {i18n.t("auto.photo")}
+          📷 {lang === "ar" ? "صورة مرفقة" : "Photo"}
         </span>
       );
     }
@@ -61,7 +66,7 @@ export const ReportDataTable: React.FC<Props> = ({
     if (field.fieldType === "gps") {
       return (
         <span className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">
-          📍 {i18n.t("auto.gps")}
+          📍 {lang === "ar" ? "موقع GPS" : "GPS"}
         </span>
       );
     }
@@ -96,7 +101,9 @@ export const ReportDataTable: React.FC<Props> = ({
               : `Records & Responses Preview (${filteredRecords.length})`}
           </span>
           <span className="text-[11px] text-slate-400">
-            {i18n.t("auto.clickOnAnyRecord")}
+            {lang === "ar"
+              ? 'انقر على أي سجل أو على زر "عرض" للاطلاع على كافة الإجابات والصور والإحداثيات'
+              : 'Click on any record or the "View" button to inspect all responses, photos, and coordinates'}
           </span>
         </div>
       </div>
@@ -106,21 +113,27 @@ export const ReportDataTable: React.FC<Props> = ({
           <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
               <th className="px-4 py-3 text-start">
-                {i18n.t("auto.targetEntityRecord")}
+                {lang === "ar"
+                  ? "الجهة المستهدفة / السجل"
+                  : "Target Entity / Record"}
               </th>
               <th className="px-4 py-3 text-start">
-                {i18n.t("auto.regionUser")}
+                {lang === "ar" ? "المنطقة والمستخدم" : "Region & User"}
               </th>
-              <th className="px-4 py-3 text-start">{i18n.t("auto.branch")}</th>
+              <th className="px-4 py-3 text-start">
+                {lang === "ar" ? "الفرع" : "Branch"}
+              </th>
               {/* Dynamic Form Field Columns */}
               {previewFields.map((field) => (
                 <th key={field.fieldId} className="px-4 py-3 text-start">
                   {lang === "ar" ? field.fieldLabelAr : field.fieldLabelEn}
                 </th>
               ))}
-              <th className="px-4 py-3 text-start">{i18n.t("auto.status")}</th>
+              <th className="px-4 py-3 text-start">
+                {lang === "ar" ? "الحالة" : "Status"}
+              </th>
               <th className="px-4 py-3 text-center">
-                {i18n.t("auto.actions")}
+                {lang === "ar" ? "الإجراءات" : "Actions"}
               </th>
             </tr>
           </thead>
@@ -131,7 +144,9 @@ export const ReportDataTable: React.FC<Props> = ({
                   colSpan={5 + previewFields.length}
                   className="px-4 py-8 text-center text-slate-400 text-xs"
                 >
-                  {i18n.t("auto.noRecordsMatchThe")}
+                  {lang === "ar"
+                    ? "لا توجد سجلات مطابقة للفلتر المحدد"
+                    : "No records match the selected filter"}
                 </td>
               </tr>
             ) : (
@@ -183,11 +198,17 @@ export const ReportDataTable: React.FC<Props> = ({
                         }`}
                       >
                         {r.recordStatus === "Submitted"
-                          ? i18n.t("auto.submitted")
+                          ? lang === "ar"
+                            ? "تم الإرسال"
+                            : "Submitted"
                           : r.recordStatus === "Completed"
-                            ? i18n.t("auto.completed1")
+                            ? lang === "ar"
+                              ? "مكتمل"
+                              : "Completed"
                             : r.recordStatus === "DraftSaved"
-                              ? i18n.t("auto.draft")
+                              ? lang === "ar"
+                                ? "مسودة"
+                                : "Draft"
                               : r.recordStatus}
                       </span>
                     </td>
@@ -201,7 +222,9 @@ export const ReportDataTable: React.FC<Props> = ({
                         className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold inline-flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
-                        <span>{i18n.t("auto.viewResponse")}</span>
+                        <span>
+                          {lang === "ar" ? "عرض الاستجابة" : "View Response"}
+                        </span>
                       </button>
                     </td>
                   </tr>

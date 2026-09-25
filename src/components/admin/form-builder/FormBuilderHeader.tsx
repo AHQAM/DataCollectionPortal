@@ -9,7 +9,6 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { RequestItem } from "../../../types";
-import i18n from "../../../i18n";
 
 interface FormBuilderHeaderProps {
   lang: "ar" | "en";
@@ -51,12 +50,16 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
             ) : (
               <ArrowLeft className="w-4 h-4" />
             )}
-            <span>{i18n.t("auto.back")}</span>
+            <span>{lang === "ar" ? "الرجوع لقائمة الطلبات" : "Back"}</span>
           </button>
           <div>
             <h1 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <Sliders className="w-4 h-4 text-purple-700" />
-              <span>{i18n.t("auto.dynamicFormBuilder")}</span>
+              <span>
+                {lang === "ar"
+                  ? "مصمم الحقول الديناميكية"
+                  : "Dynamic Form Builder"}
+              </span>
               <span className="text-xs font-mono font-bold text-purple-800 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
                 {currentRequest?.requestCode}
               </span>
@@ -77,7 +80,7 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
               {currentRequest?.status === "Published" && (
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                   <CheckCircle2 className="w-3 h-3" />
-                  <span>{i18n.t("auto.published")}</span>
+                  <span>{lang === "ar" ? "منشور ومعتمد" : "Published"}</span>
                 </span>
               )}
             </div>
@@ -90,10 +93,16 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
               type="button"
               onClick={() => onOpenImportWizard(requestId)}
               className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
-              title={i18n.t("auto.importExcelData")}
+              title={
+                lang === "ar"
+                  ? "إدراج واستيراد بيانات إكسل لهذا النموذج مباشرة"
+                  : "Import Excel Data"
+              }
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-700" />
-              <span>{i18n.t("auto.importExcelData")}</span>
+              <span>
+                {lang === "ar" ? "إدراج بيانات من Excel" : "Import Excel Data"}
+              </span>
             </button>
           )}
 
@@ -112,14 +121,24 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
               className="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition-all shadow-2xs cursor-pointer appearance-none pe-7"
             >
               <option value="" disabled>
-                {i18n.t("auto.loadFormPreset")}
+                {lang === "ar"
+                  ? "✨ إدراج نموذج جاهز..."
+                  : "✨ Load Form Preset..."}
               </option>
               <option value="general">
-                {i18n.t("auto.generalFieldSurvey")}
+                {lang === "ar"
+                  ? "استبيان ومسح ميداني عام"
+                  : "General Field Survey"}
               </option>
-              <option value="asset">{i18n.t("auto.assetFacilityAudit")}</option>
+              <option value="asset">
+                {lang === "ar"
+                  ? "جرد وتدقيق أصول ومواقع"
+                  : "Asset & Facility Audit"}
+              </option>
               <option value="debt">
-                {i18n.t("auto.customerDebtInactivity")}
+                {lang === "ar"
+                  ? "زيارات ومتابعة مديونيات"
+                  : "Customer Debt & Inactivity"}
               </option>
             </select>
             <Sparkles className="w-3.5 h-3.5 text-amber-600 absolute end-2 pointer-events-none" />
@@ -138,13 +157,21 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
           <button
             onClick={handleSaveAll}
             className="px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
-            title={i18n.t("auto.saveChangesAndPush")}
+            title={
+              lang === "ar"
+                ? "حفظ الحقول وترقية الإصدار وتعميم التحديثات فوراً"
+                : "Save changes and push version update to all representatives"
+            }
           >
             <Save className="w-4 h-4" />
             <span>
               {currentRequest?.status === "Published"
-                ? i18n.t("auto.savePropagateUpdate")
-                : i18n.t("auto.saveChanges")}
+                ? lang === "ar"
+                  ? "حفظ وترقية النموذج عند الجميع"
+                  : "Save & Propagate Update"
+                : lang === "ar"
+                  ? "حفظ النموذج"
+                  : "Save Changes"}
             </span>
           </button>
         </div>
@@ -160,7 +187,10 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
                 : `Campaign is currently Published & Live (Version v${currentRequest.formSchemaVersion || 1})`}
             </span>
             <span className="text-emerald-700 hidden sm:inline">
-              — {i18n.t("auto.youCanAddColumns")}
+              —{" "}
+              {lang === "ar"
+                ? "يمكنك إضافة أعمدة أو تعديل الحقول في أي وقت، وسيتم فوراً ترقية الإصدار وتحديث النموذج على أجهزة المستخدمين دون المساس بالبيانات المحفوظة مسبقاً."
+                : "You can add columns or edit fields anytime. Changes will auto-bump the schema version and reflect on mobile devices without losing existing records."}
             </span>
           </div>
           <span className="text-[11px] font-mono font-bold bg-emerald-200/60 text-emerald-900 px-2 py-0.5 rounded">

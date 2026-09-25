@@ -1,5 +1,4 @@
 import React from "react";
-import i18n from "../../../i18n";
 
 interface SaveTemplateModalProps {
   isOpen: boolean;
@@ -28,16 +27,18 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl border border-slate-200">
         <h3 className="font-bold text-sm text-slate-900 mb-1">
-          {i18n.t("auto.saveAsRequestTemplate")}
+          {lang === "ar" ? "حفظ الطلب كقالب معتمد" : "Save as Request Template"}
         </h3>
         <p className="text-xs text-slate-500 mb-4">
-          {i18n.t("auto.saveFieldSchemaTo")}
+          {lang === "ar"
+            ? "يمكنك إعادة استخدام هيكل الحقول لاحقاً لحملات مشابهة"
+            : "Save field schema to reuse in future campaigns"}
         </p>
 
         <form onSubmit={onSubmit} className="space-y-3 text-xs">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.templateNameArabic")}
+              {lang === "ar" ? "اسم القالب بالعربية" : "Template Name (Arabic)"}
             </label>
             <input
               type="text"
@@ -50,7 +51,9 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.templateNameEnglish")}
+              {lang === "ar"
+                ? "اسم القالب بالإنجليزية"
+                : "Template Name (English)"}
             </label>
             <input
               type="text"
@@ -67,13 +70,13 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
               onClick={onClose}
               className="flex-1 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
             >
-              {i18n.t("auto.cancel")}
+              {lang === "ar" ? "إلغاء" : "Cancel"}
             </button>
             <button
               type="submit"
               className="flex-1 h-9 rounded-lg bg-purple-900 hover:bg-purple-800 text-white font-bold"
             >
-              {i18n.t("auto.save")}
+              {lang === "ar" ? "حفظ القالب" : "Save"}
             </button>
           </div>
         </form>

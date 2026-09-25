@@ -36,7 +36,7 @@ export const RecordResponseModal: React.FC<Props> = ({
   response,
   onClose,
 }) => {
-  const { lang, t } = useApp();
+  const { lang } = useApp();
   const [activeImagePreview, setActiveImagePreview] = useState<string | null>(
     null,
   );
@@ -105,8 +105,12 @@ export const RecordResponseModal: React.FC<Props> = ({
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>
               {status === "Submitted"
-                ? t("auto.submitted")
-                : t("auto.completed1")}
+                ? lang === "ar"
+                  ? "تم الإرسال"
+                  : "Submitted"
+                : lang === "ar"
+                  ? "مكتمل"
+                  : "Completed"}
             </span>
           </span>
         );
@@ -114,7 +118,7 @@ export const RecordResponseModal: React.FC<Props> = ({
         return (
           <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
-            <span>{t("auto.draftSaved")}</span>
+            <span>{lang === "ar" ? "مسودة محفوظة" : "Draft Saved"}</span>
           </span>
         );
       default:
@@ -138,7 +142,9 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-extrabold text-slate-900">
-                  {t("auto.fieldRecordResponseDetails")}
+                  {lang === "ar"
+                    ? "تفاصيل استجابة السجل الميداني"
+                    : "Field Record Response Details"}
                 </h2>
                 {getStatusBadge(record.recordStatus)}
               </div>
@@ -153,7 +159,7 @@ export const RecordResponseModal: React.FC<Props> = ({
             <button
               onClick={() => window.print()}
               className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
-              title={t("auto.print")}
+              title={lang === "ar" ? "طباعة" : "Print"}
             >
               <Printer className="w-4 h-4" />
             </button>
@@ -173,7 +179,11 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <User className="w-3.5 h-3.5 text-purple-600" />
-                <span>{t("auto.targetEntityRecord")}</span>
+                <span>
+                  {lang === "ar"
+                    ? "الجهة المستهدفة / السجل"
+                    : "Target Entity / Record"}
+                </span>
               </div>
               <div className="text-xs font-black text-slate-900 truncate">
                 {record.targetName}
@@ -186,7 +196,9 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <MapPin className="w-3.5 h-3.5 text-purple-600" />
-                <span>{t("auto.userRegion")}</span>
+                <span>
+                  {lang === "ar" ? "المستخدم والمنطقة" : "User & Region"}
+                </span>
               </div>
               <div className="text-xs font-black text-slate-900 truncate">
                 {record.userName || "-"}
@@ -199,7 +211,7 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <Building className="w-3.5 h-3.5 text-purple-600" />
-                <span>{t("auto.branch")}</span>
+                <span>{lang === "ar" ? "الفرع" : "Branch"}</span>
               </div>
               <div className="text-xs font-black text-slate-900 truncate">
                 {record.branchName || "-"}
@@ -212,7 +224,11 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <Calendar className="w-3.5 h-3.5 text-purple-600" />
-                <span>{t("auto.submissionDate")}</span>
+                <span>
+                  {lang === "ar"
+                    ? "تاريخ التحديث / الإرسال"
+                    : "Submission Date"}
+                </span>
               </div>
               <div className="text-xs font-black text-slate-900">
                 {record.submittedAt || record.updatedAt
@@ -236,16 +252,22 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-purple-700" />
-                <span>{t("auto.fieldResponsesAnswers")}</span>
+                <span>
+                  {lang === "ar"
+                    ? "الاستجابات وإجابات الحقول"
+                    : "Field Responses & Answers"}
+                </span>
               </h3>
               <span className="text-[11px] font-mono text-slate-400">
-                {fields.length} {t("auto.fieldsDefined")}
+                {fields.length} {lang === "ar" ? "حقل معرف" : "fields defined"}
               </span>
             </div>
 
             {fields.length === 0 ? (
               <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-400 text-xs">
-                {t("auto.noFormFieldsDefined")}
+                {lang === "ar"
+                  ? "لا توجد حقول معرفة لهذا الطلب."
+                  : "No form fields defined for this campaign."}
               </div>
             ) : (
               <div className="space-y-3">
@@ -299,7 +321,11 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="space-y-3 pt-3 border-t border-slate-100">
               <h4 className="text-xs font-extrabold text-slate-600 flex items-center gap-1.5">
                 <Info className="w-3.5 h-3.5 text-slate-400" />
-                <span>{t("auto.additionalResponseData")}</span>
+                <span>
+                  {lang === "ar"
+                    ? "بيانات وحقول إضافية مسجلة"
+                    : "Additional Response Data"}
+                </span>
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {extraEntries.map(([key, val]) => (
@@ -325,14 +351,14 @@ export const RecordResponseModal: React.FC<Props> = ({
         {/* Footer */}
         <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
           <div className="text-[11px] text-slate-400 font-mono">
-            {t("auto.recordId")} {record.recordId}
+            {lang === "ar" ? "معرف السجل:" : "Record ID:"} {record.recordId}
           </div>
 
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer"
           >
-            {t("auto.close")}
+            {lang === "ar" ? "إغلاق" : "Close"}
           </button>
         </div>
       </div>
@@ -353,7 +379,7 @@ export const RecordResponseModal: React.FC<Props> = ({
               onClick={() => setActiveImagePreview(null)}
               className="mt-3 px-4 py-1.5 rounded-full bg-white/20 hover:bg-white/40 text-white text-xs font-bold backdrop-blur-md transition-all"
             >
-              {t("auto.closePreview")}
+              {lang === "ar" ? "إغلاق المعاينة" : "Close Preview"}
             </button>
           </div>
         </div>

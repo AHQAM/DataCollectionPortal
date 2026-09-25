@@ -42,7 +42,8 @@ export const AdminAssignments: React.FC = () => {
   const targetEntityLabel =
     (lang === "ar"
       ? activeReq?.targetEntityLabelAr
-      : activeReq?.targetEntityLabelEn) || t("auto.targetEntityRecord");
+      : activeReq?.targetEntityLabelEn) ||
+    (lang === "ar" ? "الجهة المستهدفة / السجل" : "Target Entity / Record");
 
   // Filter records by request, branch, search
   const filteredRecords = records.filter((r) => {
@@ -85,10 +86,16 @@ export const AdminAssignments: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Layers className="w-5 h-5 text-purple-700" />
-            <span>{t("auto.assignmentsReallocationMatrix")}</span>
+            <span>
+              {lang === "ar"
+                ? "مصفوفة التعيينات وإعادة توجيه السجلات"
+                : "Assignments & Reallocation Matrix"}
+            </span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {t("auto.trackRecordAssignmentsAcross")}
+            {lang === "ar"
+              ? "متابعة توزيع السجلات على المستخدمين وإمكانية نقل السجلات المعلقة مع توثيق الأسباب"
+              : "Track record assignments across users and reassign pending records with full audit trail"}
           </p>
         </div>
 
@@ -131,7 +138,9 @@ export const AdminAssignments: React.FC = () => {
             onChange={(e) => setSelectedBranchId(e.target.value)}
             className="h-10 px-3 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700"
           >
-            <option value="ALL">{t("auto.allBranches")}</option>
+            <option value="ALL">
+              {lang === "ar" ? "جميع الفروع" : "All Branches"}
+            </option>
             {branches.map((b) => (
               <option key={b.branchId} value={b.branchId}>
                 {lang === "ar" ? b.branchNameAr : b.branchNameEn}
@@ -148,16 +157,24 @@ export const AdminAssignments: React.FC = () => {
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
                 <th className="px-4 py-3 text-start">{targetEntityLabel}</th>
-                <th className="px-4 py-3 text-start">{t("auto.region")}</th>
                 <th className="px-4 py-3 text-start">
-                  {t("auto.assignedUser")}
+                  {lang === "ar" ? "المنطقة" : "Region"}
                 </th>
-                <th className="px-4 py-3 text-start">{t("auto.branch")}</th>
                 <th className="px-4 py-3 text-start">
-                  {t("auto.areaLocation")}
+                  {lang === "ar" ? "المستخدم المسند" : "Assigned User"}
                 </th>
-                <th className="px-4 py-3 text-start">{t("auto.status")}</th>
-                <th className="px-4 py-3 text-center">{t("auto.reassign")}</th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "الفرع" : "Branch"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "الموقع / الحي" : "Area / Location"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "الحالة" : "Status"}
+                </th>
+                <th className="px-4 py-3 text-center">
+                  {lang === "ar" ? "إعادة التعيين" : "Reassign"}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -207,10 +224,16 @@ export const AdminAssignments: React.FC = () => {
                         }`}
                       >
                         {isCompleted
-                          ? t("auto.completed1")
+                          ? lang === "ar"
+                            ? "مكتمل"
+                            : "Completed"
                           : r.recordStatus === "DraftSaved"
-                            ? t("auto.draft")
-                            : t("auto.pending")}
+                            ? lang === "ar"
+                              ? "مسودة"
+                              : "Draft"
+                            : lang === "ar"
+                              ? "معلق"
+                              : "Pending"}
                       </span>
                     </td>
 
@@ -224,11 +247,13 @@ export const AdminAssignments: React.FC = () => {
                           className="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-900 font-bold text-[10px] border border-purple-200 flex items-center justify-center gap-1 mx-auto cursor-pointer"
                         >
                           <ArrowRightLeft className="w-3 h-3" />
-                          <span>{t("auto.reassign")}</span>
+                          <span>
+                            {lang === "ar" ? "نقل التكليف" : "Reassign"}
+                          </span>
                         </button>
                       ) : (
                         <span className="text-[10px] text-slate-400 font-semibold">
-                          {t("auto.locked")}
+                          {lang === "ar" ? "معتمد نهائياً" : "Locked"}
                         </span>
                       )}
                     </td>
@@ -246,7 +271,7 @@ export const AdminAssignments: React.FC = () => {
           <div className="bg-white w-full max-w-md rounded-2xl p-5 shadow-2xl border border-slate-200 text-xs">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
               <h3 className="font-extrabold text-sm text-slate-900">
-                {t("auto.reassignRecord")}
+                {lang === "ar" ? "إعادة توجيه السجل" : "Reassign Record"}
               </h3>
               <button
                 onClick={() => setReassignModalRecord(null)}
@@ -261,8 +286,9 @@ export const AdminAssignments: React.FC = () => {
                 {reassignModalRecord.targetName}
               </div>
               <div className="text-[11px] text-slate-500">
-                {t("auto.currentUser")}
-                {reassignModalRecord.userName} ({t("auto.region1")}
+                {lang === "ar" ? "المستخدم الحالي: " : "Current User: "}
+                {reassignModalRecord.userName} (
+                {lang === "ar" ? "المنطقة #" : "Region #"}
                 {reassignModalRecord.assignedRegionNo})
               </div>
             </div>
@@ -270,7 +296,9 @@ export const AdminAssignments: React.FC = () => {
             <form onSubmit={handleReassignSubmit} className="space-y-3">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  {t("auto.targetUserRegion")}
+                  {lang === "ar"
+                    ? "المستخدم والمنطقة البديلة المستهدفة:"
+                    : "Target User & Region:"}
                 </label>
                 <select
                   value={targetRepId}
@@ -288,13 +316,19 @@ export const AdminAssignments: React.FC = () => {
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  {t("auto.reassignmentReasonAuditLog")}
+                  {lang === "ar"
+                    ? "سبب إعادة التوجيه (لأغراض التدقيق):"
+                    : "Reassignment Reason (Audit Log):"}
                 </label>
                 <textarea
                   rows={2}
                   value={reassignReason}
                   onChange={(e) => setReassignReason(e.target.value)}
-                  placeholder={t("auto.egVacationCoverage")}
+                  placeholder={
+                    lang === "ar"
+                      ? "مثال: إجازة المستخدم الأصلي، إعادة توزيع جغرافي..."
+                      : "e.g. Vacation coverage"
+                  }
                   className="w-full p-2 rounded-xl border border-slate-300"
                   required
                 />
@@ -306,13 +340,13 @@ export const AdminAssignments: React.FC = () => {
                   onClick={() => setReassignModalRecord(null)}
                   className="flex-1 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
                 >
-                  {t("auto.cancel")}
+                  {lang === "ar" ? "إلغاء" : "Cancel"}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 h-9 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-bold"
                 >
-                  {t("auto.confirmReassign")}
+                  {lang === "ar" ? "تأكيد النقل" : "Confirm Reassign"}
                 </button>
               </div>
             </form>

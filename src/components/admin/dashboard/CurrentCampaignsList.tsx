@@ -1,7 +1,6 @@
 import React from "react";
 import { Clock, ArrowUpRight } from "lucide-react";
 import { RequestItem } from "../../../types";
-import i18n from "../../../i18n";
 
 interface CurrentCampaignsListProps {
   lang: "ar" | "en";
@@ -20,7 +19,9 @@ export const CurrentCampaignsList: React.FC<CurrentCampaignsListProps> = ({
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
           <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
             <Clock className="w-4 h-4 text-purple-700" />
-            <span>{i18n.t("auto.currentCampaigns")}</span>
+            <span>
+              {lang === "ar" ? "حالة الحملات الحالية" : "Current Campaigns"}
+            </span>
           </h2>
           <span className="text-[10px] font-bold bg-purple-100 text-purple-900 px-2 py-0.5 rounded-full">
             {requests.length}
@@ -55,8 +56,10 @@ export const CurrentCampaignsList: React.FC<CurrentCampaignsListProps> = ({
                   {req.requestCode}
                 </span>
                 <span>
-                  {i18n.t("auto.due")}
-                  {new Date(req.dueAt).toLocaleDateString(i18n.t("auto.enus"))}
+                  {lang === "ar" ? "الاستحقاق: " : "Due: "}
+                  {new Date(req.dueAt).toLocaleDateString(
+                    lang === "ar" ? "ar-SA" : "en-US",
+                  )}
                 </span>
               </div>
             </div>
@@ -69,7 +72,9 @@ export const CurrentCampaignsList: React.FC<CurrentCampaignsListProps> = ({
           onClick={() => onNavigate("requests")}
           className="w-full h-10 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
         >
-          <span>{i18n.t("auto.manageAllRequests")}</span>
+          <span>
+            {lang === "ar" ? "عرض وإدارة جميع الطلبات" : "Manage All Requests"}
+          </span>
           <ArrowUpRight className="w-3.5 h-3.5" />
         </button>
       </div>

@@ -1,7 +1,6 @@
 import React from "react";
 import { RequestItem, RequestField } from "../../../types";
 import { RequestTableRow } from "./RequestTableRow";
-import i18n from "../../../i18n";
 
 interface RequestsTableProps {
   lang: "ar" | "en";
@@ -47,18 +46,22 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({
           <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
               <th className="px-4 py-3 text-start">
-                {i18n.t("auto.codeTitle")}
+                {lang === "ar" ? "رمز وعنوان الطلب" : "Code & Title"}
               </th>
               <th className="px-4 py-3 text-start">
-                {i18n.t("auto.typePriority")}
+                {lang === "ar" ? "النوع والأولوية" : "Type & Priority"}
               </th>
-              <th className="px-4 py-3 text-start">{i18n.t("auto.dueDate")}</th>
               <th className="px-4 py-3 text-start">
-                {i18n.t("auto.records1")}
+                {lang === "ar" ? "تاريخ الاستحقاق" : "Due Date"}
               </th>
-              <th className="px-4 py-3 text-start">{i18n.t("auto.status")}</th>
+              <th className="px-4 py-3 text-start">
+                {lang === "ar" ? "السجلات" : "Records"}
+              </th>
+              <th className="px-4 py-3 text-start">
+                {lang === "ar" ? "الحالة" : "Status"}
+              </th>
               <th className="px-4 py-3 text-center">
-                {i18n.t("auto.actions")}
+                {lang === "ar" ? "الإجراءات" : "Actions"}
               </th>
             </tr>
           </thead>
@@ -69,7 +72,7 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({
                   colSpan={6}
                   className="px-4 py-8 text-center text-slate-400"
                 >
-                  {i18n.t("auto.noRequestsFound")}
+                  {lang === "ar" ? "لا توجد طلبات" : "No requests found"}
                 </td>
               </tr>
             ) : (

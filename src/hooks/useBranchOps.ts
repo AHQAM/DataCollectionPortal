@@ -2,7 +2,6 @@ import { useUIStore } from "../stores/uiStore";
 import { Branch, Region } from "../types";
 import { branchRegionApi } from "../services";
 import { logAudit } from "../utils/audit";
-import i18n from "../i18n";
 
 export const useBranchOps = () => {
   return {
@@ -49,7 +48,9 @@ export const useBranchOps = () => {
         if (!res.success) {
           return {
             success: false,
-            message: res.message || i18n.t("auto.cannotDeleteBranch"),
+            message:
+              res.message ||
+              (lang === "ar" ? "تعذر حذف الفرع" : "Cannot delete branch"),
           };
         }
         logAudit("BRANCH_DELETED", "Branch", branchId, {});
@@ -105,7 +106,9 @@ export const useBranchOps = () => {
         if (!res.success) {
           return {
             success: false,
-            message: res.message || i18n.t("auto.cannotDeleteRegion"),
+            message:
+              res.message ||
+              (lang === "ar" ? "تعذر حذف المنطقة" : "Cannot delete region"),
           };
         }
         logAudit("REGION_DELETED", "Region", regionNo, {});

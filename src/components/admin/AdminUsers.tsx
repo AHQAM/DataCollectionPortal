@@ -82,15 +82,21 @@ export const AdminUsers: React.FC = () => {
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRepNameAr.trim()) {
-      alert(t("auto.arabicNameIsRequired"));
+      alert(
+        lang === "ar" ? "يرجى إدخال الاسم بالعربية" : "Arabic name is required",
+      );
       return;
     }
     if (!newRegionNo.trim()) {
-      alert(t("auto.regionNoOrEmail"));
+      alert(
+        lang === "ar"
+          ? "يرجى إدخال رقم المنطقة / البريد الإلكتروني"
+          : "Region No. or Email is required",
+      );
       return;
     }
     if (!newBranchId) {
-      alert(t("auto.pleaseSelectABranch"));
+      alert(lang === "ar" ? "يرجى اختيار الفرع" : "Please select a branch");
       return;
     }
 
@@ -109,7 +115,11 @@ export const AdminUsers: React.FC = () => {
         permissions: newRole === "SUPERVISOR" ? newPermissions : undefined,
       });
       setShowCreateModal(false);
-      showToast(t("auto.userCreatedATemporary"));
+      showToast(
+        lang === "ar"
+          ? "تم إنشاء الحساب بنجاح (سيتم إصدار كلمة مرور مؤقتة)"
+          : "User created. A temporary password will be issued.",
+      );
       // Reset form
       setNewRegionNo("");
       setNewRepNo("");
@@ -120,7 +130,11 @@ export const AdminUsers: React.FC = () => {
     } catch (err: any) {
       console.error(err);
       const msg =
-        err?.details?.message || err?.message || t("auto.errorCreatingUser");
+        err?.details?.message ||
+        err?.message ||
+        (lang === "ar"
+          ? "حدث خطأ أثناء إنشاء المستخدم"
+          : "Error creating user");
       alert(msg);
     }
   };
@@ -152,20 +166,26 @@ export const AdminUsers: React.FC = () => {
           <table className="w-full text-start text-xs">
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-start">{t("auto.user")}</th>
-                <th className="px-4 py-3 text-start">{t("auto.regionNo")}</th>
                 <th className="px-4 py-3 text-start">
-                  {t("auto.allowedRegions")}
-                </th>
-                <th className="px-4 py-3 text-start">{t("auto.branch")}</th>
-                <th className="px-4 py-3 text-start">
-                  {t("auto.boundDevice")}
+                  {lang === "ar" ? "المستخدم" : "User"}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {t("auto.accountStatus")}
+                  {lang === "ar" ? "رقم المنطقة (اسم الدخول)" : "Region No"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "المناطق المصرحة" : "Allowed Regions"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "الفرع" : "Branch"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "الجهاز المعتمد" : "Bound Device"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "حالة الحساب" : "Account Status"}
                 </th>
                 <th className="px-4 py-3 text-center">
-                  {t("auto.adminActions")}
+                  {lang === "ar" ? "الإجراءات الإدارية" : "Admin Actions"}
                 </th>
               </tr>
             </thead>

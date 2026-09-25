@@ -1,4 +1,3 @@
-import i18n from "../../../i18n";
 import React from "react";
 import { RequestItem } from "../../../types";
 import {
@@ -56,7 +55,8 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
           {lang === "ar" ? req.titleAr : req.titleEn}
         </div>
         <div className="text-[11px] text-purple-700 font-mono font-bold mt-0.5">
-          {req.requestCode} • {fieldsCount} {i18n.t("auto.fields")}
+          {req.requestCode} • {fieldsCount}{" "}
+          {lang === "ar" ? "حقل ديناميكي" : "fields"}
         </div>
       </td>
 
@@ -70,7 +70,9 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
               : req.targetEntityLabelEn
                 ? `Per ${req.targetEntityLabelEn}`
                 : "Per Record"
-            : i18n.t("auto.perUser")}
+            : lang === "ar"
+              ? "لكل مستخدم"
+              : "Per User"}
         </div>
         <span
           className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5 ${
@@ -86,13 +88,15 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
       </td>
 
       <td className="px-4 py-3.5 text-slate-600 font-mono">
-        {new Date(req.dueAt).toLocaleDateString(i18n.t("auto.enus"))}
+        {new Date(req.dueAt).toLocaleDateString(
+          lang === "ar" ? "ar-SA" : "en-US",
+        )}
       </td>
 
       <td className="px-4 py-3.5">
         <span className="font-bold text-slate-800">{req.totalRecords}</span>
         <span className="text-[10px] text-slate-400 block">
-          {req.totalAssignments} {i18n.t("auto.asg")}
+          {req.totalAssignments} {lang === "ar" ? "تعيين" : "asg"}
         </span>
       </td>
 
@@ -118,7 +122,11 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onEdit(req)}
             className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-900 font-bold border border-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={i18n.t("auto.editRequestDetailsScope")}
+            title={
+              lang === "ar"
+                ? "تعديل تفاصيل واستهداف الطلب"
+                : "Edit Request Details & Scope"
+            }
           >
             <Edit className="w-3.5 h-3.5" />
           </button>
@@ -127,7 +135,11 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onViewAssignments(req)}
             className="p-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-900 font-bold border border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={i18n.t("auto.viewAssignedRepsProgress")}
+            title={
+              lang === "ar"
+                ? "استعراض تكليفات المناديب ونسب الإنجاز"
+                : "View Assigned Reps & Progress"
+            }
           >
             <Users className="w-3.5 h-3.5" />
           </button>
@@ -136,7 +148,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onOpenFormBuilder(req.requestId)}
             className="p-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-900 font-bold border border-purple-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={i18n.t("auto.formBuilder")}
+            title={lang === "ar" ? "محرر الحقول الديناميكية" : "Form Builder"}
           >
             <Sliders className="w-3.5 h-3.5" />
           </button>
@@ -145,19 +157,27 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onOpenImportWizard(req.requestId)}
             className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold border border-emerald-300 flex items-center gap-1 text-[11px] shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
-            title={i18n.t("auto.importExcelData")}
+            title={
+              lang === "ar"
+                ? "إدراج بيانات عبر Excel لهذا الطلب"
+                : "Import Excel Data"
+            }
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-700" />
-            <span>{i18n.t("auto.excel")}</span>
+            <span>{lang === "ar" ? "إكسل" : "Excel"}</span>
           </button>
 
           <button
             disabled={actionLoadingId !== null}
             onClick={() => onViewResponses(req)}
             className="px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 font-bold border border-sky-300 flex items-center gap-1 text-[11px] shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
-            title={i18n.t("auto.viewRecordsResponses")}
+            title={
+              lang === "ar"
+                ? "عرض السجلات والاستجابات"
+                : "View Records & Responses"
+            }
           >
-            <span>{i18n.t("auto.records1")}</span>
+            <span>{lang === "ar" ? "السجلات" : "Records"}</span>
           </button>
 
           {req.status === "Draft" && (
@@ -169,7 +189,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
               {actionLoadingId === `${req.requestId}_publish` && (
                 <Loader2 className="w-3 h-3 animate-spin" />
               )}
-              <span>{i18n.t("auto.publish")}</span>
+              <span>{lang === "ar" ? "نشر" : "Publish"}</span>
             </button>
           )}
 
@@ -182,7 +202,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
               {actionLoadingId === `${req.requestId}_close` && (
                 <Loader2 className="w-3 h-3 animate-spin" />
               )}
-              <span>{i18n.t("auto.close")}</span>
+              <span>{lang === "ar" ? "إغلاق" : "Close"}</span>
             </button>
           )}
 
@@ -195,7 +215,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
               {actionLoadingId === `${req.requestId}_archive` && (
                 <Loader2 className="w-3 h-3 animate-spin" />
               )}
-              <span>{i18n.t("auto.archive")}</span>
+              <span>{lang === "ar" ? "أرشفة" : "Archive"}</span>
             </button>
           )}
 
@@ -208,7 +228,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
               {actionLoadingId === `${req.requestId}_reopen` && (
                 <Loader2 className="w-3 h-3 animate-spin" />
               )}
-              <span>{i18n.t("auto.reopen")}</span>
+              <span>{lang === "ar" ? "إعادة فتح" : "Reopen"}</span>
             </button>
           )}
 
@@ -216,7 +236,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onClone(req.requestId)}
             className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            title={i18n.t("auto.cloneRequest")}
+            title={lang === "ar" ? "استنساخ الطلب" : "Clone Request"}
           >
             {actionLoadingId === `${req.requestId}_clone` ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-600" />
@@ -229,7 +249,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onSaveTemplate(req)}
             className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={i18n.t("auto.saveAsTemplate")}
+            title={lang === "ar" ? "حفظ كقالب معتمد" : "Save as Template"}
           >
             <Sparkles className="w-3.5 h-3.5" />
           </button>
@@ -238,7 +258,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onDelete(req)}
             className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            title={i18n.t("auto.deleteRequest")}
+            title={lang === "ar" ? "حذف الطلب نهائياً" : "Delete Request"}
           >
             {actionLoadingId === `${req.requestId}_delete` ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-600" />

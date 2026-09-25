@@ -1,7 +1,6 @@
 import React from "react";
 import { RequestField } from "../../../types";
 import { Eye, Lock } from "lucide-react";
-import i18n from "../../../i18n";
 
 interface FormMobilePreviewProps {
   lang: string;
@@ -38,17 +37,23 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
       <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
         <span className="font-extrabold text-xs text-slate-800 flex items-center gap-1.5">
           <Eye className="w-4 h-4 text-purple-700" />
-          <span>{i18n.t("auto.liveInteractivePreview")}</span>
+          <span>
+            {lang === "ar"
+              ? "المعاينة التفاعلية الحية"
+              : "Live Interactive Preview"}
+          </span>
         </span>
         <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-          {i18n.t("auto.live")}
+          {lang === "ar" ? "مباشر" : "Live"}
         </span>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-3 pe-1">
         {formFields.length === 0 ? (
           <div className="p-8 text-center text-slate-400 text-xs">
-            {i18n.t("auto.formIsEmptyAdd")}
+            {lang === "ar"
+              ? "النموذج فارغ. أضف حقولاً للبدء."
+              : "Form is empty. Add fields to start."}
           </div>
         ) : (
           formFields.map((f) => {
@@ -78,7 +83,7 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                   {isReadOnly && (
                     <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 font-bold border border-amber-300 flex items-center gap-0.5">
                       <Lock className="w-2.5 h-2.5" />
-                      <span>{i18n.t("auto.readonly")}</span>
+                      <span>{lang === "ar" ? "للعرض فقط" : "Read-only"}</span>
                     </span>
                   )}
                 </div>
@@ -91,7 +96,9 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                       String(f.defaultValue).trim() !== ""
                         ? String(f.defaultValue)
                         : f.fieldType === "currency"
-                          ? i18n.t("auto.15000Sar")
+                          ? lang === "ar"
+                            ? "15,000 ر.س"
+                            : "15,000 SAR"
                           : f.fieldType === "date"
                             ? "2026-06-01"
                             : lang === "ar"
@@ -99,7 +106,7 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                               : `[${f.fieldLabelEn || f.fieldKey} from Excel]`}
                     </span>
                     <span className="text-[9px] text-amber-700 font-medium">
-                      {i18n.t("auto.excelImported")}
+                      {lang === "ar" ? "مستورد من الإكسل" : "Excel Imported"}
                     </span>
                   </div>
                 ) : (
@@ -132,7 +139,7 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                               : "bg-slate-100 text-slate-700"
                           }`}
                         >
-                          {i18n.t("auto.yes")}
+                          {lang === "ar" ? "نعم" : "Yes"}
                         </button>
                         <button
                           type="button"
@@ -145,7 +152,7 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
                               : "bg-slate-100 text-slate-700"
                           }`}
                         >
-                          {i18n.t("auto.no")}
+                          {lang === "ar" ? "لا" : "No"}
                         </button>
                       </div>
                     )}

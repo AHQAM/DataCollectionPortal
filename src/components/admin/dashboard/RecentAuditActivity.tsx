@@ -1,6 +1,5 @@
 import React from "react";
 import { AuditLog } from "../../../types";
-import i18n from "../../../i18n";
 
 interface RecentAuditActivityProps {
   lang: "ar" | "en";
@@ -19,14 +18,16 @@ export const RecentAuditActivity: React.FC<RecentAuditActivityProps> = ({
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-purple-700 animate-pulse" />
           <h2 className="font-extrabold text-sm text-slate-900">
-            {i18n.t("auto.recentFieldAuditActivity")}
+            {lang === "ar"
+              ? "سجل العمليات والنشاط الميداني اللحظي"
+              : "Recent Field Audit Activity"}
           </h2>
         </div>
         <button
           onClick={() => onNavigate("audit")}
           className="text-xs text-purple-700 hover:text-purple-900 font-bold"
         >
-          {i18n.t("auto.fullAuditTrail")}
+          {lang === "ar" ? "عرض السجل الكامل" : "Full Audit Trail"}
         </button>
       </div>
 

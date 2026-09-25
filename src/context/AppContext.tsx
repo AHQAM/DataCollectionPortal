@@ -43,3 +43,5 @@ export const useApp = () => {
     releaseUserDevice: authStore.releaseDeviceBinding,
   };
 };
+
+export const AppContext = createContext<any>(undefined);

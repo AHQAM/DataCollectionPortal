@@ -7,8 +7,7 @@ import { SupervisorGridView } from "./supervisor-matrix/SupervisorGridView";
 import { AddSupervisorModal } from "./supervisor-matrix/AddSupervisorModal";
 
 export const AdminSupervisorMatrix: React.FC = () => {
-  const { lang, users, branches, regions, updateUser, createUser, t } =
-    useApp();
+  const { lang, users, branches, regions, updateUser, createUser } = useApp();
 
   const [viewMode, setViewMode] = useState<"cards" | "grid">("cards");
   const [searchQuery, setSearchQuery] = useState("");
@@ -181,10 +180,16 @@ export const AdminSupervisorMatrix: React.FC = () => {
             <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-900 flex items-center justify-center">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <span>{t("auto.supervisorPermissionsMatrixMaster")}</span>
+            <span>
+              {lang === "ar"
+                ? "مصفوفة صلاحيات المشرفين (بيانات أساسية)"
+                : "Supervisor Permissions Matrix (Master Data)"}
+            </span>
           </h1>
           <p className="text-xs text-slate-500 mt-1 max-w-2xl">
-            {t("auto.directlyManageTheRegional")}
+            {lang === "ar"
+              ? "تحديد المناطق الميدانية التي يشرف عليها كل مشرف بدقة. يمكن للمشرف الإشراف على مناطق متعددة عبر عدة فروع، أو الاقتصار على بعض مناطق الفرع فقط، بمعزل تام عن السجلات أو الطلبات."
+              : "Directly manage the regional supervisory scope for each supervisor. Assign individual zones across multiple branches or subset regions independent of transaction records."}
           </p>
         </div>
 
@@ -199,7 +204,7 @@ export const AdminSupervisorMatrix: React.FC = () => {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              {t("auto.supervisorCards")}
+              {lang === "ar" ? "بطاقات المشرفين التفصيلية" : "Supervisor Cards"}
             </button>
             <button
               onClick={() => setViewMode("grid")}
@@ -209,7 +214,9 @@ export const AdminSupervisorMatrix: React.FC = () => {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              {t("auto.2dMatrixGrid")}
+              {lang === "ar"
+                ? "مصفوفة المقارنة الشاملة (Grid)"
+                : "2D Matrix Grid"}
             </button>
           </div>
 
@@ -218,7 +225,7 @@ export const AdminSupervisorMatrix: React.FC = () => {
             className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
-            <span>{t("auto.newSupervisor")}</span>
+            <span>{lang === "ar" ? "إضافة مشرف جديد" : "New Supervisor"}</span>
           </button>
         </div>
       </div>
@@ -227,7 +234,7 @@ export const AdminSupervisorMatrix: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
           <div className="text-[11px] font-bold text-slate-500">
-            {t("auto.supervisors")}
+            {lang === "ar" ? "إجمالي المشرفين" : "Supervisors"}
           </div>
           <div className="text-2xl font-black text-purple-950 mt-1">
             {supervisors.length}
@@ -235,7 +242,7 @@ export const AdminSupervisorMatrix: React.FC = () => {
         </div>
         <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
           <div className="text-[11px] font-bold text-slate-500">
-            {t("auto.branches")}
+            {lang === "ar" ? "إجمالي الفروع" : "Branches"}
           </div>
           <div className="text-2xl font-black text-slate-900 mt-1">
             {branches.length}
@@ -243,7 +250,7 @@ export const AdminSupervisorMatrix: React.FC = () => {
         </div>
         <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
           <div className="text-[11px] font-bold text-slate-500">
-            {t("auto.totalRegions")}
+            {lang === "ar" ? "إجمالي المناطق الميدانية" : "Total Regions"}
           </div>
           <div className="text-2xl font-black text-slate-900 mt-1">
             {regions.length}
@@ -251,7 +258,7 @@ export const AdminSupervisorMatrix: React.FC = () => {
         </div>
         <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
           <div className="text-[11px] font-bold text-slate-500">
-            {t("auto.supervisedZones")}
+            {lang === "ar" ? "مناطق تحت إشراف نشط" : "Supervised Zones"}
           </div>
           <div className="text-2xl font-black text-emerald-700 mt-1">
             {new Set(supervisors.flatMap((s) => s.allowedRegionNos || [])).size}{" "}
@@ -268,21 +275,27 @@ export const AdminSupervisorMatrix: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("auto.searchSupervisorNameOr")}
+            placeholder={
+              lang === "ar"
+                ? "بحث باسم المشرف، الرقم الوظيفي..."
+                : "Search supervisor name or number..."
+            }
             className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <span className="text-xs font-bold text-slate-500 shrink-0">
-            {t("auto.filterByBranch")}
+            {lang === "ar" ? "تصفية حسب الفرع:" : "Filter by Branch:"}
           </span>
           <select
             value={selectedBranchFilter}
             onChange={(e) => setSelectedBranchFilter(e.target.value)}
             className="h-10 px-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-purple-600"
           >
-            <option value="ALL">{t("auto.allBranches")}</option>
+            <option value="ALL">
+              {lang === "ar" ? "جميع الفروع" : "All Branches"}
+            </option>
             {branches.map((b) => (
               <option key={b.branchId} value={b.branchId}>
                 {lang === "ar" ? b.branchNameAr : b.branchNameEn} ({b.branchId})

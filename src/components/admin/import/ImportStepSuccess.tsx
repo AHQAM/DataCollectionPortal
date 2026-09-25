@@ -1,7 +1,6 @@
 import React from "react";
 import { RequestItem, User } from "../../../types";
 import { CheckCircle2, Smartphone } from "lucide-react";
-import i18n from "../../../i18n";
 
 interface Props {
   lang: string;
@@ -33,7 +32,9 @@ export const ImportStepSuccess: React.FC<Props> = ({
       </div>
 
       <h2 className="text-lg font-extrabold text-slate-900">
-        {i18n.t("auto.importAssignmentCompleted")}
+        {lang === "ar"
+          ? "تم استيراد السجلات وتوزيعها على المناديب بنجاح!"
+          : "Import & Assignment Completed!"}
       </h2>
 
       <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
@@ -47,7 +48,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
           onClick={onBack}
           className="px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md cursor-pointer transition-all"
         >
-          {i18n.t("auto.goToRequests")}
+          {lang === "ar" ? "الرجوع لقائمة الطلبات" : "Go to Requests"}
         </button>
 
         {import.meta.env.DEV && (
@@ -66,7 +67,11 @@ export const ImportStepSuccess: React.FC<Props> = ({
             className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md cursor-pointer transition-all flex items-center gap-1.5"
           >
             <Smartphone className="w-4 h-4" />
-            <span>{i18n.t("auto.previewInMobileView")}</span>
+            <span>
+              {lang === "ar"
+                ? "فتح واجهة الهاتف لمعاينة السجلات والمطابقة"
+                : "Preview in Mobile View"}
+            </span>
           </button>
         )}
 
@@ -74,7 +79,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
           onClick={onReset}
           className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
         >
-          {i18n.t("auto.importAnotherFile")}
+          {lang === "ar" ? "استيراد ملف إكسل آخر" : "Import Another File"}
         </button>
       </div>
     </div>

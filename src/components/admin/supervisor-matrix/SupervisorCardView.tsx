@@ -1,7 +1,6 @@
 import React from "react";
 import { User, Branch, Region } from "../../../types";
 import { Building2, CheckSquare, Square, Users, Check } from "lucide-react";
-import i18n from "../../../i18n";
 
 interface SupervisorCardViewProps {
   supervisors: User[];
@@ -31,10 +30,14 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
       <div className="p-12 text-center bg-white rounded-3xl border border-slate-200">
         <Users className="w-12 h-12 text-slate-300 mx-auto mb-2" />
         <h3 className="text-sm font-black text-slate-700">
-          {i18n.t("auto.noSupervisorsFound")}
+          {lang === "ar"
+            ? "لا يوجد مشرفين يطابقون خيارات البحث"
+            : "No supervisors found"}
         </h3>
         <p className="text-xs text-slate-400 mt-1">
-          {i18n.t("auto.addASupervisorOr")}
+          {lang === "ar"
+            ? "يمكنك إضافة مشرف جديد أو تعديل فلتر البحث أعلاه"
+            : "Add a supervisor or adjust search filter"}
         </p>
       </div>
     );
@@ -63,24 +66,24 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                       {supervisor.userNameAr}
                     </h3>
                     <span className="px-2 py-0.5 rounded-md bg-purple-100 text-purple-900 text-[10px] font-extrabold">
-                      {i18n.t("auto.supervisor")}
+                      {lang === "ar" ? "مشرف ميداني" : "Supervisor"}
                     </span>
                     {!supervisor.isActive && (
                       <span className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[10px] font-extrabold">
-                        {i18n.t("auto.inactive")}
+                        {lang === "ar" ? "معطل" : "Inactive"}
                       </span>
                     )}
                   </div>
                   <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-1 font-medium">
                     <span>
-                      {i18n.t("auto.empNo")}
+                      {lang === "ar" ? "الرقم الوظيفي: " : "Emp No: "}
                       <strong className="text-slate-800 font-mono">
                         {supervisor.userNo || supervisor.username}
                       </strong>
                     </span>
                     <span>•</span>
                     <span>
-                      {i18n.t("auto.primaryBranch1")}
+                      {lang === "ar" ? "الفرع الأساسي: " : "Primary Branch: "}
                       <strong className="text-purple-900 font-bold">
                         {supervisor.branchNameAr || supervisor.branchId}
                       </strong>
@@ -107,18 +110,26 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                   type="button"
                   onClick={() => onGrantAllCompanyRegions(supervisor)}
                   className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                  title={i18n.t("auto.grantAllCompanyRegions")}
+                  title={
+                    lang === "ar"
+                      ? "منح الإشراف على جميع مناطق المملكة"
+                      : "Grant all company regions"
+                  }
                 >
-                  {i18n.t("auto.selectAllRegions")}
+                  {lang === "ar"
+                    ? "تغطية كاملة (جميع المناطق)"
+                    : "Select All Regions"}
                 </button>
 
                 <button
                   type="button"
                   onClick={() => onClearAllRegions(supervisor)}
                   className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                  title={i18n.t("auto.clearAllRegions")}
+                  title={
+                    lang === "ar" ? "إلغاء كافة المناطق" : "Clear all regions"
+                  }
                 >
-                  {i18n.t("auto.clearAll")}
+                  {lang === "ar" ? "مسح التحديد" : "Clear All"}
                 </button>
               </div>
             </div>
@@ -157,7 +168,7 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                         </span>
                         <span className="text-[11px] font-bold text-slate-500">
                           ({branchAssignedCount}/{branchRegions.length}{" "}
-                          {i18n.t("auto.zones")})
+                          {lang === "ar" ? "منطقة" : "zones"})
                         </span>
                       </div>
 
@@ -171,7 +182,11 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                           className="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-purple-50 hover:bg-purple-100 text-purple-900 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center gap-1"
                         >
                           <CheckSquare className="w-3.5 h-3.5" />
-                          <span>{i18n.t("auto.selectBranch")}</span>
+                          <span>
+                            {lang === "ar"
+                              ? "تحديد كافة مناطق هذا الفرع"
+                              : "Select Branch"}
+                          </span>
                         </button>
 
                         <button
@@ -183,7 +198,11 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                           className="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-200 hover:bg-slate-300 text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center gap-1"
                         >
                           <Square className="w-3.5 h-3.5" />
-                          <span>{i18n.t("auto.deselectBranch")}</span>
+                          <span>
+                            {lang === "ar"
+                              ? "إلغاء تحديد الفرع"
+                              : "Deselect Branch"}
+                          </span>
                         </button>
                       </div>
                     </div>

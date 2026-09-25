@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { X, Building, Check } from "lucide-react";
 import { Branch, Region, RequestType, RequestPriority } from "../../../types";
-import i18n from "../../../i18n";
 
 interface CreateRequestModalProps {
   isOpen: boolean;
@@ -89,7 +88,9 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
       <div className="bg-white w-full max-w-xl rounded-2xl p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
           <h2 className="font-extrabold text-sm text-slate-900">
-            {i18n.t("auto.createNewRequestField")}
+            {lang === "ar"
+              ? "إنشاء طلب جديد / نشاط ميداني"
+              : "Create New Request / Field Activity"}
           </h2>
           <button
             onClick={onClose}
@@ -103,7 +104,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {i18n.t("auto.requestCode")}
+                {lang === "ar" ? "رمز الطلب" : "Request Code"}
               </label>
               <input
                 type="text"
@@ -115,7 +116,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {i18n.t("auto.priority")}
+                {lang === "ar" ? "الأولوية" : "Priority"}
               </label>
               <select
                 value={newPriority}
@@ -124,17 +125,24 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 }
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               >
-                <option value="low">{i18n.t("auto.low")}</option>
-                <option value="medium">{i18n.t("auto.medium")}</option>
-                <option value="high">{i18n.t("auto.high")}</option>
-                <option value="urgent">{i18n.t("auto.urgent")}</option>
+                <option value="low">{lang === "ar" ? "منخفضة" : "Low"}</option>
+                <option value="medium">
+                  {lang === "ar" ? "متوسطة" : "Medium"}
+                </option>
+                <option value="high">{lang === "ar" ? "عالية" : "High"}</option>
+                <option value="urgent">
+                  {lang === "ar" ? "حرجة / عاجلة" : "Urgent"}
+                </option>
               </select>
             </div>
           </div>
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.requestTitleArabic")} *
+              {lang === "ar"
+                ? "عنوان الطلب (بالعربية)"
+                : "Request Title (Arabic)"}{" "}
+              *
             </label>
             <input
               type="text"
@@ -148,13 +156,19 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.requestTitleEnglishOptional")}
+              {lang === "ar"
+                ? "عنوان الطلب (بالإنجليزية - اختياري)"
+                : "Request Title (English - Optional)"}
             </label>
             <input
               type="text"
               value={newTitleEn}
               onChange={(e) => setNewTitleEn(e.target.value)}
-              placeholder={i18n.t("auto.optional")}
+              placeholder={
+                lang === "ar"
+                  ? "اختياري - يترك فارغاً إذا لم ترغب به"
+                  : "Optional"
+              }
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
             />
           </div>
@@ -162,7 +176,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {i18n.t("auto.requestType")}
+                {lang === "ar" ? "نوع الطلب" : "Request Type"}
               </label>
               <select
                 value={newType}
@@ -170,16 +184,22 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 className="w-full h-10 px-3 rounded-xl border border-slate-300"
               >
                 <option value="per_record">
-                  {i18n.t("auto.perRecordTargetEntity")}
+                  {lang === "ar"
+                    ? "استجابة لكل سجل / جهة مستهدفة"
+                    : "Per Record / Target Entity"}
                 </option>
-                <option value="per_rep">{i18n.t("auto.perUser")}</option>
-                <option value="per_region">{i18n.t("auto.perRegion")}</option>
+                <option value="per_rep">
+                  {lang === "ar" ? "استجابة واحدة لكل مستخدم" : "Per User"}
+                </option>
+                <option value="per_region">
+                  {lang === "ar" ? "استجابة لكل منطقة" : "Per Region"}
+                </option>
               </select>
             </div>
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {i18n.t("auto.dueDate")}
+                {lang === "ar" ? "تاريخ الاستحقاق" : "Due Date"}
               </label>
               <input
                 type="date"
@@ -194,19 +214,27 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {i18n.t("auto.targetEntityLabelArabic")}
+                {lang === "ar"
+                  ? "تسمية الجهة المستهدفة (بالعربية - اختياري)"
+                  : "Target Entity Label (Arabic)"}
               </label>
               <input
                 type="text"
                 value={newTargetEntityLabelAr}
                 onChange={(e) => setNewTargetEntityLabelAr(e.target.value)}
-                placeholder={i18n.t("auto.egCustomerStoreSchool")}
+                placeholder={
+                  lang === "ar"
+                    ? "مثال: العميل، المتجر، المدرسة، العيادة..."
+                    : "e.g. Customer, Store, School..."
+                }
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               />
             </div>
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {i18n.t("auto.targetEntityLabelEnglish")}
+                {lang === "ar"
+                  ? "تسمية الجهة المستهدفة (بالإنجليزية - اختياري)"
+                  : "Target Entity Label (English)"}
               </label>
               <input
                 type="text"
@@ -220,7 +248,9 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.instructionsArabic")}
+              {lang === "ar"
+                ? "التعليمات والإرشادات (بالعربية)"
+                : "Instructions (Arabic)"}
             </label>
             <textarea
               rows={2}
@@ -236,7 +266,11 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 font-extrabold text-purple-950">
                 <Building className="w-4 h-4 text-purple-700" />
-                <span>{i18n.t("auto.targetBranchesZones")}</span>
+                <span>
+                  {lang === "ar"
+                    ? "نطاق الفروع والمناطق المستهدفة"
+                    : "Target Branches & Zones"}
+                </span>
               </div>
               <div className="flex gap-2">
                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
@@ -247,7 +281,11 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                     onChange={() => setNewTargetScope("ALL")}
                     className="text-purple-900"
                   />
-                  <span>{i18n.t("auto.allBranchesZones")}</span>
+                  <span>
+                    {lang === "ar"
+                      ? "كل الفروع والمناطق"
+                      : "All Branches & Zones"}
+                  </span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
                   <input
@@ -257,7 +295,9 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                     onChange={() => setNewTargetScope("SPECIFIC")}
                     className="text-purple-900"
                   />
-                  <span>{i18n.t("auto.specificBranches")}</span>
+                  <span>
+                    {lang === "ar" ? "تحديد فروع ومناطق" : "Specific Branches"}
+                  </span>
                 </label>
               </div>
             </div>
@@ -266,7 +306,9 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
               <div className="space-y-2 pt-2 border-t border-purple-200/60 animate-in fade-in">
                 <div>
                   <div className="font-bold text-slate-600 text-[11px] mb-1">
-                    {i18n.t("auto.selectTargetBranches")}
+                    {lang === "ar"
+                      ? "اختر الفروع المستهدفة:"
+                      : "Select Target Branches:"}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {branches.map((b) => {
@@ -303,7 +345,9 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 {newSelectedBranchIds.length > 0 && (
                   <div className="pt-1">
                     <div className="font-bold text-slate-600 text-[11px] mb-1">
-                      {i18n.t("auto.regionsInSelectedBranches")}
+                      {lang === "ar"
+                        ? "المناطق التابعة للفروع المختارة (اختياري):"
+                        : "Regions in Selected Branches:"}
                     </div>
                     <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1 bg-white rounded-lg border border-slate-200">
                       {regions
@@ -351,7 +395,11 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 onChange={(e) => setNewAllowEdit(e.target.checked)}
                 className="rounded text-purple-900"
               />
-              <span>{i18n.t("auto.allowEditingAfterSubmit")}</span>
+              <span>
+                {lang === "ar"
+                  ? "السماح للمستخدم بتعديل السجل بعد الاعتماد"
+                  : "Allow editing after submit"}
+              </span>
             </label>
 
             <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-700">
@@ -361,7 +409,11 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 onChange={(e) => setNewRequireSupervisor(e.target.checked)}
                 className="rounded text-purple-900"
               />
-              <span>{i18n.t("auto.requireSupervisorApproval")}</span>
+              <span>
+                {lang === "ar"
+                  ? "يتطلب اعتماد المشرف قبل الإغلاق النهائي"
+                  : "Require Supervisor Approval"}
+              </span>
             </label>
           </div>
 
@@ -371,13 +423,15 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
               onClick={onClose}
               className="flex-1 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
             >
-              {i18n.t("auto.cancel")}
+              {lang === "ar" ? "إلغاء" : "Cancel"}
             </button>
             <button
               type="submit"
               className="flex-2 h-10 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-bold"
             >
-              {i18n.t("auto.createOpenFormBuilder")}
+              {lang === "ar"
+                ? "إنشاء والانتقال لمصمم الحقول"
+                : "Create & Open Form Builder"}
             </button>
           </div>
         </form>

@@ -1,4 +1,3 @@
-import i18n from "../i18n";
 import { useAuthStore } from "../stores/authStore";
 import { useDataStore } from "../stores/dataStore";
 import { useUIStore } from "../stores/uiStore";
@@ -83,7 +82,9 @@ export const useUserOps = () => {
           allowedRegionNos:
             user.allowedRegionNos || (user.regionNo ? [user.regionNo] : []),
           userNo: user.userNo || `REP-${Date.now().toString().slice(-4)}`,
-          userNameAr: user.userNameAr || i18n.t("auto.newRepresentative"),
+          userNameAr:
+            user.userNameAr ||
+            (lang === "ar" ? "مندوب جديد" : "New Representative"),
           userNameEn: user.userNameEn || "",
           branchId: user.branchId || defaultBranch?.branchId || "",
           role: "REP",

@@ -1,7 +1,6 @@
 import React from "react";
 import { Search } from "lucide-react";
 import { Branch, RequestItem } from "../../../types";
-import i18n from "../../../i18n";
 
 interface Props {
   lang: string;
@@ -36,7 +35,7 @@ export const ReportFilters: React.FC<Props> = ({
     <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {i18n.t("auto.requestCampaign")}
+          {lang === "ar" ? "الطلب / الحملة" : "Request Campaign"}
         </label>
         <select
           value={selectedReqId}
@@ -56,14 +55,16 @@ export const ReportFilters: React.FC<Props> = ({
 
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {i18n.t("auto.branch")}
+          {lang === "ar" ? "الفرع" : "Branch"}
         </label>
         <select
           value={selectedBranchId}
           onChange={(e) => setSelectedBranchId(e.target.value)}
           className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold bg-white text-slate-800"
         >
-          <option value="ALL">{i18n.t("auto.allBranches")}</option>
+          <option value="ALL">
+            {lang === "ar" ? "جميع الفروع" : "All Branches"}
+          </option>
           {branches.map((b) => (
             <option key={b.branchId} value={b.branchId}>
               {lang === "ar" ? b.branchNameAr : b.branchNameEn}
@@ -74,31 +75,43 @@ export const ReportFilters: React.FC<Props> = ({
 
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {i18n.t("auto.recordStatus")}
+          {lang === "ar" ? "حالة السجل" : "Record Status"}
         </label>
         <select
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value)}
           className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold bg-white text-slate-800"
         >
-          <option value="ALL">{i18n.t("auto.allStatuses")}</option>
-          <option value="Submitted">{i18n.t("auto.submitted")}</option>
-          <option value="Completed">{i18n.t("auto.completed1")}</option>
-          <option value="DraftSaved">{i18n.t("auto.draftSaved")}</option>
-          <option value="Pending">{i18n.t("auto.pending")}</option>
+          <option value="ALL">
+            {lang === "ar" ? "جميع الحالات" : "All Statuses"}
+          </option>
+          <option value="Submitted">
+            {lang === "ar" ? "تم الإرسال" : "Submitted"}
+          </option>
+          <option value="Completed">
+            {lang === "ar" ? "مكتمل" : "Completed"}
+          </option>
+          <option value="DraftSaved">
+            {lang === "ar" ? "مسودة محفوظة" : "Draft Saved"}
+          </option>
+          <option value="Pending">{lang === "ar" ? "معلق" : "Pending"}</option>
         </select>
       </div>
 
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {i18n.t("auto.searchRecordUser")}
+          {lang === "ar" ? "بحث بالسجل أو المستخدم" : "Search Record / User"}
         </label>
         <div className="relative">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={i18n.t("auto.searchByNameOr")}
+            placeholder={
+              lang === "ar"
+                ? "بحث بالاسم أو الكود..."
+                : "Search by name or code..."
+            }
             className="w-full h-10 px-3 ps-8 rounded-xl border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 text-xs font-semibold"
           />
           <Search className="w-3.5 h-3.5 text-slate-400 absolute start-2.5 top-3" />

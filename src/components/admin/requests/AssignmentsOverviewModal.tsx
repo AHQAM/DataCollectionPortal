@@ -1,7 +1,6 @@
 import React from "react";
 import { X, Users, FileSpreadsheet } from "lucide-react";
 import { RequestItem, Assignment, User, Branch } from "../../../types";
-import i18n from "../../../i18n";
 
 interface AssignmentsOverviewModalProps {
   request: RequestItem | null;
@@ -37,7 +36,11 @@ export const AssignmentsOverviewModal: React.FC<
           <div>
             <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
               <Users className="w-4 h-4 text-purple-700" />
-              <span>{i18n.t("auto.assignedRepsFieldProgress")}</span>
+              <span>
+                {lang === "ar"
+                  ? "تكليفات المناديب ونسب الإنجاز"
+                  : "Assigned Reps & Field Progress"}
+              </span>
             </h2>
             <div className="text-xs text-slate-500 mt-0.5">
               {lang === "ar" ? request.titleAr : request.titleEn} (
@@ -61,10 +64,14 @@ export const AssignmentsOverviewModal: React.FC<
               <Users className="w-6 h-6" />
             </div>
             <div className="font-bold text-slate-800 text-xs">
-              {i18n.t("auto.noRepresentativesAssignedTo")}
+              {lang === "ar"
+                ? "لم يتم تعيين مناديب أو عملاء لهذا الطلب بعد"
+                : "No representatives assigned to this request yet"}
             </div>
             <p className="text-[11px] text-slate-500 max-w-md mx-auto">
-              {i18n.t("auto.youCanImportCustomers")}
+              {lang === "ar"
+                ? "يمكنك إدراج العملاء والتوزيع التلقائي على المناديب فوراً عبر معالج استيراد Excel."
+                : "You can import customers and auto-assign them to reps using the Excel Import Wizard."}
             </p>
             <button
               type="button"
@@ -76,7 +83,11 @@ export const AssignmentsOverviewModal: React.FC<
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md inline-flex items-center gap-1.5 cursor-pointer"
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>{i18n.t("auto.openExcelImportWizard")}</span>
+              <span>
+                {lang === "ar"
+                  ? "فتح معالج استيراد Excel"
+                  : "Open Excel Import Wizard"}
+              </span>
             </button>
           </div>
         ) : (
@@ -139,10 +150,10 @@ export const AssignmentsOverviewModal: React.FC<
                       <div className="text-end">
                         <div className="font-bold text-slate-800">
                           {asg.completedRecords} / {asg.totalRecords}{" "}
-                          {i18n.t("auto.records")}
+                          {lang === "ar" ? "سجل" : "records"}
                         </div>
                         <div className="text-[10px] text-slate-400">
-                          {progress}% {i18n.t("auto.done1")}
+                          {progress}% {lang === "ar" ? "إنجاز" : "done"}
                         </div>
                       </div>
                       <div className="w-20 bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
@@ -171,7 +182,7 @@ export const AssignmentsOverviewModal: React.FC<
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer"
           >
-            {i18n.t("auto.close")}
+            {lang === "ar" ? "إغلاق" : "Close"}
           </button>
         </div>
       </div>

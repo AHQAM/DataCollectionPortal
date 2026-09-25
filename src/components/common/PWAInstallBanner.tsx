@@ -1,4 +1,3 @@
-import i18n from "../../i18n";
 import React, { useState } from "react";
 import { usePWAInstall } from "../../hooks/usePWAInstall";
 import {
@@ -80,10 +79,14 @@ export const PWAInstallBanner: React.FC<Props> = ({
               </div>
               <div>
                 <h3 className="font-extrabold text-sm">
-                  {i18n.t("auto.installMobileApp")}
+                  {lang === "ar"
+                    ? "تثبيت التطبيق على الجوال"
+                    : "Install Mobile App"}
                 </h3>
                 <p className="text-[11px] text-purple-200 mt-0.5 max-w-[280px]">
-                  {i18n.t("auto.installOnceOnYour")}
+                  {lang === "ar"
+                    ? "ثبّت التطبيق لمرة واحدة للوصول السريع واستقبال الإشعارات الفورية دون متصفح"
+                    : "Install once on your phone for quick access, push alerts & offline work"}
                 </p>
               </div>
             </div>
@@ -105,7 +108,9 @@ export const PWAInstallBanner: React.FC<Props> = ({
               <Download className="w-3.5 h-3.5 text-purple-900" />
               <span>
                 {isIOS
-                  ? i18n.t("auto.howToInstallOn")
+                  ? lang === "ar"
+                    ? "طريقة التثبيت على iPhone"
+                    : "How to Install on iPhone"
                   : t("pwa.installOnDevice")}
               </span>
             </button>
@@ -131,10 +136,14 @@ export const PWAInstallBanner: React.FC<Props> = ({
           </div>
           <div className="truncate">
             <div className="text-xs font-extrabold truncate">
-              {i18n.t("auto.fieldCollectionAppPwa")}
+              {lang === "ar"
+                ? "تطبيق جمع البيانات الميداني (PWA)"
+                : "Field Collection App (PWA)"}
             </div>
             <div className="text-[10px] text-purple-200 truncate">
-              {i18n.t("auto.1clickInstallPushNotifications")}
+              {lang === "ar"
+                ? "تثبيت مرة واحدة بدون متجر + إشعارات فورية"
+                : "1-Click Install + Push Notifications"}
             </div>
           </div>
         </div>
@@ -178,7 +187,9 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
               <Smartphone className="w-4 h-4" />
             </div>
             <h3 className="text-sm font-extrabold text-slate-900">
-              {i18n.t("auto.installAppOnMobile")}
+              {lang === "ar"
+                ? "تثبيت التطبيق على الجوال"
+                : "Install App on Mobile"}
             </h3>
           </div>
           <button
@@ -191,7 +202,9 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
 
         <div className="py-4 space-y-3.5 text-xs">
           <p className="text-slate-600 font-medium leading-relaxed">
-            {i18n.t("auto.youCanInstallThis")}
+            {lang === "ar"
+              ? "يمكنك تثبيت هذا التطبيق مباشرة على هاتفك ليعمل كتطبيق مستقل بدون الحاجة لتحميله من متجر التطبيقات:"
+              : "You can install this app directly to your home screen without going to app stores:"}
           </p>
 
           <div className="space-y-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200">
@@ -201,11 +214,17 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
               </div>
               <div>
                 <span className="font-bold block text-slate-900">
-                  {i18n.t("auto.tapTheShareButton")}
+                  {lang === "ar"
+                    ? "اضغط على زر المشاركة (Share)"
+                    : "Tap the Share Button"}
                 </span>
                 <span className="text-slate-500 text-[11px] flex items-center gap-1 mt-0.5">
                   <Share className="w-3.5 h-3.5 text-blue-600 inline" />
-                  <span>{i18n.t("auto.inBrowserToolbarOr")}</span>
+                  <span>
+                    {lang === "ar"
+                      ? "أسفل متصفح Safari أو قائمة خيارات Chrome"
+                      : "In browser toolbar or menu"}
+                  </span>
                 </span>
               </div>
             </div>
@@ -216,11 +235,17 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
               </div>
               <div>
                 <span className="font-bold block text-slate-900">
-                  {i18n.t("auto.selectAddToHome")}
+                  {lang === "ar"
+                    ? "اختر «إضافة إلى الشاشة الرئيسية»"
+                    : 'Select "Add to Home Screen"'}
                 </span>
                 <span className="text-slate-500 text-[11px] flex items-center gap-1 mt-0.5">
                   <PlusSquare className="w-3.5 h-3.5 text-purple-700 inline" />
-                  <span>{i18n.t("auto.addToHomeScreen")}</span>
+                  <span>
+                    {lang === "ar"
+                      ? "Add to Home Screen"
+                      : "Add to Home Screen"}
+                  </span>
                 </span>
               </div>
             </div>
@@ -231,10 +256,12 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
               </div>
               <div>
                 <span className="font-bold block text-slate-900">
-                  {i18n.t("auto.tapAdd")}
+                  {lang === "ar" ? "اضغط «إضافة / Add»" : 'Tap "Add"'}
                 </span>
                 <span className="text-slate-500 text-[11px]">
-                  {i18n.t("auto.appIconWillAppear")}
+                  {lang === "ar"
+                    ? "سيظهر رمز التطبيق على شاشة هاتفك مع دعم الإشعارات والعمل دون إنترنت"
+                    : "App icon will appear on your phone with push alerts & offline support"}
                 </span>
               </div>
             </div>
@@ -245,7 +272,7 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
           onClick={onClose}
           className="w-full py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer"
         >
-          {i18n.t("auto.gotItThanks")}
+          {lang === "ar" ? "فهمت، حسناً" : "Got it, thanks!"}
         </button>
       </div>
     </div>

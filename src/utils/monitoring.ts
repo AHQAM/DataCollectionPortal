@@ -10,7 +10,7 @@ interface ErrorReport {
   timestamp: string;
   message: string;
   stack?: string;
-  context?: Record<string, unknown>;
+  context?: Record<string, any>;
 }
 
 class MonitoringService {
@@ -77,7 +77,7 @@ class MonitoringService {
     }
   }
 
-  public captureException(error: unknown, context?: Record<string, unknown>) {
+  public captureException(error: unknown, context?: Record<string, any>) {
     const errObj =
       error instanceof Error
         ? error
@@ -128,7 +128,7 @@ export function initMonitoring() {
 
 export function captureException(
   error: unknown,
-  context?: Record<string, unknown>,
+  context?: Record<string, any>,
 ) {
   monitoring.captureException(error, context);
 }

@@ -37,15 +37,22 @@ export const AdminAuditLogs: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-purple-700" />
-            <span>{t("auto.securityAuditTrail")}</span>
+            <span>
+              {lang === "ar"
+                ? "سجل التدقيق والرقابة الأمنية (Audit Trail)"
+                : "Security Audit Trail"}
+            </span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {t("auto.tamperevidentLogsOfSystem")}
+            {lang === "ar"
+              ? "توثيق شامل لكافة العمليات، تسجيل الدخول، فك ارتباط الأجهزة، تعديل السجلات ونشر الحملات"
+              : "Tamper-evident logs of system actions, logins, device unbinding, and submissions"}
           </p>
         </div>
 
         <span className="text-xs font-bold bg-purple-50 text-purple-900 border border-purple-200 px-3 py-1.5 rounded-xl">
-          {auditLogs.length} {t("auto.loggedOperations")}
+          {auditLogs.length}{" "}
+          {lang === "ar" ? "عملية موثقة" : "logged operations"}
         </span>
       </div>
 
@@ -56,7 +63,11 @@ export const AdminAuditLogs: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("auto.searchLogs")}
+            placeholder={
+              lang === "ar"
+                ? "بحث باسم المستخدم أو نوع العملية..."
+                : "Search logs..."
+            }
             className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
           <Search className="w-4 h-4 text-slate-400 absolute top-3 start-3" />
@@ -67,7 +78,9 @@ export const AdminAuditLogs: React.FC = () => {
           onChange={(e) => setActionFilter(e.target.value)}
           className="h-10 px-3 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700"
         >
-          <option value="ALL">{t("auto.allActions")}</option>
+          <option value="ALL">
+            {lang === "ar" ? "جميع الإجراءات" : "All Actions"}
+          </option>
           <option value="USER_LOGIN">USER_LOGIN</option>
           <option value="DEVICE_BOUND">DEVICE_BOUND</option>
           <option value="DEVICE_RELEASED">DEVICE_RELEASED</option>
@@ -87,14 +100,24 @@ export const AdminAuditLogs: React.FC = () => {
           <table className="w-full text-start text-xs">
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-start">{t("auto.timestamp")}</th>
-                <th className="px-4 py-3 text-start">{t("auto.user")}</th>
-                <th className="px-4 py-3 text-start">{t("auto.action")}</th>
                 <th className="px-4 py-3 text-start">
-                  {t("auto.targetEntity")}
+                  {lang === "ar" ? "التوقيت" : "Timestamp"}
                 </th>
-                <th className="px-4 py-3 text-start">{t("auto.deviceUuid")}</th>
-                <th className="px-4 py-3 text-start">{t("auto.details")}</th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "المستخدم" : "User"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "الإجراء" : "Action"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "الكيان المتأثر" : "Target Entity"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "معرّف الجهاز (UUID)" : "Device UUID"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {lang === "ar" ? "التفاصيل" : "Details"}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -105,7 +128,9 @@ export const AdminAuditLogs: React.FC = () => {
                     className="hover:bg-slate-50/80 transition-all font-mono text-[11px]"
                   >
                     <td className="px-4 py-3 text-slate-500 whitespace-nowrap">
-                      {new Date(log.createdAt).toLocaleString(t("auto.enus"))}
+                      {new Date(log.createdAt).toLocaleString(
+                        lang === "ar" ? "ar-SA" : "en-US",
+                      )}
                     </td>
 
                     <td className="px-4 py-3 font-bold text-slate-900 font-sans">
