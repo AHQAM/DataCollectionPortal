@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
 import { RecordItem, RequestField, RequestItem } from "../../types";
 import {
@@ -9,14 +10,8 @@ import {
   MapPin,
   Calendar,
   Clock,
-  ExternalLink,
-  Image as ImageIcon,
   CheckCircle2,
-  AlertCircle,
   Printer,
-  Compass,
-  PenTool,
-  Download,
   Info,
 } from "lucide-react";
 import { RecordResponseWidget } from "./records/RecordResponseWidget";
@@ -37,6 +32,10 @@ export const RecordResponseModal: React.FC<Props> = ({
   onClose,
 }) => {
   const { lang } = useApp();
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   const [activeImagePreview, setActiveImagePreview] = useState<string | null>(
     null,
   );
@@ -90,7 +89,7 @@ export const RecordResponseModal: React.FC<Props> = ({
       <RecordResponseWidget
         field={field}
         val={val}
-        lang={lang}
+        lang={currentLang}
         setActiveImagePreview={setActiveImagePreview}
       />
     );
@@ -105,12 +104,8 @@ export const RecordResponseModal: React.FC<Props> = ({
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>
               {status === "Submitted"
-                ? lang === "ar"
-                  ? "تم الإرسال"
-                  : "Submitted"
-                : lang === "ar"
-                  ? "مكتمل"
-                  : "Completed"}
+                ? t("recordResponse.statusSubmitted", { lng: currentLang })
+                : t("recordResponse.statusCompleted", { lng: currentLang })}
             </span>
           </span>
         );
@@ -118,7 +113,7 @@ export const RecordResponseModal: React.FC<Props> = ({
         return (
           <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
-            <span>{lang === "ar" ? "مسودة محفوظة" : "Draft Saved"}</span>
+            <span>{t("recordResponse.statusDraft", { lng: currentLang })}</span>
           </span>
         );
       default:
@@ -142,15 +137,13 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-extrabold text-slate-900">
-                  {lang === "ar"
-                    ? "تفاصيل استجابة السجل الميداني"
-                    : "Field Record Response Details"}
+                  {t("recordResponse.title", { lng: currentLang })}
                 </h2>
                 {getStatusBadge(record.recordStatus)}
               </div>
               <p className="text-xs text-slate-500 font-mono mt-0.5">
                 {request?.requestCode} -{" "}
-                {lang === "ar" ? request?.titleAr : request?.titleEn}
+                {currentLang === "ar" ? request?.titleAr : request?.titleEn}
               </p>
             </div>
           </div>
@@ -159,7 +152,7 @@ export const RecordResponseModal: React.FC<Props> = ({
             <button
               onClick={() => window.print()}
               className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
-              title={lang === "ar" ? "طباعة" : "Print"}
+              title={t("recordResponse.print", { lng: currentLang })}
             >
               <Printer className="w-4 h-4" />
             </button>
@@ -180,9 +173,7 @@ export const RecordResponseModal: React.FC<Props> = ({
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <User className="w-3.5 h-3.5 text-purple-600" />
                 <span>
-                  {lang === "ar"
-                    ? "الجهة المستهدفة / السجل"
-                    : "Target Entity / Record"}
+                  {t("recordResponse.targetEntity", { lng: currentLang })}
                 </span>
               </div>
               <div className="text-xs font-black text-slate-900 truncate">
@@ -197,7 +188,7 @@ export const RecordResponseModal: React.FC<Props> = ({
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <MapPin className="w-3.5 h-3.5 text-purple-600" />
                 <span>
-                  {lang === "ar" ? "المستخدم والمنطقة" : "User & Region"}
+                  {t("recordResponse.userRegion", { lng: currentLang })}
                 </span>
               </div>
               <div className="text-xs font-black text-slate-900 truncate">
@@ -211,7 +202,7 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <Building className="w-3.5 h-3.5 text-purple-600" />
-                <span>{lang === "ar" ? "الفرع" : "Branch"}</span>
+                <span>{t("recordResponse.branch", { lng: currentLang })}</span>
               </div>
               <div className="text-xs font-black text-slate-900 truncate">
                 {record.branchName || "-"}
@@ -225,9 +216,7 @@ export const RecordResponseModal: React.FC<Props> = ({
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <Calendar className="w-3.5 h-3.5 text-purple-600" />
                 <span>
-                  {lang === "ar"
-                    ? "تاريخ التحديث / الإرسال"
-                    : "Submission Date"}
+                  {t("recordResponse.submissionDate", { lng: currentLang })}
                 </span>
               </div>
               <div className="text-xs font-black text-slate-900">
@@ -253,21 +242,20 @@ export const RecordResponseModal: React.FC<Props> = ({
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-purple-700" />
                 <span>
-                  {lang === "ar"
-                    ? "الاستجابات وإجابات الحقول"
-                    : "Field Responses & Answers"}
+                  {t("recordResponse.responsesHeading", { lng: currentLang })}
                 </span>
               </h3>
               <span className="text-[11px] font-mono text-slate-400">
-                {fields.length} {lang === "ar" ? "حقل معرف" : "fields defined"}
+                {t("recordResponse.fieldsDefined", {
+                  count: fields.length,
+                  lng: currentLang,
+                })}
               </span>
             </div>
 
             {fields.length === 0 ? (
               <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-400 text-xs">
-                {lang === "ar"
-                  ? "لا توجد حقول معرفة لهذا الطلب."
-                  : "No form fields defined for this campaign."}
+                {t("recordResponse.noFields", { lng: currentLang })}
               </div>
             ) : (
               <div className="space-y-3">
@@ -284,7 +272,7 @@ export const RecordResponseModal: React.FC<Props> = ({
                             {index + 1}
                           </span>
                           <span className="text-xs font-bold text-slate-900">
-                            {lang === "ar"
+                            {currentLang === "ar"
                               ? field.fieldLabelAr
                               : field.fieldLabelEn}
                           </span>
@@ -304,7 +292,9 @@ export const RecordResponseModal: React.FC<Props> = ({
 
                       {(field.helpTextAr || field.helpTextEn) && (
                         <p className="text-[11px] text-slate-400">
-                          {lang === "ar" ? field.helpTextAr : field.helpTextEn}
+                          {currentLang === "ar"
+                            ? field.helpTextAr
+                            : field.helpTextEn}
                         </p>
                       )}
 
@@ -322,9 +312,7 @@ export const RecordResponseModal: React.FC<Props> = ({
               <h4 className="text-xs font-extrabold text-slate-600 flex items-center gap-1.5">
                 <Info className="w-3.5 h-3.5 text-slate-400" />
                 <span>
-                  {lang === "ar"
-                    ? "بيانات وحقول إضافية مسجلة"
-                    : "Additional Response Data"}
+                  {t("recordResponse.extraData", { lng: currentLang })}
                 </span>
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -351,14 +339,15 @@ export const RecordResponseModal: React.FC<Props> = ({
         {/* Footer */}
         <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
           <div className="text-[11px] text-slate-400 font-mono">
-            {lang === "ar" ? "معرف السجل:" : "Record ID:"} {record.recordId}
+            {t("recordResponse.recordId", { lng: currentLang })}{" "}
+            {record.recordId}
           </div>
 
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer"
           >
-            {lang === "ar" ? "إغلاق" : "Close"}
+            {t("recordResponse.close", { lng: currentLang })}
           </button>
         </div>
       </div>
@@ -379,7 +368,7 @@ export const RecordResponseModal: React.FC<Props> = ({
               onClick={() => setActiveImagePreview(null)}
               className="mt-3 px-4 py-1.5 rounded-full bg-white/20 hover:bg-white/40 text-white text-xs font-bold backdrop-blur-md transition-all"
             >
-              {lang === "ar" ? "إغلاق المعاينة" : "Close Preview"}
+              {t("recordResponse.closePreview", { lng: currentLang })}
             </button>
           </div>
         </div>

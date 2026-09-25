@@ -1,11 +1,12 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { RequestField } from "../../../types";
 import { ExternalLink, Compass } from "lucide-react";
 
 interface RecordResponseWidgetProps {
   field: RequestField;
   val: any;
-  lang: "ar" | "en";
+  lang?: "ar" | "en";
   setActiveImagePreview: (url: string) => void;
 }
 
@@ -15,10 +16,14 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
   lang,
   setActiveImagePreview,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   if (val === undefined || val === null || val === "") {
     return (
       <span className="text-slate-400 italic text-xs">
-        {lang === "ar" ? "لم يتم تقديم إجابة" : "No response provided"}
+        {t("recordResponse.noResponse", { lng: currentLang })}
       </span>
     );
   }
@@ -44,8 +49,8 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
         }`}
       >
         {isYes
-          ? "✓ " + (lang === "ar" ? "نعم" : "Yes")
-          : "✕ " + (lang === "ar" ? "لا" : "No")}
+          ? "✓ " + t("recordResponse.yes", { lng: currentLang })
+          : "✕ " + t("recordResponse.no", { lng: currentLang })}
       </span>
     );
   }
@@ -128,7 +133,7 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
           >
             <Compass className="w-3.5 h-3.5" />
             <span>
-              {lang === "ar" ? "عرض على خرائط Google" : "Open in Google Maps"}
+              {t("recordResponse.openGoogleMaps", { lng: currentLang })}
             </span>
           </a>
         )}
@@ -144,7 +149,7 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
     if (match) {
       return (
         <span className="inline-block font-semibold text-xs text-purple-900 bg-purple-50 px-3 py-1 rounded-lg border border-purple-200">
-          {lang === "ar" ? match.labelAr : match.labelEn}
+          {currentLang === "ar" ? match.labelAr : match.labelEn}
         </span>
       );
     }

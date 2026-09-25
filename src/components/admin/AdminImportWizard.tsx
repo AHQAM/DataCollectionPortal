@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
 import { getXLSX } from "../../utils/excel";
 import {
@@ -27,7 +28,6 @@ export const AdminImportWizard: React.FC<Props> = ({
   onBack,
 }) => {
   const {
-    lang,
     dir,
     requests,
     fields,
@@ -37,6 +37,8 @@ export const AdminImportWizard: React.FC<Props> = ({
     commitImport,
     quickSwitchUser,
   } = useApp();
+  const { t, i18n } = useTranslation();
+  const currentLang = (i18n.language as "ar" | "en") || "ar";
 
   const selectableRequests = requests.filter(
     (r) => r.status === "Draft" || r.status === "Published",
@@ -235,21 +237,15 @@ export const AdminImportWizard: React.FC<Props> = ({
             ) : (
               <ArrowLeft className="w-4 h-4" />
             )}
-            <span>{lang === "ar" ? "الرجوع" : "Back"}</span>
+            <span>{t("importWizard.back")}</span>
           </button>
           <div>
             <h1 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <FileSpreadsheet className="w-5 h-5 text-emerald-700" />
-              <span>
-                {lang === "ar"
-                  ? "إدراج واستيراد بيانات الحملات عبر Excel"
-                  : "Campaign Excel Data Import"}
-              </span>
+              <span>{t("importWizard.title")}</span>
             </h1>
             <p className="text-xs text-slate-500">
-              {lang === "ar"
-                ? "رفع ملفات الإكسل وتعيينها تلقائياً للمناطق وتعبئة الحقول المعتمدة للمناديب"
-                : "Import spreadsheets, auto-assign to region reps, and pre-populate field forms"}
+              {t("importWizard.subtitle")}
             </p>
           </div>
         </div>
@@ -258,18 +254,10 @@ export const AdminImportWizard: React.FC<Props> = ({
           <button
             onClick={handleDownloadCustomTemplate}
             className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold flex items-center gap-2 border border-emerald-300 transition-all cursor-pointer shadow-2xs"
-            title={
-              lang === "ar"
-                ? "تنزيل ملف إكسل يحتوي على جميع حقول هذا النموذج جاهز للتعبئة"
-                : "Download template"
-            }
+            title={t("importWizard.downloadTemplateTooltip")}
           >
             <Download className="w-4 h-4 text-emerald-700" />
-            <span>
-              {lang === "ar"
-                ? "تحميل نموذج Excel مخصص لهذا النموذج"
-                : "Download Custom Excel Template"}
-            </span>
+            <span>{t("importWizard.downloadTemplate")}</span>
           </button>
         )}
       </div>
@@ -279,20 +267,17 @@ export const AdminImportWizard: React.FC<Props> = ({
         {[
           {
             num: 1,
-            labelAr: "1. اختيار الطلب والملف",
-            labelEn: "1. Select & Upload",
+            label: t("importWizard.steps.step1"),
           },
           {
             num: 2,
-            labelAr: "2. مطابقة الأعمدة والحقول",
-            labelEn: "2. Field Mapping",
+            label: t("importWizard.steps.step2"),
           },
           {
             num: 3,
-            labelAr: "3. فحص الجودة وتأكيد البيانات",
-            labelEn: "3. Validation & QC",
+            label: t("importWizard.steps.step3"),
           },
-          { num: 4, labelAr: "4. اكتمال الاستيراد", labelEn: "4. Completed" },
+          { num: 4, label: t("importWizard.steps.step4") },
         ].map((s) => (
           <div
             key={s.num}
@@ -305,7 +290,7 @@ export const AdminImportWizard: React.FC<Props> = ({
             }`}
           >
             {step > s.num ? <Check className="w-3.5 h-3.5" /> : null}
-            <span>{lang === "ar" ? s.labelAr : s.labelEn}</span>
+            <span>{s.label}</span>
           </div>
         ))}
       </div>
@@ -313,7 +298,7 @@ export const AdminImportWizard: React.FC<Props> = ({
       {/* STEP 1: Request Selection & Upload */}
       {step === 1 && (
         <ImportStepSelectFile
-          lang={lang}
+          lang={currentLang}
           selectableRequests={selectableRequests}
           selectedRequestId={selectedRequestId}
           setSelectedRequestId={setSelectedRequestId}
@@ -327,7 +312,7 @@ export const AdminImportWizard: React.FC<Props> = ({
       {/* STEP 2: Source Column Mapping */}
       {step === 2 && (
         <ImportStepMapping
-          lang={lang}
+          lang={currentLang}
           dir={dir}
           fileName={fileName}
           rawRowsCount={rawRows.length}
@@ -345,7 +330,7 @@ export const AdminImportWizard: React.FC<Props> = ({
       {/* STEP 3: Validation & Quality Control */}
       {step === 3 && (
         <ImportStepPreview
-          lang={lang}
+          lang={currentLang}
           rawRowsCount={rawRows.length}
           validRows={validRows}
           invalidRows={invalidRows}
@@ -361,7 +346,7 @@ export const AdminImportWizard: React.FC<Props> = ({
       {/* STEP 4: Completed */}
       {step === 4 && (
         <ImportStepSuccess
-          lang={lang}
+          lang={currentLang}
           currentRequest={currentRequest}
           importStats={importStats}
           validRows={validRows}

@@ -1,9 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { RequestItem, User } from "../../../types";
 import { CheckCircle2, Smartphone } from "lucide-react";
 
 interface Props {
-  lang: string;
+  lang?: string;
   currentRequest?: RequestItem;
   importStats: { total: number; created: number } | null;
   validRows: Record<string, any>[];
@@ -25,6 +26,10 @@ export const ImportStepSuccess: React.FC<Props> = ({
   onBack,
   onReset,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-xs text-center space-y-5">
       <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-xs">
@@ -32,15 +37,18 @@ export const ImportStepSuccess: React.FC<Props> = ({
       </div>
 
       <h2 className="text-lg font-extrabold text-slate-900">
-        {lang === "ar"
-          ? "تم استيراد السجلات وتوزيعها على المناديب بنجاح!"
-          : "Import & Assignment Completed!"}
+        {t("importWizard.step4.title", { lng: currentLang })}
       </h2>
 
       <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
-        {lang === "ar"
-          ? `تم اعتماد وحفظ ${importStats?.created || validRows.length} سجل وتوزيعها فورياً على مناطق المناديب في حملة "${currentRequest?.titleAr}". البيانات متاحة الآن في تطبيق الهاتف والحقول المعتمدة تظهر للعرض فقط.`
-          : `${importStats?.created || validRows.length} records successfully imported and assigned to regional representatives.`}
+        {t("importWizard.step4.description", {
+          count: importStats?.created || validRows.length,
+          title:
+            currentLang === "ar"
+              ? currentRequest?.titleAr || ""
+              : currentRequest?.titleEn || currentRequest?.titleAr || "",
+          lng: currentLang,
+        })}
       </p>
 
       <div className="pt-3 flex flex-wrap justify-center gap-3">
@@ -48,7 +56,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
           onClick={onBack}
           className="px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md cursor-pointer transition-all"
         >
-          {lang === "ar" ? "الرجوع لقائمة الطلبات" : "Go to Requests"}
+          {t("importWizard.step4.goToRequests", { lng: currentLang })}
         </button>
 
         {import.meta.env.DEV && (
@@ -68,9 +76,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
           >
             <Smartphone className="w-4 h-4" />
             <span>
-              {lang === "ar"
-                ? "فتح واجهة الهاتف لمعاينة السجلات والمطابقة"
-                : "Preview in Mobile View"}
+              {t("importWizard.step4.previewMobile", { lng: currentLang })}
             </span>
           </button>
         )}
@@ -79,7 +85,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
           onClick={onReset}
           className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
         >
-          {lang === "ar" ? "استيراد ملف إكسل آخر" : "Import Another File"}
+          {t("importWizard.step4.importAnother", { lng: currentLang })}
         </button>
       </div>
     </div>
