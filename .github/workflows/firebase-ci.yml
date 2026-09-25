@@ -21,7 +21,7 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: cd firebase/functions && npm ci
+        run: cd firebase/functions && npm ci --legacy-peer-deps
 
       - name: Dependency Security Audit
         run: cd firebase/functions && npm audit --audit-level=critical || true
