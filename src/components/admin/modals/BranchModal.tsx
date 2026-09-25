@@ -1,9 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Building2, X, AlertTriangle } from "lucide-react";
 import { Branch } from "../../../types";
 
 interface BranchModalProps {
-  lang: string;
+  lang?: string;
   showModal: boolean;
   editingBranch: Branch | null;
   branchCode: string;
@@ -31,6 +32,10 @@ export const BranchModal: React.FC<BranchModalProps> = ({
   handleSaveBranch,
   onClose,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   if (!showModal) return null;
 
   return (
@@ -43,12 +48,8 @@ export const BranchModal: React.FC<BranchModalProps> = ({
             </div>
             <h3 className="text-sm font-extrabold text-slate-900">
               {editingBranch
-                ? lang === "ar"
-                  ? "تعديل بيانات الفرع"
-                  : "Edit Branch"
-                : lang === "ar"
-                  ? "إضافة فرع جديد"
-                  : "New Branch"}
+                ? t("branches.editBranchTitle", { lng: currentLang })
+                : t("branches.newBranchTitle", { lng: currentLang })}
             </h3>
           </div>
           <button
@@ -69,14 +70,16 @@ export const BranchModal: React.FC<BranchModalProps> = ({
         <form onSubmit={handleSaveBranch} className="space-y-3.5 mt-4 text-xs">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "رمز الفرع (Branch ID)" : "Branch ID"}
+              {t("branches.branchIdLabel", { lng: currentLang })}
             </label>
             <input
               type="text"
               disabled={!!editingBranch}
               value={branchCode}
               onChange={(e) => setBranchCode(e.target.value)}
-              placeholder="مثال: BR-RYD"
+              placeholder={t("branches.branchIdPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono font-bold uppercase disabled:bg-slate-100"
               required
             />
@@ -84,16 +87,15 @@ export const BranchModal: React.FC<BranchModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم الفرع (باللغة العربية)"
-                : "Branch Name (Arabic)"}{" "}
-              *
+              {t("branches.branchNameArLabel", { lng: currentLang })} *
             </label>
             <input
               type="text"
               value={branchNameAr}
               onChange={(e) => setBranchNameAr(e.target.value)}
-              placeholder="مثال: فرع المنطقة الجنوبية (أبها وخميس مشيط)"
+              placeholder={t("branches.branchNameArPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               required
             />
@@ -101,15 +103,15 @@ export const BranchModal: React.FC<BranchModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم الفرع (باللغة الإنجليزية)"
-                : "Branch Name (English)"}
+              {t("branches.branchNameEnLabel", { lng: currentLang })}
             </label>
             <input
               type="text"
               value={branchNameEn}
               onChange={(e) => setBranchNameEn(e.target.value)}
-              placeholder="e.g. Southern Region Branch (Abha)"
+              placeholder={t("branches.branchNameEnPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300"
             />
           </div>
@@ -120,13 +122,13 @@ export const BranchModal: React.FC<BranchModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold cursor-pointer"
             >
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+              {t("branches.cancel", { lng: currentLang })}
             </button>
             <button
               type="submit"
               className="px-5 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-extrabold shadow-sm transition-all cursor-pointer"
             >
-              {lang === "ar" ? "حفظ الفرع" : "Save Branch"}
+              {t("branches.saveBranch", { lng: currentLang })}
             </button>
           </div>
         </form>

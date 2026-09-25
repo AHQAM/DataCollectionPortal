@@ -1,9 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { MapPin, X, AlertTriangle } from "lucide-react";
 import { Region, Branch } from "../../../types";
 
 interface RegionModalProps {
-  lang: string;
+  lang?: string;
   showModal: boolean;
   editingRegion: Region | null;
   regionNo: string;
@@ -37,6 +38,10 @@ export const RegionModal: React.FC<RegionModalProps> = ({
   handleSaveRegion,
   onClose,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   if (!showModal) return null;
 
   return (
@@ -49,12 +54,8 @@ export const RegionModal: React.FC<RegionModalProps> = ({
             </div>
             <h3 className="text-sm font-extrabold text-slate-900">
               {editingRegion
-                ? lang === "ar"
-                  ? "تعديل بيانات المنطقة"
-                  : "Edit Region"
-                : lang === "ar"
-                  ? "إضافة منطقة ميدانية جديدة"
-                  : "New Field Region"}
+                ? t("branches.editRegionTitle", { lng: currentLang })
+                : t("branches.newRegionTitle", { lng: currentLang })}
             </h3>
           </div>
           <button
@@ -75,7 +76,7 @@ export const RegionModal: React.FC<RegionModalProps> = ({
         <form onSubmit={handleSaveRegion} className="space-y-3.5 mt-4 text-xs">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "الفرع التابع له" : "Parent Branch"} *
+              {t("branches.parentBranchLabel", { lng: currentLang })} *
             </label>
             <select
               value={regionBranchId}
@@ -85,7 +86,7 @@ export const RegionModal: React.FC<RegionModalProps> = ({
             >
               {branches.map((b) => (
                 <option key={b.branchId} value={b.branchId}>
-                  {lang === "ar" ? b.branchNameAr : b.branchNameEn} (
+                  {currentLang === "ar" ? b.branchNameAr : b.branchNameEn} (
                   {b.branchId})
                 </option>
               ))}
@@ -94,38 +95,34 @@ export const RegionModal: React.FC<RegionModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "رقم المنطقة الميدانية (Region Number)"
-                : "Region Number"}{" "}
-              *
+              {t("branches.regionNoLabel", { lng: currentLang })} *
             </label>
             <input
               type="text"
               value={regionNo}
               onChange={(e) => setRegionNo(e.target.value)}
-              placeholder="مثال: 110 أو 201"
+              placeholder={t("branches.regionNoPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono font-bold"
               required
             />
             <span className="text-[10px] text-slate-400 mt-1 block">
-              {lang === "ar"
-                ? "يُستخدم كرقم دخول للمستخدم الميداني وكرمز للمنطقة في ملفات الإكسل"
-                : "Used by field user to login and matches Region No column in Excel"}
+              {t("branches.regionNoHelp", { lng: currentLang })}
             </span>
           </div>
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم المنطقة والأحياء (بالعربية)"
-                : "Region Name (Arabic)"}{" "}
-              *
+              {t("branches.regionNameArLabel", { lng: currentLang })} *
             </label>
             <input
               type="text"
               value={regionNameAr}
               onChange={(e) => setRegionNameAr(e.target.value)}
-              placeholder="مثال: شمال الرياض - النرجس والياسمين"
+              placeholder={t("branches.regionNameArPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               required
             />
@@ -133,15 +130,15 @@ export const RegionModal: React.FC<RegionModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم المنطقة (بالإنجليزية)"
-                : "Region Name (English)"}
+              {t("branches.regionNameEnLabel", { lng: currentLang })}
             </label>
             <input
               type="text"
               value={regionNameEn}
               onChange={(e) => setRegionNameEn(e.target.value)}
-              placeholder="e.g. North Riyadh - Narjis & Yasmin"
+              placeholder={t("branches.regionNameEnPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300"
             />
           </div>
@@ -152,13 +149,13 @@ export const RegionModal: React.FC<RegionModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold cursor-pointer"
             >
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+              {t("branches.cancel", { lng: currentLang })}
             </button>
             <button
               type="submit"
               className="px-5 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-extrabold shadow-sm transition-all cursor-pointer"
             >
-              {lang === "ar" ? "حفظ المنطقة" : "Save Region"}
+              {t("branches.saveRegion", { lng: currentLang })}
             </button>
           </div>
         </form>

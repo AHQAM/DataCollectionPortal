@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
 import { Branch, Region } from "../../types";
 import { CheckCircle2 } from "lucide-react";
@@ -29,6 +30,10 @@ export const AdminBranches: React.FC = () => {
     deleteRegion,
     importBranchesAndRegions,
   } = useApp();
+
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
 
   const [activeTab, setActiveTab] = useState<"branches" | "regions">(
     "branches",
@@ -94,11 +99,7 @@ export const AdminBranches: React.FC = () => {
   const handleSaveBranch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!branchNameAr.trim()) {
-      setAlertError(
-        lang === "ar"
-          ? "يرجى إدخال اسم الفرع بالعربية"
-          : "Please enter branch Arabic name",
-      );
+      setAlertError(t("branches.enterArabicBranchName", { lng: currentLang }));
       return;
     }
 
@@ -109,18 +110,12 @@ export const AdminBranches: React.FC = () => {
           branchNameEn: branchNameEn.trim() || branchNameAr.trim(),
         });
         setSuccessMessage(
-          lang === "ar"
-            ? "تم تحديث بيانات الفرع بنجاح"
-            : "Branch updated successfully",
+          t("branches.branchUpdatedSuccess", { lng: currentLang }),
         );
       } else {
         const code = branchCode.trim().toUpperCase();
         if (branches.some((b) => b.branchId === code)) {
-          setAlertError(
-            lang === "ar"
-              ? "رمز الفرع موجود مسبقاً"
-              : "Branch ID already exists",
-          );
+          setAlertError(t("branches.branchIdExists", { lng: currentLang }));
           return;
         }
         await createBranch({
@@ -129,16 +124,12 @@ export const AdminBranches: React.FC = () => {
           branchNameEn: branchNameEn.trim() || branchNameAr.trim(),
         });
         setSuccessMessage(
-          lang === "ar"
-            ? "تمت إضافة الفرع الجديد بنجاح"
-            : "New branch created successfully",
+          t("branches.branchCreatedSuccess", { lng: currentLang }),
         );
       }
     } catch (err) {
       console.error(err);
-      setAlertError(
-        lang === "ar" ? "حدث خطأ أثناء الحفظ" : "Error saving branch",
-      );
+      setAlertError(t("branches.errorSavingBranch", { lng: currentLang }));
       return;
     }
 
@@ -149,18 +140,17 @@ export const AdminBranches: React.FC = () => {
   const handleDeleteBranch = async (b: Branch) => {
     if (
       window.confirm(
-        lang === "ar"
-          ? `هل أنت متأكد من حذف ${b.branchNameAr}؟`
-          : `Delete branch ${b.branchNameEn}?`,
+        t("branches.confirmDeleteBranch", {
+          name: currentLang === "ar" ? b.branchNameAr : b.branchNameEn,
+          lng: currentLang,
+        }),
       )
     ) {
       const res = await deleteBranch(b.branchId);
       if (!res.success) {
         alert(res.message || "Cannot delete");
       } else {
-        setSuccessMessage(
-          lang === "ar" ? "تم حذف الفرع بنجاح" : "Branch deleted",
-        );
+        setSuccessMessage(t("branches.branchDeleted", { lng: currentLang }));
         setTimeout(() => setSuccessMessage(null), 3000);
       }
     }
@@ -190,11 +180,7 @@ export const AdminBranches: React.FC = () => {
   const handleSaveRegion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!regionNo.trim() || !regionNameAr.trim() || !regionBranchId) {
-      setAlertError(
-        lang === "ar"
-          ? "يرجى تعبئة كافة الحقول المطلوبة"
-          : "Please fill all required fields",
-      );
+      setAlertError(t("branches.fillRequiredFields", { lng: currentLang }));
       return;
     }
 
@@ -209,17 +195,11 @@ export const AdminBranches: React.FC = () => {
           branchId: regionBranchId,
         });
         setSuccessMessage(
-          lang === "ar"
-            ? "تم تحديث بيانات المنطقة بنجاح"
-            : "Region updated successfully",
+          t("branches.regionUpdatedSuccess", { lng: currentLang }),
         );
       } else {
         if (regions.some((r) => r.regionNo === cleanNo)) {
-          setAlertError(
-            lang === "ar"
-              ? "رقم المنطقة مستخدم مسبقاً، يرجى اختيار رقم فريد"
-              : "Region number already exists",
-          );
+          setAlertError(t("branches.regionNoExists", { lng: currentLang }));
           return;
         }
         await createRegion({
@@ -230,16 +210,12 @@ export const AdminBranches: React.FC = () => {
           branchId: regionBranchId,
         });
         setSuccessMessage(
-          lang === "ar"
-            ? "تمت إضافة المنطقة بنجاح"
-            : "New region created successfully",
+          t("branches.regionCreatedSuccess", { lng: currentLang }),
         );
       }
     } catch (err) {
       console.error(err);
-      setAlertError(
-        lang === "ar" ? "حدث خطأ أثناء الحفظ" : "Error saving region",
-      );
+      setAlertError(t("branches.errorSavingRegion", { lng: currentLang }));
       return;
     }
 
@@ -250,16 +226,18 @@ export const AdminBranches: React.FC = () => {
   const handleDeleteRegion = async (r: Region) => {
     if (
       window.confirm(
-        lang === "ar"
-          ? `هل أنت متأكد من حذف منطقة ${r.regionNameAr} (#${r.regionNo})؟`
-          : `Delete region ${r.regionNameEn}?`,
+        t("branches.confirmDeleteRegion", {
+          name: currentLang === "ar" ? r.regionNameAr : r.regionNameEn,
+          no: r.regionNo,
+          lng: currentLang,
+        }),
       )
     ) {
       const res = await deleteRegion(r.regionId);
       if (!res.success) {
         alert(res.message || "Cannot delete region");
       } else {
-        setSuccessMessage(lang === "ar" ? "تم حذف المنطقة" : "Region deleted");
+        setSuccessMessage(t("branches.regionDeleted", { lng: currentLang }));
         setTimeout(() => setSuccessMessage(null), 3000);
       }
     }

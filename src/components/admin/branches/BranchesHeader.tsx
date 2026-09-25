@@ -1,8 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Building2, Plus, FileSpreadsheet } from "lucide-react";
 
 interface BranchesHeaderProps {
-  lang: "ar" | "en";
+  lang?: "ar" | "en";
   activeTab: "branches" | "regions";
   onOpenExcelModal: () => void;
   onOpenAddBranch: () => void;
@@ -16,6 +17,9 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
   onOpenAddBranch,
   onOpenAddRegion,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang = lang || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
       <div>
@@ -23,16 +27,10 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
           <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-900 flex items-center justify-center">
             <Building2 className="w-5 h-5" />
           </div>
-          <span>
-            {lang === "ar"
-              ? "إدارة الفروع والمناطق الميدانية"
-              : "Branches & Regions Management"}
-          </span>
+          <span>{t("branches.title", { lng: currentLang })}</span>
         </h1>
         <p className="text-xs text-slate-500 mt-1">
-          {lang === "ar"
-            ? "إضافة فروع المنشأة، وتحديد المناطق الميدانية لكل فرع، وربط المستخدمين والمشرفين بها ديناميكياً"
-            : "Add organization branches, define field regions, and link field users and supervisors seamlessly"}
+          {t("branches.desc", { lng: currentLang })}
         </p>
       </div>
 
@@ -42,11 +40,7 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
           className="px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
         >
           <FileSpreadsheet className="w-4 h-4 text-emerald-200" />
-          <span>
-            {lang === "ar"
-              ? "استيراد الفروع والمناطق من Excel"
-              : "Import from Excel"}
-          </span>
+          <span>{t("branches.importExcel", { lng: currentLang })}</span>
         </button>
 
         {activeTab === "branches" ? (
@@ -55,7 +49,7 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
             className="px-4 py-2.5 bg-purple-900 hover:bg-purple-800 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>{lang === "ar" ? "إضافة فرع جديد" : "New Branch"}</span>
+            <span>{t("branches.newBranch", { lng: currentLang })}</span>
           </button>
         ) : (
           <button
@@ -63,7 +57,7 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
             className="px-4 py-2.5 bg-purple-900 hover:bg-purple-800 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>{lang === "ar" ? "إضافة منطقة جديدة" : "New Region"}</span>
+            <span>{t("branches.newRegion", { lng: currentLang })}</span>
           </button>
         )}
       </div>
