@@ -1,15 +1,7 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { usePWAInstall } from "../../hooks/usePWAInstall";
-import {
-  Download,
-  Smartphone,
-  Share,
-  PlusSquare,
-  X,
-  CheckCircle,
-  ShieldCheck,
-} from "lucide-react";
-import { useApp } from "../../context/AppContext";
+import { Download, Smartphone, Share, PlusSquare, X } from "lucide-react";
 
 interface Props {
   variant?: "banner" | "button" | "card";
@@ -20,7 +12,7 @@ export const PWAInstallBanner: React.FC<Props> = ({
   variant = "banner",
   className = "",
 }) => {
-  const { lang, t } = useApp();
+  const { t } = useTranslation();
   const { isInstallable, isInstalled, isStandalone, isIOS, install } =
     usePWAInstall();
   const [showIOSModal, setShowIOSModal] = useState(false);
@@ -60,7 +52,7 @@ export const PWAInstallBanner: React.FC<Props> = ({
         </button>
 
         {showIOSModal && (
-          <IOSGuideModal onClose={() => setShowIOSModal(false)} lang={lang} />
+          <IOSGuideModal onClose={() => setShowIOSModal(false)} />
         )}
       </>
     );
@@ -79,14 +71,10 @@ export const PWAInstallBanner: React.FC<Props> = ({
               </div>
               <div>
                 <h3 className="font-extrabold text-sm">
-                  {lang === "ar"
-                    ? "تثبيت التطبيق على الجوال"
-                    : "Install Mobile App"}
+                  {t("pwa.mobileTitle")}
                 </h3>
                 <p className="text-[11px] text-purple-200 mt-0.5 max-w-[280px]">
-                  {lang === "ar"
-                    ? "ثبّت التطبيق لمرة واحدة للوصول السريع واستقبال الإشعارات الفورية دون متصفح"
-                    : "Install once on your phone for quick access, push alerts & offline work"}
+                  {t("pwa.mobileDesc")}
                 </p>
               </div>
             </div>
@@ -107,18 +95,14 @@ export const PWAInstallBanner: React.FC<Props> = ({
             >
               <Download className="w-3.5 h-3.5 text-purple-900" />
               <span>
-                {isIOS
-                  ? lang === "ar"
-                    ? "طريقة التثبيت على iPhone"
-                    : "How to Install on iPhone"
-                  : t("pwa.installOnDevice")}
+                {isIOS ? t("pwa.howToInstallIos") : t("pwa.installOnDevice")}
               </span>
             </button>
           </div>
         </div>
 
         {showIOSModal && (
-          <IOSGuideModal onClose={() => setShowIOSModal(false)} lang={lang} />
+          <IOSGuideModal onClose={() => setShowIOSModal(false)} />
         )}
       </>
     );
@@ -136,14 +120,10 @@ export const PWAInstallBanner: React.FC<Props> = ({
           </div>
           <div className="truncate">
             <div className="text-xs font-extrabold truncate">
-              {lang === "ar"
-                ? "تطبيق جمع البيانات الميداني (PWA)"
-                : "Field Collection App (PWA)"}
+              {t("pwa.bannerTitle")}
             </div>
             <div className="text-[10px] text-purple-200 truncate">
-              {lang === "ar"
-                ? "تثبيت مرة واحدة بدون متجر + إشعارات فورية"
-                : "1-Click Install + Push Notifications"}
+              {t("pwa.bannerSubtitle")}
             </div>
           </div>
         </div>
@@ -167,17 +147,14 @@ export const PWAInstallBanner: React.FC<Props> = ({
         </div>
       </div>
 
-      {showIOSModal && (
-        <IOSGuideModal onClose={() => setShowIOSModal(false)} lang={lang} />
-      )}
+      {showIOSModal && <IOSGuideModal onClose={() => setShowIOSModal(false)} />}
     </>
   );
 };
 
-const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
-  onClose,
-  lang,
-}) => {
+const IOSGuideModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
       <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl text-slate-800 border border-slate-100">
@@ -187,9 +164,7 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
               <Smartphone className="w-4 h-4" />
             </div>
             <h3 className="text-sm font-extrabold text-slate-900">
-              {lang === "ar"
-                ? "تثبيت التطبيق على الجوال"
-                : "Install App on Mobile"}
+              {t("pwa.mobileTitle")}
             </h3>
           </div>
           <button
@@ -202,9 +177,7 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
 
         <div className="py-4 space-y-3.5 text-xs">
           <p className="text-slate-600 font-medium leading-relaxed">
-            {lang === "ar"
-              ? "يمكنك تثبيت هذا التطبيق مباشرة على هاتفك ليعمل كتطبيق مستقل بدون الحاجة لتحميله من متجر التطبيقات:"
-              : "You can install this app directly to your home screen without going to app stores:"}
+            {t("pwa.iosModalDesc")}
           </p>
 
           <div className="space-y-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200">
@@ -214,17 +187,11 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
               </div>
               <div>
                 <span className="font-bold block text-slate-900">
-                  {lang === "ar"
-                    ? "اضغط على زر المشاركة (Share)"
-                    : "Tap the Share Button"}
+                  {t("pwa.iosStep1Title")}
                 </span>
                 <span className="text-slate-500 text-[11px] flex items-center gap-1 mt-0.5">
                   <Share className="w-3.5 h-3.5 text-blue-600 inline" />
-                  <span>
-                    {lang === "ar"
-                      ? "أسفل متصفح Safari أو قائمة خيارات Chrome"
-                      : "In browser toolbar or menu"}
-                  </span>
+                  <span>{t("pwa.iosStep1Desc")}</span>
                 </span>
               </div>
             </div>
@@ -235,17 +202,11 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
               </div>
               <div>
                 <span className="font-bold block text-slate-900">
-                  {lang === "ar"
-                    ? "اختر «إضافة إلى الشاشة الرئيسية»"
-                    : 'Select "Add to Home Screen"'}
+                  {t("pwa.iosStep2Title")}
                 </span>
                 <span className="text-slate-500 text-[11px] flex items-center gap-1 mt-0.5">
                   <PlusSquare className="w-3.5 h-3.5 text-purple-700 inline" />
-                  <span>
-                    {lang === "ar"
-                      ? "Add to Home Screen"
-                      : "Add to Home Screen"}
-                  </span>
+                  <span>{t("pwa.iosStep2Desc")}</span>
                 </span>
               </div>
             </div>
@@ -256,12 +217,10 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
               </div>
               <div>
                 <span className="font-bold block text-slate-900">
-                  {lang === "ar" ? "اضغط «إضافة / Add»" : 'Tap "Add"'}
+                  {t("pwa.iosStep3Title")}
                 </span>
                 <span className="text-slate-500 text-[11px]">
-                  {lang === "ar"
-                    ? "سيظهر رمز التطبيق على شاشة هاتفك مع دعم الإشعارات والعمل دون إنترنت"
-                    : "App icon will appear on your phone with push alerts & offline support"}
+                  {t("pwa.iosStep3Desc")}
                 </span>
               </div>
             </div>
@@ -272,7 +231,7 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
           onClick={onClose}
           className="w-full py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer"
         >
-          {lang === "ar" ? "فهمت، حسناً" : "Got it, thanks!"}
+          {t("pwa.understood")}
         </button>
       </div>
     </div>

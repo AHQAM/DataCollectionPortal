@@ -113,3 +113,15 @@ export const useUIStore = create<UIStore>((set, get) => {
     setIsOnline: (online) => set({ isOnline: online }),
   };
 });
+
+useUIStore.subscribe((state, prevState) => {
+  if (state.lang !== prevState.lang) {
+    if (
+      i18n &&
+      typeof i18n.changeLanguage === "function" &&
+      i18n.language !== state.lang
+    ) {
+      i18n.changeLanguage(state.lang);
+    }
+  }
+});

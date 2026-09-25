@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
 import {
   LayoutDashboard,
@@ -79,7 +80,8 @@ const AdminSettings = React.lazy(() =>
 );
 
 export const AdminLayout: React.FC = () => {
-  const { lang, dir, t, currentUser } = useApp();
+  const { t } = useTranslation();
+  const { lang, dir, currentUser } = useApp();
 
   const [currentModule, setCurrentModule] = useState<string>("dashboard");
   const [activeBuilderRequestId, setActiveBuilderRequestId] = useState<
@@ -93,74 +95,62 @@ export const AdminLayout: React.FC = () => {
   const menuItems = [
     {
       id: "dashboard",
-      labelAr: "لوحة القيادة",
-      labelEn: "Dashboard",
+      label: t("nav.dashboard"),
       icon: LayoutDashboard,
     },
     {
       id: "branches",
-      labelAr: "إدارة الفروع والمناطق",
-      labelEn: "Branches & Regions",
+      label: t("nav.branches"),
       icon: Building2,
     },
     {
       id: "supervisor_matrix",
-      labelAr: "مصفوفة صلاحيات المشرفين",
-      labelEn: "Supervisor Permissions",
+      label: t("nav.supervisorMatrix"),
       icon: ShieldCheck,
     },
     {
       id: "users",
-      labelAr: "المستخدمين",
-      labelEn: "Users",
+      label: t("nav.users"),
       icon: Users,
     },
     {
       id: "requests",
-      labelAr: "طلبات جمع البيانات",
-      labelEn: "Requests & Forms",
+      label: t("nav.requests"),
       icon: FileText,
     },
     {
       id: "import",
-      labelAr: "معالج استيراد Excel",
-      labelEn: "Excel Import Wizard",
+      label: t("nav.import"),
       icon: UploadCloud,
     },
     {
       id: "devices",
-      labelAr: "ربط وأمان الأجهزة",
-      labelEn: "Device Security",
+      label: t("nav.devices"),
       icon: Smartphone,
     },
     {
       id: "assignments",
-      labelAr: "إعادة توزيع السجلات",
-      labelEn: "Record Reassignments",
+      label: t("nav.assignments"),
       icon: Layers,
     },
     {
       id: "reports",
-      labelAr: "التقارير وتصدير إكسل",
-      labelEn: "Reports & Export",
+      label: t("nav.reports"),
       icon: FileSpreadsheet,
     },
     {
       id: "archive",
-      labelAr: "الأرشيف التاريخي",
-      labelEn: "Archive",
+      label: t("nav.archive"),
       icon: Archive,
     },
     {
       id: "audit",
-      labelAr: "سجل التدقيق والرقابة",
-      labelEn: "Audit Trail",
+      label: t("nav.audit"),
       icon: ShieldCheck,
     },
     {
       id: "settings",
-      labelAr: "إعدادات النظام",
-      labelEn: "Settings",
+      label: t("nav.settings"),
       icon: Settings,
     },
   ];
@@ -251,9 +241,7 @@ export const AdminLayout: React.FC = () => {
               <div className="p-4 border-b border-slate-100 flex items-center justify-between">
                 <div className="text-xs font-extrabold uppercase tracking-wider text-purple-900 flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-purple-700" />
-                  <span>
-                    {lang === "ar" ? "إدارة المنظومة" : "Management Portal"}
-                  </span>
+                  <span>{t("nav.managementPortal")}</span>
                 </div>
                 <button
                   onClick={() => setIsSidebarOpen(false)}
@@ -287,9 +275,7 @@ export const AdminLayout: React.FC = () => {
                         <Icon
                           className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`}
                         />
-                        <span className="truncate">
-                          {lang === "ar" ? item.labelAr : item.labelEn}
-                        </span>
+                        <span className="truncate">{item.label}</span>
                       </button>
                     );
                   })}
@@ -309,16 +295,12 @@ export const AdminLayout: React.FC = () => {
                   <div className="font-extrabold text-xs text-slate-900 truncate">
                     {currentUser?.userNameAr ||
                       currentUser?.username ||
-                      (lang === "ar" ? "المستخدم" : "User")}
+                      t("roles.user")}
                   </div>
                   <div className="text-[10px] text-purple-700 font-bold truncate">
                     {currentUser?.role === "ADMIN"
-                      ? lang === "ar"
-                        ? "مدير النظام المركزي"
-                        : "System Admin"
-                      : lang === "ar"
-                        ? "مشرف فرع"
-                        : "Branch Supervisor"}
+                      ? t("roles.adminFull")
+                      : t("roles.supervisor")}
                   </div>
                 </div>
               </div>
@@ -331,7 +313,7 @@ export const AdminLayout: React.FC = () => {
       <aside className="hidden lg:flex w-64 shrink-0 bg-white border-e border-slate-200 sticky top-16 h-[calc(100vh-4rem)] flex-col justify-between z-20">
         <div className="p-4 overflow-y-auto">
           <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 px-3 mb-2">
-            {lang === "ar" ? "إدارة المنظومة" : "Management Portal"}
+            {t("nav.managementPortal")}
           </div>
 
           <nav className="space-y-1">
@@ -354,9 +336,7 @@ export const AdminLayout: React.FC = () => {
                   <Icon
                     className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`}
                   />
-                  <span className="truncate">
-                    {lang === "ar" ? item.labelAr : item.labelEn}
-                  </span>
+                  <span className="truncate">{item.label}</span>
                 </button>
               );
             })}
@@ -375,16 +355,12 @@ export const AdminLayout: React.FC = () => {
               <div className="font-extrabold text-xs text-slate-900 truncate">
                 {currentUser?.userNameAr ||
                   currentUser?.username ||
-                  (lang === "ar" ? "المستخدم" : "User")}
+                  t("roles.user")}
               </div>
               <div className="text-[10px] text-purple-700 font-bold truncate">
                 {currentUser?.role === "ADMIN"
-                  ? lang === "ar"
-                    ? "مدير النظام المركزي"
-                    : "System Admin"
-                  : lang === "ar"
-                    ? "مشرف فرع"
-                    : "Branch Supervisor"}
+                  ? t("roles.adminFull")
+                  : t("roles.supervisor")}
               </div>
             </div>
           </div>
@@ -400,19 +376,17 @@ export const AdminLayout: React.FC = () => {
             className="flex items-center gap-2 text-xs font-bold text-purple-900 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg border border-purple-200 transition-colors"
           >
             <Menu className="w-4 h-4 text-purple-700" />
-            <span>{lang === "ar" ? "القائمة الإدارية" : "Admin Menu"}</span>
+            <span>{t("nav.adminMenu")}</span>
           </button>
           <span className="text-xs font-bold text-purple-900">
-            {menuItems.find((m) => m.id === currentModule)?.labelAr || ""}
+            {menuItems.find((m) => m.id === currentModule)?.label || ""}
           </span>
         </div>
 
         <React.Suspense
           fallback={
             <div className="flex items-center justify-center p-12 text-sm text-slate-500 font-bold">
-              {lang === "ar"
-                ? "جاري تحميل واجهة الإدارة..."
-                : "Loading module..."}
+              {t("common.loading")}
             </div>
           }
         >

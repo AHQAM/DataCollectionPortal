@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
 import { PWAInstallBanner } from "./PWAInstallBanner";
 import { BroadcastNotificationModal } from "../admin/BroadcastNotificationModal";
@@ -16,11 +17,11 @@ import {
 } from "lucide-react";
 
 export const TopNavbar: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const {
     lang,
     setLang,
     dir,
-    t,
     notifications,
     currentUser,
     users,
@@ -275,8 +276,7 @@ export const TopNavbar: React.FC = () => {
                   <div className="font-bold text-sm text-slate-800 pb-2 border-b border-slate-100 flex items-center justify-between">
                     <span>{t("topNavbar.notifications")}</span>
                     <span className="text-purple-600 text-xs font-semibold">
-                      {notifications.length}{" "}
-                      {t("nav.notifications", "إشعار", "notifications")}
+                      {notifications.length} {t("nav.notifications")}
                     </span>
                   </div>
                   <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 mt-2">

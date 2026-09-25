@@ -28,15 +28,22 @@
   },
   "nav": {
     "dashboard": "Dashboard",
-    "requests": "Requests & Projects",
+    "requests": "Requests & Forms",
     "branches": "Branches & Regions",
-    "users": "User Management",
-    "reports": "Reports & Analytics",
+    "users": "Users",
+    "reports": "Reports & Export",
     "auditLogs": "Audit Logs",
+    "audit": "Audit Trail",
     "deviceBindings": "Device Governance",
-    "supervisorMatrix": "Supervisor Matrix",
+    "devices": "Device Security",
+    "supervisorMatrix": "Supervisor Permissions",
     "archive": "Archive",
-    "settings": "System Settings"
+    "settings": "Settings",
+    "import": "Excel Import Wizard",
+    "assignments": "Record Reassignments",
+    "managementPortal": "Management Portal",
+    "adminMenu": "Admin Menu",
+    "notifications": "notifications"
   },
   "auth": {
     "login": "Sign In",
@@ -49,7 +56,13 @@
     "mustChangePassword": "Password change required to proceed",
     "invalidCredentials": "Invalid credentials provided.",
     "accountLocked": "Account temporarily locked due to failed attempts.",
-    "deviceMismatch": "Account is bound to another physical device. Contact supervisor to unbind."
+    "deviceMismatch": "Account is bound to another physical device. Contact supervisor to unbind.",
+    "portalSecure": "Secure Enterprise Authentication Portal",
+    "portalDesc": "Administrative portal for system admins and supervisors to manage operations, forms, and branches.",
+    "enterEmail": "Enter email address",
+    "enterEmailError": "Please enter email",
+    "enterPasswordError": "Please enter password",
+    "portalEncrypted": "Secure & Encrypted Portal"
   },
   "status": {
     "draft": "Draft",
@@ -67,7 +80,9 @@
   "roles": {
     "admin": "System Administrator",
     "supervisor": "Branch Supervisor",
-    "rep": "Field Representative"
+    "rep": "Field Representative",
+    "adminFull": "System Admin",
+    "user": "User"
   },
   "topNavbar": {
     "subTitle": "Dynamic Fields & Custom Auth Platform",
@@ -84,6 +99,18 @@
     "close": "Close",
     "offlineReady": "Works completely offline",
     "quickAccess": "Fast home-screen access",
-    "understood": "Got it, thanks!"
+    "understood": "Got it, thanks!",
+    "mobileTitle": "Install Mobile App",
+    "mobileDesc": "Install once on your phone for quick access, push alerts & offline work",
+    "howToInstallIos": "How to Install on iPhone",
+    "bannerTitle": "Field Collection App (PWA)",
+    "bannerSubtitle": "1-Click Install + Push Notifications",
+    "iosModalDesc": "You can install this app directly to your home screen without going to app stores:",
+    "iosStep1Title": "Tap the Share Button",
+    "iosStep1Desc": "In browser toolbar or menu",
+    "iosStep2Title": "Select \"Add to Home Screen\"",
+    "iosStep2Desc": "Add to Home Screen",
+    "iosStep3Title": "Tap \"Add\"",
+    "iosStep3Desc": "App icon will appear on your phone with push alerts & offline support"
   }
 }
