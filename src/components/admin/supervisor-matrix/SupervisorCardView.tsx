@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { User, Branch, Region } from "../../../types";
 import { Building2, CheckSquare, Square, Users, Check } from "lucide-react";
 
@@ -25,19 +26,19 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
   onClearAllRegions,
   onGrantAllCompanyRegions,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   if (supervisors.length === 0) {
     return (
       <div className="p-12 text-center bg-white rounded-3xl border border-slate-200">
         <Users className="w-12 h-12 text-slate-300 mx-auto mb-2" />
         <h3 className="text-sm font-black text-slate-700">
-          {lang === "ar"
-            ? "لا يوجد مشرفين يطابقون خيارات البحث"
-            : "No supervisors found"}
+          {t("supervisors.cards.emptyTitle", { lng: currentLang })}
         </h3>
         <p className="text-xs text-slate-400 mt-1">
-          {lang === "ar"
-            ? "يمكنك إضافة مشرف جديد أو تعديل فلتر البحث أعلاه"
-            : "Add a supervisor or adjust search filter"}
+          {t("supervisors.cards.emptyDesc", { lng: currentLang })}
         </p>
       </div>
     );
@@ -66,24 +67,28 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                       {supervisor.userNameAr}
                     </h3>
                     <span className="px-2 py-0.5 rounded-md bg-purple-100 text-purple-900 text-[10px] font-extrabold">
-                      {lang === "ar" ? "مشرف ميداني" : "Supervisor"}
+                      {t("supervisors.cards.roleBadge", { lng: currentLang })}
                     </span>
                     {!supervisor.isActive && (
                       <span className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[10px] font-extrabold">
-                        {lang === "ar" ? "معطل" : "Inactive"}
+                        {t("supervisors.cards.inactiveBadge", {
+                          lng: currentLang,
+                        })}
                       </span>
                     )}
                   </div>
                   <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-1 font-medium">
                     <span>
-                      {lang === "ar" ? "الرقم الوظيفي: " : "Emp No: "}
+                      {t("supervisors.cards.empNo", { lng: currentLang })}
                       <strong className="text-slate-800 font-mono">
                         {supervisor.userNo || supervisor.username}
                       </strong>
                     </span>
                     <span>•</span>
                     <span>
-                      {lang === "ar" ? "الفرع الأساسي: " : "Primary Branch: "}
+                      {t("supervisors.cards.primaryBranch", {
+                        lng: currentLang,
+                      })}
                       <strong className="text-purple-900 font-bold">
                         {supervisor.branchNameAr || supervisor.branchId}
                       </strong>
@@ -101,35 +106,33 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
               {/* Coverage Status & Global Quick Actions */}
               <div className="flex flex-wrap items-center gap-2">
                 <div className="px-3 py-1.5 bg-purple-100 text-purple-950 rounded-xl text-xs font-black">
-                  {lang === "ar"
-                    ? `يشرف على ${totalAssigned} من أصل ${regions.length} منطقة`
-                    : `Covers ${totalAssigned} of ${regions.length} zones`}
+                  {t("supervisors.cards.coverageStatus", {
+                    assigned: totalAssigned,
+                    total: regions.length,
+                    lng: currentLang,
+                  })}
                 </div>
 
                 <button
                   type="button"
                   onClick={() => onGrantAllCompanyRegions(supervisor)}
                   className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                  title={
-                    lang === "ar"
-                      ? "منح الإشراف على جميع مناطق المملكة"
-                      : "Grant all company regions"
-                  }
+                  title={t("supervisors.cards.grantAllTitle", {
+                    lng: currentLang,
+                  })}
                 >
-                  {lang === "ar"
-                    ? "تغطية كاملة (جميع المناطق)"
-                    : "Select All Regions"}
+                  {t("supervisors.cards.grantAllBtn", { lng: currentLang })}
                 </button>
 
                 <button
                   type="button"
                   onClick={() => onClearAllRegions(supervisor)}
                   className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                  title={
-                    lang === "ar" ? "إلغاء كافة المناطق" : "Clear all regions"
-                  }
+                  title={t("supervisors.cards.clearAllTitle", {
+                    lng: currentLang,
+                  })}
                 >
-                  {lang === "ar" ? "مسح التحديد" : "Clear All"}
+                  {t("supervisors.cards.clearAllBtn", { lng: currentLang })}
                 </button>
               </div>
             </div>
@@ -159,7 +162,7 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                       <div className="flex items-center gap-2">
                         <Building2 className="w-4 h-4 text-purple-800" />
                         <span className="font-extrabold text-xs text-slate-900">
-                          {lang === "ar"
+                          {currentLang === "ar"
                             ? branch.branchNameAr
                             : branch.branchNameEn}
                         </span>
@@ -168,7 +171,10 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                         </span>
                         <span className="text-[11px] font-bold text-slate-500">
                           ({branchAssignedCount}/{branchRegions.length}{" "}
-                          {lang === "ar" ? "منطقة" : "zones"})
+                          {t("supervisors.cards.zonesCount", {
+                            lng: currentLang,
+                          })}
+                          )
                         </span>
                       </div>
 
@@ -183,9 +189,9 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                         >
                           <CheckSquare className="w-3.5 h-3.5" />
                           <span>
-                            {lang === "ar"
-                              ? "تحديد كافة مناطق هذا الفرع"
-                              : "Select Branch"}
+                            {t("supervisors.cards.selectAllBranch", {
+                              lng: currentLang,
+                            })}
                           </span>
                         </button>
 
@@ -199,9 +205,9 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                         >
                           <Square className="w-3.5 h-3.5" />
                           <span>
-                            {lang === "ar"
-                              ? "إلغاء تحديد الفرع"
-                              : "Deselect Branch"}
+                            {t("supervisors.cards.deselectBranch", {
+                              lng: currentLang,
+                            })}
                           </span>
                         </button>
                       </div>

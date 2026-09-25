@@ -588,5 +588,59 @@
       "wipeBranchesCheckbox": "Also wipe demo branches & regions (to import your company Excel file)",
       "confirmWipeBtn": "Confirm Wipe & Start Clean"
     }
+  },
+  "supervisors": {
+    "title": "Supervisor Permissions Matrix (Master Data)",
+    "subtitle": "Directly manage the regional supervisory scope for each supervisor. Assign individual zones across multiple branches or subset regions independent of transaction records.",
+    "cardsTab": "Supervisor Cards",
+    "gridTab": "2D Matrix Grid",
+    "newSupervisorBtn": "New Supervisor",
+    "totalSupervisors": "Supervisors",
+    "totalBranches": "Branches",
+    "totalRegions": "Total Regions",
+    "activeZones": "Supervised Zones",
+    "searchPlaceholder": "Search supervisor name or number...",
+    "filterBranch": "Filter by Branch:",
+    "allBranches": "All Branches",
+    "toastUpdated": "Updated permissions for {{name}}",
+    "toastAssignedBranch": "Assigned all branch regions to {{name}}",
+    "toastRemovedBranch": "Removed branch regions from {{name}}",
+    "toastCleared": "Cleared all assigned regions for {{name}}",
+    "toastGrantedAll": "Granted full coverage to {{name}}",
+    "toastCreated": "Supervisor {{name}} created successfully",
+    "grid": {
+      "title": "Cross Matrix (Supervisors × Field Zones)",
+      "hint": "Click any cell to toggle supervision",
+      "supervisor": "Supervisor",
+      "totalZones": "Total Zones"
+    },
+    "cards": {
+      "emptyTitle": "No supervisors found",
+      "emptyDesc": "Add a supervisor or adjust search filter",
+      "roleBadge": "Supervisor",
+      "inactiveBadge": "Inactive",
+      "empNo": "Emp No: ",
+      "primaryBranch": "Primary Branch: ",
+      "coverageStatus": "Covers {{assigned}} of {{total}} zones",
+      "grantAllBtn": "Select All Regions",
+      "grantAllTitle": "Grant all company regions",
+      "clearAllBtn": "Clear All",
+      "clearAllTitle": "Clear all regions",
+      "zonesCount": "zones",
+      "selectAllBranch": "Select Branch",
+      "deselectBranch": "Deselect Branch"
+    },
+    "modal": {
+      "title": "New Field Supervisor",
+      "nameAr": "Supervisor Name (Arabic)",
+      "nameArPlaceholder": "مثال: م. عبدالله القحطاني",
+      "userNo": "Employee ID / Code",
+      "userNoPlaceholder": "مثال: SUP-101",
+      "branch": "Primary Branch",
+      "mobile": "Mobile Number",
+      "mobilePlaceholder": "05XXXXXXXX",
+      "cancel": "Cancel",
+      "submit": "Create Supervisor"
+    }
   }
 }

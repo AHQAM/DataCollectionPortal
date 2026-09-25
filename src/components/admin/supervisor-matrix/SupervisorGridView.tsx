@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { User, Region } from "../../../types";
 import { Check } from "lucide-react";
 
@@ -15,18 +16,18 @@ export const SupervisorGridView: React.FC<SupervisorGridViewProps> = ({
   lang,
   onToggleRegion,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
       <div className="p-4 border-b border-slate-100 flex items-center justify-between">
         <span className="text-xs font-black text-slate-900">
-          {lang === "ar"
-            ? "جدول التقاطع (المشرفين × المناطق الميدانية)"
-            : "Cross Matrix (Supervisors × Field Zones)"}
+          {t("supervisors.grid.title", { lng: currentLang })}
         </span>
         <span className="text-[11px] text-slate-500 font-medium">
-          {lang === "ar"
-            ? "انقر على أي مربع لتفعيل أو إلغاء الإشراف مباشرة"
-            : "Click any cell to toggle supervision"}
+          {t("supervisors.grid.hint", { lng: currentLang })}
         </span>
       </div>
 
@@ -35,10 +36,10 @@ export const SupervisorGridView: React.FC<SupervisorGridViewProps> = ({
           <thead>
             <tr className="bg-slate-100 text-slate-700 font-black border-b border-slate-200">
               <th className="p-3 text-start sticky start-0 bg-slate-100 z-10 min-w-[200px]">
-                {lang === "ar" ? "المشرف" : "Supervisor"}
+                {t("supervisors.grid.supervisor", { lng: currentLang })}
               </th>
               <th className="p-3 text-center min-w-[90px]">
-                {lang === "ar" ? "إجمالي المناطق" : "Total Zones"}
+                {t("supervisors.grid.totalZones", { lng: currentLang })}
               </th>
               {regions.map((reg) => (
                 <th

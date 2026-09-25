@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Branch } from "../../../types";
 import { UserPlus, X } from "lucide-react";
 
@@ -23,6 +24,10 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
   branches,
   lang,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   const [newSupNameAr, setNewSupNameAr] = useState("");
   const [newSupNameEn, setNewSupNameEn] = useState("");
   const [newSupNo, setNewSupNo] = useState("");
@@ -54,11 +59,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
             <UserPlus className="w-5 h-5 text-purple-900" />
-            <span>
-              {lang === "ar"
-                ? "إضافة مشرف ميداني جديد"
-                : "New Field Supervisor"}
-            </span>
+            <span>{t("supervisors.modal.title", { lng: currentLang })}</span>
           </h3>
           <button
             onClick={onClose}
@@ -71,16 +72,15 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4 pt-4 text-xs">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم المشرف (بالعربية)"
-                : "Supervisor Name (Arabic)"}{" "}
-              *
+              {t("supervisors.modal.nameAr", { lng: currentLang })} *
             </label>
             <input
               type="text"
               value={newSupNameAr}
               onChange={(e) => setNewSupNameAr(e.target.value)}
-              placeholder="مثال: م. عبدالله القحطاني"
+              placeholder={t("supervisors.modal.nameArPlaceholder", {
+                lng: currentLang,
+              })}
               required
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
             />
@@ -88,16 +88,15 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "الرقم الوظيفي / كود المشرف"
-                : "Employee ID / Code"}{" "}
-              *
+              {t("supervisors.modal.userNo", { lng: currentLang })} *
             </label>
             <input
               type="text"
               value={newSupNo}
               onChange={(e) => setNewSupNo(e.target.value)}
-              placeholder="مثال: SUP-101"
+              placeholder={t("supervisors.modal.userNoPlaceholder", {
+                lng: currentLang,
+              })}
               required
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono font-bold"
             />
@@ -105,7 +104,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "الفرع الأساسي" : "Primary Branch"} *
+              {t("supervisors.modal.branch", { lng: currentLang })} *
             </label>
             <select
               value={newSupBranchId || branches[0]?.branchId || ""}
@@ -114,7 +113,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
             >
               {branches.map((b) => (
                 <option key={b.branchId} value={b.branchId}>
-                  {lang === "ar" ? b.branchNameAr : b.branchNameEn} (
+                  {currentLang === "ar" ? b.branchNameAr : b.branchNameEn} (
                   {b.branchId})
                 </option>
               ))}
@@ -123,13 +122,15 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "رقم الجوال" : "Mobile Number"}
+              {t("supervisors.modal.mobile", { lng: currentLang })}
             </label>
             <input
               type="tel"
               value={newSupMobile}
               onChange={(e) => setNewSupMobile(e.target.value)}
-              placeholder="05XXXXXXXX"
+              placeholder={t("supervisors.modal.mobilePlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono"
             />
           </div>
@@ -140,13 +141,13 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold cursor-pointer"
             >
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+              {t("supervisors.modal.cancel", { lng: currentLang })}
             </button>
             <button
               type="submit"
               className="px-5 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-black shadow-sm transition-all cursor-pointer"
             >
-              {lang === "ar" ? "إضافة المشرف" : "Create Supervisor"}
+              {t("supervisors.modal.submit", { lng: currentLang })}
             </button>
           </div>
         </form>
