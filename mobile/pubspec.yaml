@@ -14,16 +14,16 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  firebase_core: any
-  firebase_auth: any
-  cloud_firestore: any
-  cloud_functions: any
-  firebase_messaging: any
-  firebase_crashlytics: any
+  firebase_core: 4.15.0
+  firebase_auth: 6.7.0
+  cloud_firestore: 6.10.0
+  cloud_functions: 6.5.0
+  firebase_messaging: 16.7.0
+  firebase_crashlytics: 5.4.0
   firebase_storage: any
   firebase_app_check: any
   shared_preferences: ^2.2.1
-  flutter_secure_storage: any
+  flutter_secure_storage: 11.2.0
   flutter_riverpod: any
   riverpod_annotation: any
   go_router: any
@@ -49,7 +49,7 @@ dev_dependencies:
   build_runner: ^2.4.9
   riverpod_generator: ^4.0.9
   mocktail: ^1.0.5
-  freezed: ^4.0.1
+  freezed: ^4.0.2
   json_serializable: ^6.14.1
 
 flutter:
