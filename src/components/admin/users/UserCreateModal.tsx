@@ -1,11 +1,12 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { UserRole, Branch, Region } from "../../../types";
 
 interface UserCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  lang: "ar" | "en";
+  lang?: "ar" | "en";
   branches: Branch[];
   regions: Region[];
 
@@ -58,6 +59,10 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
   setNewPermissions,
   onSubmit,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   if (!isOpen) return null;
 
   return (
@@ -65,11 +70,11 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
       <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl border border-slate-200">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
           <h2 className="font-extrabold text-sm text-slate-900">
-            {lang === "ar" ? "إضافة مستخدم جديد" : "Create New User Account"}
+            {t("users.createTitle", { lng: currentLang })}
           </h2>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded"
+            className="p-1 text-slate-400 hover:text-slate-600 rounded cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -79,7 +84,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar" ? "نوع الدور / الصلاحية" : "Role"}
+                {t("users.roleLabel", { lng: currentLang })}
               </label>
               <select
                 value={newRole}
@@ -87,24 +92,20 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               >
                 <option value="REP">
-                  {lang === "ar"
-                    ? "مستخدم ميداني / جامع بيانات (REP)"
-                    : "Field User / Data Collector"}
+                  {t("users.roleRepOption", { lng: currentLang })}
                 </option>
                 <option value="SUPERVISOR">
-                  {lang === "ar"
-                    ? "مشرف فرع (SUPERVISOR)"
-                    : "Branch Supervisor"}
+                  {t("users.roleSupervisorOption", { lng: currentLang })}
                 </option>
                 <option value="ADMIN">
-                  {lang === "ar" ? "مدير نظام (ADMIN)" : "System Admin"}
+                  {t("users.roleAdminOption", { lng: currentLang })}
                 </option>
               </select>
             </div>
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar" ? "الفرع" : "Branch"}
+                {t("users.branchLabel", { lng: currentLang })}
               </label>
               <select
                 value={newBranchId}
@@ -113,7 +114,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
               >
                 {branches.map((b) => (
                   <option key={b.branchId} value={b.branchId}>
-                    {lang === "ar" ? b.branchNameAr : b.branchNameEn}
+                    {currentLang === "ar" ? b.branchNameAr : b.branchNameEn}
                   </option>
                 ))}
               </select>
@@ -123,13 +124,9 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar"
-                  ? newRole === "REP"
-                    ? "رقم المنطقة (اسم الدخول)"
-                    : "البريد الإلكتروني (اسم الدخول)"
-                  : newRole === "REP"
-                    ? "Primary Region No"
-                    : "Email Address"}
+                {newRole === "REP"
+                  ? t("users.regionNoLabel", { lng: currentLang })
+                  : t("users.emailLabel", { lng: currentLang })}
               </label>
               <input
                 type={newRole === "REP" ? "text" : "email"}
@@ -142,7 +139,9 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                   }
                 }}
                 placeholder={
-                  newRole === "REP" ? "مثال: 109" : "email@example.com"
+                  newRole === "REP"
+                    ? t("users.regionNoPlaceholder", { lng: currentLang })
+                    : "email@example.com"
                 }
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-mono font-bold"
                 required
@@ -152,7 +151,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
             {newRole === "REP" && (
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  {lang === "ar" ? "رقم المستخدم الوظيفي" : "User No"}
+                  {t("users.userNoLabel", { lng: currentLang })}
                 </label>
                 <input
                   type="text"
@@ -167,13 +166,15 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "اسم المستخدم (بالعربية)" : "User Name (Arabic)"}
+              {t("users.userNameArLabel", { lng: currentLang })}
             </label>
             <input
               type="text"
               value={newRepNameAr}
               onChange={(e) => setNewRepNameAr(e.target.value)}
-              placeholder="مثال: عبد الرحمن المجيدي"
+              placeholder={t("users.userNameArPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               required
             />
@@ -181,15 +182,15 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم المستخدم (بالإنجليزية)"
-                : "User Name (English)"}
+              {t("users.userNameEnLabel", { lng: currentLang })}
             </label>
             <input
               type="text"
               value={newRepNameEn}
               onChange={(e) => setNewRepNameEn(e.target.value)}
-              placeholder="e.g. Abdulrahman Al-Majeedi"
+              placeholder={t("users.userNameEnPlaceholder", {
+                lng: currentLang,
+              })}
               className="w-full h-10 px-3 rounded-xl border border-slate-300"
             />
           </div>
@@ -197,9 +198,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
           {/* Multi-Region Assignment Selector */}
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "المناطق المصرح للمستخدم العمل بها (تعدد المناطق):"
-                : "Authorized Regions:"}
+              {t("users.authorizedRegionsLabel", { lng: currentLang })}
             </label>
             <div className="flex flex-wrap gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 max-h-32 overflow-y-auto">
               {regions.map((reg) => {
@@ -241,9 +240,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
           {newRole === "SUPERVISOR" && (
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
               <label className="block font-bold text-slate-700 mb-2">
-                {lang === "ar"
-                  ? "صلاحيات المشرف الدقيقة (Granular Permissions):"
-                  : "Supervisor Granular Permissions:"}
+                {t("users.supervisorPermissionsLabel", { lng: currentLang })}
               </label>
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
@@ -258,9 +255,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                     }
                     className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
                   />
-                  {lang === "ar"
-                    ? "إدارة المستخدمين والمندوبين"
-                    : "Manage Users & Reps"}
+                  {t("users.permManageUsers", { lng: currentLang })}
                 </label>
                 <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
                   <input
@@ -274,9 +269,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                     }
                     className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
                   />
-                  {lang === "ar"
-                    ? "إدارة طلبات الجمع والنماذج"
-                    : "Manage Requests & Forms"}
+                  {t("users.permManageRequests", { lng: currentLang })}
                 </label>
                 <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
                   <input
@@ -290,9 +283,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                     }
                     className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
                   />
-                  {lang === "ar"
-                    ? "إدارة المناطق وتعيينها"
-                    : "Manage Regions Assignments"}
+                  {t("users.permManageRegions", { lng: currentLang })}
                 </label>
                 <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
                   <input
@@ -306,36 +297,34 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                     }
                     className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
                   />
-                  {lang === "ar"
-                    ? "رؤية بيانات جميع الفروع"
-                    : "View All Branches Data"}
+                  {t("users.permViewAllBranches", { lng: currentLang })}
                 </label>
               </div>
             </div>
           )}
 
           <div className="p-3 bg-purple-50 rounded-xl text-[11px] text-purple-900 space-y-1">
-            <span className="font-bold">ملاحظات الأمان الإلزامية:</span>
-            <div>• يتم إنشاء كلمة مرور مؤقتة وفريدة للحساب الجديد.</div>
-            <div>• الحساب مفروض عليه تغيير كلمة المرور فور أول تسجيل دخول.</div>
-            <div>
-              • سيتم ربط الحساب تلقائياً بأول هاتف يتم تسجيل الدخول منه.
-            </div>
+            <span className="font-bold">
+              {t("users.securityNotesTitle", { lng: currentLang })}
+            </span>
+            <div>• {t("users.securityNote1", { lng: currentLang })}</div>
+            <div>• {t("users.securityNote2", { lng: currentLang })}</div>
+            <div>• {t("users.securityNote3", { lng: currentLang })}</div>
           </div>
 
           <div className="flex gap-2 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
+              className="flex-1 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer"
             >
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+              {t("users.cancel", { lng: currentLang })}
             </button>
             <button
               type="submit"
-              className="flex-1 h-10 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-bold"
+              className="flex-1 h-10 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-bold cursor-pointer"
             >
-              {lang === "ar" ? "إنشاء وتفعيل" : "Create User"}
+              {t("users.createAndActivate", { lng: currentLang })}
             </button>
           </div>
         </form>

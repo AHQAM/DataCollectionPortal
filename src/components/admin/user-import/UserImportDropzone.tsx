@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FileSpreadsheet,
   UploadCloud,
@@ -9,7 +10,7 @@ import {
 } from "lucide-react";
 
 interface UserImportDropzoneProps {
-  lang: string;
+  lang?: string;
   fileName: string | null;
   swappedDetected: boolean;
   onFileSelected: (file: File) => void;
@@ -25,6 +26,10 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
   onDownloadTemplate,
   onLoadDemoData,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -48,11 +53,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-purple-50/70 rounded-2xl border border-purple-200/80">
         <div className="flex items-center gap-2 text-xs text-purple-950 font-bold">
           <Info className="w-4 h-4 text-purple-700 shrink-0" />
-          <span>
-            {lang === "ar"
-              ? "الأعمدة: [رقم_المستخدم (المعرف)] و [اسم_المستخدم] و [الفرع] و [رقم_الجوال]"
-              : "Columns: [User_Number (ID)], [User_Name], [Branch], [Phone]"}
-          </span>
+          <span>{t("users.columnsInfo", { lng: currentLang })}</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -63,9 +64,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
           >
             <Download className="w-3.5 h-3.5 text-purple-700" />
             <span>
-              {lang === "ar"
-                ? "تحميل نموذج Excel المعتمد"
-                : "Download Sample Template"}
+              {t("users.downloadSampleTemplate", { lng: currentLang })}
             </span>
           </button>
 
@@ -75,11 +74,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold transition-all shadow-2xs cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>
-              {lang === "ar"
-                ? "تجربة عينة مناديب جدة والمدينة (18 منطقة)"
-                : "Load Demo Sample"}
-            </span>
+            <span>{t("users.loadDemoSample", { lng: currentLang })}</span>
           </button>
         </div>
       </div>
@@ -89,9 +84,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
         <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs text-emerald-900 flex items-center gap-2 animate-in fade-in">
           <ArrowUpDown className="w-4 h-4 text-emerald-600 shrink-0" />
           <div className="font-bold">
-            {lang === "ar"
-              ? "ذكاء النظام: تم الكشف تلقائياً عن تبديل في محتوى العمودين A و B (تم تصحيح رقم المستخدم واسم المستخدم تلقائياً دون أي أخطاء)!"
-              : "Auto-detected swapped columns A & B: Successfully corrected User No and User Name!"}
+            {t("users.swappedColumnsDetected", { lng: currentLang })}
           </div>
         </div>
       )}
@@ -129,16 +122,12 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
               <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
               <span>{fileName}</span>
             </span>
-          ) : lang === "ar" ? (
-            "اسحب وأفلت ملف إكسل (.xlsx, .xls, .csv) هنا، أو اضغط للاختيار من جهازك"
           ) : (
-            "Drag and drop Excel (.xlsx, .xls, .csv) file here, or click to browse"
+            t("users.dragDropExcel", { lng: currentLang })
           )}
         </p>
         <p className="text-[11px] text-slate-400 mt-1">
-          {lang === "ar"
-            ? "يتعرف المعالج تلقائياً على الأعمدة المتبادلة ويدمج صفوف نفس المستخدم تلقائياً"
-            : "Smart mapping auto-detects swapped columns and merges rows for the same user"}
+          {t("users.smartMappingHelp", { lng: currentLang })}
         </p>
       </div>
     </div>

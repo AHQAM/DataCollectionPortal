@@ -1,23 +1,8 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
-import { User, UserRole } from "../../types";
-import {
-  Users,
-  UserPlus,
-  Search,
-  KeyRound,
-  Lock,
-  Unlock,
-  Smartphone,
-  Shield,
-  CheckCircle2,
-  AlertCircle,
-  Building,
-  Layers,
-  X,
-  RefreshCw,
-  FileSpreadsheet,
-} from "lucide-react";
+import { UserRole } from "../../types";
+import { CheckCircle2 } from "lucide-react";
 import { AdminUserImportModal } from "./AdminUserImportModal";
 import { UserFilters } from "./users/UserFilters";
 import { UserTableRow } from "./users/UserTableRow";
@@ -26,18 +11,18 @@ import { UserCreateModal } from "./users/UserCreateModal";
 export const AdminUsers: React.FC = () => {
   const {
     lang,
-    dir,
-    t,
     users,
     branches,
     regions,
-    deviceBindings,
     resetUserPassword,
     unlockUser,
     releaseUserDevice,
     createUser,
-    updateUser,
   } = useApp();
+
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
@@ -82,21 +67,15 @@ export const AdminUsers: React.FC = () => {
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRepNameAr.trim()) {
-      alert(
-        lang === "ar" ? "يرجى إدخال الاسم بالعربية" : "Arabic name is required",
-      );
+      alert(t("users.arabicNameRequired", { lng: currentLang }));
       return;
     }
     if (!newRegionNo.trim()) {
-      alert(
-        lang === "ar"
-          ? "يرجى إدخال رقم المنطقة / البريد الإلكتروني"
-          : "Region No. or Email is required",
-      );
+      alert(t("users.regionOrEmailRequired", { lng: currentLang }));
       return;
     }
     if (!newBranchId) {
-      alert(lang === "ar" ? "يرجى اختيار الفرع" : "Please select a branch");
+      alert(t("users.selectBranch", { lng: currentLang }));
       return;
     }
 
@@ -115,11 +94,7 @@ export const AdminUsers: React.FC = () => {
         permissions: newRole === "SUPERVISOR" ? newPermissions : undefined,
       });
       setShowCreateModal(false);
-      showToast(
-        lang === "ar"
-          ? "تم إنشاء الحساب بنجاح (سيتم إصدار كلمة مرور مؤقتة)"
-          : "User created. A temporary password will be issued.",
-      );
+      showToast(t("users.userCreatedSuccess", { lng: currentLang }));
       // Reset form
       setNewRegionNo("");
       setNewRepNo("");
@@ -132,9 +107,7 @@ export const AdminUsers: React.FC = () => {
       const msg =
         err?.details?.message ||
         err?.message ||
-        (lang === "ar"
-          ? "حدث خطأ أثناء إنشاء المستخدم"
-          : "Error creating user");
+        t("users.errorCreatingUser", { lng: currentLang });
       alert(msg);
     }
   };
@@ -155,7 +128,7 @@ export const AdminUsers: React.FC = () => {
         setSearchQuery={setSearchQuery}
         roleFilter={roleFilter}
         setRoleFilter={setRoleFilter}
-        lang={lang}
+        lang={currentLang}
         onShowImportModal={() => setShowImportModal(true)}
         onShowCreateModal={() => setShowCreateModal(true)}
       />
@@ -167,25 +140,25 @@ export const AdminUsers: React.FC = () => {
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "المستخدم" : "User"}
+                  {t("users.colUser", { lng: currentLang })}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "رقم المنطقة (اسم الدخول)" : "Region No"}
+                  {t("users.colRegionNo", { lng: currentLang })}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "المناطق المصرحة" : "Allowed Regions"}
+                  {t("users.colAllowedRegions", { lng: currentLang })}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "الفرع" : "Branch"}
+                  {t("users.colBranch", { lng: currentLang })}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "الجهاز المعتمد" : "Bound Device"}
+                  {t("users.colBoundDevice", { lng: currentLang })}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "حالة الحساب" : "Account Status"}
+                  {t("users.colAccountStatus", { lng: currentLang })}
                 </th>
                 <th className="px-4 py-3 text-center">
-                  {lang === "ar" ? "الإجراءات الإدارية" : "Admin Actions"}
+                  {t("users.colAdminActions", { lng: currentLang })}
                 </th>
               </tr>
             </thead>
@@ -195,7 +168,7 @@ export const AdminUsers: React.FC = () => {
                   <UserTableRow
                     key={u.userId}
                     user={u}
-                    lang={lang}
+                    lang={currentLang}
                     onResetPassword={(id) => {
                       void resetUserPassword(id).then((result) => {
                         showToast(
@@ -208,17 +181,13 @@ export const AdminUsers: React.FC = () => {
                     onUnlockUser={(id) => {
                       unlockUser(id);
                       showToast(
-                        lang === "ar"
-                          ? `تم إلغاء قفل الحساب`
-                          : `Account unlocked`,
+                        t("users.accountUnlockedSuccess", { lng: currentLang }),
                       );
                     }}
                     onReleaseDevice={(id) => {
                       releaseUserDevice(id);
                       showToast(
-                        lang === "ar"
-                          ? `تم فك ارتباط الجهاز للحساب`
-                          : `Device unlinked for account`,
+                        t("users.deviceUnlinkedSuccess", { lng: currentLang }),
                       );
                     }}
                   />
@@ -233,7 +202,7 @@ export const AdminUsers: React.FC = () => {
       <UserCreateModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        lang={lang}
+        lang={currentLang}
         branches={branches}
         regions={regions}
         newRole={newRole}
@@ -260,11 +229,7 @@ export const AdminUsers: React.FC = () => {
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onSuccess={(count) =>
-          showToast(
-            lang === "ar"
-              ? `تم استيراد ${count} مستخدم بنجاح (كلمات مرور مؤقتة مع إلزام التغيير فوراً)`
-              : `Imported ${count} users successfully (temporary passwords, change required)`,
-          )
+          showToast(t("users.importSuccess", { count, lng: currentLang }))
         }
       />
     </div>

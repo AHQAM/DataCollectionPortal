@@ -1,9 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ParsedRepRow } from "./userImportParser";
 import { Users } from "lucide-react";
 
 interface UserImportPreviewTableProps {
-  lang: string;
+  lang?: string;
   parsedRows: ParsedRepRow[];
   totalRawRows: number;
 }
@@ -13,6 +14,10 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
   parsedRows,
   totalRawRows,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang =
+    (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
   if (parsedRows.length === 0) return null;
 
   const validCount = parsedRows.filter((r) => r.isValid).length;
@@ -30,25 +35,35 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
         <div className="text-xs font-bold text-slate-800 flex items-center gap-2">
           <Users className="w-4 h-4 text-purple-700" />
           <span>
-            {lang === "ar"
-              ? `تمت معالجة ${totalRawRows} صفاً في الملف ➔ ${parsedRows.length} حساب مستخدم معتمد`
-              : `${totalRawRows} rows in file ➔ ${parsedRows.length} distinct users`}
+            {t("users.processedRowsCount", {
+              total: totalRawRows,
+              users: parsedRows.length,
+              lng: currentLang,
+            })}
           </span>
         </div>
 
         <div className="flex items-center gap-2 text-[11px] font-bold">
           {multiRegionCount > 0 && (
             <span className="px-2 py-0.5 rounded-md bg-purple-100 text-purple-900 border border-purple-200">
-              {multiRegionCount}{" "}
-              {lang === "ar" ? "مستخدم متعدد المناطق" : "Multi-Region Users"}
+              {t("users.multiRegionBadge", {
+                count: multiRegionCount,
+                lng: currentLang,
+              })}
             </span>
           )}
           <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
-            {newCount} {lang === "ar" ? "مستخدم جديد" : "New Users"}
+            {t("users.newUsersBadge", {
+              count: newCount,
+              lng: currentLang,
+            })}
           </span>
           {existingCount > 0 && (
             <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800">
-              {existingCount} {lang === "ar" ? "تحديث قائم" : "Updates"}
+              {t("users.updatesBadge", {
+                count: existingCount,
+                lng: currentLang,
+              })}
             </span>
           )}
         </div>
@@ -60,22 +75,22 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
             <tr>
               <th className="px-3 py-2.5 text-start w-10">#</th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "رقم المستخدم (المعرف)" : "User ID"}
+                {t("users.colUserId", { lng: currentLang })}
               </th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "اسم المستخدم" : "User Name"}
+                {t("users.colUserName", { lng: currentLang })}
               </th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "المناطق المصرحة" : "Assigned Regions"}
+                {t("users.colAssignedRegions", { lng: currentLang })}
               </th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "الفرع" : "Branch"}
+                {t("users.colBranch", { lng: currentLang })}
               </th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "كلمة المرور المؤقتة" : "Temporary password"}
+                {t("users.colTempPassword", { lng: currentLang })}
               </th>
               <th className="px-3 py-2.5 text-center">
-                {lang === "ar" ? "الحالة" : "Status"}
+                {t("users.colStatus", { lng: currentLang })}
               </th>
             </tr>
           </thead>
@@ -99,7 +114,9 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
 
                 <td className="px-3 py-2 font-bold text-slate-900">
                   {row.userName || (
-                    <span className="text-rose-600 font-normal">اسم مفقود</span>
+                    <span className="text-rose-600 font-normal">
+                      {currentLang === "ar" ? "اسم مفقود" : "Missing Name"}
+                    </span>
                   )}
                 </td>
 
@@ -119,7 +136,7 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
                     ))}
                     {row.assignedRegions.length > 1 && (
                       <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
-                        {lang === "ar"
+                        {currentLang === "ar"
                           ? `(${row.assignedRegions.length} مناطق)`
                           : `(${row.assignedRegions.length} regions)`}
                       </span>
@@ -132,10 +149,12 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-1.5">
                     <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]">
-                      رمز مؤقت لمرة واحدة
+                      {currentLang === "ar"
+                        ? "رمز مؤقت لمرة واحدة"
+                        : "One-time temp code"}
                     </span>
                     <span className="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                      {lang === "ar" ? "تغيير إلزامي" : "Must Change"}
+                      {currentLang === "ar" ? "تغيير إلزامي" : "Must Change"}
                     </span>
                   </div>
                 </td>
@@ -144,13 +163,13 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
                   {row.isValid ? (
                     row.isExisting ? (
                       <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
-                        {lang === "ar"
+                        {currentLang === "ar"
                           ? "تحديث وتوسيع مناطق"
                           : "Update & Expand"}
                       </span>
                     ) : (
                       <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                        {lang === "ar" ? "حساب جديد" : "New Account"}
+                        {currentLang === "ar" ? "حساب جديد" : "New Account"}
                       </span>
                     )
                   ) : (
