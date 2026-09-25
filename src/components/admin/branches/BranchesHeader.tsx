@@ -24,9 +24,7 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
           <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-900 flex items-center justify-center">
             <Building2 className="w-5 h-5" />
           </div>
-          <span>
-            {i18n.t("auto.branchesRegionsManagement")}
-          </span>
+          <span>{i18n.t("auto.branchesRegionsManagement")}</span>
         </h1>
         <p className="text-xs text-slate-500 mt-1">
           {i18n.t("auto.addOrganizationBranchesDefine")}
@@ -39,9 +37,7 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
           className="px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
         >
           <FileSpreadsheet className="w-4 h-4 text-emerald-200" />
-          <span>
-            {i18n.t("auto.importFromExcel")}
-          </span>
+          <span>{i18n.t("auto.importFromExcel")}</span>
         </button>
 
         {activeTab === "branches" ? (

@@ -45,9 +45,7 @@ export const AdminDeviceManager: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Smartphone className="w-5 h-5 text-purple-700" />
-            <span>
-              {t("auto.userDeviceBindingSecurity")}
-            </span>
+            <span>{t("auto.userDeviceBindingSecurity")}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             {t("auto.enforceSingledeviceBindingAnd")}
@@ -69,9 +67,7 @@ export const AdminDeviceManager: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              t("auto.searchByUserModel")
-            }
+            placeholder={t("auto.searchByUserModel")}
             className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
           <Search className="w-4 h-4 text-slate-400 absolute top-3 start-3" />
@@ -113,24 +109,16 @@ export const AdminDeviceManager: React.FC = () => {
           <table className="w-full text-start text-xs">
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-start">
-                  {t("auto.userRegion")}
-                </th>
-                <th className="px-4 py-3 text-start">
-                  {t("auto.deviceOs")}
-                </th>
+                <th className="px-4 py-3 text-start">{t("auto.userRegion")}</th>
+                <th className="px-4 py-3 text-start">{t("auto.deviceOs")}</th>
                 <th className="px-4 py-3 text-start">
                   {t("auto.installationUuid")}
                 </th>
-                <th className="px-4 py-3 text-start">
-                  {t("auto.firstBound")}
-                </th>
+                <th className="px-4 py-3 text-start">{t("auto.firstBound")}</th>
                 <th className="px-4 py-3 text-start">
                   {t("auto.bindingStatus")}
                 </th>
-                <th className="px-4 py-3 text-center">
-                  {t("auto.actions")}
-                </th>
+                <th className="px-4 py-3 text-center">{t("auto.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -174,9 +162,7 @@ export const AdminDeviceManager: React.FC = () => {
                       </td>
 
                       <td className="px-4 py-3.5 text-slate-500">
-                        {new Date(b.boundAt).toLocaleDateString(
-                          t("auto.enus"),
-                        )}
+                        {new Date(b.boundAt).toLocaleDateString(t("auto.enus"))}
                       </td>
 
                       <td className="px-4 py-3.5">
@@ -203,9 +189,7 @@ export const AdminDeviceManager: React.FC = () => {
                             <button
                               onClick={() => releaseDeviceBinding(b.userId)}
                               className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px] border border-rose-200"
-                              title={
-                                t("auto.releaseDevice")
-                              }
+                              title={t("auto.releaseDevice")}
                             >
                               {t("auto.release")}
                             </button>

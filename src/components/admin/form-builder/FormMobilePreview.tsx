@@ -38,9 +38,7 @@ export const FormMobilePreview: React.FC<FormMobilePreviewProps> = ({
       <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
         <span className="font-extrabold text-xs text-slate-800 flex items-center gap-1.5">
           <Eye className="w-4 h-4 text-purple-700" />
-          <span>
-            {i18n.t("auto.liveInteractivePreview")}
-          </span>
+          <span>{i18n.t("auto.liveInteractivePreview")}</span>
         </span>
         <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
           {i18n.t("auto.live")}

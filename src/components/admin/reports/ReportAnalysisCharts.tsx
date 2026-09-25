@@ -45,8 +45,7 @@ export const ReportAnalysisCharts: React.FC<Props> = ({
           <div className="text-xl font-black text-purple-950">{totalCount}</div>
           <div className="text-[10px] text-slate-500 mt-1 flex items-center gap-1.5">
             <span className="text-emerald-700 font-bold">
-              {submittedCount + completedCount}{" "}
-              {i18n.t("auto.done")}
+              {submittedCount + completedCount} {i18n.t("auto.done")}
             </span>
             <span>•</span>
             <span className="text-amber-700">

@@ -41,9 +41,7 @@ export const ReportDataTable: React.FC<Props> = ({
               : "bg-slate-100 text-slate-600"
           }`}
         >
-          {isTrue
-            ? i18n.t("auto.yes")
-            : i18n.t("auto.no")}
+          {isTrue ? i18n.t("auto.yes") : i18n.t("auto.no")}
         </span>
       );
     }
@@ -113,18 +111,14 @@ export const ReportDataTable: React.FC<Props> = ({
               <th className="px-4 py-3 text-start">
                 {i18n.t("auto.regionUser")}
               </th>
-              <th className="px-4 py-3 text-start">
-                {i18n.t("auto.branch")}
-              </th>
+              <th className="px-4 py-3 text-start">{i18n.t("auto.branch")}</th>
               {/* Dynamic Form Field Columns */}
               {previewFields.map((field) => (
                 <th key={field.fieldId} className="px-4 py-3 text-start">
                   {lang === "ar" ? field.fieldLabelAr : field.fieldLabelEn}
                 </th>
               ))}
-              <th className="px-4 py-3 text-start">
-                {i18n.t("auto.status")}
-              </th>
+              <th className="px-4 py-3 text-start">{i18n.t("auto.status")}</th>
               <th className="px-4 py-3 text-center">
                 {i18n.t("auto.actions")}
               </th>
@@ -207,9 +201,7 @@ export const ReportDataTable: React.FC<Props> = ({
                         className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold inline-flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
-                        <span>
-                          {i18n.t("auto.viewResponse")}
-                        </span>
+                        <span>{i18n.t("auto.viewResponse")}</span>
                       </button>
                     </td>
                   </tr>

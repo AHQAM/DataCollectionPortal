@@ -36,7 +36,7 @@ export const RecordResponseModal: React.FC<Props> = ({
   response,
   onClose,
 }) => {
-  const { lang , t} = useApp();
+  const { lang, t } = useApp();
   const [activeImagePreview, setActiveImagePreview] = useState<string | null>(
     null,
   );
@@ -173,9 +173,7 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <User className="w-3.5 h-3.5 text-purple-600" />
-                <span>
-                  {t("auto.targetEntityRecord")}
-                </span>
+                <span>{t("auto.targetEntityRecord")}</span>
               </div>
               <div className="text-xs font-black text-slate-900 truncate">
                 {record.targetName}
@@ -188,9 +186,7 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <MapPin className="w-3.5 h-3.5 text-purple-600" />
-                <span>
-                  {t("auto.userRegion")}
-                </span>
+                <span>{t("auto.userRegion")}</span>
               </div>
               <div className="text-xs font-black text-slate-900 truncate">
                 {record.userName || "-"}
@@ -216,9 +212,7 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
               <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-bold mb-1">
                 <Calendar className="w-3.5 h-3.5 text-purple-600" />
-                <span>
-                  {t("auto.submissionDate")}
-                </span>
+                <span>{t("auto.submissionDate")}</span>
               </div>
               <div className="text-xs font-black text-slate-900">
                 {record.submittedAt || record.updatedAt
@@ -242,9 +236,7 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-purple-700" />
-                <span>
-                  {t("auto.fieldResponsesAnswers")}
-                </span>
+                <span>{t("auto.fieldResponsesAnswers")}</span>
               </h3>
               <span className="text-[11px] font-mono text-slate-400">
                 {fields.length} {t("auto.fieldsDefined")}
@@ -307,9 +299,7 @@ export const RecordResponseModal: React.FC<Props> = ({
             <div className="space-y-3 pt-3 border-t border-slate-100">
               <h4 className="text-xs font-extrabold text-slate-600 flex items-center gap-1.5">
                 <Info className="w-3.5 h-3.5 text-slate-400" />
-                <span>
-                  {t("auto.additionalResponseData")}
-                </span>
+                <span>{t("auto.additionalResponseData")}</span>
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {extraEntries.map(([key, val]) => (

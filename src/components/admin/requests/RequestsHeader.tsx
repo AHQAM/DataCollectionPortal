@@ -28,14 +28,10 @@ export const RequestsHeader: React.FC<RequestsHeaderProps> = ({
         <button
           onClick={() => onOpenImportWizard("")}
           className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md transition-all cursor-pointer"
-          title={
-            i18n.t("auto.importDataFromExcel")
-          }
+          title={i18n.t("auto.importDataFromExcel")}
         >
           <FileSpreadsheet className="w-4 h-4" />
-          <span>
-            {i18n.t("auto.importFromExcel")}
-          </span>
+          <span>{i18n.t("auto.importFromExcel")}</span>
         </button>
 
         <button

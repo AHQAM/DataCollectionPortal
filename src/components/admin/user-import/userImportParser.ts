@@ -236,20 +236,16 @@ export function groupAndProcessRows(
 
     if (!primaryNo) {
       isValid = false;
-      validationError =
-        i18n.t("auto.userNumberIsMissing");
+      validationError = i18n.t("auto.userNumberIsMissing");
     } else if (!val.userName) {
       isValid = false;
-      validationError =
-        i18n.t("auto.userNameIsMissing");
+      validationError = i18n.t("auto.userNameIsMissing");
     }
 
     groupedRows.push({
       userNo: primaryNo,
       userName: val.userName,
-      branchName:
-        val.branchName?.trim() ||
-        (i18n.t("auto.mainBranch")),
+      branchName: val.branchName?.trim() || i18n.t("auto.mainBranch"),
       phone: val.phone,
       isExisting,
       isValid,

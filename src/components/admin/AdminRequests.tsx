@@ -156,9 +156,7 @@ export const AdminRequests: React.FC<Props> = ({
       }
     } catch (err) {
       console.error("Error creating request:", err);
-      alert(
-        t("auto.errorCreatingRequest"),
-      );
+      alert(t("auto.errorCreatingRequest"));
     }
   };
 
@@ -171,9 +169,7 @@ export const AdminRequests: React.FC<Props> = ({
       setEditingRequest(null);
     } catch (err) {
       console.error("Error updating request:", err);
-      alert(
-        t("auto.errorUpdatingRequest"),
-      );
+      alert(t("auto.errorUpdatingRequest"));
     }
   };
 
@@ -187,9 +183,7 @@ export const AdminRequests: React.FC<Props> = ({
         "Custom",
       );
       setShowTemplateModal(null);
-      showToast(
-        t("auto.templateSavedSuccessfully"),
-      );
+      showToast(t("auto.templateSavedSuccessfully"));
     }
   };
 
@@ -197,14 +191,10 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_publish`);
     try {
       await publishRequest(requestId);
-      showToast(
-        t("auto.requestPublishedSuccessfully"),
-      );
+      showToast(t("auto.requestPublishedSuccessfully"));
     } catch (err: any) {
       const message =
-        err?.details?.message ||
-        err?.message ||
-        (t("auto.theRequestCouldNot"));
+        err?.details?.message || err?.message || t("auto.theRequestCouldNot");
       alert(message);
     } finally {
       setActionLoadingId(null);
@@ -215,14 +205,9 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_close`);
     try {
       await closeRequest(requestId);
-      showToast(
-        t("auto.requestClosedSuccessfully"),
-      );
+      showToast(t("auto.requestClosedSuccessfully"));
     } catch (err: any) {
-      alert(
-        err?.message ||
-          (t("auto.errorClosingRequest")),
-      );
+      alert(err?.message || t("auto.errorClosingRequest"));
     } finally {
       setActionLoadingId(null);
     }
@@ -232,14 +217,9 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_archive`);
     try {
       await archiveRequest(requestId);
-      showToast(
-        t("auto.requestArchivedSuccessfully"),
-      );
+      showToast(t("auto.requestArchivedSuccessfully"));
     } catch (err: any) {
-      alert(
-        err?.message ||
-          (t("auto.errorArchivingRequest")),
-      );
+      alert(err?.message || t("auto.errorArchivingRequest"));
     } finally {
       setActionLoadingId(null);
     }
@@ -249,14 +229,9 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_reopen`);
     try {
       await reopenRequest(requestId);
-      showToast(
-        t("auto.requestReopenedSuccessfully"),
-      );
+      showToast(t("auto.requestReopenedSuccessfully"));
     } catch (err: any) {
-      alert(
-        err?.message ||
-          (t("auto.errorReopeningRequest")),
-      );
+      alert(err?.message || t("auto.errorReopeningRequest"));
     } finally {
       setActionLoadingId(null);
     }
@@ -266,14 +241,9 @@ export const AdminRequests: React.FC<Props> = ({
     setActionLoadingId(`${requestId}_clone`);
     try {
       await cloneRequest(requestId);
-      showToast(
-        t("auto.requestClonedSuccessfully"),
-      );
+      showToast(t("auto.requestClonedSuccessfully"));
     } catch (err: any) {
-      alert(
-        err?.message ||
-          (t("auto.errorCloningRequest")),
-      );
+      alert(err?.message || t("auto.errorCloningRequest"));
     } finally {
       setActionLoadingId(null);
     }
@@ -284,17 +254,12 @@ export const AdminRequests: React.FC<Props> = ({
     try {
       const res = await deleteRequest(requestId);
       if (res.success) {
-        showToast(
-          t("auto.requestDeletedSuccessfully"),
-        );
+        showToast(t("auto.requestDeletedSuccessfully"));
       } else {
         alert(t("auto.failedToDeleteRequest"));
       }
     } catch (err: any) {
-      alert(
-        err?.message ||
-          (t("auto.errorDeletingRequest")),
-      );
+      alert(err?.message || t("auto.errorDeletingRequest"));
     } finally {
       setActionLoadingId(null);
       setDeleteConfirmRequest(null);

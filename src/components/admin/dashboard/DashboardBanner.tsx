@@ -32,9 +32,7 @@ export const DashboardBanner: React.FC<DashboardBannerProps> = ({
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-600/50 text-purple-200 hover:text-white text-xs font-bold transition-all cursor-pointer"
         >
           <Building2 className="w-4 h-4" />
-          <span>
-            {i18n.t("auto.branchesZones")}
-          </span>
+          <span>{i18n.t("auto.branchesZones")}</span>
         </button>
 
         <button
@@ -50,14 +48,10 @@ export const DashboardBanner: React.FC<DashboardBannerProps> = ({
           type="button"
           onClick={() => onNavigate("settings")}
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-600/50 text-purple-200 hover:text-white text-xs font-bold transition-all cursor-pointer"
-          title={
-            i18n.t("auto.systemSettingsDatabase")
-          }
+          title={i18n.t("auto.systemSettingsDatabase")}
         >
           <Settings className="w-4 h-4" />
-          <span>
-            {i18n.t("auto.settingsDb")}
-          </span>
+          <span>{i18n.t("auto.settingsDb")}</span>
         </button>
       </div>
     </div>

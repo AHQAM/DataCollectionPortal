@@ -55,9 +55,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
             <UserPlus className="w-5 h-5 text-purple-900" />
-            <span>
-              {i18n.t("auto.newFieldSupervisor")}
-            </span>
+            <span>{i18n.t("auto.newFieldSupervisor")}</span>
           </h3>
           <button
             onClick={onClose}
@@ -70,8 +68,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4 pt-4 text-xs">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.supervisorNameArabic")}{" "}
-              *
+              {i18n.t("auto.supervisorNameArabic")} *
             </label>
             <input
               type="text"
@@ -85,8 +82,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.employeeIdCode")}{" "}
-              *
+              {i18n.t("auto.employeeIdCode")} *
             </label>
             <input
               type="text"

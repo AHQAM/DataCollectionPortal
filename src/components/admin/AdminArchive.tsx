@@ -56,9 +56,7 @@ export const AdminArchive: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Archive className="w-5 h-5 text-purple-700" />
-            <span>
-              {t("auto.historicalCampaignArchive")}
-            </span>
+            <span>{t("auto.historicalCampaignArchive")}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             {t("auto.permanentRetentionOfCompleted")}
@@ -66,8 +64,7 @@ export const AdminArchive: React.FC = () => {
         </div>
 
         <span className="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200">
-          {archivedRequests.length}{" "}
-          {t("auto.archivedCampaigns")}
+          {archivedRequests.length} {t("auto.archivedCampaigns")}
         </span>
       </div>
 
@@ -84,9 +81,7 @@ export const AdminArchive: React.FC = () => {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={
-            t("auto.searchArchive")
-          }
+          placeholder={t("auto.searchArchive")}
           className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
         />
         <Search className="w-4 h-4 text-slate-400 absolute top-3 start-3" />
@@ -142,8 +137,7 @@ export const AdminArchive: React.FC = () => {
                     </span>
                   </div>
                   <div className="font-bold text-slate-800">
-                    {completed}/{reqRecords.length}{" "}
-                    {t("auto.completed")}
+                    {completed}/{reqRecords.length} {t("auto.completed")}
                   </div>
                 </div>
 
@@ -153,17 +147,13 @@ export const AdminArchive: React.FC = () => {
                     className="flex-1 h-9 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 text-xs font-bold flex items-center justify-center gap-1.5 border border-purple-200"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    <span>
-                      {t("auto.reopenRequest")}
-                    </span>
+                    <span>{t("auto.reopenRequest")}</span>
                   </button>
 
                   <button
                     onClick={() => handleDriveBackup(req.requestCode)}
                     className="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5"
-                    title={
-                      t("auto.syncToGoogleDrive")
-                    }
+                    title={t("auto.syncToGoogleDrive")}
                   >
                     <Cloud className="w-3.5 h-3.5 text-purple-700" />
                     <span>Drive</span>

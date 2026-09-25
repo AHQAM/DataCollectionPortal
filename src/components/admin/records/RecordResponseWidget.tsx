@@ -44,9 +44,7 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
             : "bg-rose-100 text-rose-800"
         }`}
       >
-        {isYes
-          ? "✓ " + (i18n.t("auto.yes"))
-          : "✕ " + (i18n.t("auto.no"))}
+        {isYes ? "✓ " + i18n.t("auto.yes") : "✕ " + i18n.t("auto.no")}
       </span>
     );
   }
@@ -128,9 +126,7 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
             className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline"
           >
             <Compass className="w-3.5 h-3.5" />
-            <span>
-              {i18n.t("auto.openInGoogleMaps")}
-            </span>
+            <span>{i18n.t("auto.openInGoogleMaps")}</span>
           </a>
         )}
       </div>

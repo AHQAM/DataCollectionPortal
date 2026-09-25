@@ -125,21 +125,16 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               >
                 <option value="low">{i18n.t("auto.low")}</option>
-                <option value="medium">
-                  {i18n.t("auto.medium")}
-                </option>
+                <option value="medium">{i18n.t("auto.medium")}</option>
                 <option value="high">{i18n.t("auto.high")}</option>
-                <option value="urgent">
-                  {i18n.t("auto.urgent")}
-                </option>
+                <option value="urgent">{i18n.t("auto.urgent")}</option>
               </select>
             </div>
           </div>
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.requestTitleArabic")}{" "}
-              *
+              {i18n.t("auto.requestTitleArabic")} *
             </label>
             <input
               type="text"
@@ -159,9 +154,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
               type="text"
               value={newTitleEn}
               onChange={(e) => setNewTitleEn(e.target.value)}
-              placeholder={
-                i18n.t("auto.optional")
-              }
+              placeholder={i18n.t("auto.optional")}
               className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
             />
           </div>
@@ -179,12 +172,8 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 <option value="per_record">
                   {i18n.t("auto.perRecordTargetEntity")}
                 </option>
-                <option value="per_rep">
-                  {i18n.t("auto.perUser")}
-                </option>
-                <option value="per_region">
-                  {i18n.t("auto.perRegion")}
-                </option>
+                <option value="per_rep">{i18n.t("auto.perUser")}</option>
+                <option value="per_region">{i18n.t("auto.perRegion")}</option>
               </select>
             </div>
 
@@ -211,9 +200,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 type="text"
                 value={newTargetEntityLabelAr}
                 onChange={(e) => setNewTargetEntityLabelAr(e.target.value)}
-                placeholder={
-                  i18n.t("auto.egCustomerStoreSchool")
-                }
+                placeholder={i18n.t("auto.egCustomerStoreSchool")}
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               />
             </div>
@@ -249,9 +236,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 font-extrabold text-purple-950">
                 <Building className="w-4 h-4 text-purple-700" />
-                <span>
-                  {i18n.t("auto.targetBranchesZones")}
-                </span>
+                <span>{i18n.t("auto.targetBranchesZones")}</span>
               </div>
               <div className="flex gap-2">
                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
@@ -262,9 +247,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                     onChange={() => setNewTargetScope("ALL")}
                     className="text-purple-900"
                   />
-                  <span>
-                    {i18n.t("auto.allBranchesZones")}
-                  </span>
+                  <span>{i18n.t("auto.allBranchesZones")}</span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
                   <input
@@ -274,9 +257,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                     onChange={() => setNewTargetScope("SPECIFIC")}
                     className="text-purple-900"
                   />
-                  <span>
-                    {i18n.t("auto.specificBranches")}
-                  </span>
+                  <span>{i18n.t("auto.specificBranches")}</span>
                 </label>
               </div>
             </div>
@@ -370,9 +351,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 onChange={(e) => setNewAllowEdit(e.target.checked)}
                 className="rounded text-purple-900"
               />
-              <span>
-                {i18n.t("auto.allowEditingAfterSubmit")}
-              </span>
+              <span>{i18n.t("auto.allowEditingAfterSubmit")}</span>
             </label>
 
             <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-700">
@@ -382,9 +361,7 @@ export const CreateRequestModal: React.FC<CreateRequestModalProps> = ({
                 onChange={(e) => setNewRequireSupervisor(e.target.checked)}
                 className="rounded text-purple-900"
               />
-              <span>
-                {i18n.t("auto.requireSupervisorApproval")}
-              </span>
+              <span>{i18n.t("auto.requireSupervisorApproval")}</span>
             </label>
           </div>
 

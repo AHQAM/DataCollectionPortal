@@ -53,8 +53,7 @@ export const BranchesTabsAndFilters: React.FC<BranchesTabsAndFiltersProps> = ({
         >
           <MapPin className="w-4 h-4" />
           <span>
-            {i18n.t("auto.fieldRegions")} (
-            {regions.length})
+            {i18n.t("auto.fieldRegions")} ({regions.length})
           </span>
         </button>
       </div>
@@ -68,9 +67,7 @@ export const BranchesTabsAndFilters: React.FC<BranchesTabsAndFiltersProps> = ({
               onChange={(e) => setSelectedBranchId(e.target.value)}
               className="h-9 px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 bg-slate-50 focus:outline-hidden"
             >
-              <option value="ALL">
-                {i18n.t("auto.allBranches")}
-              </option>
+              <option value="ALL">{i18n.t("auto.allBranches")}</option>
               {branches.map((b) => (
                 <option key={b.branchId} value={b.branchId}>
                   {lang === "ar" ? b.branchNameAr : b.branchNameEn}
@@ -86,9 +83,7 @@ export const BranchesTabsAndFilters: React.FC<BranchesTabsAndFiltersProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              i18n.t("auto.searchByNameOr")
-            }
+            placeholder={i18n.t("auto.searchByNameOr")}
             className="w-full h-9 ps-8 pe-3 rounded-xl border border-slate-200 text-xs font-medium focus:outline-hidden focus:border-purple-600 bg-slate-50"
           />
         </div>

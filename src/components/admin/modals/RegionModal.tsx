@@ -91,8 +91,7 @@ export const RegionModal: React.FC<RegionModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.regionNumber")}{" "}
-              *
+              {i18n.t("auto.regionNumber")} *
             </label>
             <input
               type="text"
@@ -109,8 +108,7 @@ export const RegionModal: React.FC<RegionModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.regionNameArabic")}{" "}
-              *
+              {i18n.t("auto.regionNameArabic")} *
             </label>
             <input
               type="text"

@@ -2,7 +2,6 @@ import i18n from "../../../i18n";
 import React from "react";
 import { RequestField } from "../../../types";
 import {
-
   FileSpreadsheet,
   Building,
   FileText,
@@ -46,9 +45,7 @@ export const ImportStepMapping: React.FC<Props> = ({
         <div>
           <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
             <FileSpreadsheet className="w-4 h-4 text-emerald-700" />
-            <span>
-              {i18n.t("auto.columnFieldMapping")}
-            </span>
+            <span>{i18n.t("auto.columnFieldMapping")}</span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             {lang === "ar"
@@ -68,9 +65,7 @@ export const ImportStepMapping: React.FC<Props> = ({
             onClick={onValidate}
             className="px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-md cursor-pointer"
           >
-            <span>
-              {i18n.t("auto.nextValidateData")}
-            </span>
+            <span>{i18n.t("auto.nextValidateData")}</span>
             {dir === "rtl" ? (
               <ArrowLeft className="w-4 h-4" />
             ) : (
@@ -84,9 +79,7 @@ export const ImportStepMapping: React.FC<Props> = ({
       <div className="space-y-3">
         <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
           <Building className="w-4 h-4 text-purple-700" />
-          <span>
-            {i18n.t("auto.aSystemRoutingFields")}
-          </span>
+          <span>{i18n.t("auto.aSystemRoutingFields")}</span>
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
@@ -133,9 +126,7 @@ export const ImportStepMapping: React.FC<Props> = ({
               }
               className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900"
             >
-              <option value="">
-                {i18n.t("auto.selectTargetRecordId")}
-              </option>
+              <option value="">{i18n.t("auto.selectTargetRecordId")}</option>
               {fileHeaders.map((h) => (
                 <option key={h} value={h}>
                   عمود: {h}
@@ -161,9 +152,7 @@ export const ImportStepMapping: React.FC<Props> = ({
               }
               className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900"
             >
-              <option value="">
-                {i18n.t("auto.selectTargetRecordName")}
-              </option>
+              <option value="">{i18n.t("auto.selectTargetRecordName")}</option>
               {fileHeaders.map((h) => (
                 <option key={h} value={h}>
                   عمود: {h}
@@ -184,9 +173,7 @@ export const ImportStepMapping: React.FC<Props> = ({
               }
               className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900"
             >
-              <option value="">
-                {i18n.t("auto.autoFromUserRegion")}
-              </option>
+              <option value="">{i18n.t("auto.autoFromUserRegion")}</option>
               {fileHeaders.map((h) => (
                 <option key={h} value={h}>
                   عمود: {h}
@@ -293,9 +280,7 @@ export const ImportStepMapping: React.FC<Props> = ({
                 className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900 focus:ring-2 focus:ring-purple-600"
               >
                 <option value="">
-                  --{" "}
-                  {i18n.t("auto.ignoreLeaveBlank")}{" "}
-                  --
+                  -- {i18n.t("auto.ignoreLeaveBlank")} --
                 </option>
                 {fileHeaders.map((h) => (
                   <option key={h} value={h}>

@@ -49,9 +49,7 @@ export const useBranchOps = () => {
         if (!res.success) {
           return {
             success: false,
-            message:
-              res.message ||
-              (i18n.t("auto.cannotDeleteBranch")),
+            message: res.message || i18n.t("auto.cannotDeleteBranch"),
           };
         }
         logAudit("BRANCH_DELETED", "Branch", branchId, {});
@@ -107,9 +105,7 @@ export const useBranchOps = () => {
         if (!res.success) {
           return {
             success: false,
-            message:
-              res.message ||
-              (i18n.t("auto.cannotDeleteRegion")),
+            message: res.message || i18n.t("auto.cannotDeleteRegion"),
           };
         }
         logAudit("REGION_DELETED", "Region", regionNo, {});

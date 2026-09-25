@@ -148,9 +148,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
             />
             <div className="flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-amber-700" />
-              <span>
-                {i18n.t("auto.readonlyFieldImportedVia")}
-              </span>
+              <span>{i18n.t("auto.readonlyFieldImportedVia")}</span>
             </div>
           </label>
           <p className="text-[11px] text-amber-800/90 leading-relaxed ps-6">
@@ -320,9 +318,7 @@ export const FieldPropertiesEditor: React.FC<FieldPropertiesEditorProps> = ({
               }}
               className="h-8 px-2 rounded border border-slate-300 text-[11px]"
             >
-              <option value="">
-                {i18n.t("auto.noCondition")}
-              </option>
+              <option value="">{i18n.t("auto.noCondition")}</option>
               {formFields
                 .filter((f) => f.fieldId !== selectedField.fieldId)
                 .map((f) => (

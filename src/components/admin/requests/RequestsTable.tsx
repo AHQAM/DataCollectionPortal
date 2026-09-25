@@ -52,15 +52,11 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({
               <th className="px-4 py-3 text-start">
                 {i18n.t("auto.typePriority")}
               </th>
-              <th className="px-4 py-3 text-start">
-                {i18n.t("auto.dueDate")}
-              </th>
+              <th className="px-4 py-3 text-start">{i18n.t("auto.dueDate")}</th>
               <th className="px-4 py-3 text-start">
                 {i18n.t("auto.records1")}
               </th>
-              <th className="px-4 py-3 text-start">
-                {i18n.t("auto.status")}
-              </th>
+              <th className="px-4 py-3 text-start">{i18n.t("auto.status")}</th>
               <th className="px-4 py-3 text-center">
                 {i18n.t("auto.actions")}
               </th>

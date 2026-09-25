@@ -79,9 +79,7 @@ export const AuthPortal: React.FC = () => {
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="bg-purple-50/70 border border-purple-200/80 rounded-2xl p-3 text-xs text-purple-950 flex items-start gap-2">
               <LayoutDashboard className="w-4 h-4 text-purple-700 shrink-0 mt-0.5" />
-              <p className="leading-relaxed">
-                {t("auth.portalDescription")}
-              </p>
+              <p className="leading-relaxed">{t("auth.portalDescription")}</p>
             </div>
 
             {error && (

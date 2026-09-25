@@ -88,9 +88,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
           <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
             <Edit className="w-4 h-4 text-purple-700" />
-            <span>
-              {i18n.t("auto.editRequestDetailsScope")}
-            </span>
+            <span>{i18n.t("auto.editRequestDetailsScope")}</span>
             <span className="text-purple-700 font-mono text-xs">
               ({request.requestCode})
             </span>
@@ -117,13 +115,9 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               >
                 <option value="low">{i18n.t("auto.low")}</option>
-                <option value="medium">
-                  {i18n.t("auto.medium")}
-                </option>
+                <option value="medium">{i18n.t("auto.medium")}</option>
                 <option value="high">{i18n.t("auto.high")}</option>
-                <option value="urgent">
-                  {i18n.t("auto.urgent")}
-                </option>
+                <option value="urgent">{i18n.t("auto.urgent")}</option>
               </select>
             </div>
             <div>
@@ -174,9 +168,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 type="text"
                 value={editTargetEntityLabelAr}
                 onChange={(e) => setEditTargetEntityLabelAr(e.target.value)}
-                placeholder={
-                  i18n.t("auto.egCustomerStoreSchool")
-                }
+                placeholder={i18n.t("auto.egCustomerStoreSchool")}
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               />
             </div>
@@ -211,9 +203,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 font-extrabold text-purple-950">
                 <Building className="w-4 h-4 text-purple-700" />
-                <span>
-                  {i18n.t("auto.targetBranchesZones")}
-                </span>
+                <span>{i18n.t("auto.targetBranchesZones")}</span>
               </div>
               <div className="flex gap-2">
                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
@@ -224,9 +214,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                     onChange={() => setEditTargetScope("ALL")}
                     className="text-purple-900"
                   />
-                  <span>
-                    {i18n.t("auto.allBranches")}
-                  </span>
+                  <span>{i18n.t("auto.allBranches")}</span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
                   <input
@@ -236,9 +224,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                     onChange={() => setEditTargetScope("SPECIFIC")}
                     className="text-purple-900"
                   />
-                  <span>
-                    {i18n.t("auto.specific")}
-                  </span>
+                  <span>{i18n.t("auto.specific")}</span>
                 </label>
               </div>
             </div>

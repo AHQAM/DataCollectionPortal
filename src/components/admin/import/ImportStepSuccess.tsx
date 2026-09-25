@@ -66,9 +66,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
             className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md cursor-pointer transition-all flex items-center gap-1.5"
           >
             <Smartphone className="w-4 h-4" />
-            <span>
-              {i18n.t("auto.previewInMobileView")}
-            </span>
+            <span>{i18n.t("auto.previewInMobileView")}</span>
           </button>
         )}
 

@@ -131,8 +131,7 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
                   )}
                   {branchRegions.length > 4 && (
                     <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">
-                      +{branchRegions.length - 4}{" "}
-                      {i18n.t("auto.more")}
+                      +{branchRegions.length - 4} {i18n.t("auto.more")}
                     </span>
                   )}
                 </div>
@@ -144,12 +143,8 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
                 onClick={() => onSelectBranchAndSwitchToRegions(b.branchId)}
                 className="text-xs font-bold text-purple-900 hover:text-purple-700 flex items-center gap-1 cursor-pointer"
               >
-                <span>
-                  {i18n.t("auto.viewAddZones")}
-                </span>
-                <ArrowRight
-                  className={`w-3.5 h-3.5 ${i18n.t("auto.str")}`}
-                />
+                <span>{i18n.t("auto.viewAddZones")}</span>
+                <ArrowRight className={`w-3.5 h-3.5 ${i18n.t("auto.str")}`} />
               </button>
 
               <button

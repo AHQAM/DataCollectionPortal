@@ -30,9 +30,7 @@ export const RequestFilters: React.FC<RequestFiltersProps> = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="bg-white border border-slate-200/80 text-slate-900 text-sm rounded-xl focus:ring-purple-500 focus:border-purple-500 block w-full ps-10 p-2 shadow-xs transition-all"
-          placeholder={
-            i18n.t("auto.searchByTitleCode")
-          }
+          placeholder={i18n.t("auto.searchByTitleCode")}
         />
       </div>
 

@@ -12,7 +12,7 @@ interface BroadcastNotificationModalProps {
 export const BroadcastNotificationModal: React.FC<
   BroadcastNotificationModalProps
 > = ({ isOpen, onClose }) => {
-  const { lang, dir , t} = useApp();
+  const { lang, dir, t } = useApp();
 
   const [targetAudience, setTargetAudience] = useState<
     "ALL" | "REPRESENTATIVES" | "SUPERVISORS"
@@ -41,8 +41,7 @@ export const BroadcastNotificationModal: React.FC<
     ) {
       setStatusMessage({
         type: "error",
-        text:
-          t("auto.pleaseFillAllRequired"),
+        text: t("auto.pleaseFillAllRequired"),
       });
       return;
     }
@@ -101,9 +100,7 @@ export const BroadcastNotificationModal: React.FC<
       console.error("Error sending broadcast notification:", err);
       setStatusMessage({
         type: "error",
-        text:
-          err?.message ||
-          (t("auto.failedToSendNotification")),
+        text: err?.message || t("auto.failedToSendNotification"),
       });
     } finally {
       setIsSubmitting(false);
@@ -162,9 +159,7 @@ export const BroadcastNotificationModal: React.FC<
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-purple-700" />
-              <span>
-                {t("auto.targetAudience")}
-              </span>
+              <span>{t("auto.targetAudience")}</span>
             </label>
             <div className="grid grid-cols-3 gap-2">
               {(
@@ -209,9 +204,7 @@ export const BroadcastNotificationModal: React.FC<
                 required
                 value={titleAr}
                 onChange={(e) => setTitleAr(e.target.value)}
-                placeholder={
-                  t("auto.egImportantNoticeTo")
-                }
+                placeholder={t("auto.egImportantNoticeTo")}
                 className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-slate-50 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent font-medium"
               />
             </div>
@@ -291,9 +284,7 @@ export const BroadcastNotificationModal: React.FC<
             >
               <Send className="w-3.5 h-3.5" />
               <span>
-                {isSubmitting
-                  ? t("auto.sending")
-                  : t("auto.sendBroadcastNow")}
+                {isSubmitting ? t("auto.sending") : t("auto.sendBroadcastNow")}
               </span>
             </button>
           </div>

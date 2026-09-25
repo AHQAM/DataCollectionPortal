@@ -93,9 +93,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                 <option value="SUPERVISOR">
                   {i18n.t("auto.branchSupervisor")}
                 </option>
-                <option value="ADMIN">
-                  {i18n.t("auto.systemAdmin")}
-                </option>
+                <option value="ADMIN">{i18n.t("auto.systemAdmin")}</option>
               </select>
             </div>
 

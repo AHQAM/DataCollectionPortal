@@ -83,9 +83,7 @@ export const useUserOps = () => {
           allowedRegionNos:
             user.allowedRegionNos || (user.regionNo ? [user.regionNo] : []),
           userNo: user.userNo || `REP-${Date.now().toString().slice(-4)}`,
-          userNameAr:
-            user.userNameAr ||
-            (i18n.t("auto.newRepresentative")),
+          userNameAr: user.userNameAr || i18n.t("auto.newRepresentative"),
           userNameEn: user.userNameEn || "",
           branchId: user.branchId || defaultBranch?.branchId || "",
           role: "REP",

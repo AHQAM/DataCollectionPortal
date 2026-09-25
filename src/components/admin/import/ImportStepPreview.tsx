@@ -34,9 +34,7 @@ export const ImportStepPreview: React.FC<Props> = ({
         <div>
           <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-700" />
-            <span>
-              {i18n.t("auto.validationQualitySummary")}
-            </span>
+            <span>{i18n.t("auto.validationQualitySummary")}</span>
           </h2>
           <p className="text-xs text-slate-500">
             {i18n.t("auto.checksCompletedForValid")}
@@ -125,9 +123,7 @@ export const ImportStepPreview: React.FC<Props> = ({
       {/* Valid Rows Preview Table */}
       <div className="border border-slate-200 rounded-xl overflow-hidden text-xs">
         <div className="bg-slate-100 p-2.5 font-bold text-slate-800 flex items-center justify-between">
-          <span>
-            {i18n.t("auto.previewValidRows")}
-          </span>
+          <span>{i18n.t("auto.previewValidRows")}</span>
           <span className="text-xs text-slate-500 font-normal">
             {lang === "ar"
               ? `عرض أول ${Math.min(validRows.length, 5)} سجلات`
@@ -139,15 +135,9 @@ export const ImportStepPreview: React.FC<Props> = ({
           <table className="w-full text-start">
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold text-[11px]">
               <tr>
-                <th className="p-2 text-start">
-                  {i18n.t("auto.region")}
-                </th>
-                <th className="p-2 text-start">
-                  {i18n.t("auto.recordId1")}
-                </th>
-                <th className="p-2 text-start">
-                  {i18n.t("auto.targetName")}
-                </th>
+                <th className="p-2 text-start">{i18n.t("auto.region")}</th>
+                <th className="p-2 text-start">{i18n.t("auto.recordId1")}</th>
+                <th className="p-2 text-start">{i18n.t("auto.targetName")}</th>
                 {requestFields.slice(0, 4).map((f) => (
                   <th key={f.fieldId} className="p-2 text-start">
                     {lang === "ar" ? f.fieldLabelAr : f.fieldLabelEn}

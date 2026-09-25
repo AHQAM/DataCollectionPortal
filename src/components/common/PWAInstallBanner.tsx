@@ -205,9 +205,7 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
                 </span>
                 <span className="text-slate-500 text-[11px] flex items-center gap-1 mt-0.5">
                   <Share className="w-3.5 h-3.5 text-blue-600 inline" />
-                  <span>
-                    {i18n.t("auto.inBrowserToolbarOr")}
-                  </span>
+                  <span>{i18n.t("auto.inBrowserToolbarOr")}</span>
                 </span>
               </div>
             </div>
@@ -222,9 +220,7 @@ const IOSGuideModal: React.FC<{ onClose: () => void; lang: string }> = ({
                 </span>
                 <span className="text-slate-500 text-[11px] flex items-center gap-1 mt-0.5">
                   <PlusSquare className="w-3.5 h-3.5 text-purple-700 inline" />
-                  <span>
-                    {i18n.t("auto.addToHomeScreen")}
-                  </span>
+                  <span>{i18n.t("auto.addToHomeScreen")}</span>
                 </span>
               </div>
             </div>

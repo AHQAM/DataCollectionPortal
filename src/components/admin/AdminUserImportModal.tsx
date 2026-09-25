@@ -35,7 +35,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
   onClose,
   onSuccess,
 }) => {
-  const { lang, users, branches, importUsersBatch , t} = useApp();
+  const { lang, users, branches, importUsersBatch, t } = useApp();
 
   const [fileName, setFileName] = useState<string | null>(null);
   const [parsedRows, setParsedRows] = useState<ParsedRepRow[]>([]);
@@ -91,9 +91,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
         const jsonRows: any[] = XLSX.utils.sheet_to_json(worksheet);
 
         if (!jsonRows || jsonRows.length === 0) {
-          setErrorMsg(
-            t("auto.theFileIsEmpty"),
-          );
+          setErrorMsg(t("auto.theFileIsEmpty"));
           setParsedRows([]);
           setTotalRawRows(0);
           return;
@@ -106,9 +104,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
         setParsedRows(processed);
       } catch (err) {
         console.error("Failed to parse excel file:", err);
-        setErrorMsg(
-          t("auto.errorReadingExcelFile"),
-        );
+        setErrorMsg(t("auto.errorReadingExcelFile"));
       }
     };
 
@@ -124,8 +120,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
 
     const newUsers: User[] = validRows.map((r) => {
       const rawBranchName = r.branchName?.trim();
-      const exactBranchName =
-        rawBranchName || (t("auto.mainBranch"));
+      const exactBranchName = rawBranchName || t("auto.mainBranch");
 
       const matchedBranch = branches.find(
         (b) =>
@@ -184,10 +179,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
       }
     } catch (err: any) {
       console.error("Failed to import users batch:", err);
-      setErrorMsg(
-        err?.message ||
-          (t("auto.errorImportingUsersPlease")),
-      );
+      setErrorMsg(err?.message || t("auto.errorImportingUsersPlease"));
     } finally {
       setIsSubmitting(false);
     }
@@ -206,9 +198,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
             </div>
             <div>
               <h2 className="text-base font-extrabold flex items-center gap-2">
-                <span>
-                  {t("auto.importUsersViaExcel")}
-                </span>
+                <span>{t("auto.importUsersViaExcel")}</span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
                   {t("auto.verified")}
                 </span>
@@ -239,9 +229,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
                 <span className="font-bold">
                   {t("auto.bestPracticeForMultiregion")}
                 </span>
-                <span>
-                  {t("auto.aSingleUserAccount")}
-                </span>
+                <span>{t("auto.aSingleUserAccount")}</span>
               </div>
             </div>
 
@@ -274,9 +262,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
             <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
               <KeyRound className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <div>
-                <div className="font-bold">
-                  {t("auto.securityPinPolicy")}
-                </div>
+                <div className="font-bold">{t("auto.securityPinPolicy")}</div>
                 <p className="text-[11px] text-amber-800 mt-0.5">
                   {t("auto.importedRepresentativesReceiveA")}
                 </p>
@@ -295,9 +281,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-purple-900 text-xs font-bold border border-purple-300 transition-colors cursor-pointer"
               >
                 <Download className="w-4 h-4 text-purple-700" />
-                <span>
-                  {t("auto.exportExcel")}
-                </span>
+                <span>{t("auto.exportExcel")}</span>
               </button>
 
               <button

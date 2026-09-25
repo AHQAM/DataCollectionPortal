@@ -241,9 +241,7 @@ export const AdminImportWizard: React.FC<Props> = ({
           <div>
             <h1 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <FileSpreadsheet className="w-5 h-5 text-emerald-700" />
-              <span>
-                {t("auto.campaignExcelDataImport")}
-              </span>
+              <span>{t("auto.campaignExcelDataImport")}</span>
             </h1>
             <p className="text-xs text-slate-500">
               {t("auto.importSpreadsheetsAutoassignTo")}
@@ -255,14 +253,10 @@ export const AdminImportWizard: React.FC<Props> = ({
           <button
             onClick={handleDownloadCustomTemplate}
             className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold flex items-center gap-2 border border-emerald-300 transition-all cursor-pointer shadow-2xs"
-            title={
-              t("auto.downloadTemplate")
-            }
+            title={t("auto.downloadTemplate")}
           >
             <Download className="w-4 h-4 text-emerald-700" />
-            <span>
-              {t("auto.downloadCustomExcelTemplate")}
-            </span>
+            <span>{t("auto.downloadCustomExcelTemplate")}</span>
           </button>
         )}
       </div>

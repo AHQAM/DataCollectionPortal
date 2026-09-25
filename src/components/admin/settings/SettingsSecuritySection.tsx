@@ -23,9 +23,7 @@ export const SettingsSecuritySection: React.FC<
     <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
       <div className="flex items-center gap-2 text-xs font-extrabold text-purple-950 pb-2 border-b border-slate-100">
         <Shield className="w-4 h-4 text-purple-700" />
-        <span>
-          {i18n.t("auto.passwordLockoutSecurityPolicy")}
-        </span>
+        <span>{i18n.t("auto.passwordLockoutSecurityPolicy")}</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
@@ -65,9 +63,7 @@ export const SettingsSecuritySection: React.FC<
       </div>
 
       <div className="p-3 bg-purple-50/70 rounded-xl text-xs space-y-1 text-purple-950">
-        <div className="font-bold">
-          {i18n.t("auto.enforcedSecurityRules")}
-        </div>
+        <div className="font-bold">{i18n.t("auto.enforcedSecurityRules")}</div>
         <div className="text-[11px] text-slate-600">
           • يتم إنشاء كلمة مرور مؤقتة وفريدة للحسابات الجديدة.
         </div>

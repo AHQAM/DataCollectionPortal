@@ -81,8 +81,7 @@ export const BranchModal: React.FC<BranchModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {i18n.t("auto.branchNameArabic")}{" "}
-              *
+              {i18n.t("auto.branchNameArabic")} *
             </label>
             <input
               type="text"

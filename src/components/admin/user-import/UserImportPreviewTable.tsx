@@ -40,8 +40,7 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
         <div className="flex items-center gap-2 text-[11px] font-bold">
           {multiRegionCount > 0 && (
             <span className="px-2 py-0.5 rounded-md bg-purple-100 text-purple-900 border border-purple-200">
-              {multiRegionCount}{" "}
-              {i18n.t("auto.multiregionUsers")}
+              {multiRegionCount} {i18n.t("auto.multiregionUsers")}
             </span>
           )}
           <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">

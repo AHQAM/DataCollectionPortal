@@ -93,9 +93,7 @@ export const useBranchesExcelImport = (
         const jsonData = XLSX.utils.sheet_to_json<Record<string, any>>(ws);
 
         if (!jsonData || jsonData.length === 0) {
-          setExcelParseError(
-            i18n.t("auto.theFileIsEmpty"),
-          );
+          setExcelParseError(i18n.t("auto.theFileIsEmpty"));
           return;
         }
 
@@ -192,9 +190,7 @@ export const useBranchesExcelImport = (
 
         const parsedB = Array.from(branchesMap.values());
         if (parsedB.length === 0 && regionsList.length === 0) {
-          setExcelParseError(
-            i18n.t("auto.noMatchingColumnsFound"),
-          );
+          setExcelParseError(i18n.t("auto.noMatchingColumnsFound"));
           return;
         }
 

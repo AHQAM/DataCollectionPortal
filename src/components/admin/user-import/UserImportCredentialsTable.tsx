@@ -33,9 +33,7 @@ export const UserImportCredentialsTable: React.FC<
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
         >
           <Download className="w-4 h-4" />
-          <span>
-            {i18n.t("auto.downloadCredentialsExcel")}
-          </span>
+          <span>{i18n.t("auto.downloadCredentialsExcel")}</span>
         </button>
       </div>
 

@@ -26,8 +26,7 @@ export const useRecordOps = () => {
           return {
             success: true,
             isOffline: true,
-            message:
-              i18n.t("auto.draftSavedOfflineWill"),
+            message: i18n.t("auto.draftSavedOfflineWill"),
           };
         } catch (queueErr) {
           return { success: false, error: queueErr };
@@ -57,8 +56,7 @@ export const useRecordOps = () => {
           return {
             success: true,
             conflict: true,
-            message:
-              i18n.t("auto.noticeANewerVersion"),
+            message: i18n.t("auto.noticeANewerVersion"),
           };
         }
         logAudit("RECORD_DRAFT_SAVED", "Record", recordId, {
@@ -90,8 +88,7 @@ export const useRecordOps = () => {
           return {
             success: true,
             isOffline: true,
-            message:
-              i18n.t("auto.submittedOfflineWillSync"),
+            message: i18n.t("auto.submittedOfflineWillSync"),
           };
         } catch (queueErr) {
           return {
@@ -125,8 +122,7 @@ export const useRecordOps = () => {
             return {
               success: true,
               conflict: true,
-              message:
-                i18n.t("auto.responseSavedWithTimestamp"),
+              message: i18n.t("auto.responseSavedWithTimestamp"),
             };
           }
           logAudit("RECORD_COMPLETED", "Record", recordId, {
@@ -135,8 +131,7 @@ export const useRecordOps = () => {
           });
           return {
             success: true,
-            message:
-              i18n.t("auto.savedAndSubmittedSuccessfully"),
+            message: i18n.t("auto.savedAndSubmittedSuccessfully"),
           };
         }
         return {

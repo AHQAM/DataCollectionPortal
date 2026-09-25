@@ -27,8 +27,7 @@ export const BranchStatsHeader: React.FC<BranchStatsHeaderProps> = ({
           {branches.length}
         </div>
         <div className="text-[10px] text-purple-700 font-semibold mt-1">
-          {branches.filter((b) => b.isActive).length}{" "}
-          {i18n.t("auto.active")}
+          {branches.filter((b) => b.isActive).length} {i18n.t("auto.active")}
         </div>
       </div>
 
@@ -40,8 +39,7 @@ export const BranchStatsHeader: React.FC<BranchStatsHeaderProps> = ({
           {regions.length}
         </div>
         <div className="text-[10px] text-emerald-700 font-semibold mt-1">
-          {regions.filter((r) => r.isActive).length}{" "}
-          {i18n.t("auto.covered")}
+          {regions.filter((r) => r.isActive).length} {i18n.t("auto.covered")}
         </div>
       </div>
 

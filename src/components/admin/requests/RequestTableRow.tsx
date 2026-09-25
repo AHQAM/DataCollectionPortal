@@ -2,7 +2,6 @@ import i18n from "../../../i18n";
 import React from "react";
 import { RequestItem } from "../../../types";
 import {
-
   Edit,
   Users,
   Sliders,
@@ -57,8 +56,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
           {lang === "ar" ? req.titleAr : req.titleEn}
         </div>
         <div className="text-[11px] text-purple-700 font-mono font-bold mt-0.5">
-          {req.requestCode} • {fieldsCount}{" "}
-          {i18n.t("auto.fields")}
+          {req.requestCode} • {fieldsCount} {i18n.t("auto.fields")}
         </div>
       </td>
 
@@ -88,9 +86,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
       </td>
 
       <td className="px-4 py-3.5 text-slate-600 font-mono">
-        {new Date(req.dueAt).toLocaleDateString(
-          i18n.t("auto.enus"),
-        )}
+        {new Date(req.dueAt).toLocaleDateString(i18n.t("auto.enus"))}
       </td>
 
       <td className="px-4 py-3.5">
@@ -122,9 +118,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onEdit(req)}
             className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-900 font-bold border border-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={
-              i18n.t("auto.editRequestDetailsScope")
-            }
+            title={i18n.t("auto.editRequestDetailsScope")}
           >
             <Edit className="w-3.5 h-3.5" />
           </button>
@@ -133,9 +127,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onViewAssignments(req)}
             className="p-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-900 font-bold border border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={
-              i18n.t("auto.viewAssignedRepsProgress")
-            }
+            title={i18n.t("auto.viewAssignedRepsProgress")}
           >
             <Users className="w-3.5 h-3.5" />
           </button>
@@ -153,9 +145,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onOpenImportWizard(req.requestId)}
             className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold border border-emerald-300 flex items-center gap-1 text-[11px] shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
-            title={
-              i18n.t("auto.importExcelData")
-            }
+            title={i18n.t("auto.importExcelData")}
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-700" />
             <span>{i18n.t("auto.excel")}</span>
@@ -165,9 +155,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
             disabled={actionLoadingId !== null}
             onClick={() => onViewResponses(req)}
             className="px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 font-bold border border-sky-300 flex items-center gap-1 text-[11px] shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
-            title={
-              i18n.t("auto.viewRecordsResponses")
-            }
+            title={i18n.t("auto.viewRecordsResponses")}
           >
             <span>{i18n.t("auto.records1")}</span>
           </button>

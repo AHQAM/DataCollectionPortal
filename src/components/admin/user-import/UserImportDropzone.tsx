@@ -1,7 +1,6 @@
 import i18n from "../../../i18n";
 import React, { useRef, useState } from "react";
 import {
-
   FileSpreadsheet,
   UploadCloud,
   Download,
@@ -50,9 +49,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-purple-50/70 rounded-2xl border border-purple-200/80">
         <div className="flex items-center gap-2 text-xs text-purple-950 font-bold">
           <Info className="w-4 h-4 text-purple-700 shrink-0" />
-          <span>
-            {i18n.t("auto.columnsUsernumberIdUsername")}
-          </span>
+          <span>{i18n.t("auto.columnsUsernumberIdUsername")}</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -62,9 +59,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-purple-100 text-purple-900 border border-purple-300 text-xs font-bold transition-all shadow-2xs cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 text-purple-700" />
-            <span>
-              {i18n.t("auto.downloadSampleTemplate")}
-            </span>
+            <span>{i18n.t("auto.downloadSampleTemplate")}</span>
           </button>
 
           <button
@@ -73,9 +68,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold transition-all shadow-2xs cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>
-              {i18n.t("auto.loadDemoSample")}
-            </span>
+            <span>{i18n.t("auto.loadDemoSample")}</span>
           </button>
         </div>
       </div>

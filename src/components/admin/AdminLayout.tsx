@@ -251,9 +251,7 @@ export const AdminLayout: React.FC = () => {
               <div className="p-4 border-b border-slate-100 flex items-center justify-between">
                 <div className="text-xs font-extrabold uppercase tracking-wider text-purple-900 flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-purple-700" />
-                  <span>
-                    {t("auto.managementPortal")}
-                  </span>
+                  <span>{t("auto.managementPortal")}</span>
                 </div>
                 <button
                   onClick={() => setIsSidebarOpen(false)}
@@ -309,7 +307,7 @@ export const AdminLayout: React.FC = () => {
                   <div className="font-extrabold text-xs text-slate-900 truncate">
                     {currentUser?.userNameAr ||
                       currentUser?.username ||
-                      (t("auto.user"))}
+                      t("auto.user")}
                   </div>
                   <div className="text-[10px] text-purple-700 font-bold truncate">
                     {currentUser?.role === "ADMIN"
@@ -371,7 +369,7 @@ export const AdminLayout: React.FC = () => {
               <div className="font-extrabold text-xs text-slate-900 truncate">
                 {currentUser?.userNameAr ||
                   currentUser?.username ||
-                  (t("auto.user"))}
+                  t("auto.user")}
               </div>
               <div className="text-[10px] text-purple-700 font-bold truncate">
                 {currentUser?.role === "ADMIN"

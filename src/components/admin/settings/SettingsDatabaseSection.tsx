@@ -1,7 +1,6 @@
 import i18n from "../../../i18n";
 import React from "react";
 import {
-
   Database,
   AlertOctagon,
   Trash2,
@@ -51,9 +50,7 @@ export const SettingsDatabaseSection: React.FC<
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
             <Database className="w-4 h-4 text-purple-700" />
-            <span>
-              {i18n.t("auto.databaseManagementProductionOps")}
-            </span>
+            <span>{i18n.t("auto.databaseManagementProductionOps")}</span>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">
             {i18n.t("auto.adminControl")}
@@ -99,9 +96,7 @@ export const SettingsDatabaseSection: React.FC<
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-rose-950 font-black text-xs">
               <AlertOctagon className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>
-                {i18n.t("auto.wipeDemoDataStart")}
-              </span>
+              <span>{i18n.t("auto.wipeDemoDataStart")}</span>
             </div>
             <p className="text-[11px] text-slate-600 max-w-xl leading-relaxed">
               {i18n.t("auto.purgeMockCustomerRecords")}
@@ -117,9 +112,7 @@ export const SettingsDatabaseSection: React.FC<
             className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-md transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
-            <span>
-              {i18n.t("auto.wipeDemoData")}
-            </span>
+            <span>{i18n.t("auto.wipeDemoData")}</span>
           </button>
         </div>
 
@@ -134,9 +127,7 @@ export const SettingsDatabaseSection: React.FC<
             className="px-4 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-300 text-purple-900 font-bold flex items-center gap-1.5 transition-all cursor-pointer"
           >
             <Download className="w-4 h-4 text-purple-700" />
-            <span>
-              {i18n.t("auto.exportJsonBackup")}
-            </span>
+            <span>{i18n.t("auto.exportJsonBackup")}</span>
           </button>
         </div>
       </div>
@@ -145,9 +136,7 @@ export const SettingsDatabaseSection: React.FC<
         <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3">
           <div className="flex items-center gap-2 text-xs font-extrabold text-slate-800">
             <RefreshCw className="w-4 h-4 text-slate-600" />
-            <span>
-              {i18n.t("auto.restoreDefaultSeedData")}
-            </span>
+            <span>{i18n.t("auto.restoreDefaultSeedData")}</span>
           </div>
           <p className="text-xs text-slate-600 leading-relaxed">
             {i18n.t("auto.developmentToolRestoreMock")}
@@ -180,9 +169,7 @@ export const SettingsDatabaseSection: React.FC<
               className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>
-                {i18n.t("auto.restoreInitialDemoData")}
-              </span>
+              <span>{i18n.t("auto.restoreInitialDemoData")}</span>
             </button>
           )}
         </div>
@@ -206,15 +193,11 @@ export const SettingsDatabaseSection: React.FC<
             <div className="my-4 p-4 bg-rose-50/60 rounded-2xl border border-rose-200/80 space-y-2 text-xs">
               <div className="font-extrabold text-rose-950 flex items-center gap-2">
                 <Check className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>
-                  {i18n.t("auto.purgeTestRecordsRequests")}
-                </span>
+                <span>{i18n.t("auto.purgeTestRecordsRequests")}</span>
               </div>
               <div className="font-extrabold text-rose-950 flex items-center gap-2">
                 <Check className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>
-                  {i18n.t("auto.preserveAdminUserSo")}
-                </span>
+                <span>{i18n.t("auto.preserveAdminUserSo")}</span>
               </div>
 
               <div className="pt-2 border-t border-rose-200 mt-2">
@@ -225,9 +208,7 @@ export const SettingsDatabaseSection: React.FC<
                     onChange={(e) => setWipeBranchesAlso(e.target.checked)}
                     className="mt-0.5 rounded text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer"
                   />
-                  <span>
-                    {i18n.t("auto.alsoWipeDemoBranches")}
-                  </span>
+                  <span>{i18n.t("auto.alsoWipeDemoBranches")}</span>
                 </label>
               </div>
             </div>
@@ -246,9 +227,7 @@ export const SettingsDatabaseSection: React.FC<
                 className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-md transition-all cursor-pointer flex items-center gap-1.5"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>
-                  {i18n.t("auto.confirmWipeStartClean")}
-                </span>
+                <span>{i18n.t("auto.confirmWipeStartClean")}</span>
               </button>
             </div>
           </div>

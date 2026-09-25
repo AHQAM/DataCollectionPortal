@@ -37,9 +37,7 @@ export const AssignmentsOverviewModal: React.FC<
           <div>
             <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
               <Users className="w-4 h-4 text-purple-700" />
-              <span>
-                {i18n.t("auto.assignedRepsFieldProgress")}
-              </span>
+              <span>{i18n.t("auto.assignedRepsFieldProgress")}</span>
             </h2>
             <div className="text-xs text-slate-500 mt-0.5">
               {lang === "ar" ? request.titleAr : request.titleEn} (
@@ -78,9 +76,7 @@ export const AssignmentsOverviewModal: React.FC<
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md inline-flex items-center gap-1.5 cursor-pointer"
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>
-                {i18n.t("auto.openExcelImportWizard")}
-              </span>
+              <span>{i18n.t("auto.openExcelImportWizard")}</span>
             </button>
           </div>
         ) : (

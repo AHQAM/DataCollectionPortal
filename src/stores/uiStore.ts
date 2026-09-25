@@ -93,13 +93,9 @@ export const useUIStore = create<UIStore>((set, get) => {
       set({ pushPermission: res });
       if (res === "granted") {
         const { lang } = get();
-        sendBrowserNotification(
-          i18n.t("auto.pushNotificationsEnabled"),
-          {
-            body:
-              i18n.t("auto.youWillNowReceive"),
-          },
-        );
+        sendBrowserNotification(i18n.t("auto.pushNotificationsEnabled"), {
+          body: i18n.t("auto.youWillNowReceive"),
+        });
         return true;
       }
       return false;

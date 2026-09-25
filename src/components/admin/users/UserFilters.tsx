@@ -27,9 +27,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <span className="text-purple-700">👤</span>
-            <span>
-              {i18n.t("auto.userManagement")}
-            </span>
+            <span>{i18n.t("auto.userManagement")}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             {i18n.t("auto.userAccountsMultiregionAssignments")}
@@ -42,9 +40,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
             className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs cursor-pointer transition-all"
           >
             <FileSpreadsheet className="w-4 h-4" />
-            <span>
-              {i18n.t("auto.importFromExcel")}
-            </span>
+            <span>{i18n.t("auto.importFromExcel")}</span>
           </button>
 
           <button
@@ -63,9 +59,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              i18n.t("auto.searchByUserName")
-            }
+            placeholder={i18n.t("auto.searchByUserName")}
             className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
           <Search className="w-4 h-4 text-slate-400 absolute top-3 start-3" />

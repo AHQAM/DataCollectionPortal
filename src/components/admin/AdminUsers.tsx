@@ -82,15 +82,11 @@ export const AdminUsers: React.FC = () => {
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRepNameAr.trim()) {
-      alert(
-        t("auto.arabicNameIsRequired"),
-      );
+      alert(t("auto.arabicNameIsRequired"));
       return;
     }
     if (!newRegionNo.trim()) {
-      alert(
-        t("auto.regionNoOrEmail"),
-      );
+      alert(t("auto.regionNoOrEmail"));
       return;
     }
     if (!newBranchId) {
@@ -113,9 +109,7 @@ export const AdminUsers: React.FC = () => {
         permissions: newRole === "SUPERVISOR" ? newPermissions : undefined,
       });
       setShowCreateModal(false);
-      showToast(
-        t("auto.userCreatedATemporary"),
-      );
+      showToast(t("auto.userCreatedATemporary"));
       // Reset form
       setNewRegionNo("");
       setNewRepNo("");
@@ -126,9 +120,7 @@ export const AdminUsers: React.FC = () => {
     } catch (err: any) {
       console.error(err);
       const msg =
-        err?.details?.message ||
-        err?.message ||
-        (t("auto.errorCreatingUser"));
+        err?.details?.message || err?.message || t("auto.errorCreatingUser");
       alert(msg);
     }
   };
@@ -160,18 +152,12 @@ export const AdminUsers: React.FC = () => {
           <table className="w-full text-start text-xs">
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-start">
-                  {t("auto.user")}
-                </th>
-                <th className="px-4 py-3 text-start">
-                  {t("auto.regionNo")}
-                </th>
+                <th className="px-4 py-3 text-start">{t("auto.user")}</th>
+                <th className="px-4 py-3 text-start">{t("auto.regionNo")}</th>
                 <th className="px-4 py-3 text-start">
                   {t("auto.allowedRegions")}
                 </th>
-                <th className="px-4 py-3 text-start">
-                  {t("auto.branch")}
-                </th>
+                <th className="px-4 py-3 text-start">{t("auto.branch")}</th>
                 <th className="px-4 py-3 text-start">
                   {t("auto.boundDevice")}
                 </th>

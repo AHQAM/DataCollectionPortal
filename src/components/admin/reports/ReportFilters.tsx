@@ -63,9 +63,7 @@ export const ReportFilters: React.FC<Props> = ({
           onChange={(e) => setSelectedBranchId(e.target.value)}
           className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold bg-white text-slate-800"
         >
-          <option value="ALL">
-            {i18n.t("auto.allBranches")}
-          </option>
+          <option value="ALL">{i18n.t("auto.allBranches")}</option>
           {branches.map((b) => (
             <option key={b.branchId} value={b.branchId}>
               {lang === "ar" ? b.branchNameAr : b.branchNameEn}
@@ -83,18 +81,10 @@ export const ReportFilters: React.FC<Props> = ({
           onChange={(e) => setSelectedStatus(e.target.value)}
           className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold bg-white text-slate-800"
         >
-          <option value="ALL">
-            {i18n.t("auto.allStatuses")}
-          </option>
-          <option value="Submitted">
-            {i18n.t("auto.submitted")}
-          </option>
-          <option value="Completed">
-            {i18n.t("auto.completed1")}
-          </option>
-          <option value="DraftSaved">
-            {i18n.t("auto.draftSaved")}
-          </option>
+          <option value="ALL">{i18n.t("auto.allStatuses")}</option>
+          <option value="Submitted">{i18n.t("auto.submitted")}</option>
+          <option value="Completed">{i18n.t("auto.completed1")}</option>
+          <option value="DraftSaved">{i18n.t("auto.draftSaved")}</option>
           <option value="Pending">{i18n.t("auto.pending")}</option>
         </select>
       </div>
@@ -108,9 +98,7 @@ export const ReportFilters: React.FC<Props> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              i18n.t("auto.searchByNameOr")
-            }
+            placeholder={i18n.t("auto.searchByNameOr")}
             className="w-full h-10 px-3 ps-8 rounded-xl border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 text-xs font-semibold"
           />
           <Search className="w-3.5 h-3.5 text-slate-400 absolute start-2.5 top-3" />

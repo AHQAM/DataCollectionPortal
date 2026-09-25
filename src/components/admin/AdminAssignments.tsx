@@ -42,8 +42,7 @@ export const AdminAssignments: React.FC = () => {
   const targetEntityLabel =
     (lang === "ar"
       ? activeReq?.targetEntityLabelAr
-      : activeReq?.targetEntityLabelEn) ||
-    (t("auto.targetEntityRecord"));
+      : activeReq?.targetEntityLabelEn) || t("auto.targetEntityRecord");
 
   // Filter records by request, branch, search
   const filteredRecords = records.filter((r) => {
@@ -86,9 +85,7 @@ export const AdminAssignments: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Layers className="w-5 h-5 text-purple-700" />
-            <span>
-              {t("auto.assignmentsReallocationMatrix")}
-            </span>
+            <span>{t("auto.assignmentsReallocationMatrix")}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             {t("auto.trackRecordAssignmentsAcross")}
@@ -134,9 +131,7 @@ export const AdminAssignments: React.FC = () => {
             onChange={(e) => setSelectedBranchId(e.target.value)}
             className="h-10 px-3 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700"
           >
-            <option value="ALL">
-              {t("auto.allBranches")}
-            </option>
+            <option value="ALL">{t("auto.allBranches")}</option>
             {branches.map((b) => (
               <option key={b.branchId} value={b.branchId}>
                 {lang === "ar" ? b.branchNameAr : b.branchNameEn}
@@ -153,24 +148,16 @@ export const AdminAssignments: React.FC = () => {
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
                 <th className="px-4 py-3 text-start">{targetEntityLabel}</th>
-                <th className="px-4 py-3 text-start">
-                  {t("auto.region")}
-                </th>
+                <th className="px-4 py-3 text-start">{t("auto.region")}</th>
                 <th className="px-4 py-3 text-start">
                   {t("auto.assignedUser")}
                 </th>
-                <th className="px-4 py-3 text-start">
-                  {t("auto.branch")}
-                </th>
+                <th className="px-4 py-3 text-start">{t("auto.branch")}</th>
                 <th className="px-4 py-3 text-start">
                   {t("auto.areaLocation")}
                 </th>
-                <th className="px-4 py-3 text-start">
-                  {t("auto.status")}
-                </th>
-                <th className="px-4 py-3 text-center">
-                  {t("auto.reassign")}
-                </th>
+                <th className="px-4 py-3 text-start">{t("auto.status")}</th>
+                <th className="px-4 py-3 text-center">{t("auto.reassign")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -237,9 +224,7 @@ export const AdminAssignments: React.FC = () => {
                           className="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-900 font-bold text-[10px] border border-purple-200 flex items-center justify-center gap-1 mx-auto cursor-pointer"
                         >
                           <ArrowRightLeft className="w-3 h-3" />
-                          <span>
-                            {t("auto.reassign")}
-                          </span>
+                          <span>{t("auto.reassign")}</span>
                         </button>
                       ) : (
                         <span className="text-[10px] text-slate-400 font-semibold">
@@ -277,8 +262,7 @@ export const AdminAssignments: React.FC = () => {
               </div>
               <div className="text-[11px] text-slate-500">
                 {t("auto.currentUser")}
-                {reassignModalRecord.userName} (
-                {t("auto.region1")}
+                {reassignModalRecord.userName} ({t("auto.region1")}
                 {reassignModalRecord.assignedRegionNo})
               </div>
             </div>
@@ -310,9 +294,7 @@ export const AdminAssignments: React.FC = () => {
                   rows={2}
                   value={reassignReason}
                   onChange={(e) => setReassignReason(e.target.value)}
-                  placeholder={
-                    t("auto.egVacationCoverage")
-                  }
+                  placeholder={t("auto.egVacationCoverage")}
                   className="w-full p-2 rounded-xl border border-slate-300"
                   required
                 />

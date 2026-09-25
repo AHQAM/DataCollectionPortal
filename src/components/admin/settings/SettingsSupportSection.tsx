@@ -25,9 +25,7 @@ export const SettingsSupportSection: React.FC<SettingsSupportSectionProps> = ({
     <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
       <div className="flex items-center gap-2 text-xs font-extrabold text-purple-950 pb-2 border-b border-slate-100">
         <PhoneCall className="w-4 h-4 text-purple-700" />
-        <span>
-          {i18n.t("auto.supportChannelsForRepresentatives")}
-        </span>
+        <span>{i18n.t("auto.supportChannelsForRepresentatives")}</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">

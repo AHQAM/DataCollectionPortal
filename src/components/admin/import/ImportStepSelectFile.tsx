@@ -48,8 +48,7 @@ export const ImportStepSelectFile: React.FC<Props> = ({
           {currentRequest && (
             <div className="flex items-center gap-2 text-xs flex-wrap">
               <span className="px-2.5 py-1 rounded-lg bg-purple-100 text-purple-900 font-bold">
-                {requestFields.length}{" "}
-                {i18n.t("auto.formFields")}
+                {requestFields.length} {i18n.t("auto.formFields")}
               </span>
               <span className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 font-bold flex items-center gap-1">
                 <Lock className="w-3 h-3" />
@@ -76,9 +75,7 @@ export const ImportStepSelectFile: React.FC<Props> = ({
         <div className="flex flex-wrap justify-center gap-3">
           <label className="px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold cursor-pointer shadow-md transition-all flex items-center gap-2">
             <UploadCloud className="w-4 h-4" />
-            <span>
-              {i18n.t("auto.browseFile")}
-            </span>
+            <span>{i18n.t("auto.browseFile")}</span>
             <input
               type="file"
               accept=".xlsx,.xls,.csv"
@@ -91,14 +88,10 @@ export const ImportStepSelectFile: React.FC<Props> = ({
             type="button"
             onClick={onLoadDemoData}
             className="px-4 py-2.5 rounded-xl bg-white border border-purple-300 hover:bg-purple-50 text-purple-900 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs"
-            title={
-              i18n.t("auto.loadDemoDataset")
-            }
+            title={i18n.t("auto.loadDemoDataset")}
           >
             <Sparkles className="w-4 h-4 text-purple-700" />
-            <span>
-              {i18n.t("auto.loadMatchingDemoDataset")}
-            </span>
+            <span>{i18n.t("auto.loadMatchingDemoDataset")}</span>
           </button>
         </div>
       </div>

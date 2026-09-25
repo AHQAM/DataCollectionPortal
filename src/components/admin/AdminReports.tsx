@@ -9,7 +9,8 @@ import { ReportAnalysisCharts } from "./reports/ReportAnalysisCharts";
 import { ReportDataTable } from "./reports/ReportDataTable";
 
 export const AdminReports: React.FC = () => {
-  const { lang, requests, records, branches, recordResponses, fields , t} = useApp();
+  const { lang, requests, records, branches, recordResponses, fields, t } =
+    useApp();
 
   const [selectedReqId, setSelectedReqId] = useState<string>(
     requests.length > 0 ? requests[0].requestId : "",
@@ -197,9 +198,7 @@ export const AdminReports: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <FileSpreadsheet className="w-5 h-5 text-purple-700" />
-            <span>
-              {t("auto.reportsExcelExportCenter")}
-            </span>
+            <span>{t("auto.reportsExcelExportCenter")}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             {t("auto.inspectFieldResponsesView")}
@@ -220,9 +219,7 @@ export const AdminReports: React.FC = () => {
             className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
           >
             <Download className="w-4 h-4" />
-            <span>
-              {t("auto.exportFullExcel")}
-            </span>
+            <span>{t("auto.exportFullExcel")}</span>
           </button>
         </div>
       </div>

@@ -56,9 +56,7 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
           <div>
             <h1 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <Sliders className="w-4 h-4 text-purple-700" />
-              <span>
-                {i18n.t("auto.dynamicFormBuilder")}
-              </span>
+              <span>{i18n.t("auto.dynamicFormBuilder")}</span>
               <span className="text-xs font-mono font-bold text-purple-800 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
                 {currentRequest?.requestCode}
               </span>
@@ -92,14 +90,10 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
               type="button"
               onClick={() => onOpenImportWizard(requestId)}
               className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
-              title={
-                i18n.t("auto.importExcelData")
-              }
+              title={i18n.t("auto.importExcelData")}
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-700" />
-              <span>
-                {i18n.t("auto.importExcelData")}
-              </span>
+              <span>{i18n.t("auto.importExcelData")}</span>
             </button>
           )}
 
@@ -123,9 +117,7 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
               <option value="general">
                 {i18n.t("auto.generalFieldSurvey")}
               </option>
-              <option value="asset">
-                {i18n.t("auto.assetFacilityAudit")}
-              </option>
+              <option value="asset">{i18n.t("auto.assetFacilityAudit")}</option>
               <option value="debt">
                 {i18n.t("auto.customerDebtInactivity")}
               </option>
@@ -146,9 +138,7 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
           <button
             onClick={handleSaveAll}
             className="px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
-            title={
-              i18n.t("auto.saveChangesAndPush")
-            }
+            title={i18n.t("auto.saveChangesAndPush")}
           >
             <Save className="w-4 h-4" />
             <span>
@@ -170,8 +160,7 @@ export const FormBuilderHeader: React.FC<FormBuilderHeaderProps> = ({
                 : `Campaign is currently Published & Live (Version v${currentRequest.formSchemaVersion || 1})`}
             </span>
             <span className="text-emerald-700 hidden sm:inline">
-              —{" "}
-              {i18n.t("auto.youCanAddColumns")}
+              — {i18n.t("auto.youCanAddColumns")}
             </span>
           </div>
           <span className="text-[11px] font-mono font-bold bg-emerald-200/60 text-emerald-900 px-2 py-0.5 rounded">

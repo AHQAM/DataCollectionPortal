@@ -69,9 +69,7 @@ export const AdminSettings: React.FC = () => {
   const handleConfirmWipe = () => {
     wipeDemoDataForProduction({ wipeBranchesAndRegions: wipeBranchesAlso });
     setShowWipeModal(false);
-    setWipeSuccessMsg(
-      t("auto.allDemoDataWiped"),
-    );
+    setWipeSuccessMsg(t("auto.allDemoDataWiped"));
     setTimeout(() => setWipeSuccessMsg(null), 5000);
   };
 
@@ -100,9 +98,7 @@ export const AdminSettings: React.FC = () => {
     );
     dlAnchor.click();
 
-    setBackupSuccessMsg(
-      t("auto.databaseBackupDownloadedSuccessfully"),
-    );
+    setBackupSuccessMsg(t("auto.databaseBackupDownloadedSuccessfully"));
     setTimeout(() => setBackupSuccessMsg(null), 4000);
   };
 
@@ -113,9 +109,7 @@ export const AdminSettings: React.FC = () => {
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Settings className="w-5 h-5 text-purple-700" />
-            <span>
-              {t("auto.systemSettingsSecurityPolicies")}
-            </span>
+            <span>{t("auto.systemSettingsSecurityPolicies")}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             {t("auto.configureAuthenticationRulesAccount")}
@@ -125,9 +119,7 @@ export const AdminSettings: React.FC = () => {
         {savedSuccess && (
           <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 flex items-center gap-1">
             <CheckCircle2 className="w-4 h-4" />
-            <span>
-              {t("auto.settingsSaved")}
-            </span>
+            <span>{t("auto.settingsSaved")}</span>
           </span>
         )}
       </div>

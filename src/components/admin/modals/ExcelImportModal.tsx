@@ -90,9 +90,7 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
             <div>
               <div className="text-xs font-black text-emerald-950 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-emerald-600" />
-                <span>
-                  {i18n.t("auto.standardExcelTemplate")}
-                </span>
+                <span>{i18n.t("auto.standardExcelTemplate")}</span>
               </div>
               <p className="text-[11px] text-emerald-800 mt-0.5">
                 {i18n.t("auto.downloadThePreformattedTemplate")}
@@ -104,9 +102,7 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
               className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shrink-0 shadow-xs transition-all cursor-pointer"
             >
               <Download className="w-4 h-4" />
-              <span>
-                {i18n.t("auto.downloadTemplateXlsx")}
-              </span>
+              <span>{i18n.t("auto.downloadTemplateXlsx")}</span>
             </button>
           </div>
 
@@ -168,9 +164,7 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
                       onChange={() => setImportMode("append")}
                       className="text-emerald-600 focus:ring-emerald-500"
                     />
-                    <span>
-                      {i18n.t("auto.mergeWithExisting")}
-                    </span>
+                    <span>{i18n.t("auto.mergeWithExisting")}</span>
                   </label>
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input
@@ -181,9 +175,7 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
                       onChange={() => setImportMode("replace")}
                       className="text-rose-600 focus:ring-rose-500"
                     />
-                    <span>
-                      {i18n.t("auto.replaceAll")}
-                    </span>
+                    <span>{i18n.t("auto.replaceAll")}</span>
                   </label>
                 </div>
               </div>

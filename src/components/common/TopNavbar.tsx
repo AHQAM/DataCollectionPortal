@@ -187,9 +187,23 @@ export const TopNavbar: React.FC = () => {
                               {u.role === "ADMIN"
                                 ? t("topNavbar.adminDesc")
                                 : u.role === "SUPERVISOR"
-                                  ? t("topNavbar.supervisorDesc", { branch: lang === "ar" ? (u.branchNameAr || u.branchId) : (u.branchNameEn || u.branchNameAr || u.branchId) } as any)
-                                  : t("topNavbar.userDesc", { regionNo: u.regionNo, branch: lang === "ar" ? (u.branchNameAr || u.branchId) : (u.branchNameEn || u.branchNameAr || u.branchId) } as any)
-                              }
+                                  ? t("topNavbar.supervisorDesc", {
+                                      branch:
+                                        lang === "ar"
+                                          ? u.branchNameAr || u.branchId
+                                          : u.branchNameEn ||
+                                            u.branchNameAr ||
+                                            u.branchId,
+                                    } as any)
+                                  : t("topNavbar.userDesc", {
+                                      regionNo: u.regionNo,
+                                      branch:
+                                        lang === "ar"
+                                          ? u.branchNameAr || u.branchId
+                                          : u.branchNameEn ||
+                                            u.branchNameAr ||
+                                            u.branchId,
+                                    } as any)}
                             </div>
                           </div>
                           {(() => {

@@ -95,9 +95,7 @@ export const AdminBranches: React.FC = () => {
   const handleSaveBranch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!branchNameAr.trim()) {
-      setAlertError(
-        t("auto.pleaseEnterBranchArabic"),
-      );
+      setAlertError(t("auto.pleaseEnterBranchArabic"));
       return;
     }
 
@@ -107,15 +105,11 @@ export const AdminBranches: React.FC = () => {
           branchNameAr: branchNameAr.trim(),
           branchNameEn: branchNameEn.trim() || branchNameAr.trim(),
         });
-        setSuccessMessage(
-          t("auto.branchUpdatedSuccessfully"),
-        );
+        setSuccessMessage(t("auto.branchUpdatedSuccessfully"));
       } else {
         const code = branchCode.trim().toUpperCase();
         if (branches.some((b) => b.branchId === code)) {
-          setAlertError(
-            t("auto.branchIdAlreadyExists"),
-          );
+          setAlertError(t("auto.branchIdAlreadyExists"));
           return;
         }
         await createBranch({
@@ -123,15 +117,11 @@ export const AdminBranches: React.FC = () => {
           branchNameAr: branchNameAr.trim(),
           branchNameEn: branchNameEn.trim() || branchNameAr.trim(),
         });
-        setSuccessMessage(
-          t("auto.newBranchCreatedSuccessfully"),
-        );
+        setSuccessMessage(t("auto.newBranchCreatedSuccessfully"));
       }
     } catch (err) {
       console.error(err);
-      setAlertError(
-        t("auto.errorSavingBranch"),
-      );
+      setAlertError(t("auto.errorSavingBranch"));
       return;
     }
 
@@ -151,9 +141,7 @@ export const AdminBranches: React.FC = () => {
       if (!res.success) {
         alert(res.message || "Cannot delete");
       } else {
-        setSuccessMessage(
-          t("auto.branchDeleted"),
-        );
+        setSuccessMessage(t("auto.branchDeleted"));
         setTimeout(() => setSuccessMessage(null), 3000);
       }
     }
@@ -183,9 +171,7 @@ export const AdminBranches: React.FC = () => {
   const handleSaveRegion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!regionNo.trim() || !regionNameAr.trim() || !regionBranchId) {
-      setAlertError(
-        t("auto.pleaseFillAllRequired"),
-      );
+      setAlertError(t("auto.pleaseFillAllRequired"));
       return;
     }
 
@@ -199,14 +185,10 @@ export const AdminBranches: React.FC = () => {
           regionNameEn: regionNameEn.trim() || regionNameAr.trim(),
           branchId: regionBranchId,
         });
-        setSuccessMessage(
-          t("auto.regionUpdatedSuccessfully"),
-        );
+        setSuccessMessage(t("auto.regionUpdatedSuccessfully"));
       } else {
         if (regions.some((r) => r.regionNo === cleanNo)) {
-          setAlertError(
-            t("auto.regionNumberAlreadyExists"),
-          );
+          setAlertError(t("auto.regionNumberAlreadyExists"));
           return;
         }
         await createRegion({
@@ -216,15 +198,11 @@ export const AdminBranches: React.FC = () => {
           regionNameEn: regionNameEn.trim() || regionNameAr.trim(),
           branchId: regionBranchId,
         });
-        setSuccessMessage(
-          t("auto.newRegionCreatedSuccessfully"),
-        );
+        setSuccessMessage(t("auto.newRegionCreatedSuccessfully"));
       }
     } catch (err) {
       console.error(err);
-      setAlertError(
-        t("auto.errorSavingRegion"),
-      );
+      setAlertError(t("auto.errorSavingRegion"));
       return;
     }
 

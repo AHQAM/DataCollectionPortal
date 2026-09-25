@@ -107,9 +107,7 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                   type="button"
                   onClick={() => onGrantAllCompanyRegions(supervisor)}
                   className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                  title={
-                    i18n.t("auto.grantAllCompanyRegions")
-                  }
+                  title={i18n.t("auto.grantAllCompanyRegions")}
                 >
                   {i18n.t("auto.selectAllRegions")}
                 </button>
@@ -118,9 +116,7 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                   type="button"
                   onClick={() => onClearAllRegions(supervisor)}
                   className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                  title={
-                    i18n.t("auto.clearAllRegions")
-                  }
+                  title={i18n.t("auto.clearAllRegions")}
                 >
                   {i18n.t("auto.clearAll")}
                 </button>
@@ -175,9 +171,7 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                           className="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-purple-50 hover:bg-purple-100 text-purple-900 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center gap-1"
                         >
                           <CheckSquare className="w-3.5 h-3.5" />
-                          <span>
-                            {i18n.t("auto.selectBranch")}
-                          </span>
+                          <span>{i18n.t("auto.selectBranch")}</span>
                         </button>
 
                         <button
@@ -189,9 +183,7 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                           className="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-200 hover:bg-slate-300 text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center gap-1"
                         >
                           <Square className="w-3.5 h-3.5" />
-                          <span>
-                            {i18n.t("auto.deselectBranch")}
-                          </span>
+                          <span>{i18n.t("auto.deselectBranch")}</span>
                         </button>
                       </div>
                     </div>

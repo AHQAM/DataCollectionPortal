@@ -97,9 +97,7 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
           <button
             onClick={() => onResetPassword(user.userId)}
             className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
-            title={
-              i18n.t("auto.generateTemporaryPassword")
-            }
+            title={i18n.t("auto.generateTemporaryPassword")}
           >
             <KeyRound className="w-3.5 h-3.5" />
           </button>
@@ -120,9 +118,7 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
             <button
               onClick={() => onReleaseDevice(user.userId)}
               className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200"
-              title={
-                i18n.t("auto.unlinkDevice")
-              }
+              title={i18n.t("auto.unlinkDevice")}
             >
               <Smartphone className="w-3.5 h-3.5" />
             </button>
