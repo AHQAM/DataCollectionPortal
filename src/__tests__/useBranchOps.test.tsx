@@ -26,7 +26,9 @@ describe("useBranchOps Hook", () => {
 
   describe("Branch Operations", () => {
     it("creates branch and logs audit on success", async () => {
-      vi.mocked(branchRegionApi.createBranch).mockResolvedValueOnce(undefined as any);
+      vi.mocked(branchRegionApi.createBranch).mockResolvedValueOnce(
+        undefined as any,
+      );
 
       const hook = useBranchOps();
       const res = await hook.createBranch({
@@ -63,7 +65,9 @@ describe("useBranchOps Hook", () => {
     });
 
     it("updates branch and logs audit", async () => {
-      vi.mocked(branchRegionApi.updateBranch).mockResolvedValueOnce(undefined as any);
+      vi.mocked(branchRegionApi.updateBranch).mockResolvedValueOnce(
+        undefined as any,
+      );
 
       const hook = useBranchOps();
       const res = await hook.updateBranch("b1", { isActive: false });
@@ -108,7 +112,9 @@ describe("useBranchOps Hook", () => {
 
   describe("Region Operations", () => {
     it("creates region and logs audit", async () => {
-      vi.mocked(branchRegionApi.createRegion).mockResolvedValueOnce(undefined as any);
+      vi.mocked(branchRegionApi.createRegion).mockResolvedValueOnce(
+        undefined as any,
+      );
 
       const hook = useBranchOps();
       const res = await hook.createRegion({

@@ -18,9 +18,7 @@ jest.mock("../config/db", () => ({
     collection: jest.fn().mockReturnValue({
       get: jest.fn().mockResolvedValue({
         empty: false,
-        docs: [
-          { ref: { id: "d1" }, data: () => ({ totalRecords: 5 }) },
-        ],
+        docs: [{ ref: { id: "d1" }, data: () => ({ totalRecords: 5 }) }],
       }),
     }),
     batch: mockBatch,
@@ -82,7 +80,10 @@ describe("System Maintenance Cloud Functions (Gen 2)", () => {
 
   it("successfully executes wipe and returns confirmation when token is valid", async () => {
     const res = await wrappedWipeDemoData(
-      { confirmationToken: "CONFIRM_WIPE_DEMO_DATA", wipeBranchesAndRegions: true },
+      {
+        confirmationToken: "CONFIRM_WIPE_DEMO_DATA",
+        wipeBranchesAndRegions: true,
+      },
       { auth: { uid: "admin1", token: { role: "ADMIN" } } },
     );
 

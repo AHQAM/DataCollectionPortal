@@ -23,10 +23,7 @@ export const createBranch = onCallGen2(async (data, context) => {
   const { branchId, branchNameAr, branchNameEn } = data || {};
 
   if (!branchId || !branchNameAr) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Missing required branch fields.",
-    );
+    throw new HttpsError("invalid-argument", "Missing required branch fields.");
   }
 
   const cleanId = String(branchId).toUpperCase().trim();
@@ -34,10 +31,7 @@ export const createBranch = onCallGen2(async (data, context) => {
   const existing = await branchRef.get();
 
   if (existing.exists) {
-    throw new HttpsError(
-      "already-exists",
-      "Branch ID already exists.",
-    );
+    throw new HttpsError("already-exists", "Branch ID already exists.");
   }
 
   const now = admin.firestore.FieldValue.serverTimestamp();
@@ -114,10 +108,7 @@ export const deleteBranch = onCallGen2(async (data, context) => {
   const { branchId } = data || {};
 
   if (!branchId) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Branch ID required.",
-    );
+    throw new HttpsError("invalid-argument", "Branch ID required.");
   }
 
   // 1. Check for associated regions
@@ -172,10 +163,7 @@ export const createRegion = onCallGen2(async (data, context) => {
   const { regionNo, regionNameAr, regionNameEn, branchId } = data || {};
 
   if (!regionNo || !regionNameAr || !branchId) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Missing required region fields.",
-    );
+    throw new HttpsError("invalid-argument", "Missing required region fields.");
   }
 
   const cleanNo = String(regionNo).trim();
@@ -183,10 +171,7 @@ export const createRegion = onCallGen2(async (data, context) => {
   const existing = await regionRef.get();
 
   if (existing.exists) {
-    throw new HttpsError(
-      "already-exists",
-      "Region number already exists.",
-    );
+    throw new HttpsError("already-exists", "Region number already exists.");
   }
 
   const now = admin.firestore.FieldValue.serverTimestamp();
@@ -267,10 +252,7 @@ export const deleteRegion = onCallGen2(async (data, context) => {
   const { regionNo } = data || {};
 
   if (!regionNo) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Region number required.",
-    );
+    throw new HttpsError("invalid-argument", "Region number required.");
   }
 
   // Check users assigned to this region
@@ -319,74 +301,69 @@ export const deleteRegion = onCallGen2(async (data, context) => {
 /**
  * importBranchesAndRegions
  */
-export const importBranchesAndRegions = onCallGen2(
-  async (data, context) => {
-    checkAdmin(context);
-    const { branches = [], regions = [] } = data || {};
+export const importBranchesAndRegions = onCallGen2(async (data, context) => {
+  checkAdmin(context);
+  const { branches = [], regions = [] } = data || {};
 
-    if (!Array.isArray(branches) || !Array.isArray(regions)) {
-      throw new HttpsError(
-        "invalid-argument",
-        "Invalid payload arrays.",
-      );
-    }
+  if (!Array.isArray(branches) || !Array.isArray(regions)) {
+    throw new HttpsError("invalid-argument", "Invalid payload arrays.");
+  }
 
-    const batch = db().batch();
-    const now = admin.firestore.FieldValue.serverTimestamp();
+  const batch = db().batch();
+  const now = admin.firestore.FieldValue.serverTimestamp();
 
-    for (const b of branches) {
-      if (!b.branchId) continue;
-      const ref = db()
-        .collection("branches")
-        .doc(String(b.branchId).toUpperCase().trim());
-      batch.set(
-        ref,
-        {
-          branchId: String(b.branchId).toUpperCase().trim(),
-          branchNameAr: String(b.branchNameAr || "").trim(),
-          branchNameEn: String(b.branchNameEn || b.branchNameAr || "").trim(),
-          isActive: b.isActive !== false,
-          createdAt: now,
-          updatedAt: now,
-        },
-        { merge: true },
-      );
-    }
+  for (const b of branches) {
+    if (!b.branchId) continue;
+    const ref = db()
+      .collection("branches")
+      .doc(String(b.branchId).toUpperCase().trim());
+    batch.set(
+      ref,
+      {
+        branchId: String(b.branchId).toUpperCase().trim(),
+        branchNameAr: String(b.branchNameAr || "").trim(),
+        branchNameEn: String(b.branchNameEn || b.branchNameAr || "").trim(),
+        isActive: b.isActive !== false,
+        createdAt: now,
+        updatedAt: now,
+      },
+      { merge: true },
+    );
+  }
 
-    for (const r of regions) {
-      if (!r.regionNo) continue;
-      const ref = db().collection("regions").doc(String(r.regionNo).trim());
-      batch.set(
-        ref,
-        {
-          regionId: String(r.regionNo).trim(),
-          regionNo: String(r.regionNo).trim(),
-          regionNameAr: String(r.regionNameAr || "").trim(),
-          regionNameEn: String(r.regionNameEn || r.regionNameAr || "").trim(),
-          branchId: String(r.branchId || "").trim(),
-          isActive: r.isActive !== false,
-          createdAt: now,
-          updatedAt: now,
-        },
-        { merge: true },
-      );
-    }
+  for (const r of regions) {
+    if (!r.regionNo) continue;
+    const ref = db().collection("regions").doc(String(r.regionNo).trim());
+    batch.set(
+      ref,
+      {
+        regionId: String(r.regionNo).trim(),
+        regionNo: String(r.regionNo).trim(),
+        regionNameAr: String(r.regionNameAr || "").trim(),
+        regionNameEn: String(r.regionNameEn || r.regionNameAr || "").trim(),
+        branchId: String(r.branchId || "").trim(),
+        isActive: r.isActive !== false,
+        createdAt: now,
+        updatedAt: now,
+      },
+      { merge: true },
+    );
+  }
 
-    await batch.commit();
+  await batch.commit();
 
-    await logAuditSafe({
-      userId: context.auth!.uid,
-      userRole: "ADMIN",
-      action: "BRANCHES_REGIONS_IMPORTED",
-      entityType: "SYSTEM",
-      entityId: "IMPORT",
-      details: { branchesCount: branches.length, regionsCount: regions.length },
-    });
+  await logAuditSafe({
+    userId: context.auth!.uid,
+    userRole: "ADMIN",
+    action: "BRANCHES_REGIONS_IMPORTED",
+    entityType: "SYSTEM",
+    entityId: "IMPORT",
+    details: { branchesCount: branches.length, regionsCount: regions.length },
+  });
 
-    return {
-      success: true,
-      branchesCount: branches.length,
-      regionsCount: regions.length,
-    };
-  },
-);
+  return {
+    success: true,
+    branchesCount: branches.length,
+    regionsCount: regions.length,
+  };
+});

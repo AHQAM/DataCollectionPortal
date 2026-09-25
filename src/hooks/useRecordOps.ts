@@ -118,10 +118,15 @@ export const useRecordOps = () => {
         );
         if (res.success) {
           if (res.conflict) {
-            logAudit("RECORD_SUBMISSION_CONFLICT_RESOLVED", "Record", recordId, {
-              reason: res.reason,
-              targetId: targetRecord?.targetId,
-            });
+            logAudit(
+              "RECORD_SUBMISSION_CONFLICT_RESOLVED",
+              "Record",
+              recordId,
+              {
+                reason: res.reason,
+                targetId: targetRecord?.targetId,
+              },
+            );
             return {
               success: true,
               conflict: true,

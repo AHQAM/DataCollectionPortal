@@ -49,7 +49,9 @@ describe("useRequestOps Hook", () => {
   });
 
   it("createRequest returns failure on error", async () => {
-    vi.mocked(requestApi.createRequest).mockRejectedValue(new Error("API Error"));
+    vi.mocked(requestApi.createRequest).mockRejectedValue(
+      new Error("API Error"),
+    );
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {
@@ -61,7 +63,9 @@ describe("useRequestOps Hook", () => {
 
   // --- updateRequest ---
   it("updateRequest calls API and returns success", async () => {
-    vi.mocked(requestApi.updateDraftRequest).mockResolvedValue(undefined as any);
+    vi.mocked(requestApi.updateDraftRequest).mockResolvedValue(
+      undefined as any,
+    );
     const { result } = renderHook(() => useRequestOps());
     let res;
     await act(async () => {

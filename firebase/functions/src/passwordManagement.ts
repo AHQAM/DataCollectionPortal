@@ -151,76 +151,74 @@ export const changePassword = onCallGen2(async (data, context) => {
  * Allows a representative to submit a password reset request
  * from the login screen. Admin will review and action it.
  */
-export const requestPasswordReset = onCallGen2(
-  async (data, _context) => {
-    const { regionNo, notes, mobile } = data;
+export const requestPasswordReset = onCallGen2(async (data, _context) => {
+  const { regionNo, notes, mobile } = data;
 
-    if (!regionNo) {
-      throw new HttpsError(
-        "invalid-argument",
-        "رقم المنطقة مطلوب. | Region number is required.",
-      );
-    }
+  if (!regionNo) {
+    throw new HttpsError(
+      "invalid-argument",
+      "رقم المنطقة مطلوب. | Region number is required.",
+    );
+  }
 
-    try {
-      // Find the user (don't reveal if user exists via error message)
-      const usersRef = db.collection("users");
-      const snapshot = await usersRef
-        .where("username", "==", String(regionNo).trim())
-        .limit(1)
-        .get();
+  try {
+    // Find the user (don't reveal if user exists via error message)
+    const usersRef = db.collection("users");
+    const snapshot = await usersRef
+      .where("username", "==", String(regionNo).trim())
+      .limit(1)
+      .get();
 
-      // Always create a request — even if user not found
-      // This prevents username enumeration
-      const userId = snapshot.empty ? null : snapshot.docs[0].id;
+    // Always create a request — even if user not found
+    // This prevents username enumeration
+    const userId = snapshot.empty ? null : snapshot.docs[0].id;
 
-      const resetRef = db.collection("passwordResetRequests").doc();
-      await resetRef.set({
-        resetRequestId: resetRef.id,
-        userId: userId || null,
-        regionNo: String(regionNo).trim(),
-        requestNotes: notes || null,
-        mobile: mobile || null,
-        status: "PENDING",
-        requestedAt: admin.firestore.FieldValue.serverTimestamp(),
-        reviewedBy: null,
-        reviewedAt: null,
-        resetAt: null,
-        resetMethod: null,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    const resetRef = db.collection("passwordResetRequests").doc();
+    await resetRef.set({
+      resetRequestId: resetRef.id,
+      userId: userId || null,
+      regionNo: String(regionNo).trim(),
+      requestNotes: notes || null,
+      mobile: mobile || null,
+      status: "PENDING",
+      requestedAt: admin.firestore.FieldValue.serverTimestamp(),
+      reviewedBy: null,
+      reviewedAt: null,
+      resetAt: null,
+      resetMethod: null,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    if (userId) {
+      await logAuditSafe({
+        userId,
+        userRole: "REP",
+        action: "PASSWORD_RESET_REQUESTED",
+        entityType: "PASSWORD_RESET",
+        entityId: resetRef.id,
+        details: { regionNo },
       });
-
-      if (userId) {
-        await logAuditSafe({
-          userId,
-          userRole: "REP",
-          action: "PASSWORD_RESET_REQUESTED",
-          entityType: "PASSWORD_RESET",
-          entityId: resetRef.id,
-          details: { regionNo },
-        });
-      }
-
-      return {
-        success: true,
-        messageAr:
-          "تم إرسال طلب استعادة كلمة المرور. سيقوم المسؤول بمراجعة الطلب.",
-        messageEn:
-          "Password reset request submitted. Admin will review your request.",
-      };
-    } catch (error: any) {
-      if (error instanceof HttpsError) {
-        throw error;
-      }
-      console.error("Password reset request error:", error);
-      throw new HttpsError(
-        "internal",
-        "حدث خطأ في الخادم. | Internal server error.",
-      );
     }
-  },
-);
+
+    return {
+      success: true,
+      messageAr:
+        "تم إرسال طلب استعادة كلمة المرور. سيقوم المسؤول بمراجعة الطلب.",
+      messageEn:
+        "Password reset request submitted. Admin will review your request.",
+    };
+  } catch (error: any) {
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+    console.error("Password reset request error:", error);
+    throw new HttpsError(
+      "internal",
+      "حدث خطأ في الخادم. | Internal server error.",
+    );
+  }
+});
 
 /**
  * Cloud Function: adminResetPassword
@@ -229,133 +227,128 @@ export const requestPasswordReset = onCallGen2(
  * Resets to a caller-provided temporary password and sets mustChangePassword = true.
  * Revokes existing refresh tokens.
  */
-export const adminResetPassword = onCallGen2(
-  async (data, context) => {
-    // Admin-only check
-    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
+export const adminResetPassword = onCallGen2(async (data, context) => {
+  // Admin-only check
+  if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
+    throw new HttpsError(
+      "permission-denied",
+      "صلاحية المسؤول مطلوبة. | Admin permission required.",
+    );
+  }
+
+  const { targetUserId, resetRequestId, temporaryPassword } = data;
+
+  if (!targetUserId) {
+    throw new HttpsError(
+      "invalid-argument",
+      "معرف المستخدم مطلوب. | User ID is required.",
+    );
+  }
+
+  if (
+    typeof temporaryPassword !== "string" ||
+    temporaryPassword.length < 12 ||
+    temporaryPassword.length > 128
+  ) {
+    throw new HttpsError(
+      "invalid-argument",
+      "كلمة المرور المؤقتة مطلوبة ويجب أن تكون 12 حرفاً على الأقل. | A temporary password of at least 12 characters is required.",
+    );
+  }
+
+  const adminId = context.auth.uid;
+
+  try {
+    const userRef = db.collection("users").doc(targetUserId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
       throw new HttpsError(
-        "permission-denied",
-        "صلاحية المسؤول مطلوبة. | Admin permission required.",
+        "not-found",
+        "المستخدم غير موجود. | User not found.",
       );
     }
 
-    const { targetUserId, resetRequestId, temporaryPassword } = data;
+    const userData = userDoc.data()!;
 
-    if (!targetUserId) {
-      throw new HttpsError(
-        "invalid-argument",
-        "معرف المستخدم مطلوب. | User ID is required.",
-      );
-    }
+    const newHash = await hashPassword(temporaryPassword);
+    const newSessionVersion = (userData.sessionVersion || 0) + 1;
 
-    if (
-      typeof temporaryPassword !== "string" ||
-      temporaryPassword.length < 12 ||
-      temporaryPassword.length > 128
-    ) {
-      throw new HttpsError(
-        "invalid-argument",
-        "كلمة المرور المؤقتة مطلوبة ويجب أن تكون 12 حرفاً على الأقل. | A temporary password of at least 12 characters is required.",
-      );
-    }
+    await userRef.update({
+      passwordHash: newHash,
+      mustChangePassword: true,
+      passwordChangedAt: admin.firestore.FieldValue.serverTimestamp(),
+      sessionVersion: newSessionVersion,
+      failedLoginCount: 0,
+      lockedUntil: null,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
-    const adminId = context.auth.uid;
-
+    // Revoke existing Firebase Auth refresh tokens
     try {
-      const userRef = db.collection("users").doc(targetUserId);
-      const userDoc = await userRef.get();
+      await admin.auth().revokeRefreshTokens(targetUserId);
+    } catch (e) {
+      console.warn("Could not revoke tokens (user may not exist in Auth):", e);
+    }
 
-      if (!userDoc.exists) {
-        throw new HttpsError(
-          "not-found",
-          "المستخدم غير موجود. | User not found.",
-        );
-      }
-
-      const userData = userDoc.data()!;
-
-      const newHash = await hashPassword(temporaryPassword);
-      const newSessionVersion = (userData.sessionVersion || 0) + 1;
-
-      await userRef.update({
-        passwordHash: newHash,
-        mustChangePassword: true,
-        passwordChangedAt: admin.firestore.FieldValue.serverTimestamp(),
+    // Update custom claims
+    try {
+      await admin.auth().setCustomUserClaims(targetUserId, {
+        role: userData.role,
+        branchId: userData.branchId || null,
+        regionNo: userData.regionNo || null,
+        allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
         sessionVersion: newSessionVersion,
-        failedLoginCount: 0,
-        lockedUntil: null,
+        mustChangePassword: true,
+      });
+    } catch (e) {
+      console.warn("Could not update claims:", e);
+    }
+
+    // If there's a corresponding reset request, mark it as actioned
+    if (resetRequestId) {
+      const resetRef = db
+        .collection("passwordResetRequests")
+        .doc(resetRequestId);
+      await resetRef.update({
+        status: "APPROVED",
+        reviewedBy: adminId,
+        reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
+        resetAt: admin.firestore.FieldValue.serverTimestamp(),
+        resetMethod: "TEMPORARY_PASSWORD",
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-
-      // Revoke existing Firebase Auth refresh tokens
-      try {
-        await admin.auth().revokeRefreshTokens(targetUserId);
-      } catch (e) {
-        console.warn(
-          "Could not revoke tokens (user may not exist in Auth):",
-          e,
-        );
-      }
-
-      // Update custom claims
-      try {
-        await admin.auth().setCustomUserClaims(targetUserId, {
-          role: userData.role,
-          branchId: userData.branchId || null,
-          regionNo: userData.regionNo || null,
-          allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
-          sessionVersion: newSessionVersion,
-          mustChangePassword: true,
-        });
-      } catch (e) {
-        console.warn("Could not update claims:", e);
-      }
-
-      // If there's a corresponding reset request, mark it as actioned
-      if (resetRequestId) {
-        const resetRef = db
-          .collection("passwordResetRequests")
-          .doc(resetRequestId);
-        await resetRef.update({
-          status: "APPROVED",
-          reviewedBy: adminId,
-          reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
-          resetAt: admin.firestore.FieldValue.serverTimestamp(),
-          resetMethod: "TEMPORARY_PASSWORD",
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-      }
-
-      await logAuditSafe({
-        userId: adminId,
-        userRole: "ADMIN",
-        action: "ADMIN_RESET_PASSWORD",
-        entityType: "USER",
-        entityId: targetUserId,
-        details: {
-          resetMethod: "TEMPORARY_PASSWORD",
-          resetRequestId: resetRequestId || null,
-          targetUserRegionNo: userData.regionNo,
-        },
-      });
-
-      return {
-        success: true,
-        messageAr: "تم إعادة تعيين كلمة المرور بنجاح.",
-        messageEn: "Password reset successfully.",
-      };
-    } catch (error: any) {
-      if (error instanceof HttpsError) {
-        throw error;
-      }
-      console.error("Admin reset password error:", error);
-      throw new HttpsError(
-        "internal",
-        "حدث خطأ في الخادم. | Internal server error.",
-      );
     }
-  },
-);
+
+    await logAuditSafe({
+      userId: adminId,
+      userRole: "ADMIN",
+      action: "ADMIN_RESET_PASSWORD",
+      entityType: "USER",
+      entityId: targetUserId,
+      details: {
+        resetMethod: "TEMPORARY_PASSWORD",
+        resetRequestId: resetRequestId || null,
+        targetUserRegionNo: userData.regionNo,
+      },
+    });
+
+    return {
+      success: true,
+      messageAr: "تم إعادة تعيين كلمة المرور بنجاح.",
+      messageEn: "Password reset successfully.",
+    };
+  } catch (error: any) {
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+    console.error("Admin reset password error:", error);
+    throw new HttpsError(
+      "internal",
+      "حدث خطأ في الخادم. | Internal server error.",
+    );
+  }
+});
 
 /**
  * Cloud Function: adminUnlockAccount
@@ -363,63 +356,61 @@ export const adminResetPassword = onCallGen2(
  * Admin-only function to unlock a locked user account.
  * Resets failed login count and clears lockout timer.
  */
-export const adminUnlockAccount = onCallGen2(
-  async (data, context) => {
-    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
+export const adminUnlockAccount = onCallGen2(async (data, context) => {
+  if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
+    throw new HttpsError(
+      "permission-denied",
+      "صلاحية المسؤول مطلوبة. | Admin permission required.",
+    );
+  }
+
+  const { targetUserId } = data;
+
+  if (!targetUserId) {
+    throw new HttpsError(
+      "invalid-argument",
+      "معرف المستخدم مطلوب. | User ID is required.",
+    );
+  }
+
+  try {
+    const userRef = db.collection("users").doc(targetUserId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
       throw new HttpsError(
-        "permission-denied",
-        "صلاحية المسؤول مطلوبة. | Admin permission required.",
+        "not-found",
+        "المستخدم غير موجود. | User not found.",
       );
     }
 
-    const { targetUserId } = data;
+    await userRef.update({
+      failedLoginCount: 0,
+      lockedUntil: null,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
-    if (!targetUserId) {
-      throw new HttpsError(
-        "invalid-argument",
-        "معرف المستخدم مطلوب. | User ID is required.",
-      );
+    await logAuditSafe({
+      userId: context.auth.uid,
+      userRole: "ADMIN",
+      action: "ADMIN_UNLOCK_ACCOUNT",
+      entityType: "USER",
+      entityId: targetUserId,
+    });
+
+    return {
+      success: true,
+      messageAr: "تم فتح قفل الحساب بنجاح.",
+      messageEn: "Account unlocked successfully.",
+    };
+  } catch (error: any) {
+    if (error instanceof HttpsError) {
+      throw error;
     }
-
-    try {
-      const userRef = db.collection("users").doc(targetUserId);
-      const userDoc = await userRef.get();
-
-      if (!userDoc.exists) {
-        throw new HttpsError(
-          "not-found",
-          "المستخدم غير موجود. | User not found.",
-        );
-      }
-
-      await userRef.update({
-        failedLoginCount: 0,
-        lockedUntil: null,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-      await logAuditSafe({
-        userId: context.auth.uid,
-        userRole: "ADMIN",
-        action: "ADMIN_UNLOCK_ACCOUNT",
-        entityType: "USER",
-        entityId: targetUserId,
-      });
-
-      return {
-        success: true,
-        messageAr: "تم فتح قفل الحساب بنجاح.",
-        messageEn: "Account unlocked successfully.",
-      };
-    } catch (error: any) {
-      if (error instanceof HttpsError) {
-        throw error;
-      }
-      console.error("Unlock account error:", error);
-      throw new HttpsError(
-        "internal",
-        "حدث خطأ في الخادم. | Internal server error.",
-      );
-    }
-  },
-);
+    console.error("Unlock account error:", error);
+    throw new HttpsError(
+      "internal",
+      "حدث خطأ في الخادم. | Internal server error.",
+    );
+  }
+});

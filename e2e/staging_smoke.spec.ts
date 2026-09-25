@@ -152,4 +152,3 @@ test.describe("Staging Environment - E2E Smoke & Health Suite", () => {
     expect(isOnlineNow).toBe(true);
   });
 });
-

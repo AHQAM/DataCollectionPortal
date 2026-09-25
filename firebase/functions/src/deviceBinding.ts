@@ -300,77 +300,72 @@ export const forceLogoutUser = onCallGen2(async (data, context) => {
  *
  * Admin-only: Rejects a pending device replacement request.
  */
-export const rejectDeviceReplacement = onCallGen2(
-  async (data, context) => {
-    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-      throw new HttpsError(
-        "permission-denied",
-        "صلاحية المسؤول مطلوبة. | Admin permission required.",
-      );
+export const rejectDeviceReplacement = onCallGen2(async (data, context) => {
+  if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
+    throw new HttpsError(
+      "permission-denied",
+      "صلاحية المسؤول مطلوبة. | Admin permission required.",
+    );
+  }
+
+  const { bindingId, targetUserId, reason } = data || {};
+
+  if (!bindingId && !targetUserId) {
+    throw new HttpsError(
+      "invalid-argument",
+      "معرف الربط أو معرف المستخدم مطلوب. | bindingId or targetUserId required.",
+    );
+  }
+
+  try {
+    let targetDoc: admin.firestore.DocumentSnapshot | null = null;
+    if (bindingId) {
+      const docRef = db.collection("deviceBindings").doc(bindingId);
+      const docSnap = await docRef.get();
+      if (docSnap.exists) {
+        targetDoc = docSnap;
+      }
     }
 
-    const { bindingId, targetUserId, reason } = data || {};
-
-    if (!bindingId && !targetUserId) {
-      throw new HttpsError(
-        "invalid-argument",
-        "معرف الربط أو معرف المستخدم مطلوب. | bindingId or targetUserId required.",
-      );
+    if (!targetDoc && targetUserId) {
+      const snap = await db
+        .collection("deviceBindings")
+        .where("userId", "==", targetUserId)
+        .where("status", "in", ["PENDING", "PENDING_APPROVAL", "ACTIVE"])
+        .limit(1)
+        .get();
+      if (!snap.empty) {
+        targetDoc = snap.docs[0];
+      }
     }
 
-    try {
-      let targetDoc: admin.firestore.DocumentSnapshot | null = null;
-      if (bindingId) {
-        const docRef = db.collection("deviceBindings").doc(bindingId);
-        const docSnap = await docRef.get();
-        if (docSnap.exists) {
-          targetDoc = docSnap;
-        }
-      }
-
-      if (!targetDoc && targetUserId) {
-        const snap = await db
-          .collection("deviceBindings")
-          .where("userId", "==", targetUserId)
-          .where("status", "in", ["PENDING", "PENDING_APPROVAL", "ACTIVE"])
-          .limit(1)
-          .get();
-        if (!snap.empty) {
-          targetDoc = snap.docs[0];
-        }
-      }
-
-      if (targetDoc) {
-        await targetDoc.ref.update({
-          status: "REJECTED",
-          rejectedAt: admin.firestore.FieldValue.serverTimestamp(),
-          rejectedBy: context.auth.uid,
-          rejectionReason: reason || "Admin rejected replacement",
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-      }
-
-      await logAuditSafe({
-        userId: context.auth.uid,
-        userRole: "ADMIN",
-        action: "DEVICE_REPLACEMENT_REJECTED",
-        entityType: "DEVICE_BINDING",
-        entityId: bindingId || targetUserId || "UNKNOWN",
-        details: { reason: reason || "Admin rejected replacement" },
+    if (targetDoc) {
+      await targetDoc.ref.update({
+        status: "REJECTED",
+        rejectedAt: admin.firestore.FieldValue.serverTimestamp(),
+        rejectedBy: context.auth.uid,
+        rejectionReason: reason || "Admin rejected replacement",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-
-      return {
-        success: true,
-        messageAr: "تم رفض طلب استبدال الجهاز.",
-        messageEn: "Device replacement request rejected.",
-      };
-    } catch (error: any) {
-      if (error instanceof HttpsError) throw error;
-      console.error("Reject device replacement error:", error);
-      throw new HttpsError(
-        "internal",
-        "Internal server error.",
-      );
     }
-  },
-);
+
+    await logAuditSafe({
+      userId: context.auth.uid,
+      userRole: "ADMIN",
+      action: "DEVICE_REPLACEMENT_REJECTED",
+      entityType: "DEVICE_BINDING",
+      entityId: bindingId || targetUserId || "UNKNOWN",
+      details: { reason: reason || "Admin rejected replacement" },
+    });
+
+    return {
+      success: true,
+      messageAr: "تم رفض طلب استبدال الجهاز.",
+      messageEn: "Device replacement request rejected.",
+    };
+  } catch (error: any) {
+    if (error instanceof HttpsError) throw error;
+    console.error("Reject device replacement error:", error);
+    throw new HttpsError("internal", "Internal server error.");
+  }
+});

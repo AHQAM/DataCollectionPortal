@@ -25,17 +25,11 @@ export const exportReport = onCallGen2(async (data, context) => {
     branchId !== "ALL" &&
     branchId !== callerBranchId
   ) {
-    throw new HttpsError(
-      "permission-denied",
-      "Branch is outside your scope.",
-    );
+    throw new HttpsError("permission-denied", "Branch is outside your scope.");
   }
 
   if (!requestId) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Missing requestId.",
-    );
+    throw new HttpsError("invalid-argument", "Missing requestId.");
   }
 
   let recordsQuery: admin.firestore.Query = db

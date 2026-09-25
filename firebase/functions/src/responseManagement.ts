@@ -19,13 +19,17 @@ function parseTimestampMillis(ts: any): number | null {
 
 export const submitResponse = onCallGen2(async (data, context) => {
   if (!context.auth) {
-    throw new HttpsError(
-      "unauthenticated",
-      "Authentication required.",
-    );
+    throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const { requestId, recordId, activityId, formData, submittedAt, clientUpdatedAt } = data || {};
+  const {
+    requestId,
+    recordId,
+    activityId,
+    formData,
+    submittedAt,
+    clientUpdatedAt,
+  } = data || {};
   if (
     typeof requestId !== "string" ||
     typeof recordId !== "string" ||
@@ -33,10 +37,7 @@ export const submitResponse = onCallGen2(async (data, context) => {
     typeof formData !== "object" ||
     Array.isArray(formData)
   ) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Invalid response payload.",
-    );
+    throw new HttpsError("invalid-argument", "Invalid response payload.");
   }
 
   const recordRef = db.collection("records").doc(recordId);
@@ -255,147 +256,138 @@ export const submitResponse = onCallGen2(async (data, context) => {
   return txResult || { success: true, responseId: responseRef.id };
 });
 
-export const saveDraftResponse = onCallGen2(
-  async (data, context) => {
-    if (!context.auth) {
-      throw new HttpsError(
-        "unauthenticated",
-        "Authentication required.",
-      );
+export const saveDraftResponse = onCallGen2(async (data, context) => {
+  if (!context.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const { requestId, recordId, activityId, formData, clientUpdatedAt } =
+    data || {};
+  if (!recordId || !formData || typeof formData !== "object") {
+    throw new HttpsError("invalid-argument", "Invalid draft payload.");
+  }
+
+  const recordRef = db.collection("records").doc(recordId);
+  const record = await recordRef.get();
+
+  let isNewRecord = !record.exists;
+  let recData: FirebaseFirestore.DocumentData | null = null;
+
+  if (isNewRecord && requestId) {
+    const userDoc = await db.collection("users").doc(context.auth.uid).get();
+    const userData = userDoc.exists ? userDoc.data() : null;
+
+    recData = {
+      recordId,
+      requestId,
+      assignmentId: "UNASSIGNED",
+      assignedUserId: context.auth.uid,
+      assignedRegionNo: userData?.regionNo || context.auth.token.regionNo || "",
+      targetId: formData.targetId || formData.storeNo || recordId,
+      targetName:
+        formData.targetName ||
+        formData.storeName ||
+        formData.clientName ||
+        "مسودة عميل",
+      branchId: userData?.branchId || context.auth.token.branchId || "",
+      branchName: userData?.branchNameAr || "",
+      regionNo: userData?.regionNo || context.auth.token.regionNo || "",
+      userNo: userData?.userNo || userData?.username || "",
+      userName:
+        userData?.userNameAr ||
+        userData?.userNameEn ||
+        context.auth.token.name ||
+        "",
+      rawData: formData,
+      recordStatus: "DraftSaved",
+      completionPercent: 50,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  const responseRef = db.collection("responses").doc(recordId);
+  const now = admin.firestore.FieldValue.serverTimestamp();
+
+  const txResult = await db.runTransaction(async (transaction) => {
+    // 1. ALL READS FIRST
+    const recordDoc = await transaction.get(recordRef);
+    const isExisting = recordDoc.exists;
+
+    // Check conflict if existing
+    if (isExisting) {
+      const existingData = recordDoc.data() || {};
+      const existingStatus = existingData.recordStatus;
+      const isAlreadySubmitted =
+        existingStatus === "Submitted" || existingStatus === "Completed";
+
+      let isServerNewer = false;
+      if (clientUpdatedAt) {
+        const serverMs = parseTimestampMillis(
+          existingData.updatedAt || existingData.lastSavedAt,
+        );
+        const clientMs = parseTimestampMillis(clientUpdatedAt);
+        if (serverMs !== null && clientMs !== null && serverMs > clientMs) {
+          isServerNewer = true;
+        }
+      }
+
+      if (isAlreadySubmitted || isServerNewer) {
+        return {
+          success: true,
+          conflict: true,
+          reason: isAlreadySubmitted ? "RECORD_LOCKED" : "SERVER_NEWER",
+        };
+      }
     }
 
-    const { requestId, recordId, activityId, formData, clientUpdatedAt } = data || {};
-    if (!recordId || !formData || typeof formData !== "object") {
-      throw new HttpsError(
-        "invalid-argument",
-        "Invalid draft payload.",
-      );
-    }
-
-    const recordRef = db.collection("records").doc(recordId);
-    const record = await recordRef.get();
-
-    let isNewRecord = !record.exists;
-    let recData: FirebaseFirestore.DocumentData | null = null;
-
-    if (isNewRecord && requestId) {
-      const userDoc = await db.collection("users").doc(context.auth.uid).get();
-      const userData = userDoc.exists ? userDoc.data() : null;
-
-      recData = {
+    // 2. ALL WRITES AFTER READS
+    transaction.set(
+      responseRef,
+      {
+        responseId: responseRef.id,
+        requestId: requestId || recordDoc.data()?.requestId || "",
+        activityId: activityId || recordDoc.data()?.activityId || "",
         recordId,
-        requestId,
-        assignmentId: "UNASSIGNED",
-        assignedUserId: context.auth.uid,
-        assignedRegionNo:
-          userData?.regionNo || context.auth.token.regionNo || "",
-        targetId: formData.targetId || formData.storeNo || recordId,
-        targetName:
-          formData.targetName ||
-          formData.storeName ||
-          formData.clientName ||
-          "مسودة عميل",
-        branchId: userData?.branchId || context.auth.token.branchId || "",
-        branchName: userData?.branchNameAr || "",
-        regionNo: userData?.regionNo || context.auth.token.regionNo || "",
-        userNo: userData?.userNo || userData?.username || "",
-        userName:
-          userData?.userNameAr ||
-          userData?.userNameEn ||
-          context.auth.token.name ||
-          "",
-        rawData: formData,
+        savedBy: context.auth!.uid,
+        data: formData,
+        updatedAt: now,
+      },
+      { merge: true },
+    );
+
+    if (!isExisting && recData) {
+      transaction.set(recordRef, {
+        ...recData,
+        draftSavedAt: now,
+        lastSavedAt: now,
+        lastSavedBy: context.auth!.uid,
+        updatedAt: now,
+      });
+    } else if (isExisting) {
+      transaction.update(recordRef, {
         recordStatus: "DraftSaved",
         completionPercent: 50,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-    }
-
-    const responseRef = db.collection("responses").doc(recordId);
-    const now = admin.firestore.FieldValue.serverTimestamp();
-
-    const txResult = await db.runTransaction(async (transaction) => {
-      // 1. ALL READS FIRST
-      const recordDoc = await transaction.get(recordRef);
-      const isExisting = recordDoc.exists;
-
-      // Check conflict if existing
-      if (isExisting) {
-        const existingData = recordDoc.data() || {};
-        const existingStatus = existingData.recordStatus;
-        const isAlreadySubmitted =
-          existingStatus === "Submitted" || existingStatus === "Completed";
-
-        let isServerNewer = false;
-        if (clientUpdatedAt) {
-          const serverMs = parseTimestampMillis(
-            existingData.updatedAt || existingData.lastSavedAt,
-          );
-          const clientMs = parseTimestampMillis(clientUpdatedAt);
-          if (serverMs !== null && clientMs !== null && serverMs > clientMs) {
-            isServerNewer = true;
-          }
-        }
-
-        if (isAlreadySubmitted || isServerNewer) {
-          return {
-            success: true,
-            conflict: true,
-            reason: isAlreadySubmitted ? "RECORD_LOCKED" : "SERVER_NEWER",
-          };
-        }
-      }
-
-      // 2. ALL WRITES AFTER READS
-      transaction.set(
-        responseRef,
-        {
-          responseId: responseRef.id,
-          requestId: requestId || recordDoc.data()?.requestId || "",
-          activityId: activityId || recordDoc.data()?.activityId || "",
-          recordId,
-          savedBy: context.auth!.uid,
-          data: formData,
-          updatedAt: now,
-        },
-        { merge: true },
-      );
-
-      if (!isExisting && recData) {
-        transaction.set(recordRef, {
-          ...recData,
-          draftSavedAt: now,
-          lastSavedAt: now,
-          lastSavedBy: context.auth!.uid,
-          updatedAt: now,
-        });
-      } else if (isExisting) {
-        transaction.update(recordRef, {
-          recordStatus: "DraftSaved",
-          completionPercent: 50,
-          draftSavedAt: now,
-          lastSavedAt: now,
-          lastSavedBy: context.auth!.uid,
-          updatedAt: now,
-        });
-      }
-
-      return { success: true };
-    });
-
-    if (txResult?.conflict) {
-      await logAuditSafe({
-        userId: context.auth.uid,
-        userRole: context.auth.token.role || "REP",
-        action: "RECORD_DRAFT_CONFLICT_RESOLVED",
-        entityType: "RECORD",
-        entityId: recordId,
-        details: { requestId, reason: txResult.reason },
+        draftSavedAt: now,
+        lastSavedAt: now,
+        lastSavedBy: context.auth!.uid,
+        updatedAt: now,
       });
     }
 
-    return txResult || { success: true };
-  },
-);
+    return { success: true };
+  });
 
+  if (txResult?.conflict) {
+    await logAuditSafe({
+      userId: context.auth.uid,
+      userRole: context.auth.token.role || "REP",
+      action: "RECORD_DRAFT_CONFLICT_RESOLVED",
+      entityType: "RECORD",
+      entityId: recordId,
+      details: { requestId, reason: txResult.reason },
+    });
+  }
+
+  return txResult || { success: true };
+});

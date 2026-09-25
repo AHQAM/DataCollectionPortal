@@ -1,4 +1,8 @@
-import { onCall, CallableOptions, HttpsError } from "firebase-functions/v2/https";
+import {
+  onCall,
+  CallableOptions,
+  HttpsError,
+} from "firebase-functions/v2/https";
 import { verifyAppCheck } from "./appCheck";
 
 export { HttpsError };

@@ -34,17 +34,11 @@ export const authenticateWithRegionPassword = onCallGen2(
 
     // Input validation
     if (!regionNo || !password || !installationDeviceId) {
-      throw new HttpsError(
-        "invalid-argument",
-        "Missing required fields.",
-      );
+      throw new HttpsError("invalid-argument", "Missing required fields.");
     }
 
     if (typeof regionNo !== "string" || typeof password !== "string") {
-      throw new HttpsError(
-        "invalid-argument",
-        "Invalid input types.",
-      );
+      throw new HttpsError("invalid-argument", "Invalid input types.");
     }
 
     // Basic rate limiting: reject very rapid requests

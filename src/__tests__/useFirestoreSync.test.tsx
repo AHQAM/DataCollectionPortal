@@ -60,14 +60,15 @@ describe("useFirestoreSync Hook", () => {
     const unsubMock = vi.fn();
     let usersCallback: any;
 
-    vi.mocked(onSnapshot).mockImplementation(
-      ((queryRef: string, callback: Function) => {
-        if (queryRef === "users") {
-          usersCallback = callback;
-        }
-        return unsubMock;
-      }) as any,
-    );
+    vi.mocked(onSnapshot).mockImplementation(((
+      queryRef: string,
+      callback: Function,
+    ) => {
+      if (queryRef === "users") {
+        usersCallback = callback;
+      }
+      return unsubMock;
+    }) as any);
 
     const { unmount } = renderHook(() => useFirestoreSync());
 
@@ -103,14 +104,15 @@ describe("useFirestoreSync Hook", () => {
 
     let responsesCallback: any;
 
-    vi.mocked(onSnapshot).mockImplementation(
-      ((queryRef: string, callback: Function) => {
-        if (queryRef.includes("responses")) {
-          responsesCallback = callback;
-        }
-        return vi.fn();
-      }) as any,
-    );
+    vi.mocked(onSnapshot).mockImplementation(((
+      queryRef: string,
+      callback: Function,
+    ) => {
+      if (queryRef.includes("responses")) {
+        responsesCallback = callback;
+      }
+      return vi.fn();
+    }) as any);
 
     renderHook(() => useFirestoreSync());
 
@@ -136,13 +138,15 @@ describe("useFirestoreSync Hook", () => {
     const callbacks: Record<string, Function> = {};
     const errorCallbacks: Record<string, Function> = {};
 
-    vi.mocked(onSnapshot).mockImplementation(
-      ((queryRef: string, callback: Function, errorCb?: Function) => {
-        callbacks[queryRef] = callback;
-        if (errorCb) errorCallbacks[queryRef] = errorCb;
-        return vi.fn();
-      }) as any,
-    );
+    vi.mocked(onSnapshot).mockImplementation(((
+      queryRef: string,
+      callback: Function,
+      errorCb?: Function,
+    ) => {
+      callbacks[queryRef] = callback;
+      if (errorCb) errorCallbacks[queryRef] = errorCb;
+      return vi.fn();
+    }) as any);
 
     renderHook(() => useFirestoreSync());
 

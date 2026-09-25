@@ -8,10 +8,7 @@ const MAX_IMPORT_FILENAME_LENGTH = 255;
 
 const checkAdminOrSupervisor = (context: CallableContextCompat) => {
   if (!context.auth) {
-    throw new HttpsError(
-      "unauthenticated",
-      "User must be authenticated.",
-    );
+    throw new HttpsError("unauthenticated", "User must be authenticated.");
   }
   const role = context.auth.token.role;
   if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {
@@ -22,14 +19,12 @@ const checkAdminOrSupervisor = (context: CallableContextCompat) => {
   }
 };
 
-export const importDataPreview = onCallGen2(
-  async (data, context) => {
-    checkAdminOrSupervisor(context);
-    // Optional: Just return a preview of first 5 rows and mapping hints
-    // Can be implemented if Admin UI wants backend processing for CSV
-    return { success: true, message: "Preview generated" };
-  },
-);
+export const importDataPreview = onCallGen2(async (data, context) => {
+  checkAdminOrSupervisor(context);
+  // Optional: Just return a preview of first 5 rows and mapping hints
+  // Can be implemented if Admin UI wants backend processing for CSV
+  return { success: true, message: "Preview generated" };
+});
 
 export const commitImport = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
@@ -45,10 +40,7 @@ export const commitImport = onCallGen2(async (data, context) => {
     typeof mapping !== "object" ||
     Array.isArray(mapping)
   ) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Missing required fields.",
-    );
+    throw new HttpsError("invalid-argument", "Missing required fields.");
   }
 
   if (
@@ -57,10 +49,7 @@ export const commitImport = onCallGen2(async (data, context) => {
       fileName.length === 0 ||
       fileName.length > MAX_IMPORT_FILENAME_LENGTH)
   ) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Invalid import file name.",
-    );
+    throw new HttpsError("invalid-argument", "Invalid import file name.");
   }
 
   const requestDoc = await db.collection("requests").doc(requestId).get();

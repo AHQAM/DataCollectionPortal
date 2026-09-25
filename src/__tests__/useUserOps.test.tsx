@@ -47,7 +47,9 @@ describe("useUserOps Hook", () => {
 
   describe("updateUser", () => {
     it("returns success and logs audit when update succeeds", async () => {
-      vi.mocked(userApi.updateUser).mockResolvedValueOnce({ success: true } as any);
+      vi.mocked(userApi.updateUser).mockResolvedValueOnce({
+        success: true,
+      } as any);
 
       const hook = useUserOps();
       const userObj = {
@@ -146,7 +148,9 @@ describe("useUserOps Hook", () => {
 
   describe("deactivateUser", () => {
     it("deactivates and logs", async () => {
-      vi.mocked(userApi.deactivateUser).mockResolvedValueOnce({ success: true } as any);
+      vi.mocked(userApi.deactivateUser).mockResolvedValueOnce({
+        success: true,
+      } as any);
 
       const hook = useUserOps();
       const res = await hook.deactivateUser("u1");

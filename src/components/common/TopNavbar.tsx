@@ -275,7 +275,8 @@ export const TopNavbar: React.FC = () => {
                   <div className="font-bold text-sm text-slate-800 pb-2 border-b border-slate-100 flex items-center justify-between">
                     <span>{t("topNavbar.notifications")}</span>
                     <span className="text-purple-600 text-xs font-semibold">
-                      {notifications.length} {t("nav.notifications", "إشعار", "notifications")}
+                      {notifications.length}{" "}
+                      {t("nav.notifications", "إشعار", "notifications")}
                     </span>
                   </div>
                   <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 mt-2">

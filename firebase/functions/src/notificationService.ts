@@ -118,57 +118,52 @@ export const sendNotificationInternal = async (
 };
 
 // Callable for Admin to send manual broadcast
-export const sendBroadcastNotification = onCallGen2(
-  async (data, context) => {
-    if (
-      !context.auth ||
-      (context.auth.token.role !== USER_ROLES.ADMIN &&
-        context.auth.token.role !== USER_ROLES.SUPERVISOR)
-    ) {
-      throw new HttpsError(
-        "permission-denied",
-        "Only admins or supervisors can send broadcasts.",
-      );
-    }
+export const sendBroadcastNotification = onCallGen2(async (data, context) => {
+  if (
+    !context.auth ||
+    (context.auth.token.role !== USER_ROLES.ADMIN &&
+      context.auth.token.role !== USER_ROLES.SUPERVISOR)
+  ) {
+    throw new HttpsError(
+      "permission-denied",
+      "Only admins or supervisors can send broadcasts.",
+    );
+  }
 
-    const { targetAudience, titleAr, titleEn, bodyAr, bodyEn, payload } =
-      data || {};
+  const { targetAudience, titleAr, titleEn, bodyAr, bodyEn, payload } =
+    data || {};
 
-    if (!titleAr || !titleEn || !bodyAr || !bodyEn) {
-      throw new HttpsError(
-        "invalid-argument",
-        "Missing title or body.",
-      );
-    }
+  if (!titleAr || !titleEn || !bodyAr || !bodyEn) {
+    throw new HttpsError("invalid-argument", "Missing title or body.");
+  }
 
-    let usersQuery: admin.firestore.Query = db
-      .collection("users")
-      .where("isActive", "==", true);
+  let usersQuery: admin.firestore.Query = db
+    .collection("users")
+    .where("isActive", "==", true);
 
-    if (targetAudience === "REPRESENTATIVES") {
-      usersQuery = usersQuery.where("role", "==", USER_ROLES.REP);
-    } else if (targetAudience === "SUPERVISORS") {
-      usersQuery = usersQuery.where("role", "==", USER_ROLES.SUPERVISOR);
-    }
+  if (targetAudience === "REPRESENTATIVES") {
+    usersQuery = usersQuery.where("role", "==", USER_ROLES.REP);
+  } else if (targetAudience === "SUPERVISORS") {
+    usersQuery = usersQuery.where("role", "==", USER_ROLES.SUPERVISOR);
+  }
 
-    const usersSnap = await usersQuery.get();
-    const promises: Promise<void>[] = [];
+  const usersSnap = await usersQuery.get();
+  const promises: Promise<void>[] = [];
 
-    usersSnap.docs.forEach((doc) => {
-      promises.push(
-        sendNotificationInternal(
-          doc.id,
-          titleAr,
-          titleEn,
-          bodyAr,
-          bodyEn,
-          payload,
-        ),
-      );
-    });
+  usersSnap.docs.forEach((doc) => {
+    promises.push(
+      sendNotificationInternal(
+        doc.id,
+        titleAr,
+        titleEn,
+        bodyAr,
+        bodyEn,
+        payload,
+      ),
+    );
+  });
 
-    await Promise.allSettled(promises);
+  await Promise.allSettled(promises);
 
-    return { success: true, count: usersSnap.size };
-  },
-);
+  return { success: true, count: usersSnap.size };
+});

@@ -4,10 +4,14 @@ import { TopNavbar } from "./components/common/TopNavbar";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 const AuthPortal = lazy(() =>
-  import("./components/common/AuthPortal").then((m) => ({ default: m.AuthPortal })),
+  import("./components/common/AuthPortal").then((m) => ({
+    default: m.AuthPortal,
+  })),
 );
 const AdminLayout = lazy(() =>
-  import("./components/admin/AdminLayout").then((m) => ({ default: m.AdminLayout })),
+  import("./components/admin/AdminLayout").then((m) => ({
+    default: m.AdminLayout,
+  })),
 );
 
 const MainAppContent: React.FC = () => {

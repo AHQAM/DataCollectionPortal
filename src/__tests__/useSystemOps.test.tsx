@@ -35,7 +35,9 @@ describe("useSystemOps Hook", () => {
 
   describe("Device Operations", () => {
     it("approveDeviceReplacement succeeds and logs audit", async () => {
-      vi.mocked(deviceApi.replaceDevice).mockResolvedValueOnce(undefined as any);
+      vi.mocked(deviceApi.replaceDevice).mockResolvedValueOnce(
+        undefined as any,
+      );
       const hook = useSystemOps();
       const res = await hook.approveDeviceReplacement("u1", "lost");
 
@@ -50,7 +52,9 @@ describe("useSystemOps Hook", () => {
     });
 
     it("releaseDeviceBinding succeeds and logs audit", async () => {
-      vi.mocked(deviceApi.releaseDevice).mockResolvedValueOnce(undefined as any);
+      vi.mocked(deviceApi.releaseDevice).mockResolvedValueOnce(
+        undefined as any,
+      );
       const hook = useSystemOps();
       const res = await hook.releaseDeviceBinding("u1");
 
@@ -123,7 +127,9 @@ describe("useSystemOps Hook", () => {
         fields: [{ requestId: "req1", fieldId: "f1" } as any],
       });
       useAuthStore.setState({ currentUser: { userId: "admin1" } as any });
-      vi.mocked(templateApi.saveTemplate).mockResolvedValueOnce(undefined as any);
+      vi.mocked(templateApi.saveTemplate).mockResolvedValueOnce(
+        undefined as any,
+      );
 
       const hook = useSystemOps();
       const res = await hook.saveAsTemplate("req1", "ar", "en", "cat");
@@ -134,7 +140,9 @@ describe("useSystemOps Hook", () => {
 
   describe("System Maintenance", () => {
     it("wipeDemoDataForProduction calls systemApi", async () => {
-      vi.mocked(systemApi.wipeDemoData).mockResolvedValueOnce({ wiped: true } as any);
+      vi.mocked(systemApi.wipeDemoData).mockResolvedValueOnce({
+        wiped: true,
+      } as any);
       const hook = useSystemOps();
       const res = await hook.wipeDemoDataForProduction();
       expect(res.success).toBe(true);

@@ -339,177 +339,173 @@ export const deactivateUser = onCallGen2(async (data, context) => {
  * Admin-only batch user creation from import.
  * Each user gets a unique temporary password and mustChangePassword = true.
  */
-export const importUsersBatch = onCallGen2(
-  async (data, context) => {
-    if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
-      throw new HttpsError(
-        "permission-denied",
-        "صلاحية المسؤول مطلوبة. | Admin permission required.",
-      );
-    }
+export const importUsersBatch = onCallGen2(async (data, context) => {
+  if (!context.auth || context.auth.token.role !== USER_ROLES.ADMIN) {
+    throw new HttpsError(
+      "permission-denied",
+      "صلاحية المسؤول مطلوبة. | Admin permission required.",
+    );
+  }
 
-    const { users } = data;
+  const { users } = data;
 
-    if (!Array.isArray(users) || users.length === 0) {
-      throw new HttpsError(
-        "invalid-argument",
-        "قائمة المستخدمين مطلوبة. | Users list is required.",
-      );
-    }
+  if (!Array.isArray(users) || users.length === 0) {
+    throw new HttpsError(
+      "invalid-argument",
+      "قائمة المستخدمين مطلوبة. | Users list is required.",
+    );
+  }
 
-    if (users.length > 100) {
-      throw new HttpsError(
-        "invalid-argument",
-        "الحد الأقصى 100 مستخدم في الدفعة الواحدة. | Maximum 100 users per batch.",
-      );
-    }
+  if (users.length > 100) {
+    throw new HttpsError(
+      "invalid-argument",
+      "الحد الأقصى 100 مستخدم في الدفعة الواحدة. | Maximum 100 users per batch.",
+    );
+  }
 
-    try {
-      // Check for duplicate usernames
-      const existingUsers = await db.collection("users").get();
-      const existingUsernames = new Set(
-        existingUsers.docs.map((d) => d.data().username),
-      );
+  try {
+    // Check for duplicate usernames
+    const existingUsers = await db.collection("users").get();
+    const existingUsernames = new Set(
+      existingUsers.docs.map((d) => d.data().username),
+    );
 
-      const results = {
-        created: 0,
-        updated: 0,
-        skipped: 0,
-        errors: [] as string[],
-        temporaryPasswords: [] as Array<{
-          username: string;
-          userNameAr: string;
-          branchName?: string;
-          allowedRegionNos: string[];
-          password: string;
-        }>,
-      };
+    const results = {
+      created: 0,
+      updated: 0,
+      skipped: 0,
+      errors: [] as string[],
+      temporaryPasswords: [] as Array<{
+        username: string;
+        userNameAr: string;
+        branchName?: string;
+        allowedRegionNos: string[];
+        password: string;
+      }>,
+    };
 
-      const batch = db.batch();
+    const batch = db.batch();
 
-      for (const user of users) {
-        const username = String(user.username || user.regionNo).trim();
+    for (const user of users) {
+      const username = String(user.username || user.regionNo).trim();
 
-        if (!username || !user.userNameAr || !user.branchId) {
-          results.errors.push(
-            `Skipped: Missing required fields for ${username}`,
-          );
-          results.skipped++;
-          continue;
-        }
-
-        if (existingUsernames.has(username)) {
-          const existingDoc = existingUsers.docs.find(
-            (d) =>
-              d.data().username === username || d.data().regionNo === username,
-          );
-          if (existingDoc) {
-            const existingData = existingDoc.data();
-            const currentAllowed = existingData.allowedRegionNos || [
-              existingData.regionNo,
-            ];
-            const newAllowed = user.allowedRegionNos || [
-              user.regionNo || username,
-            ];
-            const merged = Array.from(
-              new Set([...currentAllowed, ...newAllowed]),
-            );
-            batch.update(existingDoc.ref, {
-              allowedRegionNos: merged,
-              branchId: user.branchId || existingData.branchId,
-              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            });
-            results.updated++;
-          }
-          continue;
-        }
-
-        const userId = `USER-${uuidv4().substring(0, 8).toUpperCase()}`;
-        const userRef = db.collection("users").doc(userId);
-        const temporaryPassword = randomBytes(9).toString("base64url");
-        const passwordHash = await hashPassword(temporaryPassword);
-
-        const allowedRegions = user.allowedRegionNos || [
-          String(user.regionNo || username).trim(),
-        ];
-
-        batch.set(userRef, {
-          userId,
-          username,
-          regionNo: String(user.regionNo || username).trim(),
-          allowedRegionNos: allowedRegions,
-          userNo: user.userNo || username,
-          userNameAr: user.userNameAr.trim(),
-          userNameEn: user.userNameEn?.trim() || null,
-          email: user.email?.trim() || null,
-          mobile: user.mobile?.trim() || null,
-          branchId: user.branchId,
-          role: user.role || "REP",
-          passwordHash,
-          mustChangePassword: true,
-          isActive: true,
-          failedLoginCount: 0,
-          lockedUntil: null,
-          lastLoginAt: null,
-          passwordChangedAt: null,
-          sessionVersion: 1,
-          deviceBindingStatus: "UNBOUND",
-          boundDeviceIdHash: null,
-          boundDevicePlatform: null,
-          boundDeviceLabel: null,
-          maxAllowedDevices: 1,
-          fcmToken: null,
-          fcmTokenUpdatedAt: null,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          deletedAt: null,
-          deletedBy: null,
-        });
-
-        existingUsernames.add(username);
-        results.temporaryPasswords.push({
-          username,
-          userNameAr: user.userNameAr.trim(),
-          branchName: user.branchNameAr || user.branchId,
-          allowedRegionNos: allowedRegions,
-          password: temporaryPassword,
-        });
-        results.created++;
+      if (!username || !user.userNameAr || !user.branchId) {
+        results.errors.push(`Skipped: Missing required fields for ${username}`);
+        results.skipped++;
+        continue;
       }
 
-      await batch.commit();
+      if (existingUsernames.has(username)) {
+        const existingDoc = existingUsers.docs.find(
+          (d) =>
+            d.data().username === username || d.data().regionNo === username,
+        );
+        if (existingDoc) {
+          const existingData = existingDoc.data();
+          const currentAllowed = existingData.allowedRegionNos || [
+            existingData.regionNo,
+          ];
+          const newAllowed = user.allowedRegionNos || [
+            user.regionNo || username,
+          ];
+          const merged = Array.from(
+            new Set([...currentAllowed, ...newAllowed]),
+          );
+          batch.update(existingDoc.ref, {
+            allowedRegionNos: merged,
+            branchId: user.branchId || existingData.branchId,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          results.updated++;
+        }
+        continue;
+      }
 
-      await logAuditSafe({
-        userId: context.auth.uid,
-        userRole: "ADMIN",
-        action: "USERS_BATCH_IMPORTED",
-        entityType: "USER",
-        entityId: "BATCH",
-        details: {
-          totalInput: users.length,
-          created: results.created,
-          skipped: results.skipped,
-        },
+      const userId = `USER-${uuidv4().substring(0, 8).toUpperCase()}`;
+      const userRef = db.collection("users").doc(userId);
+      const temporaryPassword = randomBytes(9).toString("base64url");
+      const passwordHash = await hashPassword(temporaryPassword);
+
+      const allowedRegions = user.allowedRegionNos || [
+        String(user.regionNo || username).trim(),
+      ];
+
+      batch.set(userRef, {
+        userId,
+        username,
+        regionNo: String(user.regionNo || username).trim(),
+        allowedRegionNos: allowedRegions,
+        userNo: user.userNo || username,
+        userNameAr: user.userNameAr.trim(),
+        userNameEn: user.userNameEn?.trim() || null,
+        email: user.email?.trim() || null,
+        mobile: user.mobile?.trim() || null,
+        branchId: user.branchId,
+        role: user.role || "REP",
+        passwordHash,
+        mustChangePassword: true,
+        isActive: true,
+        failedLoginCount: 0,
+        lockedUntil: null,
+        lastLoginAt: null,
+        passwordChangedAt: null,
+        sessionVersion: 1,
+        deviceBindingStatus: "UNBOUND",
+        boundDeviceIdHash: null,
+        boundDevicePlatform: null,
+        boundDeviceLabel: null,
+        maxAllowedDevices: 1,
+        fcmToken: null,
+        fcmTokenUpdatedAt: null,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        deletedAt: null,
+        deletedBy: null,
       });
 
-      return {
-        success: true,
+      existingUsernames.add(username);
+      results.temporaryPasswords.push({
+        username,
+        userNameAr: user.userNameAr.trim(),
+        branchName: user.branchNameAr || user.branchId,
+        allowedRegionNos: allowedRegions,
+        password: temporaryPassword,
+      });
+      results.created++;
+    }
+
+    await batch.commit();
+
+    await logAuditSafe({
+      userId: context.auth.uid,
+      userRole: "ADMIN",
+      action: "USERS_BATCH_IMPORTED",
+      entityType: "USER",
+      entityId: "BATCH",
+      details: {
+        totalInput: users.length,
         created: results.created,
         skipped: results.skipped,
-        errors: results.errors,
-        temporaryPasswords: results.temporaryPasswords,
-        messageAr: `تم إنشاء ${results.created} مستخدم بنجاح.`,
-        messageEn: `${results.created} users created successfully.`,
-      };
-    } catch (error: any) {
-      if (error instanceof HttpsError) {
-        throw error;
-      }
-      console.error("Import users batch error:", error);
-      throw new HttpsError(
-        "internal",
-        "حدث خطأ في الخادم. | Internal server error.",
-      );
+      },
+    });
+
+    return {
+      success: true,
+      created: results.created,
+      skipped: results.skipped,
+      errors: results.errors,
+      temporaryPasswords: results.temporaryPasswords,
+      messageAr: `تم إنشاء ${results.created} مستخدم بنجاح.`,
+      messageEn: `${results.created} users created successfully.`,
+    };
+  } catch (error: any) {
+    if (error instanceof HttpsError) {
+      throw error;
     }
-  },
-);
+    console.error("Import users batch error:", error);
+    throw new HttpsError(
+      "internal",
+      "حدث خطأ في الخادم. | Internal server error.",
+    );
+  }
+});

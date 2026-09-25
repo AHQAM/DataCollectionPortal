@@ -131,7 +131,9 @@ describe("useRecordOps Hook", () => {
 
   describe("submitRecord", () => {
     it("submits record and logs audit", async () => {
-      vi.mocked(recordApi.submitRecord).mockResolvedValueOnce({ success: true } as any);
+      vi.mocked(recordApi.submitRecord).mockResolvedValueOnce({
+        success: true,
+      } as any);
       const hook = useRecordOps();
       const res = await hook.submitRecord("r1", { fieldB: 2 });
 
@@ -197,7 +199,9 @@ describe("useRecordOps Hook", () => {
 
   describe("reassignRecord", () => {
     it("reassigns and logs audit", async () => {
-      vi.mocked(recordApi.reassignRecord).mockResolvedValueOnce(undefined as any);
+      vi.mocked(recordApi.reassignRecord).mockResolvedValueOnce(
+        undefined as any,
+      );
       const hook = useRecordOps();
       const res = await hook.reassignRecord("r1", "user2", "holiday");
 
@@ -248,7 +252,9 @@ describe("useRecordOps Hook", () => {
     });
 
     it("returns error on exception", async () => {
-      vi.mocked(recordApi.commitImport).mockRejectedValueOnce(new Error("Error"));
+      vi.mocked(recordApi.commitImport).mockRejectedValueOnce(
+        new Error("Error"),
+      );
       const hook = useRecordOps();
       const res = await hook.commitImport("req1", [], {}, "test.csv");
 

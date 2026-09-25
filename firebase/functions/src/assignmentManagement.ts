@@ -6,10 +6,7 @@ import { USER_ROLES } from "./roles";
 
 const checkAdminOrSupervisor = (context: CallableContextCompat) => {
   if (!context.auth) {
-    throw new HttpsError(
-      "unauthenticated",
-      "User must be authenticated.",
-    );
+    throw new HttpsError("unauthenticated", "User must be authenticated.");
   }
   const role = context.auth.token.role;
   if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {

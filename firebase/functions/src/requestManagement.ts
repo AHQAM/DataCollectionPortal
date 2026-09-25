@@ -8,10 +8,7 @@ import { logAuditSafe } from "./auditLogger";
 
 const checkAdminOrSupervisor = (context: CallableContextCompat) => {
   if (!context.auth) {
-    throw new HttpsError(
-      "unauthenticated",
-      "User must be authenticated.",
-    );
+    throw new HttpsError("unauthenticated", "User must be authenticated.");
   }
   const role = context.auth.token.role;
   if (role !== USER_ROLES.ADMIN && role !== USER_ROLES.SUPERVISOR) {
@@ -43,10 +40,7 @@ export const createRequest = onCallGen2(async (data, context) => {
   } = data;
 
   if (!titleAr) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Title (Ar) is required.",
-    );
+    throw new HttpsError("invalid-argument", "Title (Ar) is required.");
   }
 
   const requestId =
@@ -92,53 +86,48 @@ export const createRequest = onCallGen2(async (data, context) => {
   return { success: true, requestId: requestId, activityId: requestId };
 });
 
-export const updateDraftRequest = onCallGen2(
-  async (data, context) => {
-    checkAdminOrSupervisor(context);
+export const updateDraftRequest = onCallGen2(async (data, context) => {
+  checkAdminOrSupervisor(context);
 
-    const { requestId, updates } = data;
-    if (!requestId || !updates) {
-      throw new HttpsError(
-        "invalid-argument",
-        "requestId and updates are required.",
-      );
-    }
+  const { requestId, updates } = data;
+  if (!requestId || !updates) {
+    throw new HttpsError(
+      "invalid-argument",
+      "requestId and updates are required.",
+    );
+  }
 
-    const requestRef = db.collection("requests").doc(requestId);
-    const requestDoc = await requestRef.get();
+  const requestRef = db.collection("requests").doc(requestId);
+  const requestDoc = await requestRef.get();
 
-    if (!requestDoc.exists) {
-      throw new HttpsError("not-found", "Request not found.");
-    }
+  if (!requestDoc.exists) {
+    throw new HttpsError("not-found", "Request not found.");
+  }
 
-    if (
-      requestDoc.data()?.status !== "Draft" &&
-      requestDoc.data()?.status !== "draft"
-    ) {
-      throw new HttpsError(
-        "failed-precondition",
-        "Can only update draft requests.",
-      );
-    }
+  if (
+    requestDoc.data()?.status !== "Draft" &&
+    requestDoc.data()?.status !== "draft"
+  ) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Can only update draft requests.",
+    );
+  }
 
-    await requestRef.update({
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    });
+  await requestRef.update({
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  });
 
-    return { success: true };
-  },
-);
+  return { success: true };
+});
 
 export const publishRequest = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
 
   const { requestId } = data;
   if (!requestId) {
-    throw new HttpsError(
-      "invalid-argument",
-      "requestId is required.",
-    );
+    throw new HttpsError("invalid-argument", "requestId is required.");
   }
 
   const requestRef = db.collection("requests").doc(requestId);
@@ -242,10 +231,7 @@ export const closeRequest = onCallGen2(async (data, context) => {
 
   const { requestId } = data;
   if (!requestId) {
-    throw new HttpsError(
-      "invalid-argument",
-      "requestId is required.",
-    );
+    throw new HttpsError("invalid-argument", "requestId is required.");
   }
 
   await db.collection("requests").doc(requestId).update({
@@ -262,10 +248,7 @@ export const archiveRequest = onCallGen2(async (data, context) => {
 
   const { requestId } = data;
   if (!requestId) {
-    throw new HttpsError(
-      "invalid-argument",
-      "requestId is required.",
-    );
+    throw new HttpsError("invalid-argument", "requestId is required.");
   }
 
   await db.collection("requests").doc(requestId).update({
@@ -282,10 +265,7 @@ export const reopenRequest = onCallGen2(async (data, context) => {
 
   const { requestId } = data;
   if (!requestId) {
-    throw new HttpsError(
-      "invalid-argument",
-      "requestId is required.",
-    );
+    throw new HttpsError("invalid-argument", "requestId is required.");
   }
 
   await db.collection("requests").doc(requestId).update({
@@ -301,20 +281,14 @@ export const cloneRequest = onCallGen2(async (data, context) => {
 
   const { requestId } = data;
   if (!requestId) {
-    throw new HttpsError(
-      "invalid-argument",
-      "requestId is required.",
-    );
+    throw new HttpsError("invalid-argument", "requestId is required.");
   }
 
   const srcRef = db.collection("requests").doc(requestId);
   const srcDoc = await srcRef.get();
 
   if (!srcDoc.exists) {
-    throw new HttpsError(
-      "not-found",
-      "Source request not found.",
-    );
+    throw new HttpsError("not-found", "Source request not found.");
   }
 
   const srcData = srcDoc.data()!;
@@ -378,10 +352,7 @@ export const deleteRequest = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
   const { requestId } = data || {};
   if (!requestId || typeof requestId !== "string") {
-    throw new HttpsError(
-      "invalid-argument",
-      "requestId is required.",
-    );
+    throw new HttpsError("invalid-argument", "requestId is required.");
   }
 
   const requestRef = db.collection("requests").doc(requestId);

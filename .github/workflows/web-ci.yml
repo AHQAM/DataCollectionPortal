@@ -27,7 +27,6 @@ jobs:
       - name: Dependency Security Audit
         run: npm audit --audit-level=critical
 
-
       - name: Typecheck
         run: npm run typecheck
 
