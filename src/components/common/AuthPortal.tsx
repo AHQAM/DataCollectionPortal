@@ -74,7 +74,7 @@ export const AuthPortal: React.FC = () => {
               className="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
             >
               <Globe className="w-3.5 h-3.5" />
-              <span>{lang === "ar" ? "English" : "عربي"}</span>
+              <span>{t("common.langToggle", { lng: lang })}</span>
             </button>
           </div>
         </div>

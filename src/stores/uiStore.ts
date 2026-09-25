@@ -94,14 +94,9 @@ export const useUIStore = create<UIStore>((set, get) => {
       if (res === "granted") {
         const { lang } = get();
         sendBrowserNotification(
-          lang === "ar"
-            ? "تم تفعيل إشعارات الجوال بنجاح!"
-            : "Push Notifications Enabled!",
+          i18n.t("pushNotifications.pushEnabledTitle", { lng: lang }),
           {
-            body:
-              lang === "ar"
-                ? "ستصلك الآن تنبيهات فورية عند نزول أي طلبات أو سجلات جديدة على هاتفك."
-                : "You will now receive instant alerts on your phone whenever new requests or records arrive.",
+            body: i18n.t("pushNotifications.pushEnabledBody", { lng: lang }),
           },
         );
         return true;

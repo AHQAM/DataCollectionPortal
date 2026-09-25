@@ -24,7 +24,8 @@
     "date": "التاريخ",
     "notes": "الملاحظات",
     "offlineNotice": "وضع العمل بدون اتصال مفعل. سيتم المزامنة تلقائياً عند عودة الإنترنت.",
-    "all": "الكل"
+    "all": "الكل",
+    "langToggle": "English"
   },
   "nav": {
     "dashboard": "لوحة القيادة",
@@ -194,7 +195,12 @@
     "mergeOption": "دمج مع الحالي (Merge)",
     "replaceOption": "استبدال بالكامل (Replace All)",
     "moreRegionsInFile": "... ويوجد {{count}} مناطق إضافية في الملف",
-    "confirmImportCount": "تأكيد الاستيراد ({{branches}} فرع / {{regions}} منطقة)"
+    "confirmImportCount": "تأكيد الاستيراد ({{branches}} فرع / {{regions}} منطقة)",
+    "cannotDeleteBranch": "تعذر حذف الفرع",
+    "cannotDeleteRegion": "تعذر حذف المنطقة",
+    "excelEmptyError": "الملف فارغ أو لا يحتوي على صفوف بيانات",
+    "excelNoMatchingCols": "لم يتم العثور على أعمدة متطابقة في الملف. يرجى التأكد من مطابقة أسماء الأعمدة أو تحميل القالب النموذجي.",
+    "excelImportSuccess": "تم استيراد {{branchesCount}} فرع و {{regionsCount}} منطقة ميدانية بنجاح"
   },
   "users": {
     "title": "إدارة المستخدمين",
@@ -281,6 +287,9 @@
     "fileEmptyError": "الملف فارغ أو لا يحتوي على صفوف صالحة",
     "excelReadError": "حدث خطأ أثناء قراءة ملف الإكسل. يرجى التأكد من صيغة الملف (.xlsx, .xls, .csv)",
     "importError": "حدث خطأ أثناء استيراد المستخدمين. يرجى المحاولة مرة أخرى.",
+    "userNumberMissing": "رقم المستخدم/المنطقة مفقود",
+    "userNameMissing": "اسم المستخدم مفقود",
+    "newRepDefault": "مندوب جديد",
     "mainBranchDefault": "الفرع الرئيسي",
     "securityPolicyTitle": "إجراءات الأمان وكلمات المرور:",
     "securityPolicyDesc": "سيتم إنشاء رمز دخول مؤقت وفريد لكل مندوب مستورد، وسيلزم النظام المندوب بتعيين كلمة مرور جديدة فور تسجيل دخوله الأول.",
@@ -295,7 +304,12 @@
     "qaModalTitle": "تبديل الحساب السريع لاختبار النظام",
     "broadcast": "إرسال إشعار عام (FCM)",
     "notifications": "إشعارات النظام",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "adminRoleDesc": "مسؤول النظام • كامل الصلاحيات",
+    "supervisorRoleDesc": "مشرف • {{branch}}",
+    "userRoleDesc": "مستخدم • منطقة {{region}} • {{branch}}",
+    "statusLocked": "مقفل",
+    "statusNewPw": "تغيير كلمة المرور"
   },
   "pwa": {
     "installApp": "تثبيت التطبيق",
@@ -837,5 +851,24 @@
       "previewMobile": "فتح واجهة الهاتف لمعاينة السجلات والمطابقة",
       "importAnother": "استيراد ملف إكسل آخر"
     }
+  },
+  "app": {
+    "verifyingSession": "جاري التحقق من جلسة الدخول...",
+    "loadingInterface": "جاري تحميل الواجهة...",
+    "loadingDashboard": "جاري تحميل لوحة التحكم...",
+    "footerTitle": "منصة جمع البيانات الميدانية",
+    "footerCompliance": "متوافق مع حوكمة أمان الأجهزة وتغيير كلمات المرور الإلزامي ونظام الأوفلاين التلقائي",
+    "enterpriseVersion": "v2.4.0 Enterprise"
+  },
+  "recordOps": {
+    "draftSavedOffline": "تم حفظ المسودة محلياً. ستتم المزامنة تلقائياً عند عودة الاتصال.",
+    "draftConflictResolved": "تنبيه: يوجد إصدار أحدث على الخادم، تم فض التعارض بنجاح.",
+    "submittedOffline": "تم اعتماد السجل محلياً بدون اتصال. ستتم المزامنة تلقائياً فور توفر الإنترنت.",
+    "conflictResolved": "تم حفظ الاستجابة مع رصد تعارض زمني وحله بنجاح.",
+    "savedAndSubmitted": "تم الحفظ والاعتماد بنجاح."
+  },
+  "pushNotifications": {
+    "pushEnabledTitle": "تم تفعيل إشعارات الجوال بنجاح!",
+    "pushEnabledBody": "ستصلك الآن تنبيهات فورية عند نزول أي طلبات أو سجلات جديدة على هاتفك."
   }
 }

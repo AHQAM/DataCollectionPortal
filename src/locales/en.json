@@ -24,7 +24,8 @@
     "date": "Date",
     "notes": "Notes",
     "offlineNotice": "Offline mode active. Operations will automatically sync when connection is restored.",
-    "all": "All"
+    "all": "All",
+    "langToggle": "عربي"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -194,7 +195,12 @@
     "mergeOption": "Merge with existing",
     "replaceOption": "Replace all",
     "moreRegionsInFile": "... and {{count}} more regions in file",
-    "confirmImportCount": "Confirm Import ({{branches}} Branches / {{regions}} Regions)"
+    "confirmImportCount": "Confirm Import ({{branches}} Branches / {{regions}} Regions)",
+    "cannotDeleteBranch": "Cannot delete branch",
+    "cannotDeleteRegion": "Cannot delete region",
+    "excelEmptyError": "The file is empty or contains no rows",
+    "excelNoMatchingCols": "No matching columns found. Please verify column headers or use the standard template.",
+    "excelImportSuccess": "Successfully imported {{branchesCount}} branches and {{regionsCount}} regions"
   },
   "users": {
     "title": "User Management",
@@ -281,6 +287,9 @@
     "fileEmptyError": "The file is empty or contains no rows",
     "excelReadError": "Error reading Excel file. Please ensure it is a valid .xlsx, .xls, or .csv",
     "importError": "Error importing users. Please try again.",
+    "userNumberMissing": "User number is missing",
+    "userNameMissing": "User name is missing",
+    "newRepDefault": "New Representative",
     "mainBranchDefault": "Main Branch",
     "securityPolicyTitle": "Security & PIN Policy:",
     "securityPolicyDesc": "Imported representatives receive a unique temporary password and must set a new password on first sign-in.",
@@ -295,7 +304,12 @@
     "qaModalTitle": "Switch Account for QA / Demo",
     "broadcast": "Broadcast Push Notification",
     "notifications": "System Notifications",
-    "logout": "Logout"
+    "logout": "Logout",
+    "adminRoleDesc": "System Admin • Full Access",
+    "supervisorRoleDesc": "Supervisor • {{branch}}",
+    "userRoleDesc": "User • Region {{region}} • {{branch}}",
+    "statusLocked": "Locked",
+    "statusNewPw": "New PW"
   },
   "pwa": {
     "installApp": "Install App",
@@ -837,5 +851,24 @@
       "previewMobile": "Preview in Mobile View",
       "importAnother": "Import Another File"
     }
+  },
+  "app": {
+    "verifyingSession": "Verifying login session...",
+    "loadingInterface": "Loading interface...",
+    "loadingDashboard": "Loading control panel...",
+    "footerTitle": "Field Data Collection Hub",
+    "footerCompliance": "Compliant with device binding security, mandatory PIN change, and auto offline sync",
+    "enterpriseVersion": "v2.4.0 Enterprise"
+  },
+  "recordOps": {
+    "draftSavedOffline": "Draft saved offline. Will sync automatically when online.",
+    "draftConflictResolved": "Notice: A newer version exists on the server, conflict resolved.",
+    "submittedOffline": "Submitted offline. Will sync automatically when online.",
+    "conflictResolved": "Response saved with timestamp conflict resolved.",
+    "savedAndSubmitted": "Saved and submitted successfully."
+  },
+  "pushNotifications": {
+    "pushEnabledTitle": "Push Notifications Enabled!",
+    "pushEnabledBody": "You will now receive instant alerts on your phone whenever new requests or records arrive."
   }
 }

@@ -3,6 +3,7 @@ import { useDataStore } from "../stores/dataStore";
 import { recordApi } from "../services";
 import { logAudit } from "../utils/audit";
 import { enqueueOfflineRecord, flushOfflineQueue } from "../utils/offlineQueue";
+import i18n from "../i18n";
 
 export const useRecordOps = () => {
   return {
@@ -25,10 +26,7 @@ export const useRecordOps = () => {
           return {
             success: true,
             isOffline: true,
-            message:
-              lang === "ar"
-                ? "تم حفظ المسودة محلياً. ستتم المزامنة تلقائياً عند عودة الاتصال."
-                : "Draft saved offline. Will sync automatically when online.",
+            message: i18n.t("recordOps.draftSavedOffline", { lng: lang }),
           };
         } catch (queueErr) {
           return { success: false, error: queueErr };
@@ -58,10 +56,7 @@ export const useRecordOps = () => {
           return {
             success: true,
             conflict: true,
-            message:
-              lang === "ar"
-                ? "تنبيه: يوجد إصدار أحدث على الخادم، تم فض التعارض بنجاح."
-                : "Notice: A newer version exists on the server, conflict resolved.",
+            message: i18n.t("recordOps.draftConflictResolved", { lng: lang }),
           };
         }
         logAudit("RECORD_DRAFT_SAVED", "Record", recordId, {
@@ -93,10 +88,7 @@ export const useRecordOps = () => {
           return {
             success: true,
             isOffline: true,
-            message:
-              lang === "ar"
-                ? "تم اعتماد السجل محلياً بدون اتصال. ستتم المزامنة تلقائياً فور توفر الإنترنت."
-                : "Submitted offline. Will sync automatically when online.",
+            message: i18n.t("recordOps.submittedOffline", { lng: lang }),
           };
         } catch (queueErr) {
           return {
@@ -130,10 +122,7 @@ export const useRecordOps = () => {
             return {
               success: true,
               conflict: true,
-              message:
-                lang === "ar"
-                  ? "تم حفظ الاستجابة مع رصد تعارض زمني وحله بنجاح."
-                  : "Response saved with timestamp conflict resolved.",
+              message: i18n.t("recordOps.conflictResolved", { lng: lang }),
             };
           }
           logAudit("RECORD_COMPLETED", "Record", recordId, {
@@ -142,10 +131,7 @@ export const useRecordOps = () => {
           });
           return {
             success: true,
-            message:
-              lang === "ar"
-                ? "تم الحفظ والاعتماد بنجاح."
-                : "Saved and submitted successfully.",
+            message: i18n.t("recordOps.savedAndSubmitted", { lng: lang }),
           };
         }
         return {

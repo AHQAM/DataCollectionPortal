@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { getXLSX } from "../utils/excel";
+import i18n from "../i18n";
 
 export const useBranchesExcelImport = (
   lang: "ar" | "en",
@@ -92,11 +93,7 @@ export const useBranchesExcelImport = (
         const jsonData = XLSX.utils.sheet_to_json<Record<string, any>>(ws);
 
         if (!jsonData || jsonData.length === 0) {
-          setExcelParseError(
-            lang === "ar"
-              ? "الملف فارغ أو لا يحتوي على صفوف بيانات"
-              : "The file is empty or contains no rows",
-          );
+          setExcelParseError(i18n.t("branches.excelEmptyError", { lng: lang }));
           return;
         }
 
@@ -194,9 +191,7 @@ export const useBranchesExcelImport = (
         const parsedB = Array.from(branchesMap.values());
         if (parsedB.length === 0 && regionsList.length === 0) {
           setExcelParseError(
-            lang === "ar"
-              ? "لم يتم العثور على أعمدة متطابقة في الملف. يرجى التأكد من مطابقة أسماء الأعمدة أو تحميل القالب النموذجي."
-              : "No matching columns found. Please verify column headers or use the standard template.",
+            i18n.t("branches.excelNoMatchingCols", { lng: lang }),
           );
           return;
         }
@@ -219,9 +214,11 @@ export const useBranchesExcelImport = (
     );
     if (res.success && res.data) {
       setSuccessMessage(
-        lang === "ar"
-          ? `تم استيراد ${res.data.branchesCount} فرع و ${res.data.regionsCount} منطقة ميدانية بنجاح`
-          : `Successfully imported ${res.data.branchesCount} branches and ${res.data.regionsCount} regions`,
+        i18n.t("branches.excelImportSuccess", {
+          lng: lang,
+          branchesCount: res.data.branchesCount,
+          regionsCount: res.data.regionsCount,
+        }),
       );
     }
     setShowExcelModal(false);

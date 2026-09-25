@@ -3,6 +3,7 @@ import { useDataStore } from "../stores/dataStore";
 import { useUIStore } from "../stores/uiStore";
 import { User, AuditLog } from "../types";
 import { userApi } from "../services";
+import i18n from "../i18n";
 
 import { logAudit } from "../utils/audit";
 
@@ -83,8 +84,7 @@ export const useUserOps = () => {
             user.allowedRegionNos || (user.regionNo ? [user.regionNo] : []),
           userNo: user.userNo || `REP-${Date.now().toString().slice(-4)}`,
           userNameAr:
-            user.userNameAr ||
-            (lang === "ar" ? "مندوب جديد" : "New Representative"),
+            user.userNameAr || i18n.t("users.newRepDefault", { lng: lang }),
           userNameEn: user.userNameEn || "",
           branchId: user.branchId || defaultBranch?.branchId || "",
           role: "REP",

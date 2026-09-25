@@ -117,7 +117,7 @@ export const TopNavbar: React.FC = () => {
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-900/60 hover:bg-purple-800/80 border border-purple-700/50 text-purple-200 transition-all cursor-pointer"
           >
             <Globe className="w-3.5 h-3.5" />
-            <span>{lang === "ar" ? "English" : "عربي"}</span>
+            <span>{t("common.langToggle", { lng: lang })}</span>
           </button>
 
           {/* PWA Install Button */}
@@ -186,16 +186,27 @@ export const TopNavbar: React.FC = () => {
                             </div>
                             <div className="text-[10px] text-slate-500 truncate">
                               {u.role === "ADMIN"
-                                ? lang === "ar"
-                                  ? "مسؤول النظام • كامل الصلاحيات"
-                                  : "System Admin • Full Access"
+                                ? t("topNavbar.adminRoleDesc", { lng: lang })
                                 : u.role === "SUPERVISOR"
-                                  ? lang === "ar"
-                                    ? `مشرف • ${u.branchNameAr || u.branchId}`
-                                    : `Supervisor • ${u.branchNameEn || u.branchNameAr || u.branchId}`
-                                  : lang === "ar"
-                                    ? `مستخدم • منطقة ${u.regionNo} • ${u.branchNameAr || u.branchId}`
-                                    : `User • Region ${u.regionNo} • ${u.branchNameEn || u.branchNameAr || u.branchId}`}
+                                  ? t("topNavbar.supervisorRoleDesc", {
+                                      lng: lang,
+                                      branch:
+                                        lang === "ar"
+                                          ? u.branchNameAr || u.branchId
+                                          : u.branchNameEn ||
+                                            u.branchNameAr ||
+                                            u.branchId,
+                                    })
+                                  : t("topNavbar.userRoleDesc", {
+                                      lng: lang,
+                                      region: u.regionNo,
+                                      branch:
+                                        lang === "ar"
+                                          ? u.branchNameAr || u.branchId
+                                          : u.branchNameEn ||
+                                            u.branchNameAr ||
+                                            u.branchId,
+                                    })}
                             </div>
                           </div>
                           {(() => {
@@ -218,13 +229,9 @@ export const TopNavbar: React.FC = () => {
                                 }`}
                               >
                                 {isLocked
-                                  ? lang === "ar"
-                                    ? "مقفل"
-                                    : "Locked"
+                                  ? t("topNavbar.statusLocked", { lng: lang })
                                   : u.mustChangePassword
-                                    ? lang === "ar"
-                                      ? "تغيير كلمة المرور"
-                                      : "New PW"
+                                    ? t("topNavbar.statusNewPw", { lng: lang })
                                     : u.role}
                               </span>
                             );
