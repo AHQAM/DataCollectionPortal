@@ -1,6 +1,7 @@
 import React from "react";
 import { Clock, ArrowUpRight } from "lucide-react";
 import { RequestItem } from "../../../types";
+import i18n from "../../../i18n";
 
 interface CurrentCampaignsListProps {
   lang: "ar" | "en";
@@ -20,7 +21,7 @@ export const CurrentCampaignsList: React.FC<CurrentCampaignsListProps> = ({
           <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
             <Clock className="w-4 h-4 text-purple-700" />
             <span>
-              {lang === "ar" ? "حالة الحملات الحالية" : "Current Campaigns"}
+              {i18n.t("auto.currentCampaigns")}
             </span>
           </h2>
           <span className="text-[10px] font-bold bg-purple-100 text-purple-900 px-2 py-0.5 rounded-full">
@@ -56,9 +57,9 @@ export const CurrentCampaignsList: React.FC<CurrentCampaignsListProps> = ({
                   {req.requestCode}
                 </span>
                 <span>
-                  {lang === "ar" ? "الاستحقاق: " : "Due: "}
+                  {i18n.t("auto.due")}
                   {new Date(req.dueAt).toLocaleDateString(
-                    lang === "ar" ? "ar-SA" : "en-US",
+                    i18n.t("auto.enus"),
                   )}
                 </span>
               </div>
@@ -73,7 +74,7 @@ export const CurrentCampaignsList: React.FC<CurrentCampaignsListProps> = ({
           className="w-full h-10 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
         >
           <span>
-            {lang === "ar" ? "عرض وإدارة جميع الطلبات" : "Manage All Requests"}
+            {i18n.t("auto.manageAllRequests")}
           </span>
           <ArrowUpRight className="w-3.5 h-3.5" />
         </button>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Search, Filter, Plus } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface RequestFiltersProps {
   searchQuery: string;
@@ -30,7 +31,7 @@ export const RequestFilters: React.FC<RequestFiltersProps> = ({
           onChange={(e) => setSearchQuery(e.target.value)}
           className="bg-white border border-slate-200/80 text-slate-900 text-sm rounded-xl focus:ring-purple-500 focus:border-purple-500 block w-full ps-10 p-2 shadow-xs transition-all"
           placeholder={
-            lang === "ar" ? "بحث بالاسم، الرمز..." : "Search by title, code..."
+            i18n.t("auto.searchByTitleCode")
           }
         />
       </div>

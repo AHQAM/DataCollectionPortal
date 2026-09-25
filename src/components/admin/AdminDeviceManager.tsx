@@ -46,22 +46,18 @@ export const AdminDeviceManager: React.FC = () => {
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Smartphone className="w-5 h-5 text-purple-700" />
             <span>
-              {lang === "ar"
-                ? "مركز أمان وربط أجهزة المستخدمين"
-                : "User Device Binding & Security"}
+              {t("auto.userDeviceBindingSecurity")}
             </span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {lang === "ar"
-              ? "تأمين تسجيل الدخول وحصر كل مستخدم على هاتف ذكي معتمد برقم UUID فريد"
-              : "Enforce single-device binding and approve phone replacements with UUID validation"}
+            {t("auto.enforceSingledeviceBindingAnd")}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold bg-purple-50 text-purple-900 border border-purple-200 px-3 py-1.5 rounded-xl">
             {deviceBindings.filter((b) => b.status === "ACTIVE").length}{" "}
-            {lang === "ar" ? "جهاز نشط" : "Active Devices"}
+            {t("auto.activeDevices")}
           </span>
         </div>
       </div>
@@ -74,9 +70,7 @@ export const AdminDeviceManager: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={
-              lang === "ar"
-                ? "بحث باسم المستخدم، طراز الهاتف، UUID..."
-                : "Search by user, model, UUID..."
+              t("auto.searchByUserModel")
             }
             className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
@@ -120,22 +114,22 @@ export const AdminDeviceManager: React.FC = () => {
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "المستخدم والمنطقة" : "User & Region"}
+                  {t("auto.userRegion")}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "طراز الهاتف والنظام" : "Device & OS"}
+                  {t("auto.deviceOs")}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "معرّف التثبيت (UUID)" : "Installation UUID"}
+                  {t("auto.installationUuid")}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "تاريخ أول ربط" : "First Bound"}
+                  {t("auto.firstBound")}
                 </th>
                 <th className="px-4 py-3 text-start">
-                  {lang === "ar" ? "حالة الربط" : "Binding Status"}
+                  {t("auto.bindingStatus")}
                 </th>
                 <th className="px-4 py-3 text-center">
-                  {lang === "ar" ? "الإجراءات" : "Actions"}
+                  {t("auto.actions")}
                 </th>
               </tr>
             </thead>
@@ -143,9 +137,7 @@ export const AdminDeviceManager: React.FC = () => {
               {filteredBindings.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-slate-400">
-                    {lang === "ar"
-                      ? "لا توجد أجهزة مطابقة للفلتر"
-                      : "No device bindings found"}
+                    {t("auto.noDeviceBindingsFound")}
                   </td>
                 </tr>
               ) : (
@@ -183,7 +175,7 @@ export const AdminDeviceManager: React.FC = () => {
 
                       <td className="px-4 py-3.5 text-slate-500">
                         {new Date(b.boundAt).toLocaleDateString(
-                          lang === "ar" ? "ar-SA" : "en-US",
+                          t("auto.enus"),
                         )}
                       </td>
 
@@ -198,16 +190,10 @@ export const AdminDeviceManager: React.FC = () => {
                           }`}
                         >
                           {b.status === "ACTIVE"
-                            ? lang === "ar"
-                              ? "معتمد ونشط"
-                              : "Active Bound"
+                            ? t("auto.activeBound")
                             : b.status === "PENDING_REPLACEMENT"
-                              ? lang === "ar"
-                                ? "بانتظار الموافقة"
-                                : "Pending Approval"
-                              : lang === "ar"
-                                ? "مفكوك"
-                                : "Unbound"}
+                              ? t("auto.pendingApproval")
+                              : t("auto.unbound")}
                         </span>
                       </td>
 
@@ -218,12 +204,10 @@ export const AdminDeviceManager: React.FC = () => {
                               onClick={() => releaseDeviceBinding(b.userId)}
                               className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px] border border-rose-200"
                               title={
-                                lang === "ar"
-                                  ? "فك الارتباط فوراً"
-                                  : "Release Device"
+                                t("auto.releaseDevice")
                               }
                             >
-                              {lang === "ar" ? "فك الارتباط" : "Release"}
+                              {t("auto.release")}
                             </button>
                           )}
 
@@ -235,7 +219,7 @@ export const AdminDeviceManager: React.FC = () => {
                                 }
                                 className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px]"
                               >
-                                {lang === "ar" ? "موافقة" : "Approve"}
+                                {t("auto.approve")}
                               </button>
                               <button
                                 onClick={() =>
@@ -243,7 +227,7 @@ export const AdminDeviceManager: React.FC = () => {
                                 }
                                 className="px-2.5 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-[10px]"
                               >
-                                {lang === "ar" ? "رفض" : "Reject"}
+                                {t("auto.reject")}
                               </button>
                             </>
                           )}

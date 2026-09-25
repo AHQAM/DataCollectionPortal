@@ -1,6 +1,7 @@
 import React from "react";
 import { Building2, MapPin, Filter, Search } from "lucide-react";
 import { Branch, Region } from "../../../types";
+import i18n from "../../../i18n";
 
 interface BranchesTabsAndFiltersProps {
   lang: "ar" | "en";
@@ -38,7 +39,7 @@ export const BranchesTabsAndFilters: React.FC<BranchesTabsAndFiltersProps> = ({
         >
           <Building2 className="w-4 h-4" />
           <span>
-            {lang === "ar" ? "قائمة الفروع" : "Branches"} ({branches.length})
+            {i18n.t("auto.branches")} ({branches.length})
           </span>
         </button>
 
@@ -52,7 +53,7 @@ export const BranchesTabsAndFilters: React.FC<BranchesTabsAndFiltersProps> = ({
         >
           <MapPin className="w-4 h-4" />
           <span>
-            {lang === "ar" ? "المناطق الميدانية" : "Field Regions"} (
+            {i18n.t("auto.fieldRegions")} (
             {regions.length})
           </span>
         </button>
@@ -68,7 +69,7 @@ export const BranchesTabsAndFilters: React.FC<BranchesTabsAndFiltersProps> = ({
               className="h-9 px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 bg-slate-50 focus:outline-hidden"
             >
               <option value="ALL">
-                {lang === "ar" ? "جميع الفروع" : "All Branches"}
+                {i18n.t("auto.allBranches")}
               </option>
               {branches.map((b) => (
                 <option key={b.branchId} value={b.branchId}>
@@ -86,9 +87,7 @@ export const BranchesTabsAndFilters: React.FC<BranchesTabsAndFiltersProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={
-              lang === "ar"
-                ? "بحث بالاسم أو الرمز..."
-                : "Search by name or code..."
+              i18n.t("auto.searchByNameOr")
             }
             className="w-full h-9 ps-8 pe-3 rounded-xl border border-slate-200 text-xs font-medium focus:outline-hidden focus:border-purple-600 bg-slate-50"
           />

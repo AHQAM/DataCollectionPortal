@@ -1,6 +1,7 @@
 import React from "react";
 import { Building2, X, AlertTriangle } from "lucide-react";
 import { Branch } from "../../../types";
+import i18n from "../../../i18n";
 
 interface BranchModalProps {
   lang: string;
@@ -43,12 +44,8 @@ export const BranchModal: React.FC<BranchModalProps> = ({
             </div>
             <h3 className="text-sm font-extrabold text-slate-900">
               {editingBranch
-                ? lang === "ar"
-                  ? "تعديل بيانات الفرع"
-                  : "Edit Branch"
-                : lang === "ar"
-                  ? "إضافة فرع جديد"
-                  : "New Branch"}
+                ? i18n.t("auto.editBranch")
+                : i18n.t("auto.newBranch")}
             </h3>
           </div>
           <button
@@ -69,7 +66,7 @@ export const BranchModal: React.FC<BranchModalProps> = ({
         <form onSubmit={handleSaveBranch} className="space-y-3.5 mt-4 text-xs">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "رمز الفرع (Branch ID)" : "Branch ID"}
+              {i18n.t("auto.branchId")}
             </label>
             <input
               type="text"
@@ -84,9 +81,7 @@ export const BranchModal: React.FC<BranchModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم الفرع (باللغة العربية)"
-                : "Branch Name (Arabic)"}{" "}
+              {i18n.t("auto.branchNameArabic")}{" "}
               *
             </label>
             <input
@@ -101,9 +96,7 @@ export const BranchModal: React.FC<BranchModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم الفرع (باللغة الإنجليزية)"
-                : "Branch Name (English)"}
+              {i18n.t("auto.branchNameEnglish")}
             </label>
             <input
               type="text"
@@ -120,13 +113,13 @@ export const BranchModal: React.FC<BranchModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold cursor-pointer"
             >
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+              {i18n.t("auto.cancel")}
             </button>
             <button
               type="submit"
               className="px-5 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-extrabold shadow-sm transition-all cursor-pointer"
             >
-              {lang === "ar" ? "حفظ الفرع" : "Save Branch"}
+              {i18n.t("auto.saveBranch")}
             </button>
           </div>
         </form>

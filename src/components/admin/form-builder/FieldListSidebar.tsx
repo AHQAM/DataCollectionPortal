@@ -1,6 +1,7 @@
 import React from "react";
 import { RequestField, FieldType } from "../../../types";
 import { Plus, ChevronUp, ChevronDown, Lock } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface FieldListSidebarProps {
   lang: string;
@@ -33,7 +34,7 @@ export const FieldListSidebar: React.FC<FieldListSidebarProps> = ({
             className="text-xs font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 bg-purple-50 px-2 py-1 rounded-lg transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>{lang === "ar" ? "إضافة حقل" : "Add"}</span>
+            <span>{i18n.t("auto.add")}</span>
           </button>
         </div>
 
@@ -67,7 +68,7 @@ export const FieldListSidebar: React.FC<FieldListSidebarProps> = ({
                         }`}
                       >
                         <Lock className="w-2.5 h-2.5" />
-                        <span>{lang === "ar" ? "للعرض فقط" : "Read-only"}</span>
+                        <span>{i18n.t("auto.readonly")}</span>
                       </span>
                     )}
                   </div>
@@ -105,9 +106,7 @@ export const FieldListSidebar: React.FC<FieldListSidebarProps> = ({
 
       <div className="pt-3 border-t border-slate-100 mt-2">
         <span className="text-[10px] text-slate-400 block text-center">
-          {lang === "ar"
-            ? "يدعم 24 نوع حقل وقواعد شرطية"
-            : "Supports 24 field types & conditions"}
+          {i18n.t("auto.supports24FieldTypes")}
         </span>
       </div>
     </div>

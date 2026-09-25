@@ -1,6 +1,7 @@
 import React from "react";
 import { Branch, Region, User } from "../../../types";
 import { Building2, Edit2, Trash2, ArrowRight, Plus } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface BranchesListViewProps {
   lang: string;
@@ -26,9 +27,7 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
   if (branches.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-slate-200/80 p-8 text-center text-slate-400 text-xs shadow-xs">
-        {lang === "ar"
-          ? "لا توجد فروع مطابقة للبحث"
-          : "No matching branches found"}
+        {i18n.t("auto.noMatchingBranchesFound")}
       </div>
     );
   }
@@ -68,7 +67,7 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
                   <button
                     onClick={() => onOpenEditBranch(b)}
                     className="p-1.5 text-slate-400 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-all cursor-pointer"
-                    title={lang === "ar" ? "تعديل" : "Edit"}
+                    title={i18n.t("auto.edit")}
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
@@ -85,7 +84,7 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
               <div className="mt-4 grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-center">
                 <div>
                   <span className="text-[10px] text-slate-400 block font-bold">
-                    {lang === "ar" ? "المناطق" : "Regions"}
+                    {i18n.t("auto.regions")}
                   </span>
                   <span className="text-xs font-black text-slate-800">
                     {branchRegions.length}
@@ -93,7 +92,7 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 block font-bold">
-                    {lang === "ar" ? "المشرفين" : "Supervisors"}
+                    {i18n.t("auto.supervisors")}
                   </span>
                   <span className="text-xs font-black text-purple-900">
                     {branchSupervisors.length}
@@ -101,7 +100,7 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 block font-bold">
-                    {lang === "ar" ? "المناديب" : "Reps"}
+                    {i18n.t("auto.reps")}
                   </span>
                   <span className="text-xs font-black text-slate-800">
                     {branchReps.length}
@@ -112,16 +111,12 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
               {/* Region badges inside branch */}
               <div className="mt-3">
                 <span className="text-[10px] text-slate-400 font-bold block mb-1">
-                  {lang === "ar"
-                    ? "المناطق الميدانية التابعة:"
-                    : "Assigned Zones:"}
+                  {i18n.t("auto.assignedZones")}
                 </span>
                 <div className="flex flex-wrap gap-1">
                   {branchRegions.length === 0 ? (
                     <span className="text-[10px] text-slate-400 italic">
-                      {lang === "ar"
-                        ? "لا توجد مناطق مضافة بعد"
-                        : "No regions yet"}
+                      {i18n.t("auto.noRegionsYet")}
                     </span>
                   ) : (
                     branchRegions.slice(0, 4).map((r) => (
@@ -137,7 +132,7 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
                   {branchRegions.length > 4 && (
                     <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">
                       +{branchRegions.length - 4}{" "}
-                      {lang === "ar" ? "المزيد" : "more"}
+                      {i18n.t("auto.more")}
                     </span>
                   )}
                 </div>
@@ -150,12 +145,10 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
                 className="text-xs font-bold text-purple-900 hover:text-purple-700 flex items-center gap-1 cursor-pointer"
               >
                 <span>
-                  {lang === "ar"
-                    ? "استعراض وإضافة مناطق الفرع"
-                    : "View & Add Zones"}
+                  {i18n.t("auto.viewAddZones")}
                 </span>
                 <ArrowRight
-                  className={`w-3.5 h-3.5 ${lang === "ar" ? "rotate-180" : ""}`}
+                  className={`w-3.5 h-3.5 ${i18n.t("auto.str")}`}
                 />
               </button>
 
@@ -164,7 +157,7 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
                 className="text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer"
               >
                 <Plus className="w-3 h-3" />
-                <span>{lang === "ar" ? "منطقة" : "Add Zone"}</span>
+                <span>{i18n.t("auto.addZone")}</span>
               </button>
             </div>
           </div>

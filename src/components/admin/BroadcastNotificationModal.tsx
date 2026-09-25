@@ -12,7 +12,7 @@ interface BroadcastNotificationModalProps {
 export const BroadcastNotificationModal: React.FC<
   BroadcastNotificationModalProps
 > = ({ isOpen, onClose }) => {
-  const { lang, dir } = useApp();
+  const { lang, dir , t} = useApp();
 
   const [targetAudience, setTargetAudience] = useState<
     "ALL" | "REPRESENTATIVES" | "SUPERVISORS"
@@ -42,9 +42,7 @@ export const BroadcastNotificationModal: React.FC<
       setStatusMessage({
         type: "error",
         text:
-          lang === "ar"
-            ? "يرجى ملء جميع الحقول المطلوبة"
-            : "Please fill all required fields",
+          t("auto.pleaseFillAllRequired"),
       });
       return;
     }
@@ -105,9 +103,7 @@ export const BroadcastNotificationModal: React.FC<
         type: "error",
         text:
           err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء إرسال الإشعار"
-            : "Failed to send notification"),
+          (t("auto.failedToSendNotification")),
       });
     } finally {
       setIsSubmitting(false);
@@ -128,14 +124,10 @@ export const BroadcastNotificationModal: React.FC<
             </div>
             <div>
               <h3 className="font-bold text-lg leading-tight">
-                {lang === "ar"
-                  ? "بث إشعار عام (FCM)"
-                  : "Broadcast Push Notification"}
+                {t("auto.broadcastPushNotification")}
               </h3>
               <p className="text-xs text-purple-200 mt-0.5">
-                {lang === "ar"
-                  ? "إرسال إشعار فوري لجميع الأجهزة النشطة"
-                  : "Send instant push to active devices"}
+                {t("auto.sendInstantPushTo")}
               </p>
             </div>
           </div>
@@ -171,7 +163,7 @@ export const BroadcastNotificationModal: React.FC<
             <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-purple-700" />
               <span>
-                {lang === "ar" ? "الجمهور المستهدف" : "Target Audience"}
+                {t("auto.targetAudience")}
               </span>
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -210,7 +202,7 @@ export const BroadcastNotificationModal: React.FC<
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {lang === "ar" ? "العنوان (بالعربية) *" : "Title (Arabic) *"}
+                {t("auto.titleArabic")}
               </label>
               <input
                 type="text"
@@ -218,18 +210,14 @@ export const BroadcastNotificationModal: React.FC<
                 value={titleAr}
                 onChange={(e) => setTitleAr(e.target.value)}
                 placeholder={
-                  lang === "ar"
-                    ? "مثال: تنبيه هام لجميع المستخدمين الميدانيين"
-                    : "e.g. Important notice to all field users"
+                  t("auto.egImportantNoticeTo")
                 }
                 className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-slate-50 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent font-medium"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {lang === "ar"
-                  ? "العنوان (بالإنجليزية) *"
-                  : "Title (English) *"}
+                {t("auto.titleEnglish")}
               </label>
               <input
                 type="text"
@@ -246,7 +234,7 @@ export const BroadcastNotificationModal: React.FC<
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {lang === "ar" ? "نص الإشعار (بالعربية) *" : "Body (Arabic) *"}
+                {t("auto.bodyArabic")}
               </label>
               <textarea
                 required
@@ -259,9 +247,7 @@ export const BroadcastNotificationModal: React.FC<
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                {lang === "ar"
-                  ? "نص الإشعار (بالإنجليزية) *"
-                  : "Body (English) *"}
+                {t("auto.bodyEnglish")}
               </label>
               <textarea
                 required
@@ -277,9 +263,7 @@ export const BroadcastNotificationModal: React.FC<
           {/* Optional Request ID for Deep Linking */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "معرف الطلب (اختياري للتوجيه المباشر)"
-                : "Request ID (Optional for deep linking)"}
+              {t("auto.requestIdOptionalFor")}
             </label>
             <input
               type="text"
@@ -298,7 +282,7 @@ export const BroadcastNotificationModal: React.FC<
               disabled={isSubmitting}
               className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
             >
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+              {t("auto.cancel")}
             </button>
             <button
               type="submit"
@@ -308,12 +292,8 @@ export const BroadcastNotificationModal: React.FC<
               <Send className="w-3.5 h-3.5" />
               <span>
                 {isSubmitting
-                  ? lang === "ar"
-                    ? "جاري الإرسال..."
-                    : "Sending..."
-                  : lang === "ar"
-                    ? "إرسال البث الآن"
-                    : "Send Broadcast Now"}
+                  ? t("auto.sending")
+                  : t("auto.sendBroadcastNow")}
               </span>
             </button>
           </div>

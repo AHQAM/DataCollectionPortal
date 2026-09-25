@@ -1,6 +1,8 @@
+import i18n from "../../../i18n";
 import React from "react";
 import { RequestField } from "../../../types";
 import {
+
   FileSpreadsheet,
   Building,
   FileText,
@@ -45,9 +47,7 @@ export const ImportStepMapping: React.FC<Props> = ({
           <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
             <FileSpreadsheet className="w-4 h-4 text-emerald-700" />
             <span>
-              {lang === "ar"
-                ? "مطابقة أعمدة الإكسل مع حقول النظام والنموذج"
-                : "Column & Field Mapping"}
+              {i18n.t("auto.columnFieldMapping")}
             </span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -62,16 +62,14 @@ export const ImportStepMapping: React.FC<Props> = ({
             onClick={onBackToStep1}
             className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
           >
-            {lang === "ar" ? "تغيير الملف" : "Change File"}
+            {i18n.t("auto.changeFile")}
           </button>
           <button
             onClick={onValidate}
             className="px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-md cursor-pointer"
           >
             <span>
-              {lang === "ar"
-                ? "التالي: فحص البيانات ومطابقتها"
-                : "Next: Validate Data"}
+              {i18n.t("auto.nextValidateData")}
             </span>
             {dir === "rtl" ? (
               <ArrowLeft className="w-4 h-4" />
@@ -87,9 +85,7 @@ export const ImportStepMapping: React.FC<Props> = ({
         <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
           <Building className="w-4 h-4 text-purple-700" />
           <span>
-            {lang === "ar"
-              ? "أ. حقول التوجيه والتعيين الجغرافي (إلزامية للتوزيع للمناديب)"
-              : "A. System & Routing Fields"}
+            {i18n.t("auto.aSystemRoutingFields")}
           </span>
         </h3>
 
@@ -98,10 +94,10 @@ export const ImportStepMapping: React.FC<Props> = ({
           <div className="p-3 bg-purple-50/50 rounded-xl border border-purple-200">
             <div className="flex items-center justify-between mb-1">
               <label className="font-extrabold text-purple-950">
-                {lang === "ar" ? "رقم المنطقة" : "Region Number"}
+                {i18n.t("auto.regionNumber")}
               </label>
               <span className="text-[10px] bg-rose-100 text-rose-800 font-bold px-1.5 py-0.5 rounded">
-                {lang === "ar" ? "إلزامي للتعيين" : "Required"}
+                {i18n.t("auto.required")}
               </span>
             </div>
             <select
@@ -124,12 +120,10 @@ export const ImportStepMapping: React.FC<Props> = ({
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
             <div className="flex items-center justify-between mb-1">
               <label className="font-extrabold text-slate-800">
-                {lang === "ar"
-                  ? "معرف السجل / الكيان (المعرف الفريد)"
-                  : "Record / Target ID"}
+                {i18n.t("auto.recordTargetId")}
               </label>
               <span className="text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">
-                {lang === "ar" ? "معرف السجل" : "Key ID"}
+                {i18n.t("auto.keyId")}
               </span>
             </div>
             <select
@@ -140,9 +134,7 @@ export const ImportStepMapping: React.FC<Props> = ({
               className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900"
             >
               <option value="">
-                {lang === "ar"
-                  ? "-- اختر عمود معرف السجل / الكيان --"
-                  : "-- Select Target / Record ID Column --"}
+                {i18n.t("auto.selectTargetRecordId")}
               </option>
               {fileHeaders.map((h) => (
                 <option key={h} value={h}>
@@ -156,9 +148,7 @@ export const ImportStepMapping: React.FC<Props> = ({
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
             <div className="flex items-center justify-between mb-1">
               <label className="font-extrabold text-slate-800">
-                {lang === "ar"
-                  ? "اسم الجهة المستهدفة / السجل"
-                  : "Target Entity / Record Name"}
+                {i18n.t("auto.targetEntityRecordName")}
               </label>
             </div>
             <select
@@ -172,9 +162,7 @@ export const ImportStepMapping: React.FC<Props> = ({
               className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900"
             >
               <option value="">
-                {lang === "ar"
-                  ? "-- اختر عمود اسم الجهة / السجل --"
-                  : "-- Select Target / Record Name Column --"}
+                {i18n.t("auto.selectTargetRecordName")}
               </option>
               {fileHeaders.map((h) => (
                 <option key={h} value={h}>
@@ -187,7 +175,7 @@ export const ImportStepMapping: React.FC<Props> = ({
           {/* Branch */}
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
             <label className="block font-bold text-slate-800 mb-1">
-              {lang === "ar" ? "اسم الفرع (اختياري)" : "Branch Name (Optional)"}
+              {i18n.t("auto.branchNameOptional")}
             </label>
             <select
               value={systemColMap.branchName || ""}
@@ -197,9 +185,7 @@ export const ImportStepMapping: React.FC<Props> = ({
               className="w-full h-9 px-2 rounded-lg border border-slate-300 bg-white font-mono text-xs font-bold text-slate-900"
             >
               <option value="">
-                {lang === "ar"
-                  ? "-- تلقائي من بيانات المستخدم والمنطقة --"
-                  : "-- Auto from user & region --"}
+                {i18n.t("auto.autoFromUserRegion")}
               </option>
               {fileHeaders.map((h) => (
                 <option key={h} value={h}>
@@ -212,9 +198,7 @@ export const ImportStepMapping: React.FC<Props> = ({
           {/* Rep No */}
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
             <label className="block font-bold text-slate-800 mb-1">
-              {lang === "ar"
-                ? "رقم المستخدم الوظيفي (اختياري)"
-                : "User Number (Optional)"}
+              {i18n.t("auto.userNumberOptional")}
             </label>
             <select
               value={systemColMap.userNo || ""}
@@ -235,9 +219,7 @@ export const ImportStepMapping: React.FC<Props> = ({
           {/* Area */}
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
             <label className="block font-bold text-slate-800 mb-1">
-              {lang === "ar"
-                ? "الحي / المدينة (اختياري)"
-                : "Area / City (Optional)"}
+              {i18n.t("auto.areaCityOptional")}
             </label>
             <select
               value={systemColMap.area || ""}
@@ -269,9 +251,7 @@ export const ImportStepMapping: React.FC<Props> = ({
             </span>
           </h3>
           <span className="text-[11px] text-slate-500">
-            {lang === "ar"
-              ? "الحقول المعلمة بـ (للعرض فقط) ستظهر للمستخدم كمرجع من الإكسل ولا يمكنه تعديلها"
-              : "Read-only fields will be displayed to the user without edit permission"}
+            {i18n.t("auto.readonlyFieldsWillBe")}
           </span>
         </div>
 
@@ -293,7 +273,7 @@ export const ImportStepMapping: React.FC<Props> = ({
                   {field.isReadOnly && (
                     <span className="text-[10px] font-bold bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded flex items-center gap-0.5">
                       <Lock className="w-2.5 h-2.5" />
-                      <span>{lang === "ar" ? "للعرض فقط" : "Read-only"}</span>
+                      <span>{i18n.t("auto.readonly")}</span>
                     </span>
                   )}
                   <span className="text-[10px] bg-slate-200 text-slate-700 font-mono px-1 rounded">
@@ -314,9 +294,7 @@ export const ImportStepMapping: React.FC<Props> = ({
               >
                 <option value="">
                   --{" "}
-                  {lang === "ar"
-                    ? "تجاهل أو بدون تعبئة مسبقة"
-                    : "Ignore / Leave Blank"}{" "}
+                  {i18n.t("auto.ignoreLeaveBlank")}{" "}
                   --
                 </option>
                 {fileHeaders.map((h) => (

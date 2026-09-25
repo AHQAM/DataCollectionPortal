@@ -1,6 +1,7 @@
 import React from "react";
 import { RequestField } from "../../../types";
 import { CheckCircle2, Database, AlertTriangle } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface Props {
   lang: string;
@@ -34,15 +35,11 @@ export const ImportStepPreview: React.FC<Props> = ({
           <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-700" />
             <span>
-              {lang === "ar"
-                ? "تقرير فحص سلامة البيانات والمطابقة الجغرافية"
-                : "Validation & Quality Summary"}
+              {i18n.t("auto.validationQualitySummary")}
             </span>
           </h2>
           <p className="text-xs text-slate-500">
-            {lang === "ar"
-              ? "تم فحص وجود أرقام المناطق، وعدم تكرار العملاء، والتحقق من صحة الحقول"
-              : "Checks completed for valid regions, unique IDs, and field formats"}
+            {i18n.t("auto.checksCompletedForValid")}
           </p>
         </div>
 
@@ -51,7 +48,7 @@ export const ImportStepPreview: React.FC<Props> = ({
             onClick={onBackToStep2}
             className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
           >
-            {lang === "ar" ? "تعديل المطابقة" : "Back"}
+            {i18n.t("auto.back")}
           </button>
           <button
             onClick={onCommitImport}
@@ -61,9 +58,7 @@ export const ImportStepPreview: React.FC<Props> = ({
             <Database className="w-4 h-4" />
             <span>
               {isImporting
-                ? lang === "ar"
-                  ? "جارٍ الحفظ وتوزيع السجلات..."
-                  : "Importing..."
+                ? i18n.t("auto.importing")
                 : lang === "ar"
                   ? `اعتماد استيراد ${validRows.length} سجل وتوزيعها`
                   : `Confirm Import (${validRows.length})`}
@@ -76,7 +71,7 @@ export const ImportStepPreview: React.FC<Props> = ({
       <div className="grid grid-cols-3 gap-3 text-center">
         <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
           <span className="text-slate-500 block text-xs font-bold">
-            {lang === "ar" ? "إجمالي صفوف الملف" : "Total Rows"}
+            {i18n.t("auto.totalRows")}
           </span>
           <span className="text-xl font-extrabold text-slate-900 mt-0.5 block">
             {rawRowsCount}
@@ -84,7 +79,7 @@ export const ImportStepPreview: React.FC<Props> = ({
         </div>
         <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200">
           <span className="text-emerald-700 block text-xs font-bold">
-            {lang === "ar" ? "صفوف سليمة ومطابقة" : "Valid Rows"}
+            {i18n.t("auto.validRows")}
           </span>
           <span className="text-xl font-extrabold text-emerald-800 mt-0.5 block">
             {validRows.length}
@@ -92,7 +87,7 @@ export const ImportStepPreview: React.FC<Props> = ({
         </div>
         <div className="p-3.5 bg-rose-50 rounded-xl border border-rose-200">
           <span className="text-rose-700 block text-xs font-bold">
-            {lang === "ar" ? "أخطاء مستبعدة" : "Invalid Rows"}
+            {i18n.t("auto.invalidRows")}
           </span>
           <span className="text-xl font-extrabold text-rose-800 mt-0.5 block">
             {invalidRows.length}
@@ -131,9 +126,7 @@ export const ImportStepPreview: React.FC<Props> = ({
       <div className="border border-slate-200 rounded-xl overflow-hidden text-xs">
         <div className="bg-slate-100 p-2.5 font-bold text-slate-800 flex items-center justify-between">
           <span>
-            {lang === "ar"
-              ? "معاينة عينة من السجلات السليمة ومطابقة الحقول:"
-              : "Preview Valid Rows:"}
+            {i18n.t("auto.previewValidRows")}
           </span>
           <span className="text-xs text-slate-500 font-normal">
             {lang === "ar"
@@ -147,13 +140,13 @@ export const ImportStepPreview: React.FC<Props> = ({
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold text-[11px]">
               <tr>
                 <th className="p-2 text-start">
-                  {lang === "ar" ? "المنطقة" : "Region"}
+                  {i18n.t("auto.region")}
                 </th>
                 <th className="p-2 text-start">
-                  {lang === "ar" ? "معرف السجل" : "Record ID"}
+                  {i18n.t("auto.recordId1")}
                 </th>
                 <th className="p-2 text-start">
-                  {lang === "ar" ? "الجهة المستهدفة / السجل" : "Target / Name"}
+                  {i18n.t("auto.targetName")}
                 </th>
                 {requestFields.slice(0, 4).map((f) => (
                   <th key={f.fieldId} className="p-2 text-start">

@@ -44,4 +44,3 @@ export const useApp = () => {
   };
 };
 
-export const AppContext = createContext<any>(undefined);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Edit, Building, Check } from "lucide-react";
 import { RequestItem, Branch, Region, RequestPriority } from "../../../types";
+import i18n from "../../../i18n";
 
 interface EditRequestModalProps {
   request: RequestItem | null;
@@ -88,9 +89,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
           <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
             <Edit className="w-4 h-4 text-purple-700" />
             <span>
-              {lang === "ar"
-                ? "تعديل تفاصيل واستهداف الطلب"
-                : "Edit Request Details & Scope"}
+              {i18n.t("auto.editRequestDetailsScope")}
             </span>
             <span className="text-purple-700 font-mono text-xs">
               ({request.requestCode})
@@ -108,7 +107,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar" ? "الأولوية" : "Priority"}
+                {i18n.t("auto.priority")}
               </label>
               <select
                 value={editPriority}
@@ -117,19 +116,19 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 }
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               >
-                <option value="low">{lang === "ar" ? "منخفضة" : "Low"}</option>
+                <option value="low">{i18n.t("auto.low")}</option>
                 <option value="medium">
-                  {lang === "ar" ? "متوسطة" : "Medium"}
+                  {i18n.t("auto.medium")}
                 </option>
-                <option value="high">{lang === "ar" ? "عالية" : "High"}</option>
+                <option value="high">{i18n.t("auto.high")}</option>
                 <option value="urgent">
-                  {lang === "ar" ? "حرجة / عاجلة" : "Urgent"}
+                  {i18n.t("auto.urgent")}
                 </option>
               </select>
             </div>
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar" ? "تاريخ الاستحقاق" : "Due Date"}
+                {i18n.t("auto.dueDate")}
               </label>
               <input
                 type="date"
@@ -143,9 +142,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "عنوان الطلب (بالعربية)"
-                : "Request Title (Arabic)"}
+              {i18n.t("auto.requestTitleArabic")}
             </label>
             <input
               type="text"
@@ -158,9 +155,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "عنوان الطلب (بالإنجليزية)"
-                : "Request Title (English)"}
+              {i18n.t("auto.requestTitleEnglish")}
             </label>
             <input
               type="text"
@@ -173,27 +168,21 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar"
-                  ? "تسمية الجهة المستهدفة (بالعربية)"
-                  : "Target Entity Label (Arabic)"}
+                {i18n.t("auto.targetEntityLabelArabic")}
               </label>
               <input
                 type="text"
                 value={editTargetEntityLabelAr}
                 onChange={(e) => setEditTargetEntityLabelAr(e.target.value)}
                 placeholder={
-                  lang === "ar"
-                    ? "مثال: العميل، المتجر، المدرسة..."
-                    : "e.g. Customer, Store, School..."
+                  i18n.t("auto.egCustomerStoreSchool")
                 }
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               />
             </div>
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar"
-                  ? "تسمية الجهة المستهدفة (بالإنجليزية)"
-                  : "Target Entity Label (English)"}
+                {i18n.t("auto.targetEntityLabelEnglish")}
               </label>
               <input
                 type="text"
@@ -207,7 +196,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "التعليمات والإرشادات" : "Instructions"}
+              {i18n.t("auto.instructions")}
             </label>
             <textarea
               rows={2}
@@ -223,9 +212,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
               <div className="flex items-center gap-1.5 font-extrabold text-purple-950">
                 <Building className="w-4 h-4 text-purple-700" />
                 <span>
-                  {lang === "ar"
-                    ? "نطاق الفروع والمناطق المستهدفة"
-                    : "Target Branches & Zones"}
+                  {i18n.t("auto.targetBranchesZones")}
                 </span>
               </div>
               <div className="flex gap-2">
@@ -238,7 +225,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                     className="text-purple-900"
                   />
                   <span>
-                    {lang === "ar" ? "كل الفروع والمناطق" : "All Branches"}
+                    {i18n.t("auto.allBranches")}
                   </span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
@@ -250,7 +237,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                     className="text-purple-900"
                   />
                   <span>
-                    {lang === "ar" ? "تحديد فروع ومناطق" : "Specific"}
+                    {i18n.t("auto.specific")}
                   </span>
                 </label>
               </div>
@@ -260,9 +247,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
               <div className="space-y-2 pt-2 border-t border-purple-200/60 animate-in fade-in">
                 <div>
                   <div className="font-bold text-slate-600 text-[11px] mb-1">
-                    {lang === "ar"
-                      ? "اختر الفروع المستهدفة:"
-                      : "Select Target Branches:"}
+                    {i18n.t("auto.selectTargetBranches")}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {branches.map((b) => {
@@ -299,9 +284,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 {editSelectedBranchIds.length > 0 && (
                   <div className="pt-1">
                     <div className="font-bold text-slate-600 text-[11px] mb-1">
-                      {lang === "ar"
-                        ? "المناطق التابعة للفروع المختارة:"
-                        : "Regions in Selected Branches:"}
+                      {i18n.t("auto.regionsInSelectedBranches")}
                     </div>
                     <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1 bg-white rounded-lg border border-slate-200">
                       {regions
@@ -347,13 +330,13 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
               onClick={onClose}
               className="flex-1 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer"
             >
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+              {i18n.t("auto.cancel")}
             </button>
             <button
               type="submit"
               className="flex-2 h-10 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-bold cursor-pointer shadow-md"
             >
-              {lang === "ar" ? "حفظ التعديلات" : "Save Changes"}
+              {i18n.t("auto.saveChanges")}
             </button>
           </div>
         </form>

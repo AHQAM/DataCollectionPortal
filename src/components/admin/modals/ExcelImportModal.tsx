@@ -10,6 +10,7 @@ import {
   Check,
 } from "lucide-react";
 import { Branch } from "../../../types";
+import i18n from "../../../i18n";
 
 interface ExcelImportModalProps {
   lang: string;
@@ -69,14 +70,10 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-black text-slate-900">
-                {lang === "ar"
-                  ? "استيراد الفروع والمناطق من Excel"
-                  : "Import Branches & Regions from Excel"}
+                {i18n.t("auto.importBranchesRegionsFrom")}
               </h3>
               <p className="text-xs text-slate-500">
-                {lang === "ar"
-                  ? "رفع ملف Excel (.xlsx) لإنشاء الفروع وتوزيع المناطق الميدانية تلقائياً"
-                  : "Upload an Excel (.xlsx) file to auto-populate branches and regional sales zones"}
+                {i18n.t("auto.uploadAnExcelXlsx")}
               </p>
             </div>
           </div>
@@ -94,15 +91,11 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
               <div className="text-xs font-black text-emerald-950 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-emerald-600" />
                 <span>
-                  {lang === "ar"
-                    ? "القالب النموذجي المعتمد"
-                    : "Standard Excel Template"}
+                  {i18n.t("auto.standardExcelTemplate")}
                 </span>
               </div>
               <p className="text-[11px] text-emerald-800 mt-0.5">
-                {lang === "ar"
-                  ? "حمّل ملف الإكسل المنسّق مسبقاً، عبّئ فروعك ومناطقك ثم ارفعه هنا."
-                  : "Download the pre-formatted template, fill in your branches and zones, then upload."}
+                {i18n.t("auto.downloadThePreformattedTemplate")}
               </p>
             </div>
             <button
@@ -112,9 +105,7 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
             >
               <Download className="w-4 h-4" />
               <span>
-                {lang === "ar"
-                  ? "تحميل قالب Excel (.xlsx)"
-                  : "Download Template (.xlsx)"}
+                {i18n.t("auto.downloadTemplateXlsx")}
               </span>
             </button>
           </div>
@@ -123,9 +114,7 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
             <UploadCloud className="w-10 h-10 text-slate-400 mx-auto mb-2" />
             <label className="cursor-pointer">
               <span className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl inline-block shadow-xs transition-all">
-                {lang === "ar"
-                  ? "اختر ملف الإكسل (.xlsx, .xls, .csv)"
-                  : "Select Excel File (.xlsx, .xls, .csv)"}
+                {i18n.t("auto.selectExcelFileXlsx")}
               </span>
               <input
                 type="file"
@@ -141,9 +130,7 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
               </div>
             ) : (
               <p className="text-[11px] text-slate-400 mt-2">
-                {lang === "ar"
-                  ? "يدعم ملفات .xlsx و .xls و .csv"
-                  : "Supports .xlsx, .xls, and .csv files"}
+                {i18n.t("auto.supportsXlsxXlsAnd")}
               </p>
             )}
           </div>
@@ -182,9 +169,7 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
                       className="text-emerald-600 focus:ring-emerald-500"
                     />
                     <span>
-                      {lang === "ar"
-                        ? "دمج مع الحالي (Merge)"
-                        : "Merge with existing"}
+                      {i18n.t("auto.mergeWithExisting")}
                     </span>
                   </label>
                   <label className="flex items-center gap-1.5 cursor-pointer">
@@ -197,9 +182,7 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
                       className="text-rose-600 focus:ring-rose-500"
                     />
                     <span>
-                      {lang === "ar"
-                        ? "استبدال بالكامل (Replace All)"
-                        : "Replace all"}
+                      {i18n.t("auto.replaceAll")}
                     </span>
                   </label>
                 </div>
@@ -210,16 +193,16 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
                   <thead className="bg-slate-100 text-slate-700 font-bold sticky top-0">
                     <tr>
                       <th className="px-3 py-2 text-start">
-                        {lang === "ar" ? "رمز الفرع" : "Branch ID"}
+                        {i18n.t("auto.branchId")}
                       </th>
                       <th className="px-3 py-2 text-start">
-                        {lang === "ar" ? "اسم الفرع" : "Branch Name"}
+                        {i18n.t("auto.branchName")}
                       </th>
                       <th className="px-3 py-2 text-start">
-                        {lang === "ar" ? "رقم المنطقة" : "Region No"}
+                        {i18n.t("auto.regionNo")}
                       </th>
                       <th className="px-3 py-2 text-start">
-                        {lang === "ar" ? "اسم المنطقة" : "Region Name"}
+                        {i18n.t("auto.regionName")}
                       </th>
                     </tr>
                   </thead>
@@ -265,7 +248,7 @@ export const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer"
           >
-            {lang === "ar" ? "إلغاء" : "Cancel"}
+            {i18n.t("auto.cancel")}
           </button>
           <button
             type="button"

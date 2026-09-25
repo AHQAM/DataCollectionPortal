@@ -116,7 +116,7 @@ export const TopNavbar: React.FC = () => {
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-900/60 hover:bg-purple-800/80 border border-purple-700/50 text-purple-200 transition-all cursor-pointer"
           >
             <Globe className="w-3.5 h-3.5" />
-            <span>{lang === "ar" ? "English" : "عربي"}</span>
+            <span>{t("auto.str1")}</span>
           </button>
 
           {/* PWA Install Button */}
@@ -185,16 +185,11 @@ export const TopNavbar: React.FC = () => {
                             </div>
                             <div className="text-[10px] text-slate-500 truncate">
                               {u.role === "ADMIN"
-                                ? lang === "ar"
-                                  ? "مسؤول النظام • كامل الصلاحيات"
-                                  : "System Admin • Full Access"
+                                ? t("topNavbar.adminDesc")
                                 : u.role === "SUPERVISOR"
-                                  ? lang === "ar"
-                                    ? `مشرف • ${u.branchNameAr || u.branchId}`
-                                    : `Supervisor • ${u.branchNameEn || u.branchNameAr || u.branchId}`
-                                  : lang === "ar"
-                                    ? `مستخدم • منطقة ${u.regionNo} • ${u.branchNameAr || u.branchId}`
-                                    : `User • Region ${u.regionNo} • ${u.branchNameEn || u.branchNameAr || u.branchId}`}
+                                  ? t("topNavbar.supervisorDesc", { branch: lang === "ar" ? (u.branchNameAr || u.branchId) : (u.branchNameEn || u.branchNameAr || u.branchId) } as any)
+                                  : t("topNavbar.userDesc", { regionNo: u.regionNo, branch: lang === "ar" ? (u.branchNameAr || u.branchId) : (u.branchNameEn || u.branchNameAr || u.branchId) } as any)
+                              }
                             </div>
                           </div>
                           {(() => {
@@ -217,14 +212,10 @@ export const TopNavbar: React.FC = () => {
                                 }`}
                               >
                                 {isLocked
-                                  ? lang === "ar"
-                                    ? "مقفل"
-                                    : "Locked"
+                                  ? t("topNavbar.locked")
                                   : u.mustChangePassword
-                                    ? lang === "ar"
-                                      ? "تغيير كلمة المرور"
-                                      : "New PW"
-                                    : u.role}
+                                    ? t("topNavbar.newPw")
+                                    : t(`roles.${u.role.toLowerCase()}`)}
                               </span>
                             );
                           })()}
@@ -291,7 +282,7 @@ export const TopNavbar: React.FC = () => {
                         <div className="text-[10px] text-slate-400 mt-1 flex items-center justify-between">
                           <span>
                             {new Date(notif.sentAt).toLocaleDateString(
-                              lang === "ar" ? "ar-SA" : "en-US",
+                              t("auto.enus"),
                             )}
                           </span>
                           <span className="uppercase text-purple-600 font-bold">

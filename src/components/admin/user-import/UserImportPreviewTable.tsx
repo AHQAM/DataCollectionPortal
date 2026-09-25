@@ -1,6 +1,7 @@
 import React from "react";
 import { ParsedRepRow } from "./userImportParser";
 import { Users } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface UserImportPreviewTableProps {
   lang: string;
@@ -40,15 +41,15 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
           {multiRegionCount > 0 && (
             <span className="px-2 py-0.5 rounded-md bg-purple-100 text-purple-900 border border-purple-200">
               {multiRegionCount}{" "}
-              {lang === "ar" ? "مستخدم متعدد المناطق" : "Multi-Region Users"}
+              {i18n.t("auto.multiregionUsers")}
             </span>
           )}
           <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
-            {newCount} {lang === "ar" ? "مستخدم جديد" : "New Users"}
+            {newCount} {i18n.t("auto.newUsers")}
           </span>
           {existingCount > 0 && (
             <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800">
-              {existingCount} {lang === "ar" ? "تحديث قائم" : "Updates"}
+              {existingCount} {i18n.t("auto.updates")}
             </span>
           )}
         </div>
@@ -60,22 +61,22 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
             <tr>
               <th className="px-3 py-2.5 text-start w-10">#</th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "رقم المستخدم (المعرف)" : "User ID"}
+                {i18n.t("auto.userId")}
               </th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "اسم المستخدم" : "User Name"}
+                {i18n.t("auto.userName")}
               </th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "المناطق المصرحة" : "Assigned Regions"}
+                {i18n.t("auto.assignedRegions")}
               </th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "الفرع" : "Branch"}
+                {i18n.t("auto.branch")}
               </th>
               <th className="px-3 py-2.5 text-start">
-                {lang === "ar" ? "كلمة المرور المؤقتة" : "Temporary password"}
+                {i18n.t("auto.temporaryPassword1")}
               </th>
               <th className="px-3 py-2.5 text-center">
-                {lang === "ar" ? "الحالة" : "Status"}
+                {i18n.t("auto.status")}
               </th>
             </tr>
           </thead>
@@ -135,7 +136,7 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
                       رمز مؤقت لمرة واحدة
                     </span>
                     <span className="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                      {lang === "ar" ? "تغيير إلزامي" : "Must Change"}
+                      {i18n.t("auto.mustChange")}
                     </span>
                   </div>
                 </td>
@@ -144,13 +145,11 @@ export const UserImportPreviewTable: React.FC<UserImportPreviewTableProps> = ({
                   {row.isValid ? (
                     row.isExisting ? (
                       <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
-                        {lang === "ar"
-                          ? "تحديث وتوسيع مناطق"
-                          : "Update & Expand"}
+                        {i18n.t("auto.updateExpand")}
                       </span>
                     ) : (
                       <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                        {lang === "ar" ? "حساب جديد" : "New Account"}
+                        {i18n.t("auto.newAccount")}
                       </span>
                     )
                   ) : (

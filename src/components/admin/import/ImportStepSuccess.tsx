@@ -1,6 +1,7 @@
 import React from "react";
 import { RequestItem, User } from "../../../types";
 import { CheckCircle2, Smartphone } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface Props {
   lang: string;
@@ -32,9 +33,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
       </div>
 
       <h2 className="text-lg font-extrabold text-slate-900">
-        {lang === "ar"
-          ? "تم استيراد السجلات وتوزيعها على المناديب بنجاح!"
-          : "Import & Assignment Completed!"}
+        {i18n.t("auto.importAssignmentCompleted")}
       </h2>
 
       <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
@@ -48,7 +47,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
           onClick={onBack}
           className="px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md cursor-pointer transition-all"
         >
-          {lang === "ar" ? "الرجوع لقائمة الطلبات" : "Go to Requests"}
+          {i18n.t("auto.goToRequests")}
         </button>
 
         {import.meta.env.DEV && (
@@ -68,9 +67,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
           >
             <Smartphone className="w-4 h-4" />
             <span>
-              {lang === "ar"
-                ? "فتح واجهة الهاتف لمعاينة السجلات والمطابقة"
-                : "Preview in Mobile View"}
+              {i18n.t("auto.previewInMobileView")}
             </span>
           </button>
         )}
@@ -79,7 +76,7 @@ export const ImportStepSuccess: React.FC<Props> = ({
           onClick={onReset}
           className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
         >
-          {lang === "ar" ? "استيراد ملف إكسل آخر" : "Import Another File"}
+          {i18n.t("auto.importAnotherFile")}
         </button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import { PhoneCall } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface SettingsSupportSectionProps {
   lang: "ar" | "en";
@@ -25,16 +26,14 @@ export const SettingsSupportSection: React.FC<SettingsSupportSectionProps> = ({
       <div className="flex items-center gap-2 text-xs font-extrabold text-purple-950 pb-2 border-b border-slate-100">
         <PhoneCall className="w-4 h-4 text-purple-700" />
         <span>
-          {lang === "ar"
-            ? "قنوات التواصل والدعم الفني للمناديب"
-            : "Support Channels for Representatives"}
+          {i18n.t("auto.supportChannelsForRepresentatives")}
         </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === "ar" ? "الهاتف الموحد" : "Phone"}
+            {i18n.t("auto.phone")}
           </label>
           <input
             type="text"
@@ -46,7 +45,7 @@ export const SettingsSupportSection: React.FC<SettingsSupportSectionProps> = ({
 
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === "ar" ? "البريد الإلكتروني" : "Email"}
+            {i18n.t("auto.email")}
           </label>
           <input
             type="email"
@@ -58,7 +57,7 @@ export const SettingsSupportSection: React.FC<SettingsSupportSectionProps> = ({
 
         <div>
           <label className="block font-bold text-slate-700 mb-1">
-            {lang === "ar" ? "رقم واتساب الإدارة" : "WhatsApp"}
+            {i18n.t("auto.whatsapp")}
           </label>
           <input
             type="text"

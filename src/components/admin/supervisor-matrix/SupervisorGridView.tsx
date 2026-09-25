@@ -1,6 +1,7 @@
 import React from "react";
 import { User, Region } from "../../../types";
 import { Check } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface SupervisorGridViewProps {
   supervisors: User[];
@@ -19,14 +20,10 @@ export const SupervisorGridView: React.FC<SupervisorGridViewProps> = ({
     <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
       <div className="p-4 border-b border-slate-100 flex items-center justify-between">
         <span className="text-xs font-black text-slate-900">
-          {lang === "ar"
-            ? "جدول التقاطع (المشرفين × المناطق الميدانية)"
-            : "Cross Matrix (Supervisors × Field Zones)"}
+          {i18n.t("auto.crossMatrixSupervisorsField")}
         </span>
         <span className="text-[11px] text-slate-500 font-medium">
-          {lang === "ar"
-            ? "انقر على أي مربع لتفعيل أو إلغاء الإشراف مباشرة"
-            : "Click any cell to toggle supervision"}
+          {i18n.t("auto.clickAnyCellTo")}
         </span>
       </div>
 
@@ -35,10 +32,10 @@ export const SupervisorGridView: React.FC<SupervisorGridViewProps> = ({
           <thead>
             <tr className="bg-slate-100 text-slate-700 font-black border-b border-slate-200">
               <th className="p-3 text-start sticky start-0 bg-slate-100 z-10 min-w-[200px]">
-                {lang === "ar" ? "المشرف" : "Supervisor"}
+                {i18n.t("auto.supervisor")}
               </th>
               <th className="p-3 text-center min-w-[90px]">
-                {lang === "ar" ? "إجمالي المناطق" : "Total Zones"}
+                {i18n.t("auto.totalZones")}
               </th>
               {regions.map((reg) => (
                 <th

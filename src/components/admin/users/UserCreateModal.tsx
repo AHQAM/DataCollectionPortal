@@ -1,6 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import { UserRole, Branch, Region } from "../../../types";
+import i18n from "../../../i18n";
 
 interface UserCreateModalProps {
   isOpen: boolean;
@@ -65,7 +66,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
       <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl border border-slate-200">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
           <h2 className="font-extrabold text-sm text-slate-900">
-            {lang === "ar" ? "إضافة مستخدم جديد" : "Create New User Account"}
+            {i18n.t("auto.createNewUserAccount")}
           </h2>
           <button
             onClick={onClose}
@@ -79,7 +80,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar" ? "نوع الدور / الصلاحية" : "Role"}
+                {i18n.t("auto.role")}
               </label>
               <select
                 value={newRole}
@@ -87,24 +88,20 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               >
                 <option value="REP">
-                  {lang === "ar"
-                    ? "مستخدم ميداني / جامع بيانات (REP)"
-                    : "Field User / Data Collector"}
+                  {i18n.t("auto.fieldUserDataCollector")}
                 </option>
                 <option value="SUPERVISOR">
-                  {lang === "ar"
-                    ? "مشرف فرع (SUPERVISOR)"
-                    : "Branch Supervisor"}
+                  {i18n.t("auto.branchSupervisor")}
                 </option>
                 <option value="ADMIN">
-                  {lang === "ar" ? "مدير نظام (ADMIN)" : "System Admin"}
+                  {i18n.t("auto.systemAdmin")}
                 </option>
               </select>
             </div>
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                {lang === "ar" ? "الفرع" : "Branch"}
+                {i18n.t("auto.branch")}
               </label>
               <select
                 value={newBranchId}
@@ -152,7 +149,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
             {newRole === "REP" && (
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  {lang === "ar" ? "رقم المستخدم الوظيفي" : "User No"}
+                  {i18n.t("auto.userNo")}
                 </label>
                 <input
                   type="text"
@@ -167,7 +164,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "اسم المستخدم (بالعربية)" : "User Name (Arabic)"}
+              {i18n.t("auto.userNameArabic")}
             </label>
             <input
               type="text"
@@ -181,9 +178,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم المستخدم (بالإنجليزية)"
-                : "User Name (English)"}
+              {i18n.t("auto.userNameEnglish")}
             </label>
             <input
               type="text"
@@ -197,9 +192,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
           {/* Multi-Region Assignment Selector */}
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "المناطق المصرح للمستخدم العمل بها (تعدد المناطق):"
-                : "Authorized Regions:"}
+              {i18n.t("auto.authorizedRegions")}
             </label>
             <div className="flex flex-wrap gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 max-h-32 overflow-y-auto">
               {regions.map((reg) => {
@@ -241,9 +234,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
           {newRole === "SUPERVISOR" && (
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
               <label className="block font-bold text-slate-700 mb-2">
-                {lang === "ar"
-                  ? "صلاحيات المشرف الدقيقة (Granular Permissions):"
-                  : "Supervisor Granular Permissions:"}
+                {i18n.t("auto.supervisorGranularPermissions")}
               </label>
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
@@ -258,9 +249,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                     }
                     className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
                   />
-                  {lang === "ar"
-                    ? "إدارة المستخدمين والمندوبين"
-                    : "Manage Users & Reps"}
+                  {i18n.t("auto.manageUsersReps")}
                 </label>
                 <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
                   <input
@@ -274,9 +263,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                     }
                     className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
                   />
-                  {lang === "ar"
-                    ? "إدارة طلبات الجمع والنماذج"
-                    : "Manage Requests & Forms"}
+                  {i18n.t("auto.manageRequestsForms")}
                 </label>
                 <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
                   <input
@@ -290,9 +277,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                     }
                     className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
                   />
-                  {lang === "ar"
-                    ? "إدارة المناطق وتعيينها"
-                    : "Manage Regions Assignments"}
+                  {i18n.t("auto.manageRegionsAssignments")}
                 </label>
                 <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer">
                   <input
@@ -306,9 +291,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                     }
                     className="w-4 h-4 text-purple-700 rounded border-slate-300 focus:ring-purple-600"
                   />
-                  {lang === "ar"
-                    ? "رؤية بيانات جميع الفروع"
-                    : "View All Branches Data"}
+                  {i18n.t("auto.viewAllBranchesData")}
                 </label>
               </div>
             </div>
@@ -329,13 +312,13 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
               onClick={onClose}
               className="flex-1 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
             >
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+              {i18n.t("auto.cancel")}
             </button>
             <button
               type="submit"
               className="flex-1 h-10 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-bold"
             >
-              {lang === "ar" ? "إنشاء وتفعيل" : "Create User"}
+              {i18n.t("auto.createUser")}
             </button>
           </div>
         </form>

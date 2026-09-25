@@ -1,5 +1,6 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import { AppProvider, useApp } from "./context/AppContext";
+import { useTranslation } from "react-i18next";
 import { TopNavbar } from "./components/common/TopNavbar";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -17,6 +18,7 @@ const AdminLayout = lazy(() =>
 const MainAppContent: React.FC = () => {
   const { lang, dir, currentUser, authReady, setIsOnline, syncOfflineQueue } =
     useApp();
+  const { t } = useTranslation();
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -47,7 +49,7 @@ const MainAppContent: React.FC = () => {
   if (!authReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100 text-slate-700">
-        جاري التحقق من جلسة الدخول...
+        {t("common.verifyingSession")}
       </div>
     );
   }
@@ -57,7 +59,7 @@ const MainAppContent: React.FC = () => {
       <Suspense
         fallback={
           <div className="min-h-screen flex items-center justify-center bg-slate-100 text-slate-700">
-            جاري تحميل الواجهة...
+            {t("common.loadingUI")}
           </div>
         }
       >
@@ -76,7 +78,7 @@ const MainAppContent: React.FC = () => {
         <Suspense
           fallback={
             <div className="flex h-full items-center justify-center text-slate-500">
-              جاري تحميل لوحة التحكم...
+              {t("common.loadingDashboard")}
             </div>
           }
         >
@@ -89,17 +91,13 @@ const MainAppContent: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
           <span className="font-semibold text-slate-700">
-            {lang === "ar"
-              ? "منصة جمع البيانات الميدانية"
-              : "Field Data Collection Hub"}
+            {t("common.footerTitle")}
           </span>
           <span className="text-slate-400 font-mono">v2.4.0 Enterprise</span>
         </div>
 
         <div className="text-[10px] text-slate-400">
-          {lang === "ar"
-            ? "متوافق مع حوكمة أمان الأجهزة وتغيير كلمات المرور الإلزامي ونظام الأوفلاين التلقائي"
-            : "Compliant with device binding security, mandatory PIN change, and auto offline sync"}
+          {t("common.footerCompliance")}
         </div>
       </footer>
     </div>

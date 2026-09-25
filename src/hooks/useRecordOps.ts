@@ -1,3 +1,4 @@
+import i18n from "../i18n";
 import { useUIStore } from "../stores/uiStore";
 import { useDataStore } from "../stores/dataStore";
 import { recordApi } from "../services";
@@ -26,9 +27,7 @@ export const useRecordOps = () => {
             success: true,
             isOffline: true,
             message:
-              lang === "ar"
-                ? "تم حفظ المسودة محلياً. ستتم المزامنة تلقائياً عند عودة الاتصال."
-                : "Draft saved offline. Will sync automatically when online.",
+              i18n.t("auto.draftSavedOfflineWill"),
           };
         } catch (queueErr) {
           return { success: false, error: queueErr };
@@ -59,9 +58,7 @@ export const useRecordOps = () => {
             success: true,
             conflict: true,
             message:
-              lang === "ar"
-                ? "تنبيه: يوجد إصدار أحدث على الخادم، تم فض التعارض بنجاح."
-                : "Notice: A newer version exists on the server, conflict resolved.",
+              i18n.t("auto.noticeANewerVersion"),
           };
         }
         logAudit("RECORD_DRAFT_SAVED", "Record", recordId, {
@@ -94,9 +91,7 @@ export const useRecordOps = () => {
             success: true,
             isOffline: true,
             message:
-              lang === "ar"
-                ? "تم اعتماد السجل محلياً بدون اتصال. ستتم المزامنة تلقائياً فور توفر الإنترنت."
-                : "Submitted offline. Will sync automatically when online.",
+              i18n.t("auto.submittedOfflineWillSync"),
           };
         } catch (queueErr) {
           return {
@@ -131,9 +126,7 @@ export const useRecordOps = () => {
               success: true,
               conflict: true,
               message:
-                lang === "ar"
-                  ? "تم حفظ الاستجابة مع رصد تعارض زمني وحله بنجاح."
-                  : "Response saved with timestamp conflict resolved.",
+                i18n.t("auto.responseSavedWithTimestamp"),
             };
           }
           logAudit("RECORD_COMPLETED", "Record", recordId, {
@@ -143,9 +136,7 @@ export const useRecordOps = () => {
           return {
             success: true,
             message:
-              lang === "ar"
-                ? "تم الحفظ والاعتماد بنجاح."
-                : "Saved and submitted successfully.",
+              i18n.t("auto.savedAndSubmittedSuccessfully"),
           };
         }
         return {

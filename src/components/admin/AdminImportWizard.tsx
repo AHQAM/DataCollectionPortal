@@ -36,6 +36,7 @@ export const AdminImportWizard: React.FC<Props> = ({
     branches,
     commitImport,
     quickSwitchUser,
+    t,
   } = useApp();
 
   const selectableRequests = requests.filter(
@@ -235,21 +236,17 @@ export const AdminImportWizard: React.FC<Props> = ({
             ) : (
               <ArrowLeft className="w-4 h-4" />
             )}
-            <span>{lang === "ar" ? "الرجوع" : "Back"}</span>
+            <span>{t("auto.back")}</span>
           </button>
           <div>
             <h1 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <FileSpreadsheet className="w-5 h-5 text-emerald-700" />
               <span>
-                {lang === "ar"
-                  ? "إدراج واستيراد بيانات الحملات عبر Excel"
-                  : "Campaign Excel Data Import"}
+                {t("auto.campaignExcelDataImport")}
               </span>
             </h1>
             <p className="text-xs text-slate-500">
-              {lang === "ar"
-                ? "رفع ملفات الإكسل وتعيينها تلقائياً للمناطق وتعبئة الحقول المعتمدة للمناديب"
-                : "Import spreadsheets, auto-assign to region reps, and pre-populate field forms"}
+              {t("auto.importSpreadsheetsAutoassignTo")}
             </p>
           </div>
         </div>
@@ -259,16 +256,12 @@ export const AdminImportWizard: React.FC<Props> = ({
             onClick={handleDownloadCustomTemplate}
             className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold flex items-center gap-2 border border-emerald-300 transition-all cursor-pointer shadow-2xs"
             title={
-              lang === "ar"
-                ? "تنزيل ملف إكسل يحتوي على جميع حقول هذا النموذج جاهز للتعبئة"
-                : "Download template"
+              t("auto.downloadTemplate")
             }
           >
             <Download className="w-4 h-4 text-emerald-700" />
             <span>
-              {lang === "ar"
-                ? "تحميل نموذج Excel مخصص لهذا النموذج"
-                : "Download Custom Excel Template"}
+              {t("auto.downloadCustomExcelTemplate")}
             </span>
           </button>
         )}

@@ -17,6 +17,7 @@ export const AdminSettings: React.FC = () => {
     branches,
     regions,
     users,
+    t,
   } = useApp();
 
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -69,9 +70,7 @@ export const AdminSettings: React.FC = () => {
     wipeDemoDataForProduction({ wipeBranchesAndRegions: wipeBranchesAlso });
     setShowWipeModal(false);
     setWipeSuccessMsg(
-      lang === "ar"
-        ? "تم تفريغ كافة البيانات التجريبية بنجاح! النظام الآن بصفحة بيضاء جاهز للتشغيل الفعلي بالشركة."
-        : "All demo data wiped successfully! System is now a clean blank slate ready for production.",
+      t("auto.allDemoDataWiped"),
     );
     setTimeout(() => setWipeSuccessMsg(null), 5000);
   };
@@ -102,9 +101,7 @@ export const AdminSettings: React.FC = () => {
     dlAnchor.click();
 
     setBackupSuccessMsg(
-      lang === "ar"
-        ? "تم تنزيل النسخة الاحتياطية بنجاح!"
-        : "Database backup downloaded successfully!",
+      t("auto.databaseBackupDownloadedSuccessfully"),
     );
     setTimeout(() => setBackupSuccessMsg(null), 4000);
   };
@@ -117,15 +114,11 @@ export const AdminSettings: React.FC = () => {
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Settings className="w-5 h-5 text-purple-700" />
             <span>
-              {lang === "ar"
-                ? "إعدادات النظام وسياسات الأمان"
-                : "System Settings & Security Policies"}
+              {t("auto.systemSettingsSecurityPolicies")}
             </span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {lang === "ar"
-              ? "تخصيص سياسات كلمات المرور، قفل الحسابات التلقائي، وقنوات الدعم الفني"
-              : "Configure authentication rules, account lockouts, and administrative contact channels"}
+            {t("auto.configureAuthenticationRulesAccount")}
           </p>
         </div>
 
@@ -133,7 +126,7 @@ export const AdminSettings: React.FC = () => {
           <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 flex items-center gap-1">
             <CheckCircle2 className="w-4 h-4" />
             <span>
-              {lang === "ar" ? "تم حفظ الإعدادات" : "Settings Saved!"}
+              {t("auto.settingsSaved")}
             </span>
           </span>
         )}
@@ -163,7 +156,7 @@ export const AdminSettings: React.FC = () => {
             type="submit"
             className="px-6 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-extrabold shadow-md transition-all cursor-pointer"
           >
-            {lang === "ar" ? "حفظ كافة التغييرات" : "Save System Settings"}
+            {t("auto.saveSystemSettings")}
           </button>
         </div>
       </form>

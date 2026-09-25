@@ -35,7 +35,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
   onClose,
   onSuccess,
 }) => {
-  const { lang, users, branches, importUsersBatch } = useApp();
+  const { lang, users, branches, importUsersBatch , t} = useApp();
 
   const [fileName, setFileName] = useState<string | null>(null);
   const [parsedRows, setParsedRows] = useState<ParsedRepRow[]>([]);
@@ -92,9 +92,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
 
         if (!jsonRows || jsonRows.length === 0) {
           setErrorMsg(
-            lang === "ar"
-              ? "الملف فارغ أو لا يحتوي على صفوف صالحة"
-              : "The file is empty or contains no rows",
+            t("auto.theFileIsEmpty"),
           );
           setParsedRows([]);
           setTotalRawRows(0);
@@ -109,9 +107,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
       } catch (err) {
         console.error("Failed to parse excel file:", err);
         setErrorMsg(
-          lang === "ar"
-            ? "حدث خطأ أثناء قراءة ملف الإكسل. يرجى التأكد من صيغة الملف (.xlsx, .xls, .csv)"
-            : "Error reading Excel file. Please ensure it is a valid .xlsx, .xls, or .csv",
+          t("auto.errorReadingExcelFile"),
         );
       }
     };
@@ -129,7 +125,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
     const newUsers: User[] = validRows.map((r) => {
       const rawBranchName = r.branchName?.trim();
       const exactBranchName =
-        rawBranchName || (lang === "ar" ? "الفرع الرئيسي" : "Main Branch");
+        rawBranchName || (t("auto.mainBranch"));
 
       const matchedBranch = branches.find(
         (b) =>
@@ -190,9 +186,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
       console.error("Failed to import users batch:", err);
       setErrorMsg(
         err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء استيراد المستخدمين. يرجى المحاولة مرة أخرى."
-            : "Error importing users. Please try again."),
+          (t("auto.errorImportingUsersPlease")),
       );
     } finally {
       setIsSubmitting(false);
@@ -213,12 +207,10 @@ export const AdminUserImportModal: React.FC<Props> = ({
             <div>
               <h2 className="text-base font-extrabold flex items-center gap-2">
                 <span>
-                  {lang === "ar"
-                    ? "استيراد المستخدمين والمناديب عبر Excel"
-                    : "Import Users via Excel"}
+                  {t("auto.importUsersViaExcel")}
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-                  {lang === "ar" ? "معتمد" : "Verified"}
+                  {t("auto.verified")}
                 </span>
               </h2>
             </div>
@@ -245,14 +237,10 @@ export const AdminUserImportModal: React.FC<Props> = ({
               <Layers className="w-5 h-5 text-indigo-700 shrink-0 mt-0.5" />
               <div className="leading-relaxed text-indigo-950">
                 <span className="font-bold">
-                  {lang === "ar"
-                    ? "الحل الأفضل والمعتمد للمناديب متعددي المناطق: "
-                    : "Best Practice for Multi-Region Reps: "}
+                  {t("auto.bestPracticeForMultiregion")}
                 </span>
                 <span>
-                  {lang === "ar"
-                    ? "يتم إنشاء حساب مستخدم واحد فقط للمندوب يربط جهازه بأمان، وتُدرج جميع أرقام مناطقه في قائمة صلاحياته. يحصل المندوب على رمز دخول مؤقت لمرة واحدة ويُطلب منه تغييره عند أول تسجيل دخول."
-                    : "A single user account is created with all assigned regions linked. The rep can sign in using any of their region numbers and toggle between regions easily!"}
+                  {t("auto.aSingleUserAccount")}
                 </span>
               </div>
             </div>
@@ -287,14 +275,10 @@ export const AdminUserImportModal: React.FC<Props> = ({
               <KeyRound className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 <div className="font-bold">
-                  {lang === "ar"
-                    ? "إجراءات الأمان وكلمات المرور:"
-                    : "Security & PIN Policy:"}
+                  {t("auto.securityPinPolicy")}
                 </div>
                 <p className="text-[11px] text-amber-800 mt-0.5">
-                  {lang === "ar"
-                    ? "سيتم إنشاء رمز دخول مؤقت وفريد لكل مندوب مستورد، وسيلزم النظام المندوب بتعيين كلمة مرور جديدة فور تسجيل دخوله الأول."
-                    : "Imported representatives receive a unique temporary password and must set a new password on first sign-in."}
+                  {t("auto.importedRepresentativesReceiveA")}
                 </p>
               </div>
             </div>
@@ -312,7 +296,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
               >
                 <Download className="w-4 h-4 text-purple-700" />
                 <span>
-                  {lang === "ar" ? "تصدير ملف Excel" : "Export Excel"}
+                  {t("auto.exportExcel")}
                 </span>
               </button>
 
@@ -321,7 +305,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
                 onClick={onClose}
                 className="px-6 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-extrabold shadow-md transition-all cursor-pointer"
               >
-                {lang === "ar" ? "تم الانتهاء والإغلاق" : "Done & Close"}
+                {t("auto.doneClose")}
               </button>
             </>
           ) : (
@@ -331,7 +315,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
                 onClick={onClose}
                 className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300 transition-colors cursor-pointer"
               >
-                {lang === "ar" ? "إلغاء" : "Cancel"}
+                {t("auto.cancel")}
               </button>
 
               <button
@@ -351,9 +335,7 @@ export const AdminUserImportModal: React.FC<Props> = ({
                 )}
                 <span>
                   {isSubmitting
-                    ? lang === "ar"
-                      ? "جاري الاستيراد..."
-                      : "Importing..."
+                    ? t("auto.importing")
                     : lang === "ar"
                       ? `اعتماد استيراد (${validCount}) مندوب الآن`
                       : `Commit Import (${validCount} Reps)`}

@@ -1,6 +1,7 @@
 import React from "react";
 import { Building, ArrowUpRight } from "lucide-react";
 import { Branch } from "../../../types";
+import i18n from "../../../i18n";
 
 interface BranchStat {
   branch: Branch;
@@ -25,21 +26,17 @@ export const BranchProgress: React.FC<BranchProgressProps> = ({
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <div>
           <h2 className="font-extrabold text-sm text-slate-900">
-            {lang === "ar"
-              ? "نسبة الإنجاز وتوزيع السجلات حسب الفرع"
-              : "Completion by Branch"}
+            {i18n.t("auto.completionByBranch")}
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            {lang === "ar"
-              ? "مقارنة تقدم العمل في الفروع الرئيسية الثلاثة"
-              : "Comparative performance across 3 operating branches"}
+            {i18n.t("auto.comparativePerformanceAcross3")}
           </p>
         </div>
         <button
           onClick={() => onNavigate("reports")}
           className="text-xs text-purple-700 hover:text-purple-900 font-bold flex items-center gap-1"
         >
-          <span>{lang === "ar" ? "التقارير التفصيلية" : "View Reports"}</span>
+          <span>{i18n.t("auto.viewReports")}</span>
           <ArrowUpRight className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -58,7 +55,7 @@ export const BranchProgress: React.FC<BranchProgressProps> = ({
                 </span>
               </div>
               <div className="text-xs font-bold text-slate-700">
-                {completed} / {total} {lang === "ar" ? "سجل" : "records"} ({pct}
+                {completed} / {total} {i18n.t("auto.records")} ({pct}
                 %)
               </div>
             </div>

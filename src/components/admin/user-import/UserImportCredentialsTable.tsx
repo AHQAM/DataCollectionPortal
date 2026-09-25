@@ -1,6 +1,7 @@
 import React from "react";
 import { ImportedCredential } from "./userImportParser";
 import { CheckCircle2, Download } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface UserImportCredentialsTableProps {
   lang: string;
@@ -18,9 +19,7 @@ export const UserImportCredentialsTable: React.FC<
         <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
         <div className="flex-1">
           <h3 className="text-sm font-extrabold text-emerald-950">
-            {lang === "ar"
-              ? "تم استيراد حسابات المستخدمين بنجاح!"
-              : "Users imported successfully!"}
+            {i18n.t("auto.usersImportedSuccessfully")}
           </h3>
           <p className="text-xs text-emerald-800 mt-1 leading-relaxed">
             {lang === "ar"
@@ -35,9 +34,7 @@ export const UserImportCredentialsTable: React.FC<
         >
           <Download className="w-4 h-4" />
           <span>
-            {lang === "ar"
-              ? "تنزيل كشف كلمات المرور (Excel)"
-              : "Download Credentials (Excel)"}
+            {i18n.t("auto.downloadCredentialsExcel")}
           </span>
         </button>
       </div>
@@ -46,14 +43,10 @@ export const UserImportCredentialsTable: React.FC<
       <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
         <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
           <span className="text-xs font-bold text-slate-700">
-            {lang === "ar"
-              ? "كشف بيانات الدخول المؤقتة:"
-              : "Temporary Credentials Sheet:"}
+            {i18n.t("auto.temporaryCredentialsSheet")}
           </span>
           <span className="text-[11px] text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-            {lang === "ar"
-              ? "يلزم تغيير كلمة المرور عند أول تسجيل دخول"
-              : "Must change password on first login"}
+            {i18n.t("auto.mustChangePasswordOn")}
           </span>
         </div>
         <div className="max-h-72 overflow-y-auto">
@@ -62,21 +55,19 @@ export const UserImportCredentialsTable: React.FC<
               <tr>
                 <th className="px-3 py-2 text-start w-10">#</th>
                 <th className="px-3 py-2 text-start">
-                  {lang === "ar" ? "اسم المستخدم" : "User Name"}
+                  {i18n.t("auto.userName")}
                 </th>
                 <th className="px-3 py-2 text-start">
-                  {lang === "ar"
-                    ? "رقم المستخدم (اسم الدخول)"
-                    : "Username / User No"}
+                  {i18n.t("auto.usernameUserNo")}
                 </th>
                 <th className="px-3 py-2 text-start">
-                  {lang === "ar" ? "الفرع" : "Branch"}
+                  {i18n.t("auto.branch")}
                 </th>
                 <th className="px-3 py-2 text-start">
-                  {lang === "ar" ? "المناطق المصرحة" : "Regions"}
+                  {i18n.t("auto.regions")}
                 </th>
                 <th className="px-3 py-2 text-start">
-                  {lang === "ar" ? "كلمة المرور المؤقتة" : "Temporary Password"}
+                  {i18n.t("auto.temporaryPassword")}
                 </th>
               </tr>
             </thead>

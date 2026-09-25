@@ -157,7 +157,7 @@ export const AdminRequests: React.FC<Props> = ({
     } catch (err) {
       console.error("Error creating request:", err);
       alert(
-        lang === "ar" ? "حدث خطأ أثناء إنشاء الطلب" : "Error creating request",
+        t("auto.errorCreatingRequest"),
       );
     }
   };
@@ -172,7 +172,7 @@ export const AdminRequests: React.FC<Props> = ({
     } catch (err) {
       console.error("Error updating request:", err);
       alert(
-        lang === "ar" ? "تعذر حفظ تعديلات الطلب" : "Error updating request",
+        t("auto.errorUpdatingRequest"),
       );
     }
   };
@@ -188,7 +188,7 @@ export const AdminRequests: React.FC<Props> = ({
       );
       setShowTemplateModal(null);
       showToast(
-        lang === "ar" ? "تم حفظ القالب بنجاح" : "Template saved successfully",
+        t("auto.templateSavedSuccessfully"),
       );
     }
   };
@@ -198,15 +198,13 @@ export const AdminRequests: React.FC<Props> = ({
     try {
       await publishRequest(requestId);
       showToast(
-        lang === "ar" ? "تم نشر الطلب بنجاح" : "Request published successfully",
+        t("auto.requestPublishedSuccessfully"),
       );
     } catch (err: any) {
       const message =
         err?.details?.message ||
         err?.message ||
-        (lang === "ar"
-          ? "تعذر نشر الطلب. تحقق من حقول النموذج ثم حاول مرة أخرى."
-          : "The request could not be published. Check the form fields and try again.");
+        (t("auto.theRequestCouldNot"));
       alert(message);
     } finally {
       setActionLoadingId(null);
@@ -218,14 +216,12 @@ export const AdminRequests: React.FC<Props> = ({
     try {
       await closeRequest(requestId);
       showToast(
-        lang === "ar" ? "تم إغلاق الطلب بنجاح" : "Request closed successfully",
+        t("auto.requestClosedSuccessfully"),
       );
     } catch (err: any) {
       alert(
         err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء إغلاق الطلب"
-            : "Error closing request"),
+          (t("auto.errorClosingRequest")),
       );
     } finally {
       setActionLoadingId(null);
@@ -237,16 +233,12 @@ export const AdminRequests: React.FC<Props> = ({
     try {
       await archiveRequest(requestId);
       showToast(
-        lang === "ar"
-          ? "تمت أرشفة الطلب بنجاح"
-          : "Request archived successfully",
+        t("auto.requestArchivedSuccessfully"),
       );
     } catch (err: any) {
       alert(
         err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء أرشفة الطلب"
-            : "Error archiving request"),
+          (t("auto.errorArchivingRequest")),
       );
     } finally {
       setActionLoadingId(null);
@@ -258,16 +250,12 @@ export const AdminRequests: React.FC<Props> = ({
     try {
       await reopenRequest(requestId);
       showToast(
-        lang === "ar"
-          ? "تمت إعادة فتح الطلب بنجاح"
-          : "Request reopened successfully",
+        t("auto.requestReopenedSuccessfully"),
       );
     } catch (err: any) {
       alert(
         err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء إعادة فتح الطلب"
-            : "Error reopening request"),
+          (t("auto.errorReopeningRequest")),
       );
     } finally {
       setActionLoadingId(null);
@@ -279,16 +267,12 @@ export const AdminRequests: React.FC<Props> = ({
     try {
       await cloneRequest(requestId);
       showToast(
-        lang === "ar"
-          ? "تم استنساخ الطلب بنجاح"
-          : "Request cloned successfully",
+        t("auto.requestClonedSuccessfully"),
       );
     } catch (err: any) {
       alert(
         err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء استنساخ الطلب"
-            : "Error cloning request"),
+          (t("auto.errorCloningRequest")),
       );
     } finally {
       setActionLoadingId(null);
@@ -301,19 +285,15 @@ export const AdminRequests: React.FC<Props> = ({
       const res = await deleteRequest(requestId);
       if (res.success) {
         showToast(
-          lang === "ar"
-            ? "تم حذف الطلب وجميع بياناته بنجاح"
-            : "Request deleted successfully",
+          t("auto.requestDeletedSuccessfully"),
         );
       } else {
-        alert(lang === "ar" ? "فشل حذف الطلب" : "Failed to delete request");
+        alert(t("auto.failedToDeleteRequest"));
       }
     } catch (err: any) {
       alert(
         err?.message ||
-          (lang === "ar"
-            ? "حدث خطأ أثناء حذف الطلب"
-            : "Error deleting request"),
+          (t("auto.errorDeletingRequest")),
       );
     } finally {
       setActionLoadingId(null);

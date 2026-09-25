@@ -57,21 +57,17 @@ export const AdminArchive: React.FC = () => {
           <h1 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Archive className="w-5 h-5 text-purple-700" />
             <span>
-              {lang === "ar"
-                ? "الأرشيف التاريخي وسجل الحملات"
-                : "Historical Campaign Archive"}
+              {t("auto.historicalCampaignArchive")}
             </span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {lang === "ar"
-              ? "الاحتفاظ بكامل بيانات الحملات المكتملة وهيكل الحقول والاستجابات والنسخ الاحتياطي السحابي"
-              : "Permanent retention of completed campaign records, schema versions, and drive backup"}
+            {t("auto.permanentRetentionOfCompleted")}
           </p>
         </div>
 
         <span className="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200">
           {archivedRequests.length}{" "}
-          {lang === "ar" ? "حملة مؤرشفة" : "archived campaigns"}
+          {t("auto.archivedCampaigns")}
         </span>
       </div>
 
@@ -89,7 +85,7 @@ export const AdminArchive: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={
-            lang === "ar" ? "بحث في الأرشيف..." : "Search archive..."
+            t("auto.searchArchive")
           }
           className="w-full h-10 ps-9 pe-3 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-600"
         />
@@ -102,9 +98,7 @@ export const AdminArchive: React.FC = () => {
           <div className="col-span-2 bg-white rounded-2xl p-8 text-center text-slate-400 border border-slate-200">
             <Archive className="w-10 h-10 mx-auto mb-2 opacity-50" />
             <div className="font-bold text-xs">
-              {lang === "ar"
-                ? "لا توجد حملات في الأرشيف حالياً"
-                : "No archived campaigns found"}
+              {t("auto.noArchivedCampaignsFound")}
             </div>
           </div>
         ) : (
@@ -131,7 +125,7 @@ export const AdminArchive: React.FC = () => {
                     </h2>
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
-                    {lang === "ar" ? "مؤرشف" : "Archived"}
+                    {t("auto.archived")}
                   </span>
                 </div>
 
@@ -143,13 +137,13 @@ export const AdminArchive: React.FC = () => {
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5 text-purple-700" />
                     <span>
-                      {lang === "ar" ? "الأرشفة: " : "Archived: "}
+                      {t("auto.archived1")}
                       {new Date(req.updatedAt).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="font-bold text-slate-800">
                     {completed}/{reqRecords.length}{" "}
-                    {lang === "ar" ? "سجل مكتمل" : "completed"}
+                    {t("auto.completed")}
                   </div>
                 </div>
 
@@ -160,7 +154,7 @@ export const AdminArchive: React.FC = () => {
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>
-                      {lang === "ar" ? "إعادة فتح الطلب" : "Reopen Request"}
+                      {t("auto.reopenRequest")}
                     </span>
                   </button>
 
@@ -168,9 +162,7 @@ export const AdminArchive: React.FC = () => {
                     onClick={() => handleDriveBackup(req.requestCode)}
                     className="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5"
                     title={
-                      lang === "ar"
-                        ? "أرشفة سحابية على Google Drive"
-                        : "Sync to Google Drive"
+                      t("auto.syncToGoogleDrive")
                     }
                   >
                     <Cloud className="w-3.5 h-3.5 text-purple-700" />

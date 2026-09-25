@@ -1,6 +1,7 @@
 import React from "react";
 import { X, Users, FileSpreadsheet } from "lucide-react";
 import { RequestItem, Assignment, User, Branch } from "../../../types";
+import i18n from "../../../i18n";
 
 interface AssignmentsOverviewModalProps {
   request: RequestItem | null;
@@ -37,9 +38,7 @@ export const AssignmentsOverviewModal: React.FC<
             <h2 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
               <Users className="w-4 h-4 text-purple-700" />
               <span>
-                {lang === "ar"
-                  ? "تكليفات المناديب ونسب الإنجاز"
-                  : "Assigned Reps & Field Progress"}
+                {i18n.t("auto.assignedRepsFieldProgress")}
               </span>
             </h2>
             <div className="text-xs text-slate-500 mt-0.5">
@@ -64,14 +63,10 @@ export const AssignmentsOverviewModal: React.FC<
               <Users className="w-6 h-6" />
             </div>
             <div className="font-bold text-slate-800 text-xs">
-              {lang === "ar"
-                ? "لم يتم تعيين مناديب أو عملاء لهذا الطلب بعد"
-                : "No representatives assigned to this request yet"}
+              {i18n.t("auto.noRepresentativesAssignedTo")}
             </div>
             <p className="text-[11px] text-slate-500 max-w-md mx-auto">
-              {lang === "ar"
-                ? "يمكنك إدراج العملاء والتوزيع التلقائي على المناديب فوراً عبر معالج استيراد Excel."
-                : "You can import customers and auto-assign them to reps using the Excel Import Wizard."}
+              {i18n.t("auto.youCanImportCustomers")}
             </p>
             <button
               type="button"
@@ -84,9 +79,7 @@ export const AssignmentsOverviewModal: React.FC<
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
               <span>
-                {lang === "ar"
-                  ? "فتح معالج استيراد Excel"
-                  : "Open Excel Import Wizard"}
+                {i18n.t("auto.openExcelImportWizard")}
               </span>
             </button>
           </div>
@@ -150,10 +143,10 @@ export const AssignmentsOverviewModal: React.FC<
                       <div className="text-end">
                         <div className="font-bold text-slate-800">
                           {asg.completedRecords} / {asg.totalRecords}{" "}
-                          {lang === "ar" ? "سجل" : "records"}
+                          {i18n.t("auto.records")}
                         </div>
                         <div className="text-[10px] text-slate-400">
-                          {progress}% {lang === "ar" ? "إنجاز" : "done"}
+                          {progress}% {i18n.t("auto.done1")}
                         </div>
                       </div>
                       <div className="w-20 bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
@@ -182,7 +175,7 @@ export const AssignmentsOverviewModal: React.FC<
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer"
           >
-            {lang === "ar" ? "إغلاق" : "Close"}
+            {i18n.t("auto.close")}
           </button>
         </div>
       </div>

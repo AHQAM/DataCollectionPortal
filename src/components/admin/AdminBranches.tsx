@@ -28,6 +28,7 @@ export const AdminBranches: React.FC = () => {
     updateRegion,
     deleteRegion,
     importBranchesAndRegions,
+    t,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<"branches" | "regions">(
@@ -95,9 +96,7 @@ export const AdminBranches: React.FC = () => {
     e.preventDefault();
     if (!branchNameAr.trim()) {
       setAlertError(
-        lang === "ar"
-          ? "يرجى إدخال اسم الفرع بالعربية"
-          : "Please enter branch Arabic name",
+        t("auto.pleaseEnterBranchArabic"),
       );
       return;
     }
@@ -109,17 +108,13 @@ export const AdminBranches: React.FC = () => {
           branchNameEn: branchNameEn.trim() || branchNameAr.trim(),
         });
         setSuccessMessage(
-          lang === "ar"
-            ? "تم تحديث بيانات الفرع بنجاح"
-            : "Branch updated successfully",
+          t("auto.branchUpdatedSuccessfully"),
         );
       } else {
         const code = branchCode.trim().toUpperCase();
         if (branches.some((b) => b.branchId === code)) {
           setAlertError(
-            lang === "ar"
-              ? "رمز الفرع موجود مسبقاً"
-              : "Branch ID already exists",
+            t("auto.branchIdAlreadyExists"),
           );
           return;
         }
@@ -129,15 +124,13 @@ export const AdminBranches: React.FC = () => {
           branchNameEn: branchNameEn.trim() || branchNameAr.trim(),
         });
         setSuccessMessage(
-          lang === "ar"
-            ? "تمت إضافة الفرع الجديد بنجاح"
-            : "New branch created successfully",
+          t("auto.newBranchCreatedSuccessfully"),
         );
       }
     } catch (err) {
       console.error(err);
       setAlertError(
-        lang === "ar" ? "حدث خطأ أثناء الحفظ" : "Error saving branch",
+        t("auto.errorSavingBranch"),
       );
       return;
     }
@@ -159,7 +152,7 @@ export const AdminBranches: React.FC = () => {
         alert(res.message || "Cannot delete");
       } else {
         setSuccessMessage(
-          lang === "ar" ? "تم حذف الفرع بنجاح" : "Branch deleted",
+          t("auto.branchDeleted"),
         );
         setTimeout(() => setSuccessMessage(null), 3000);
       }
@@ -191,9 +184,7 @@ export const AdminBranches: React.FC = () => {
     e.preventDefault();
     if (!regionNo.trim() || !regionNameAr.trim() || !regionBranchId) {
       setAlertError(
-        lang === "ar"
-          ? "يرجى تعبئة كافة الحقول المطلوبة"
-          : "Please fill all required fields",
+        t("auto.pleaseFillAllRequired"),
       );
       return;
     }
@@ -209,16 +200,12 @@ export const AdminBranches: React.FC = () => {
           branchId: regionBranchId,
         });
         setSuccessMessage(
-          lang === "ar"
-            ? "تم تحديث بيانات المنطقة بنجاح"
-            : "Region updated successfully",
+          t("auto.regionUpdatedSuccessfully"),
         );
       } else {
         if (regions.some((r) => r.regionNo === cleanNo)) {
           setAlertError(
-            lang === "ar"
-              ? "رقم المنطقة مستخدم مسبقاً، يرجى اختيار رقم فريد"
-              : "Region number already exists",
+            t("auto.regionNumberAlreadyExists"),
           );
           return;
         }
@@ -230,15 +217,13 @@ export const AdminBranches: React.FC = () => {
           branchId: regionBranchId,
         });
         setSuccessMessage(
-          lang === "ar"
-            ? "تمت إضافة المنطقة بنجاح"
-            : "New region created successfully",
+          t("auto.newRegionCreatedSuccessfully"),
         );
       }
     } catch (err) {
       console.error(err);
       setAlertError(
-        lang === "ar" ? "حدث خطأ أثناء الحفظ" : "Error saving region",
+        t("auto.errorSavingRegion"),
       );
       return;
     }
@@ -259,7 +244,7 @@ export const AdminBranches: React.FC = () => {
       if (!res.success) {
         alert(res.message || "Cannot delete region");
       } else {
-        setSuccessMessage(lang === "ar" ? "تم حذف المنطقة" : "Region deleted");
+        setSuccessMessage(t("auto.regionDeleted"));
         setTimeout(() => setSuccessMessage(null), 3000);
       }
     }

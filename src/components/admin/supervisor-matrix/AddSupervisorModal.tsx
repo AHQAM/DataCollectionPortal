@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Branch } from "../../../types";
 import { UserPlus, X } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface AddSupervisorModalProps {
   isOpen: boolean;
@@ -55,9 +56,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
           <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
             <UserPlus className="w-5 h-5 text-purple-900" />
             <span>
-              {lang === "ar"
-                ? "إضافة مشرف ميداني جديد"
-                : "New Field Supervisor"}
+              {i18n.t("auto.newFieldSupervisor")}
             </span>
           </h3>
           <button
@@ -71,9 +70,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4 pt-4 text-xs">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "اسم المشرف (بالعربية)"
-                : "Supervisor Name (Arabic)"}{" "}
+              {i18n.t("auto.supervisorNameArabic")}{" "}
               *
             </label>
             <input
@@ -88,9 +85,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar"
-                ? "الرقم الوظيفي / كود المشرف"
-                : "Employee ID / Code"}{" "}
+              {i18n.t("auto.employeeIdCode")}{" "}
               *
             </label>
             <input
@@ -105,7 +100,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "الفرع الأساسي" : "Primary Branch"} *
+              {i18n.t("auto.primaryBranch")} *
             </label>
             <select
               value={newSupBranchId || branches[0]?.branchId || ""}
@@ -123,7 +118,7 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "رقم الجوال" : "Mobile Number"}
+              {i18n.t("auto.mobileNumber")}
             </label>
             <input
               type="tel"
@@ -140,13 +135,13 @@ export const AddSupervisorModal: React.FC<AddSupervisorModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold cursor-pointer"
             >
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+              {i18n.t("auto.cancel")}
             </button>
             <button
               type="submit"
               className="px-5 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white font-black shadow-sm transition-all cursor-pointer"
             >
-              {lang === "ar" ? "إضافة المشرف" : "Create Supervisor"}
+              {i18n.t("auto.createSupervisor")}
             </button>
           </div>
         </form>

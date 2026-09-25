@@ -1,5 +1,6 @@
 import React from "react";
 import { Building2, Plus, FileSpreadsheet } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface BranchesHeaderProps {
   lang: "ar" | "en";
@@ -24,15 +25,11 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
             <Building2 className="w-5 h-5" />
           </div>
           <span>
-            {lang === "ar"
-              ? "إدارة الفروع والمناطق الميدانية"
-              : "Branches & Regions Management"}
+            {i18n.t("auto.branchesRegionsManagement")}
           </span>
         </h1>
         <p className="text-xs text-slate-500 mt-1">
-          {lang === "ar"
-            ? "إضافة فروع المنشأة، وتحديد المناطق الميدانية لكل فرع، وربط المستخدمين والمشرفين بها ديناميكياً"
-            : "Add organization branches, define field regions, and link field users and supervisors seamlessly"}
+          {i18n.t("auto.addOrganizationBranchesDefine")}
         </p>
       </div>
 
@@ -43,9 +40,7 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
         >
           <FileSpreadsheet className="w-4 h-4 text-emerald-200" />
           <span>
-            {lang === "ar"
-              ? "استيراد الفروع والمناطق من Excel"
-              : "Import from Excel"}
+            {i18n.t("auto.importFromExcel")}
           </span>
         </button>
 
@@ -55,7 +50,7 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
             className="px-4 py-2.5 bg-purple-900 hover:bg-purple-800 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>{lang === "ar" ? "إضافة فرع جديد" : "New Branch"}</span>
+            <span>{i18n.t("auto.newBranch")}</span>
           </button>
         ) : (
           <button
@@ -63,7 +58,7 @@ export const BranchesHeader: React.FC<BranchesHeaderProps> = ({
             className="px-4 py-2.5 bg-purple-900 hover:bg-purple-800 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>{lang === "ar" ? "إضافة منطقة جديدة" : "New Region"}</span>
+            <span>{i18n.t("auto.newRegion")}</span>
           </button>
         )}
       </div>

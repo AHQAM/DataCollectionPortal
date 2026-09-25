@@ -252,7 +252,7 @@ export const AdminLayout: React.FC = () => {
                 <div className="text-xs font-extrabold uppercase tracking-wider text-purple-900 flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-purple-700" />
                   <span>
-                    {lang === "ar" ? "إدارة المنظومة" : "Management Portal"}
+                    {t("auto.managementPortal")}
                   </span>
                 </div>
                 <button
@@ -309,16 +309,12 @@ export const AdminLayout: React.FC = () => {
                   <div className="font-extrabold text-xs text-slate-900 truncate">
                     {currentUser?.userNameAr ||
                       currentUser?.username ||
-                      (lang === "ar" ? "المستخدم" : "User")}
+                      (t("auto.user"))}
                   </div>
                   <div className="text-[10px] text-purple-700 font-bold truncate">
                     {currentUser?.role === "ADMIN"
-                      ? lang === "ar"
-                        ? "مدير النظام المركزي"
-                        : "System Admin"
-                      : lang === "ar"
-                        ? "مشرف فرع"
-                        : "Branch Supervisor"}
+                      ? t("auto.systemAdmin")
+                      : t("auto.branchSupervisor")}
                   </div>
                 </div>
               </div>
@@ -331,7 +327,7 @@ export const AdminLayout: React.FC = () => {
       <aside className="hidden lg:flex w-64 shrink-0 bg-white border-e border-slate-200 sticky top-16 h-[calc(100vh-4rem)] flex-col justify-between z-20">
         <div className="p-4 overflow-y-auto">
           <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 px-3 mb-2">
-            {lang === "ar" ? "إدارة المنظومة" : "Management Portal"}
+            {t("auto.managementPortal")}
           </div>
 
           <nav className="space-y-1">
@@ -375,16 +371,12 @@ export const AdminLayout: React.FC = () => {
               <div className="font-extrabold text-xs text-slate-900 truncate">
                 {currentUser?.userNameAr ||
                   currentUser?.username ||
-                  (lang === "ar" ? "المستخدم" : "User")}
+                  (t("auto.user"))}
               </div>
               <div className="text-[10px] text-purple-700 font-bold truncate">
                 {currentUser?.role === "ADMIN"
-                  ? lang === "ar"
-                    ? "مدير النظام المركزي"
-                    : "System Admin"
-                  : lang === "ar"
-                    ? "مشرف فرع"
-                    : "Branch Supervisor"}
+                  ? t("auto.systemAdmin")
+                  : t("auto.branchSupervisor")}
               </div>
             </div>
           </div>
@@ -400,7 +392,7 @@ export const AdminLayout: React.FC = () => {
             className="flex items-center gap-2 text-xs font-bold text-purple-900 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg border border-purple-200 transition-colors"
           >
             <Menu className="w-4 h-4 text-purple-700" />
-            <span>{lang === "ar" ? "القائمة الإدارية" : "Admin Menu"}</span>
+            <span>{t("auto.adminMenu")}</span>
           </button>
           <span className="text-xs font-bold text-purple-900">
             {menuItems.find((m) => m.id === currentModule)?.labelAr || ""}
@@ -410,9 +402,7 @@ export const AdminLayout: React.FC = () => {
         <React.Suspense
           fallback={
             <div className="flex items-center justify-center p-12 text-sm text-slate-500 font-bold">
-              {lang === "ar"
-                ? "جاري تحميل واجهة الإدارة..."
-                : "Loading module..."}
+              {t("auto.loadingModule")}
             </div>
           }
         >

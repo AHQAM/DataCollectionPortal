@@ -1,5 +1,6 @@
 import { User } from "../../../types";
 import { getXLSX } from "../../../utils/excel";
+import i18n from "../../../i18n";
 
 export interface ParsedRepRow {
   userNo: string;
@@ -236,11 +237,11 @@ export function groupAndProcessRows(
     if (!primaryNo) {
       isValid = false;
       validationError =
-        lang === "ar" ? "رقم المستخدم/المنطقة مفقود" : "User number is missing";
+        i18n.t("auto.userNumberIsMissing");
     } else if (!val.userName) {
       isValid = false;
       validationError =
-        lang === "ar" ? "اسم المستخدم مفقود" : "User name is missing";
+        i18n.t("auto.userNameIsMissing");
     }
 
     groupedRows.push({
@@ -248,7 +249,7 @@ export function groupAndProcessRows(
       userName: val.userName,
       branchName:
         val.branchName?.trim() ||
-        (lang === "ar" ? "الفرع الرئيسي" : "Main Branch"),
+        (i18n.t("auto.mainBranch")),
       phone: val.phone,
       isExisting,
       isValid,

@@ -1,6 +1,7 @@
 import React from "react";
 import { User } from "../../../types";
 import { Smartphone, Lock, CheckCircle2, KeyRound, Unlock } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface UserTableRowProps {
   user: User;
@@ -63,7 +64,7 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
           </div>
         ) : (
           <span className="text-[10px] text-slate-400 font-semibold">
-            {lang === "ar" ? "غير مرتبط بجهاز" : "Unbound"}
+            {i18n.t("auto.unbound")}
           </span>
         )}
       </td>
@@ -73,20 +74,18 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
           {isLocked ? (
             <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
               <Lock className="w-3 h-3" />
-              <span>{lang === "ar" ? "حساب مقفل" : "Locked Out"}</span>
+              <span>{i18n.t("auto.lockedOut")}</span>
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
               <CheckCircle2 className="w-3 h-3" />
-              <span>{lang === "ar" ? "نشط" : "Active"}</span>
+              <span>{i18n.t("auto.active")}</span>
             </span>
           )}
 
           {user.mustChangePassword && (
             <span className="block text-[9px] font-bold text-amber-700">
-              {lang === "ar"
-                ? "بانتظار تغيير كلمة المرور"
-                : "Pending Password Change"}
+              {i18n.t("auto.pendingPasswordChange")}
             </span>
           )}
         </div>
@@ -99,9 +98,7 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
             onClick={() => onResetPassword(user.userId)}
             className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
             title={
-              lang === "ar"
-                ? "إنشاء كلمة مرور مؤقتة"
-                : "Generate temporary password"
+              i18n.t("auto.generateTemporaryPassword")
             }
           >
             <KeyRound className="w-3.5 h-3.5" />
@@ -112,7 +109,7 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
             <button
               onClick={() => onUnlockUser(user.userId)}
               className="p-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold"
-              title={lang === "ar" ? "إلغاء قفل الحساب" : "Unlock Account"}
+              title={i18n.t("auto.unlockAccount")}
             >
               <Unlock className="w-3.5 h-3.5" />
             </button>
@@ -124,9 +121,7 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
               onClick={() => onReleaseDevice(user.userId)}
               className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200"
               title={
-                lang === "ar"
-                  ? "فك ارتباط الجهاز (السماح بهاتف جديد)"
-                  : "Unlink Device"
+                i18n.t("auto.unlinkDevice")
               }
             >
               <Smartphone className="w-3.5 h-3.5" />

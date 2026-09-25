@@ -1,5 +1,7 @@
+import i18n from "../../../i18n";
 import React, { useRef, useState } from "react";
 import {
+
   FileSpreadsheet,
   UploadCloud,
   Download,
@@ -49,9 +51,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
         <div className="flex items-center gap-2 text-xs text-purple-950 font-bold">
           <Info className="w-4 h-4 text-purple-700 shrink-0" />
           <span>
-            {lang === "ar"
-              ? "الأعمدة: [رقم_المستخدم (المعرف)] و [اسم_المستخدم] و [الفرع] و [رقم_الجوال]"
-              : "Columns: [User_Number (ID)], [User_Name], [Branch], [Phone]"}
+            {i18n.t("auto.columnsUsernumberIdUsername")}
           </span>
         </div>
 
@@ -63,9 +63,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
           >
             <Download className="w-3.5 h-3.5 text-purple-700" />
             <span>
-              {lang === "ar"
-                ? "تحميل نموذج Excel المعتمد"
-                : "Download Sample Template"}
+              {i18n.t("auto.downloadSampleTemplate")}
             </span>
           </button>
 
@@ -76,9 +74,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>
-              {lang === "ar"
-                ? "تجربة عينة مناديب جدة والمدينة (18 منطقة)"
-                : "Load Demo Sample"}
+              {i18n.t("auto.loadDemoSample")}
             </span>
           </button>
         </div>
@@ -89,9 +85,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
         <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs text-emerald-900 flex items-center gap-2 animate-in fade-in">
           <ArrowUpDown className="w-4 h-4 text-emerald-600 shrink-0" />
           <div className="font-bold">
-            {lang === "ar"
-              ? "ذكاء النظام: تم الكشف تلقائياً عن تبديل في محتوى العمودين A و B (تم تصحيح رقم المستخدم واسم المستخدم تلقائياً دون أي أخطاء)!"
-              : "Auto-detected swapped columns A & B: Successfully corrected User No and User Name!"}
+            {i18n.t("auto.autodetectedSwappedColumnsA")}
           </div>
         </div>
       )}
@@ -136,9 +130,7 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
           )}
         </p>
         <p className="text-[11px] text-slate-400 mt-1">
-          {lang === "ar"
-            ? "يتعرف المعالج تلقائياً على الأعمدة المتبادلة ويدمج صفوف نفس المستخدم تلقائياً"
-            : "Smart mapping auto-detects swapped columns and merges rows for the same user"}
+          {i18n.t("auto.smartMappingAutodetectsSwapped")}
         </p>
       </div>
     </div>

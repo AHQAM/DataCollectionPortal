@@ -1,6 +1,7 @@
 import React from "react";
 import { Search } from "lucide-react";
 import { Branch, RequestItem } from "../../../types";
+import i18n from "../../../i18n";
 
 interface Props {
   lang: string;
@@ -35,7 +36,7 @@ export const ReportFilters: React.FC<Props> = ({
     <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {lang === "ar" ? "الطلب / الحملة" : "Request Campaign"}
+          {i18n.t("auto.requestCampaign")}
         </label>
         <select
           value={selectedReqId}
@@ -55,7 +56,7 @@ export const ReportFilters: React.FC<Props> = ({
 
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {lang === "ar" ? "الفرع" : "Branch"}
+          {i18n.t("auto.branch")}
         </label>
         <select
           value={selectedBranchId}
@@ -63,7 +64,7 @@ export const ReportFilters: React.FC<Props> = ({
           className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold bg-white text-slate-800"
         >
           <option value="ALL">
-            {lang === "ar" ? "جميع الفروع" : "All Branches"}
+            {i18n.t("auto.allBranches")}
           </option>
           {branches.map((b) => (
             <option key={b.branchId} value={b.branchId}>
@@ -75,7 +76,7 @@ export const ReportFilters: React.FC<Props> = ({
 
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {lang === "ar" ? "حالة السجل" : "Record Status"}
+          {i18n.t("auto.recordStatus")}
         </label>
         <select
           value={selectedStatus}
@@ -83,24 +84,24 @@ export const ReportFilters: React.FC<Props> = ({
           className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold bg-white text-slate-800"
         >
           <option value="ALL">
-            {lang === "ar" ? "جميع الحالات" : "All Statuses"}
+            {i18n.t("auto.allStatuses")}
           </option>
           <option value="Submitted">
-            {lang === "ar" ? "تم الإرسال" : "Submitted"}
+            {i18n.t("auto.submitted")}
           </option>
           <option value="Completed">
-            {lang === "ar" ? "مكتمل" : "Completed"}
+            {i18n.t("auto.completed1")}
           </option>
           <option value="DraftSaved">
-            {lang === "ar" ? "مسودة محفوظة" : "Draft Saved"}
+            {i18n.t("auto.draftSaved")}
           </option>
-          <option value="Pending">{lang === "ar" ? "معلق" : "Pending"}</option>
+          <option value="Pending">{i18n.t("auto.pending")}</option>
         </select>
       </div>
 
       <div>
         <label className="block font-bold text-slate-700 mb-1">
-          {lang === "ar" ? "بحث بالسجل أو المستخدم" : "Search Record / User"}
+          {i18n.t("auto.searchRecordUser")}
         </label>
         <div className="relative">
           <input
@@ -108,9 +109,7 @@ export const ReportFilters: React.FC<Props> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={
-              lang === "ar"
-                ? "بحث بالاسم أو الكود..."
-                : "Search by name or code..."
+              i18n.t("auto.searchByNameOr")
             }
             className="w-full h-10 px-3 ps-8 rounded-xl border border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 text-xs font-semibold"
           />

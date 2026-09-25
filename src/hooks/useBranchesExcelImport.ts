@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { getXLSX } from "../utils/excel";
+import i18n from "../i18n";
 
 export const useBranchesExcelImport = (
   lang: "ar" | "en",
@@ -93,9 +94,7 @@ export const useBranchesExcelImport = (
 
         if (!jsonData || jsonData.length === 0) {
           setExcelParseError(
-            lang === "ar"
-              ? "الملف فارغ أو لا يحتوي على صفوف بيانات"
-              : "The file is empty or contains no rows",
+            i18n.t("auto.theFileIsEmpty"),
           );
           return;
         }
@@ -194,9 +193,7 @@ export const useBranchesExcelImport = (
         const parsedB = Array.from(branchesMap.values());
         if (parsedB.length === 0 && regionsList.length === 0) {
           setExcelParseError(
-            lang === "ar"
-              ? "لم يتم العثور على أعمدة متطابقة في الملف. يرجى التأكد من مطابقة أسماء الأعمدة أو تحميل القالب النموذجي."
-              : "No matching columns found. Please verify column headers or use the standard template.",
+            i18n.t("auto.noMatchingColumnsFound"),
           );
           return;
         }

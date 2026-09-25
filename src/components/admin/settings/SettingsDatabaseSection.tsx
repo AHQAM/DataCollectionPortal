@@ -1,5 +1,7 @@
+import i18n from "../../../i18n";
 import React from "react";
 import {
+
   Database,
   AlertOctagon,
   Trash2,
@@ -50,20 +52,18 @@ export const SettingsDatabaseSection: React.FC<
           <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
             <Database className="w-4 h-4 text-purple-700" />
             <span>
-              {lang === "ar"
-                ? "إدارة قاعدة البيانات والتشغيل الفعلي"
-                : "Database Management & Production Ops"}
+              {i18n.t("auto.databaseManagementProductionOps")}
             </span>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">
-            {lang === "ar" ? "التحكم الإداري" : "Admin Control"}
+            {i18n.t("auto.adminControl")}
           </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
             <div className="text-slate-500 text-[11px]">
-              {lang === "ar" ? "سجلات العملاء" : "Customer Records"}
+              {i18n.t("auto.customerRecords")}
             </div>
             <div className="text-base font-black text-slate-800 mt-0.5">
               {recordsLength}
@@ -71,7 +71,7 @@ export const SettingsDatabaseSection: React.FC<
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
             <div className="text-slate-500 text-[11px]">
-              {lang === "ar" ? "طلبات الجمع" : "Collection Requests"}
+              {i18n.t("auto.collectionRequests")}
             </div>
             <div className="text-base font-black text-slate-800 mt-0.5">
               {requestsLength}
@@ -79,7 +79,7 @@ export const SettingsDatabaseSection: React.FC<
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
             <div className="text-slate-500 text-[11px]">
-              {lang === "ar" ? "الفروع المسجلة" : "Registered Branches"}
+              {i18n.t("auto.registeredBranches")}
             </div>
             <div className="text-base font-black text-slate-800 mt-0.5">
               {branchesLength}
@@ -87,7 +87,7 @@ export const SettingsDatabaseSection: React.FC<
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
             <div className="text-slate-500 text-[11px]">
-              {lang === "ar" ? "المناطق والمناديب" : "Regions & Reps"}
+              {i18n.t("auto.regionsReps")}
             </div>
             <div className="text-base font-black text-slate-800 mt-0.5">
               {regionsLength}
@@ -100,15 +100,11 @@ export const SettingsDatabaseSection: React.FC<
             <div className="flex items-center gap-2 text-rose-950 font-black text-xs">
               <AlertOctagon className="w-4 h-4 text-rose-600 shrink-0" />
               <span>
-                {lang === "ar"
-                  ? "تفريغ البيانات التجريبية والبدء بصفحة بيضاء للإنتاج الفعلي"
-                  : "Wipe Demo Data & Start Blank Slate for Live Production"}
+                {i18n.t("auto.wipeDemoDataStart")}
               </span>
             </div>
             <p className="text-[11px] text-slate-600 max-w-xl leading-relaxed">
-              {lang === "ar"
-                ? "مسح كافة سجلات العملاء التجريبية (20 سجل)، والطلبات النموذجية، والردود والتكليفات، للبدء بصفحة بيضاء نظيفة تماماً جاهزة للتشغيل الفعلي بالشركة مع إبقاء حساب المدير فعالاً."
-                : "Purge mock customer records, sample collection requests, and test assignments to start with a pristine blank slate for company operations while keeping Admin active."}
+              {i18n.t("auto.purgeMockCustomerRecords")}
             </p>
           </div>
 
@@ -122,16 +118,14 @@ export const SettingsDatabaseSection: React.FC<
           >
             <Trash2 className="w-4 h-4" />
             <span>
-              {lang === "ar" ? "تفريغ البيانات التجريبية" : "Wipe Demo Data"}
+              {i18n.t("auto.wipeDemoData")}
             </span>
           </button>
         </div>
 
         <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="text-slate-600 text-[11px]">
-            {lang === "ar"
-              ? "تصدير نسخة احتياطية كاملة من قاعدة البيانات والإعدادات كملف JSON للأرشفة والأمان."
-              : "Export full database backup & system settings as a JSON file for archiving."}
+            {i18n.t("auto.exportFullDatabaseBackup")}
           </div>
 
           <button
@@ -141,9 +135,7 @@ export const SettingsDatabaseSection: React.FC<
           >
             <Download className="w-4 h-4 text-purple-700" />
             <span>
-              {lang === "ar"
-                ? "تصدير نسخة احتياطية (JSON)"
-                : "Export JSON Backup"}
+              {i18n.t("auto.exportJsonBackup")}
             </span>
           </button>
         </div>
@@ -154,15 +146,11 @@ export const SettingsDatabaseSection: React.FC<
           <div className="flex items-center gap-2 text-xs font-extrabold text-slate-800">
             <RefreshCw className="w-4 h-4 text-slate-600" />
             <span>
-              {lang === "ar"
-                ? "استعادة البيانات النموذجية للتجربة (QA Demo Seed Data)"
-                : "Restore Default Seed Data"}
+              {i18n.t("auto.restoreDefaultSeedData")}
             </span>
           </div>
           <p className="text-xs text-slate-600 leading-relaxed">
-            {lang === "ar"
-              ? "أداة تطوير محلية: في حال رغبت في إعادة السجلات والطلبات النموذجية لاختبار دورة العمل والتجربة من جديد."
-              : "Development Tool: Restore mock records, requests, and sample branch data for demo testing."}
+            {i18n.t("auto.developmentToolRestoreMock")}
           </p>
 
           {showResetConfirm ? (
@@ -175,16 +163,14 @@ export const SettingsDatabaseSection: React.FC<
                 }}
                 className="px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-800 text-white text-xs font-bold shadow-md cursor-pointer"
               >
-                {lang === "ar"
-                  ? "نعم، استعادة البيانات النموذجية"
-                  : "Yes, Restore Seed Data"}
+                {i18n.t("auto.yesRestoreSeedData")}
               </button>
               <button
                 type="button"
                 onClick={() => setShowResetConfirm(false)}
                 className="px-3 py-2 rounded-xl bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
               >
-                {lang === "ar" ? "إلغاء" : "Cancel"}
+                {i18n.t("auto.cancel")}
               </button>
             </div>
           ) : (
@@ -195,9 +181,7 @@ export const SettingsDatabaseSection: React.FC<
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>
-                {lang === "ar"
-                  ? "استعادة البيانات النموذجية الأولية"
-                  : "Restore Initial Demo Data"}
+                {i18n.t("auto.restoreInitialDemoData")}
               </span>
             </button>
           )}
@@ -212,14 +196,10 @@ export const SettingsDatabaseSection: React.FC<
                 <AlertOctagon className="w-8 h-8" />
               </div>
               <h3 className="text-lg font-black text-slate-900">
-                {lang === "ar"
-                  ? "تفريغ البيانات التجريبية والبدء بصفحة بيضاء"
-                  : "Wipe Demo Data for Live Production"}
+                {i18n.t("auto.wipeDemoDataFor")}
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed max-w-md mx-auto">
-                {lang === "ar"
-                  ? "سيتم مسح كافة سجلات العملاء التجريبية (20 سجل)، والطلبات النموذجية، والردود والتكليفات، للبدء بصفحة بيضاء نظيفة تماماً جاهزة للتشغيل الفعلي بالشركة."
-                  : "This will purge all mock customer records (20 records), sample collection requests, and test responses, giving you a completely clean blank slate for live company operations."}
+                {i18n.t("auto.thisWillPurgeAll")}
               </p>
             </div>
 
@@ -227,17 +207,13 @@ export const SettingsDatabaseSection: React.FC<
               <div className="font-extrabold text-rose-950 flex items-center gap-2">
                 <Check className="w-4 h-4 text-rose-600 shrink-0" />
                 <span>
-                  {lang === "ar"
-                    ? "مسح سجلات العملاء والطلبات والتكليفات التجريبية (صفحة بيضاء)"
-                    : "Purge test records, requests & assignments (Blank Slate)"}
+                  {i18n.t("auto.purgeTestRecordsRequests")}
                 </span>
               </div>
               <div className="font-extrabold text-rose-950 flex items-center gap-2">
                 <Check className="w-4 h-4 text-rose-600 shrink-0" />
                 <span>
-                  {lang === "ar"
-                    ? "إبقاء حساب مدير النظام (Admin) فعالاً لعدم إغلاق الجلسة"
-                    : "Preserve Admin user so login remains active"}
+                  {i18n.t("auto.preserveAdminUserSo")}
                 </span>
               </div>
 
@@ -250,9 +226,7 @@ export const SettingsDatabaseSection: React.FC<
                     className="mt-0.5 rounded text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer"
                   />
                   <span>
-                    {lang === "ar"
-                      ? "مسح الفروع والمناطق التجريبية أيضاً (لبدء استيراد ملف فروع شركتك من Excel)"
-                      : "Also wipe demo branches & regions (to import your company Excel file)"}
+                    {i18n.t("auto.alsoWipeDemoBranches")}
                   </span>
                 </label>
               </div>
@@ -264,7 +238,7 @@ export const SettingsDatabaseSection: React.FC<
                 onClick={() => setShowWipeModal(false)}
                 className="px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer"
               >
-                {lang === "ar" ? "تراجع وإلغاء" : "Cancel"}
+                {i18n.t("auto.cancel")}
               </button>
               <button
                 type="button"
@@ -273,9 +247,7 @@ export const SettingsDatabaseSection: React.FC<
               >
                 <Trash2 className="w-4 h-4" />
                 <span>
-                  {lang === "ar"
-                    ? "تأكيد التفريغ والبدء بصفحة بيضاء"
-                    : "Confirm Wipe & Start Clean"}
+                  {i18n.t("auto.confirmWipeStartClean")}
                 </span>
               </button>
             </div>

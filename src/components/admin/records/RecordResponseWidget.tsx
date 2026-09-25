@@ -1,6 +1,7 @@
 import React from "react";
 import { RequestField } from "../../../types";
 import { ExternalLink, Compass } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface RecordResponseWidgetProps {
   field: RequestField;
@@ -18,7 +19,7 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
   if (val === undefined || val === null || val === "") {
     return (
       <span className="text-slate-400 italic text-xs">
-        {lang === "ar" ? "لم يتم تقديم إجابة" : "No response provided"}
+        {i18n.t("auto.noResponseProvided")}
       </span>
     );
   }
@@ -44,8 +45,8 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
         }`}
       >
         {isYes
-          ? "✓ " + (lang === "ar" ? "نعم" : "Yes")
-          : "✕ " + (lang === "ar" ? "لا" : "No")}
+          ? "✓ " + (i18n.t("auto.yes"))
+          : "✕ " + (i18n.t("auto.no"))}
       </span>
     );
   }
@@ -128,7 +129,7 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
           >
             <Compass className="w-3.5 h-3.5" />
             <span>
-              {lang === "ar" ? "عرض على خرائط Google" : "Open in Google Maps"}
+              {i18n.t("auto.openInGoogleMaps")}
             </span>
           </a>
         )}

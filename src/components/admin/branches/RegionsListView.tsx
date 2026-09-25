@@ -1,6 +1,7 @@
 import React from "react";
 import { Branch, Region, User, RecordItem } from "../../../types";
 import { Building2, Users, Edit2, Trash2 } from "lucide-react";
+import i18n from "../../../i18n";
 
 interface RegionsListViewProps {
   lang: string;
@@ -28,22 +29,22 @@ export const RegionsListView: React.FC<RegionsListViewProps> = ({
           <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "رقم المنطقة" : "Region No"}
+                {i18n.t("auto.regionNo")}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "اسم المنطقة والحي" : "Region Name"}
+                {i18n.t("auto.regionName")}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "الفرع التابع له" : "Parent Branch"}
+                {i18n.t("auto.parentBranch")}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "المندوب المعين" : "Assigned Rep"}
+                {i18n.t("auto.assignedRep")}
               </th>
               <th className="px-4 py-3 text-start">
-                {lang === "ar" ? "سجلات العملاء" : "Customer Records"}
+                {i18n.t("auto.customerRecords")}
               </th>
               <th className="px-4 py-3 text-center">
-                {lang === "ar" ? "الإجراءات" : "Actions"}
+                {i18n.t("auto.actions")}
               </th>
             </tr>
           </thead>
@@ -54,9 +55,7 @@ export const RegionsListView: React.FC<RegionsListViewProps> = ({
                   colSpan={6}
                   className="px-4 py-10 text-center text-slate-400"
                 >
-                  {lang === "ar"
-                    ? "لا توجد مناطق مطابقة لمعايير البحث"
-                    : "No matching regions found"}
+                  {i18n.t("auto.noMatchingRegionsFound")}
                 </td>
               </tr>
             ) : (
@@ -112,7 +111,7 @@ export const RegionsListView: React.FC<RegionsListViewProps> = ({
                         </div>
                       ) : (
                         <span className="text-slate-400 italic text-[11px]">
-                          {lang === "ar" ? "غير مسند لمستخدم" : "Unassigned"}
+                          {i18n.t("auto.unassigned")}
                         </span>
                       )}
                     </td>
@@ -121,7 +120,7 @@ export const RegionsListView: React.FC<RegionsListViewProps> = ({
                         {regRecords.length}
                       </span>{" "}
                       <span className="text-[10px] text-slate-400">
-                        {lang === "ar" ? "سجل" : "records"}
+                        {i18n.t("auto.records")}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-center">
@@ -129,14 +128,14 @@ export const RegionsListView: React.FC<RegionsListViewProps> = ({
                         <button
                           onClick={() => onOpenEditRegion(r)}
                           className="p-1.5 text-slate-400 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-all cursor-pointer"
-                          title={lang === "ar" ? "تعديل" : "Edit"}
+                          title={i18n.t("auto.edit")}
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => onDeleteRegion(r)}
                           className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
-                          title={lang === "ar" ? "حذف" : "Delete"}
+                          title={i18n.t("auto.delete")}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>

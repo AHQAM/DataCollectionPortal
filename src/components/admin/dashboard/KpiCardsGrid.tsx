@@ -1,6 +1,7 @@
 import React from "react";
 import { FileText, TrendingUp, Layers, ShieldCheck } from "lucide-react";
 import { User } from "../../../types";
+import i18n from "../../../i18n";
 
 interface KpiCardsGridProps {
   lang: "ar" | "en";
@@ -31,7 +32,7 @@ export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
       <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80">
         <div className="flex items-center justify-between text-slate-500 mb-2">
           <span className="text-xs font-bold">
-            {lang === "ar" ? "الطلبات النشطة" : "Active Campaigns"}
+            {i18n.t("auto.activeCampaigns")}
           </span>
           <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
             <FileText className="w-4 h-4" />
@@ -42,7 +43,7 @@ export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
         </div>
         <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
           <span className="font-bold text-purple-700">{draftRequests}</span>
-          <span>{lang === "ar" ? "مسودة قيد الإعداد" : "in draft"}</span>
+          <span>{i18n.t("auto.inDraft")}</span>
         </div>
       </div>
 
@@ -50,7 +51,7 @@ export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
       <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80">
         <div className="flex items-center justify-between text-slate-500 mb-2">
           <span className="text-xs font-bold">
-            {lang === "ar" ? "نسبة الإنجاز الكلية" : "Overall Completion"}
+            {i18n.t("auto.overallCompletion")}
           </span>
           <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
             <TrendingUp className="w-4 h-4" />
@@ -71,7 +72,7 @@ export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
       <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80">
         <div className="flex items-center justify-between text-slate-500 mb-2">
           <span className="text-xs font-bold">
-            {lang === "ar" ? "إجمالي السجلات" : "Total Records"}
+            {i18n.t("auto.totalRecords")}
           </span>
           <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
             <Layers className="w-4 h-4" />
@@ -95,7 +96,7 @@ export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
       <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80">
         <div className="flex items-center justify-between text-slate-500 mb-2">
           <span className="text-xs font-bold">
-            {lang === "ar" ? "حالة أمان الحسابات" : "Security & Access"}
+            {i18n.t("auto.securityAccess")}
           </span>
           <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
             <ShieldCheck className="w-4 h-4" />
@@ -105,7 +106,7 @@ export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
           {users.filter((u) => u.role === "REP").length}
         </div>
         <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
-          <span>{lang === "ar" ? "مستخدم معتمد" : "authorized users"}</span>
+          <span>{i18n.t("auto.authorizedUsers")}</span>
           {lockedUsersCount > 0 && (
             <span className="text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded">
               {lockedUsersCount} مقفل
