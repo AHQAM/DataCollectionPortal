@@ -75,7 +75,8 @@
     "archived": "Archived",
     "closed": "Closed",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "locked": "Locked"
   },
   "roles": {
     "admin": "System Administrator",
@@ -83,6 +84,30 @@
     "rep": "Field Representative",
     "adminFull": "System Admin",
     "user": "User"
+  },
+  "dashboard": {
+    "title": "Executive Dashboard",
+    "subtitle": "Dynamic Data Collection Portal",
+    "desc": "Real-time campaign progress, branch completion metrics, and field assignment tracking.",
+    "branches": "Branches & Zones",
+    "newRequest": "New Request",
+    "settingsTitle": "System Settings & Database",
+    "settings": "Settings & DB",
+    "activeCampaigns": "Active Campaigns",
+    "inDraft": "in draft",
+    "overallCompletion": "Overall Completion",
+    "totalRecords": "Total Records",
+    "securityAccess": "Security & Access",
+    "authorizedUsers": "authorized users",
+    "branchCompletion": "Completion by Branch",
+    "branchComparison": "Comparative performance across 3 operating branches",
+    "viewReports": "View Reports",
+    "recordsUnit": "records",
+    "currentCampaigns": "Current Campaigns",
+    "due": "Due: ",
+    "manageAllRequests": "Manage All Requests",
+    "recentAudit": "Recent Field Audit Activity",
+    "fullAuditTrail": "Full Audit Trail"
   },
   "topNavbar": {
     "subTitle": "Dynamic Fields & Custom Auth Platform",

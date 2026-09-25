@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Building, ArrowUpRight } from "lucide-react";
 import { Branch } from "../../../types";
 
@@ -10,7 +11,7 @@ interface BranchStat {
 }
 
 interface BranchProgressProps {
-  lang: "ar" | "en";
+  lang?: "ar" | "en";
   onNavigate: (module: string) => void;
   branchStats: BranchStat[];
 }
@@ -20,26 +21,25 @@ export const BranchProgress: React.FC<BranchProgressProps> = ({
   onNavigate,
   branchStats,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang = lang || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-xs border border-slate-200/80 space-y-4">
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <div>
           <h2 className="font-extrabold text-sm text-slate-900">
-            {lang === "ar"
-              ? "نسبة الإنجاز وتوزيع السجلات حسب الفرع"
-              : "Completion by Branch"}
+            {t("dashboard.branchCompletion", { lng: currentLang })}
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            {lang === "ar"
-              ? "مقارنة تقدم العمل في الفروع الرئيسية الثلاثة"
-              : "Comparative performance across 3 operating branches"}
+            {t("dashboard.branchComparison", { lng: currentLang })}
           </p>
         </div>
         <button
           onClick={() => onNavigate("reports")}
-          className="text-xs text-purple-700 hover:text-purple-900 font-bold flex items-center gap-1"
+          className="text-xs text-purple-700 hover:text-purple-900 font-bold flex items-center gap-1 cursor-pointer"
         >
-          <span>{lang === "ar" ? "التقارير التفصيلية" : "View Reports"}</span>
+          <span>{t("dashboard.viewReports", { lng: currentLang })}</span>
           <ArrowUpRight className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -54,12 +54,14 @@ export const BranchProgress: React.FC<BranchProgressProps> = ({
               <div className="flex items-center gap-2">
                 <Building className="w-4 h-4 text-purple-700" />
                 <span className="font-bold text-xs text-slate-900">
-                  {lang === "ar" ? branch.branchNameAr : branch.branchNameEn}
+                  {currentLang === "ar"
+                    ? branch.branchNameAr
+                    : branch.branchNameEn}
                 </span>
               </div>
               <div className="text-xs font-bold text-slate-700">
-                {completed} / {total} {lang === "ar" ? "سجل" : "records"} ({pct}
-                %)
+                {completed} / {total}{" "}
+                {t("dashboard.recordsUnit", { lng: currentLang })} ({pct}%)
               </div>
             </div>
 

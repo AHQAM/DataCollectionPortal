@@ -1,8 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { AuditLog } from "../../../types";
 
 interface RecentAuditActivityProps {
-  lang: "ar" | "en";
+  lang?: "ar" | "en";
   onNavigate: (module: string) => void;
   auditLogs: AuditLog[];
 }
@@ -12,22 +13,23 @@ export const RecentAuditActivity: React.FC<RecentAuditActivityProps> = ({
   onNavigate,
   auditLogs,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang = lang || (i18n.language as "ar" | "en") || "ar";
+
   return (
     <div className="bg-white rounded-2xl p-5 shadow-xs border border-slate-200/80">
       <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-purple-700 animate-pulse" />
           <h2 className="font-extrabold text-sm text-slate-900">
-            {lang === "ar"
-              ? "سجل العمليات والنشاط الميداني اللحظي"
-              : "Recent Field Audit Activity"}
+            {t("dashboard.recentAudit", { lng: currentLang })}
           </h2>
         </div>
         <button
           onClick={() => onNavigate("audit")}
-          className="text-xs text-purple-700 hover:text-purple-900 font-bold"
+          className="text-xs text-purple-700 hover:text-purple-900 font-bold cursor-pointer"
         >
-          {lang === "ar" ? "عرض السجل الكامل" : "Full Audit Trail"}
+          {t("dashboard.fullAuditTrail", { lng: currentLang })}
         </button>
       </div>
 
