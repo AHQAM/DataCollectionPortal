@@ -1,5 +1,5 @@
 name: mobile
-description: A new Flutter project for DataCollectionPortal Rep App.
+description: Field Data Collection Hub - Mobile App for Field Audits, Inspections, and Surveys.
 
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
@@ -51,6 +51,7 @@ dev_dependencies:
   mocktail: ^1.0.5
   freezed: ^4.0.1
   json_serializable: ^6.14.1
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true

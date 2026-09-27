@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In ar, this message translates to:
-  /// **'منصة جمع المبيعات'**
+  /// **'منصة جمع البيانات الميدانية'**
   String get appName;
 
   /// No description provided for @loginTitle.

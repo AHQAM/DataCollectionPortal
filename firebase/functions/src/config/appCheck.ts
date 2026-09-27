@@ -1,4 +1,4 @@
-import * as functions from "firebase-functions";
+import { HttpsError } from "./gen2";
 
 /**
  * Verifies that the incoming callable function context contains a valid Firebase App Check token.
@@ -7,7 +7,7 @@ import * as functions from "firebase-functions";
  */
 export const verifyAppCheck = (context: { app?: any }) => {
   if (process.env.ENFORCE_APP_CHECK === "true" && !context?.app) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "failed-precondition",
       "App Check verification failed. The request originated from an unauthorized client.",
     );

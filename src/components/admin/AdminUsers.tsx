@@ -18,6 +18,7 @@ export const AdminUsers: React.FC = () => {
     unlockUser,
     releaseUserDevice,
     createUser,
+    deactivateUser,
   } = useApp();
 
   const { t, i18n } = useTranslation();
@@ -190,6 +191,17 @@ export const AdminUsers: React.FC = () => {
                         t("users.deviceUnlinkedSuccess", { lng: currentLang }),
                       );
                     }}
+                    onDeactivateUser={(id) => {
+                      if (window.confirm("Are you sure you want to delete/deactivate this user?")) {
+                        void deactivateUser(id).then((result: { success: boolean }) => {
+                          showToast(
+                            result.success
+                              ? t("users.accountDeactivatedSuccess", { lng: currentLang }) || "User deactivated successfully"
+                              : "Failed to deactivate user"
+                          );
+                        });
+                      }
+                    }}
                   />
                 );
               })}
@@ -203,8 +215,8 @@ export const AdminUsers: React.FC = () => {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         lang={currentLang}
-        branches={branches}
-        regions={regions}
+        branches={branches.filter((b) => b.isActive !== false)}
+        regions={regions.filter((r) => r.isActive !== false)}
         newRole={newRole}
         setNewRole={setNewRole}
         newRegionNo={newRegionNo}

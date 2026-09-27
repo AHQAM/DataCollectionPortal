@@ -92,6 +92,13 @@ export const RegionsListView: React.FC<RegionsListViewProps> = ({
                           {r.regionNameEn}
                         </div>
                       )}
+                      {r.isActive === false && (
+                        <div className="mt-1">
+                          <span className="text-[10px] text-red-700 font-bold bg-red-50 px-1.5 py-0.5 rounded leading-none">
+                            {currentLang === "ar" ? "غير مفعل" : "Inactive"}
+                          </span>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3.5">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-bold text-[11px]">

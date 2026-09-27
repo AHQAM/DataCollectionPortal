@@ -1,7 +1,8 @@
+specVersion: v1alpha1
 endpoints:
   authenticateWithRegionPassword:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -13,8 +14,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: authenticateWithRegionPassword
   createAdminSupervisorUser:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -26,8 +27,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: createAdminSupervisorUser
   auditPrivilegedUsers:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -39,8 +40,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: auditPrivilegedUsers
   changePassword:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -52,8 +53,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: changePassword
   requestPasswordReset:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -65,8 +66,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: requestPasswordReset
   adminResetPassword:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -78,8 +79,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: adminResetPassword
   adminUnlockAccount:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -91,8 +92,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: adminUnlockAccount
   createUser:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -104,8 +105,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: createUser
   updateUser:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -117,8 +118,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: updateUser
   deactivateUser:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -130,8 +131,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: deactivateUser
   importUsersBatch:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -143,8 +144,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: importUsersBatch
   releaseDevice:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -156,8 +157,8 @@ endpoints:
     callableTrigger: &ref_1 {}
     entryPoint: releaseDevice
   releaseDeviceBinding:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -169,8 +170,8 @@ endpoints:
     callableTrigger: *ref_1
     entryPoint: releaseDeviceBinding
   replaceDevice:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -182,8 +183,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: replaceDevice
   rejectDeviceReplacement:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -195,8 +196,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: rejectDeviceReplacement
   forceLogoutUser:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -208,8 +209,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: forceLogoutUser
   createBranch:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -221,8 +222,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: createBranch
   updateBranch:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -234,8 +235,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: updateBranch
   deleteBranch:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -247,8 +248,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: deleteBranch
   createRegion:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -260,8 +261,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: createRegion
   updateRegion:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -273,8 +274,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: updateRegion
   deleteRegion:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -286,8 +287,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: deleteRegion
   importBranchesAndRegions:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -299,8 +300,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: importBranchesAndRegions
   createRequest:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -312,8 +313,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: createRequest
   updateDraftRequest:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -325,8 +326,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: updateDraftRequest
   publishRequest:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -338,8 +339,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: publishRequest
   closeRequest:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -351,8 +352,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: closeRequest
   archiveRequest:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -364,8 +365,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: archiveRequest
   reopenRequest:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -377,8 +378,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: reopenRequest
   cloneRequest:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -390,8 +391,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: cloneRequest
   deleteRequest:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -403,8 +404,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: deleteRequest
   saveRequestFields:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -416,8 +417,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: saveRequestFields
   reassignRecords:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -429,8 +430,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: reassignRecords
   importDataPreview:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -442,8 +443,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: importDataPreview
   commitImport:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -455,8 +456,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: commitImport
   exportDataToExternalSystem:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -468,8 +469,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: exportDataToExternalSystem
   sendBroadcastNotification:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -481,8 +482,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: sendBroadcastNotification
   exportReport:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -494,8 +495,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: exportReport
   submitResponse:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -507,8 +508,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: submitResponse
   saveDraftResponse:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -520,8 +521,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: saveDraftResponse
   wipeDemoData:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -533,8 +534,8 @@ endpoints:
     callableTrigger: {}
     entryPoint: wipeDemoData
   getSystemHealth:
-    availableMemoryMb: null
-    timeoutSeconds: null
+    availableMemoryMb: 256
+    timeoutSeconds: 60
     minInstances: null
     maxInstances: null
     ingressSettings: null
@@ -545,6 +546,5 @@ endpoints:
     labels: {}
     callableTrigger: {}
     entryPoint: getSystemHealth
-specVersion: v1alpha1
-requiredAPIs: []
 extensions: {}
+requiredAPIs: []

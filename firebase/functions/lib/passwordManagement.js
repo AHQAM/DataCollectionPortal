@@ -99,6 +99,16 @@ exports.changePassword = (0, gen2_1.onCallGen2)(async (data, context) => {
             sessionVersion: newSessionVersion,
             updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
+        // Attempt to update Native Firebase Auth password (if user exists there)
+        try {
+            await admin.auth().updateUser(userId, { password: newPassword });
+        }
+        catch (authErr) {
+            // Ignore if user does not exist in Native Auth (e.g. REP users)
+            if (authErr.code !== "auth/user-not-found") {
+                console.warn(`Failed to update native auth password for ${userId}:`, authErr);
+            }
+        }
         // Update custom claims with new session version
         const customClaims = {
             role: userData.role,
@@ -231,12 +241,15 @@ exports.adminResetPassword = (0, gen2_1.onCallGen2)(async (data, context) => {
             lockedUntil: null,
             updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
-        // Revoke existing Firebase Auth refresh tokens
+        // Update Native Firebase Auth password if user exists there
         try {
+            await admin.auth().updateUser(targetUserId, { password: temporaryPassword });
             await admin.auth().revokeRefreshTokens(targetUserId);
         }
         catch (e) {
-            console.warn("Could not revoke tokens (user may not exist in Auth):", e);
+            if (e.code !== "auth/user-not-found") {
+                console.warn(`Could not update native auth for ${targetUserId}:`, e);
+            }
         }
         // Update custom claims
         try {

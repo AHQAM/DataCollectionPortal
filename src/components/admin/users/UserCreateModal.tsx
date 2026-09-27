@@ -112,7 +112,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                 onChange={(e) => setNewBranchId(e.target.value)}
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               >
-                {branches.map((b) => (
+                {branches.filter(b => b.isActive !== false).map((b) => (
                   <option key={b.branchId} value={b.branchId}>
                     {currentLang === "ar" ? b.branchNameAr : b.branchNameEn}
                   </option>
@@ -201,7 +201,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
               {t("users.authorizedRegionsLabel", { lng: currentLang })}
             </label>
             <div className="flex flex-wrap gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 max-h-32 overflow-y-auto">
-              {regions.map((reg) => {
+              {regions.filter(r => r.isActive !== false).map((reg) => {
                 const isChecked = newAllowedRegions.includes(reg.regionNo);
                 return (
                   <label

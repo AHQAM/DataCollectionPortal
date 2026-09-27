@@ -231,7 +231,7 @@ export const AdminReports: React.FC = () => {
       <ReportFilters
         lang={lang}
         requests={requests}
-        branches={branches}
+        branches={branches.filter(b => b.isActive !== false)}
         selectedReqId={selectedReqId}
         setSelectedReqId={setSelectedReqId}
         selectedBranchId={selectedBranchId}

@@ -28,3 +28,4 @@ mobile/.flutter-plugins-dependencies
 .firebase/
 firebase/.firebase/
 scratch/
+*.apk

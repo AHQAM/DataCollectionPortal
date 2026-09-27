@@ -124,14 +124,10 @@ export const useAuthStore = create<AuthStore>((set, get) => {
       }
 
       try {
-        if (trimmedInput.includes("@")) {
-          await signInWithEmailAndPassword(auth, trimmedInput, passwordInput);
-          return { success: true, mustChangePassword: false };
-        } else {
-          const authFunction = httpsCallable(
-            functions,
-            "authenticateWithRegionPassword",
-          );
+        const authFunction = httpsCallable(
+          functions,
+          "authenticateWithRegionPassword",
+        );
           const response = await authFunction({
             regionNo: trimmedInput,
             password: passwordInput,
@@ -175,7 +171,6 @@ export const useAuthStore = create<AuthStore>((set, get) => {
               messageEn: "Invalid login credentials.",
             };
           }
-        }
       } catch (err: any) {
         console.error("Login Error:", err);
         let errorAr = "فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.";

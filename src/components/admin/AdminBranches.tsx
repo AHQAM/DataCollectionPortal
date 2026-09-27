@@ -300,7 +300,7 @@ export const AdminBranches: React.FC = () => {
         lang={lang}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        branches={branches}
+        branches={branches.filter(b => b.isActive !== false)}
         regions={regions}
         selectedBranchId={selectedBranchId}
         setSelectedBranchId={setSelectedBranchId}
@@ -361,7 +361,7 @@ export const AdminBranches: React.FC = () => {
         setRegionNameEn={setRegionNameEn}
         regionBranchId={regionBranchId}
         setRegionBranchId={setRegionBranchId}
-        branches={branches}
+        branches={branches.filter(b => b.isActive !== false)}
         alertError={alertError}
         handleSaveRegion={handleSaveRegion}
         onClose={() => setShowRegionModal(false)}

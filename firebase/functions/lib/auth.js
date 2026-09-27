@@ -168,63 +168,65 @@ exports.authenticateWithRegionPassword = (0, gen2_1.onCallGen2)(async (data, con
             });
             throw new gen2_1.HttpsError("unauthenticated", "بيانات الاعتماد غير صحيحة. | Invalid credentials.");
         }
-        // 5. Validate Device Binding
-        if (userData.deviceBindingStatus === "BOUND") {
-            // Compare against stored device hash
-            const storedDeviceHash = userData.boundDeviceIdHash;
-            if (storedDeviceHash) {
-                const deviceMatches = await bcrypt.compare(installationDeviceId, storedDeviceHash);
-                if (!deviceMatches) {
-                    await (0, auditLogger_1.logAuditSafe)({
-                        userId,
-                        userRole: userData.role,
-                        action: "LOGIN_FAILED_DEVICE_MISMATCH",
-                        entityType: "AUTH",
-                        entityId: userId,
-                        details: { platform, appVersion },
-                    });
-                    throw new gen2_1.HttpsError("permission-denied", "هذا الحساب مرتبط بجهاز آخر. يرجى التواصل مع الإدارة لفك ارتباط الجهاز. | This account is linked to another device. Please contact the administrator to release the device.");
+        // 5. Validate Device Binding (Only for REP users)
+        if (userData.role === "REP") {
+            if (userData.deviceBindingStatus === "BOUND") {
+                // Compare against stored device hash
+                const storedDeviceHash = userData.boundDeviceIdHash;
+                if (storedDeviceHash) {
+                    const deviceMatches = await bcrypt.compare(installationDeviceId, storedDeviceHash);
+                    if (!deviceMatches) {
+                        await (0, auditLogger_1.logAuditSafe)({
+                            userId,
+                            userRole: userData.role,
+                            action: "LOGIN_FAILED_DEVICE_MISMATCH",
+                            entityType: "AUTH",
+                            entityId: userId,
+                            details: { platform, appVersion },
+                        });
+                        throw new gen2_1.HttpsError("permission-denied", "هذا الحساب مرتبط بجهاز آخر. يرجى التواصل مع الإدارة لفك ارتباط الجهاز. | This account is linked to another device. Please contact the administrator to release the device.");
+                    }
                 }
             }
-        }
-        else if (userData.deviceBindingStatus === "UNBOUND") {
-            // First login — bind device
-            const deviceIdHash = await bcrypt.hash(installationDeviceId, BCRYPT_SALT_ROUNDS);
-            await userDoc.ref.update({
-                deviceBindingStatus: "BOUND",
-                boundDeviceIdHash: deviceIdHash,
-                boundDevicePlatform: platform || "Unknown",
-                boundDeviceLabel: `${platform || "Unknown"} - ${appVersion || "Unknown"}`,
-                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            });
-            // Create device binding record
-            const bindingRef = db_1.db.collection("deviceBindings").doc();
-            await bindingRef.set({
-                bindingId: bindingRef.id,
-                userId,
-                deviceIdHash,
-                devicePlatform: platform || "Unknown",
-                deviceLabel: `${platform || "Unknown"} - ${appVersion || "Unknown"}`,
-                appVersion: appVersion || "Unknown",
-                status: "ACTIVE",
-                boundAt: admin.firestore.FieldValue.serverTimestamp(),
-                lastActiveAt: admin.firestore.FieldValue.serverTimestamp(),
-                fcmTokenHash: fcmToken ? "[SET]" : null,
-                fcmTokenUpdatedAt: fcmToken
-                    ? admin.firestore.FieldValue.serverTimestamp()
-                    : null,
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
-                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            });
-            await (0, auditLogger_1.logAuditSafe)({
-                userId,
-                userRole: userData.role,
-                action: "DEVICE_BOUND",
-                entityType: "DEVICE_BINDING",
-                entityId: bindingRef.id,
-                details: { platform, appVersion },
-                deviceBindingId: bindingRef.id,
-            });
+            else if (userData.deviceBindingStatus === "UNBOUND") {
+                // First login — bind device
+                const deviceIdHash = await bcrypt.hash(installationDeviceId, BCRYPT_SALT_ROUNDS);
+                await userDoc.ref.update({
+                    deviceBindingStatus: "BOUND",
+                    boundDeviceIdHash: deviceIdHash,
+                    boundDevicePlatform: platform || "Unknown",
+                    boundDeviceLabel: `${platform || "Unknown"} - ${appVersion || "Unknown"}`,
+                    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                });
+                // Create device binding record
+                const bindingRef = db_1.db.collection("deviceBindings").doc();
+                await bindingRef.set({
+                    bindingId: bindingRef.id,
+                    userId,
+                    deviceIdHash,
+                    devicePlatform: platform || "Unknown",
+                    deviceLabel: `${platform || "Unknown"} - ${appVersion || "Unknown"}`,
+                    appVersion: appVersion || "Unknown",
+                    status: "ACTIVE",
+                    boundAt: admin.firestore.FieldValue.serverTimestamp(),
+                    lastActiveAt: admin.firestore.FieldValue.serverTimestamp(),
+                    fcmTokenHash: fcmToken ? "[SET]" : null,
+                    fcmTokenUpdatedAt: fcmToken
+                        ? admin.firestore.FieldValue.serverTimestamp()
+                        : null,
+                    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                });
+                await (0, auditLogger_1.logAuditSafe)({
+                    userId,
+                    userRole: userData.role,
+                    action: "DEVICE_BOUND",
+                    entityType: "DEVICE_BINDING",
+                    entityId: bindingRef.id,
+                    details: { platform, appVersion },
+                    deviceBindingId: bindingRef.id,
+                });
+            }
         }
         // 6. Success — reset failed count, update last login
         const loginUpdates = {

@@ -58,7 +58,7 @@ exports.submitResponse = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth) {
         throw new gen2_1.HttpsError("unauthenticated", "Authentication required.");
     }
-    const { requestId, recordId, activityId, formData, submittedAt, clientUpdatedAt } = data || {};
+    const { requestId, recordId, activityId, formData, submittedAt, clientUpdatedAt, } = data || {};
     if (typeof requestId !== "string" ||
         typeof recordId !== "string" ||
         !formData ||

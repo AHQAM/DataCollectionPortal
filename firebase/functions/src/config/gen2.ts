@@ -1,11 +1,7 @@
-import {
-  onCall,
-  CallableOptions,
-  HttpsError,
-} from "firebase-functions/v2/https";
+import { onCall, CallableOptions, CallableRequest, HttpsError as Gen2HttpsError } from "firebase-functions/v2/https";
 import { verifyAppCheck } from "./appCheck";
 
-export { HttpsError };
+export const HttpsError = Gen2HttpsError;
 
 export interface CallableContextCompat {
   auth?: {
@@ -29,46 +25,24 @@ export function onCallGen2<TData = any, TResp = any>(
     context: CallableContextCompat,
   ) => Promise<TResp> | TResp,
 ) {
-  const defaultOptions: CallableOptions = {
-    cors: true,
-    maxInstances: 100, // Prevent DDoS billing spikes
-    memory: "256MiB",
-    concurrency: 80, // Minimize cold starts
-  };
+  let options: CallableOptions = { memory: "256MiB", timeoutSeconds: 60 };
+  let handler: (data: TData, context: CallableContextCompat) => Promise<TResp> | TResp;
 
-  const options: CallableOptions =
-    typeof optionsOrHandler === "function"
-      ? defaultOptions
-      : { ...defaultOptions, ...optionsOrHandler };
-  const handler =
-    typeof optionsOrHandler === "function"
-      ? optionsOrHandler
-      : handlerOrUndefined!;
+  if (typeof optionsOrHandler === "function") {
+    handler = optionsOrHandler;
+  } else {
+    options = { ...options, ...optionsOrHandler };
+    handler = handlerOrUndefined!;
+  }
 
-  return onCall(options, async (req: any, ctx?: any) => {
-    // 1. Direct invocation from test runners passing (data, context)
-    if (ctx && ctx.auth !== undefined) {
-      verifyAppCheck(ctx);
-      return handler(req, ctx);
-    }
-    // 2. Runtime invocation via Firebase / Cloud Run passing single CallableRequest
-    if (
-      req &&
-      (req.data !== undefined ||
-        req.auth !== undefined ||
-        req.rawRequest !== undefined)
-    ) {
-      const context: CallableContextCompat = {
-        auth: req.auth,
-        app: req.app,
-        rawRequest: req.rawRequest,
-      };
-      verifyAppCheck(context);
-      return handler(req.data, context);
-    }
-    // 3. Fallback
-    const fallbackContext = ctx || {};
-    verifyAppCheck(fallbackContext);
-    return handler(req, fallbackContext);
+  return onCall(options, async (request: CallableRequest) => {
+    const context: CallableContextCompat = {
+      auth: request.auth,
+      app: request.app,
+      rawRequest: request.rawRequest,
+    };
+    
+    verifyAppCheck(context);
+    return handler(request.data, context);
   });
 }

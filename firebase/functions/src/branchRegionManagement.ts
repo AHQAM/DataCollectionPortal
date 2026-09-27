@@ -111,37 +111,42 @@ export const deleteBranch = onCallGen2(async (data, context) => {
     throw new HttpsError("invalid-argument", "Branch ID required.");
   }
 
-  // 1. Check for associated regions
+  const batch = db().batch();
+
+  // 1. Soft delete associated regions
   const regionsSnap = await db()
     .collection("regions")
     .where("branchId", "==", branchId)
-    .limit(1)
     .get();
-  if (!regionsSnap.empty) {
-    throw new HttpsError(
-      "failed-precondition",
-      "لا يمكن حذف الفرع لأنه مرتبط بمناطق حالية. | Cannot delete branch linked to existing regions.",
-    );
-  }
+  
+  regionsSnap.docs.forEach((doc) => {
+    batch.update(doc.ref, {
+      isActive: false,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  });
 
-  // 2. Check for associated users
+  // 2. Soft delete associated users
   const usersSnap = await db()
     .collection("users")
     .where("branchId", "==", branchId)
-    .limit(1)
     .get();
-  if (!usersSnap.empty) {
-    throw new HttpsError(
-      "failed-precondition",
-      "لا يمكن حذف الفرع لأنه مسند لمستخدمين. | Cannot delete branch assigned to users.",
-    );
-  }
+  
+  usersSnap.docs.forEach((doc) => {
+    batch.update(doc.ref, {
+      isActive: false,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  });
 
-  // Soft delete (deactivate) or delete
-  await db().collection("branches").doc(branchId).update({
+  // Soft delete branch
+  const branchRef = db().collection("branches").doc(branchId);
+  batch.update(branchRef, {
     isActive: false,
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   });
+
+  await batch.commit();
 
   await logAuditSafe({
     userId: context.auth!.uid,
@@ -255,36 +260,42 @@ export const deleteRegion = onCallGen2(async (data, context) => {
     throw new HttpsError("invalid-argument", "Region number required.");
   }
 
-  // Check users assigned to this region
+  const batch = db().batch();
+
+  // Soft delete users assigned to this region
   const usersSnap = await db()
     .collection("users")
     .where("regionNo", "==", regionNo)
-    .limit(1)
     .get();
-  if (!usersSnap.empty) {
-    throw new HttpsError(
-      "failed-precondition",
-      "لا يمكن حذف المنطقة لأنها مسندة لمندوبين. | Cannot delete region assigned to reps.",
-    );
-  }
+  
+  usersSnap.docs.forEach((doc) => {
+    batch.update(doc.ref, {
+      isActive: false,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  });
 
-  // Check assignments
+  // Cancel assignments for this region
   const asgSnap = await db()
     .collection("assignments")
     .where("regionNo", "==", regionNo)
-    .limit(1)
     .get();
-  if (!asgSnap.empty) {
-    throw new HttpsError(
-      "failed-precondition",
-      "لا يمكن حذف المنطقة لوجود إسنادات نشطة عليها. | Cannot delete region with active assignments.",
-    );
-  }
+    
+  asgSnap.docs.forEach((doc) => {
+    batch.update(doc.ref, {
+      status: "Cancelled",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  });
 
-  await db().collection("regions").doc(regionNo).update({
+  // Soft delete region
+  const regionRef = db().collection("regions").doc(regionNo);
+  batch.update(regionRef, {
     isActive: false,
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   });
+  
+  await batch.commit();
 
   await logAuditSafe({
     userId: context.auth!.uid,

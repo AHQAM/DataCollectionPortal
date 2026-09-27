@@ -96,31 +96,7 @@ export const SettingsDatabaseSection: React.FC<
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50/80 to-amber-50/60 border border-rose-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-rose-950 font-black text-xs">
-              <AlertOctagon className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>
-                {t("settings.database.wipeBannerTitle", { lng: currentLang })}
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-600 max-w-xl leading-relaxed">
-              {t("settings.database.wipeBannerDesc", { lng: currentLang })}
-            </p>
-          </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setWipeBranchesAlso(false);
-              setShowWipeModal(true);
-            }}
-            className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-md transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>{t("settings.database.wipeBtn", { lng: currentLang })}</span>
-          </button>
-        </div>
 
         <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="text-slate-600 text-[11px]">

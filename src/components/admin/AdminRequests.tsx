@@ -347,8 +347,8 @@ export const AdminRequests: React.FC<Props> = ({
       <CreateRequestModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        branches={branches}
-        regions={regions}
+        branches={branches.filter(b => b.isActive !== false)}
+        regions={regions.filter(r => r.isActive !== false)}
         lang={lang}
         defaultCode={`REQ-${Math.floor(100 + Math.random() * 900)}`}
         onSubmit={handleCreateSubmit}
@@ -358,8 +358,8 @@ export const AdminRequests: React.FC<Props> = ({
       <EditRequestModal
         request={editingRequest}
         onClose={() => setEditingRequest(null)}
-        branches={branches}
-        regions={regions}
+        branches={branches.filter(b => b.isActive !== false)}
+        regions={regions.filter(r => r.isActive !== false)}
         lang={lang}
         onSubmit={handleEditSubmit}
       />
@@ -369,8 +369,8 @@ export const AdminRequests: React.FC<Props> = ({
         request={viewingAssignmentsRequest}
         onClose={() => setViewingAssignmentsRequest(null)}
         assignments={assignments}
-        users={users}
-        branches={branches}
+        users={users.filter((u) => u.isActive !== false)}
+        branches={branches.filter(b => b.isActive !== false)}
         lang={lang}
         onOpenImportWizard={onOpenImportWizard}
       />

@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/change_password_screen.dart';
 import '../../features/auth/presentation/auth_controller.dart';
+import '../../features/auth/presentation/admin_portal_screen.dart';
 import '../../features/requests/presentation/my_requests_screen.dart';
 import '../../features/requests/presentation/request_records_screen.dart';
 import '../../features/forms/presentation/dynamic_form_screen.dart';
@@ -33,8 +34,14 @@ GoRouter appRouter(Ref ref) {
           if (state.uri.path != '/change-password') return '/change-password';
         } else {
           // Logged in, no forced password change
-          if (isLoggingIn || state.uri.path == '/change-password') {
-            return '/requests';
+          if (user.role == 'ADMIN' || user.role == 'SUPERVISOR') {
+            if (isLoggingIn || state.uri.path == '/change-password') {
+              return '/admin-portal';
+            }
+          } else {
+            if (isLoggingIn || state.uri.path == '/change-password') {
+              return '/requests';
+            }
           }
         }
       }
@@ -45,6 +52,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/change-password',
         builder: (context, state) => const ChangePasswordScreen(),
+      ),
+      GoRoute(
+        path: '/admin-portal',
+        builder: (context, state) => const AdminPortalScreen(),
       ),
       GoRoute(
         path: '/requests',

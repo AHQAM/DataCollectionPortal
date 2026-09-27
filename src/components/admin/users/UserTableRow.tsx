@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { User } from "../../../types";
-import { Smartphone, Lock, CheckCircle2, KeyRound, Unlock } from "lucide-react";
+import { Smartphone, Lock, CheckCircle2, KeyRound, Unlock, Trash2 } from "lucide-react";
 
 interface UserTableRowProps {
   user: User;
@@ -9,6 +9,7 @@ interface UserTableRowProps {
   onResetPassword: (userId: string) => void;
   onUnlockUser: (userId: string) => void;
   onReleaseDevice: (userId: string) => void;
+  onDeactivateUser: (userId: string) => void;
 }
 
 export const UserTableRow: React.FC<UserTableRowProps> = ({
@@ -17,6 +18,7 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
   onResetPassword,
   onUnlockUser,
   onReleaseDevice,
+  onDeactivateUser,
 }) => {
   const { t, i18n } = useTranslation();
   const currentLang =
@@ -75,7 +77,12 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
 
       <td className="px-4 py-3.5">
         <div className="space-y-1">
-          {isLocked ? (
+          {user.isActive === false ? (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+              <Lock className="w-3 h-3" />
+              <span>{currentLang === "ar" ? "معطل" : "Deactivated"}</span>
+            </span>
+          ) : isLocked ? (
             <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
               <Lock className="w-3 h-3" />
               <span>{t("users.lockedOut", { lng: currentLang })}</span>
@@ -127,6 +134,15 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
               <Smartphone className="w-3.5 h-3.5" />
             </button>
           )}
+
+          {/* Delete / Deactivate User */}
+          <button
+            onClick={() => onDeactivateUser(user.userId)}
+            className="p-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold"
+            title={t("users.deactivateUser", { lng: currentLang }) || "Deactivate User"}
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         </div>
       </td>
     </tr>
