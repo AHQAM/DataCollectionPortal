@@ -57,6 +57,9 @@ exports.changePassword = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!newPassword) {
         throw new gen2_1.HttpsError("invalid-argument", "كلمة المرور الجديدة مطلوبة. | New password is required.");
     }
+    if (currentPassword === "") {
+        throw new gen2_1.HttpsError("invalid-argument", "كلمة المرور الحالية مطلوبة. | Current password is required.");
+    }
     if (typeof newPassword !== "string" || newPassword.length < 6) {
         throw new gen2_1.HttpsError("invalid-argument", "كلمة المرور يجب أن تكون 6 أحرف على الأقل. | Password must be at least 6 characters.");
     }
@@ -249,7 +252,9 @@ exports.adminResetPassword = (0, gen2_1.onCallGen2)(async (data, context) => {
         });
         // Update Native Firebase Auth password if user exists there
         try {
-            await admin.auth().updateUser(targetUserId, { password: temporaryPassword });
+            await admin
+                .auth()
+                .updateUser(targetUserId, { password: temporaryPassword });
             await admin.auth().revokeRefreshTokens(targetUserId);
         }
         catch (e) {

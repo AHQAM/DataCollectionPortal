@@ -28,7 +28,8 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final requestsAsyncValue = ref.watch(myRequestsProvider);
     final userState = ref.watch(authControllerProvider);
-    final isSupervisorOrAdmin = userState.value?.role == 'SUPERVISOR' ||
+    final isSupervisorOrAdmin =
+        userState.value?.role == 'SUPERVISOR' ||
         userState.value?.role == 'ADMIN';
 
     return Scaffold(
@@ -67,7 +68,10 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  Icon(Icons.admin_panel_settings, color: Colors.indigo.shade700),
+                  Icon(
+                    Icons.admin_panel_settings,
+                    color: Colors.indigo.shade700,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -80,9 +84,14 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      final url = Uri.parse('https://landsurvey-ebb3b.web.app/');
+                      final url = Uri.parse(
+                        'https://landsurvey-ebb3b.web.app/',
+                      );
                       if (await canLaunchUrl(url)) {
-                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                        await launchUrl(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -184,12 +193,19 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.red,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         AppErrorFormatter.format(error, context),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton.icon(

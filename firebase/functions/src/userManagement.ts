@@ -611,7 +611,10 @@ export const updateUserProfile = onCallGen2(async (data, context) => {
         await admin.auth().updateUser(userId, { password: newPassword });
       } catch (authErr: any) {
         if (authErr.code !== "auth/user-not-found") {
-          console.warn(`Failed to update native auth password for ${userId}:`, authErr);
+          console.warn(
+            `Failed to update native auth password for ${userId}:`,
+            authErr,
+          );
         }
       }
     }

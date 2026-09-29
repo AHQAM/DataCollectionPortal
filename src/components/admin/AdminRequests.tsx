@@ -77,18 +77,22 @@ export const AdminRequests: React.FC<Props> = ({
   } = useApp();
 
   const isSupervisor = currentUser?.role === "SUPERVISOR";
-  
+
   const safeBranches = branches || [];
   const safeUsers = users || [];
   const safeRegions = regions || [];
 
-  const allowedBranches = isSupervisor 
-    ? safeBranches.filter(b => b.branchId === currentUser?.branchId && b.isActive !== false)
-    : safeBranches.filter(b => b.isActive !== false);
+  const allowedBranches = isSupervisor
+    ? safeBranches.filter(
+        (b) => b.branchId === currentUser?.branchId && b.isActive !== false,
+      )
+    : safeBranches.filter((b) => b.isActive !== false);
 
   const allowedUsers = isSupervisor
-    ? safeUsers.filter(u => u.branchId === currentUser?.branchId && u.isActive !== false)
-    : safeUsers.filter(u => u.isActive !== false);
+    ? safeUsers.filter(
+        (u) => u.branchId === currentUser?.branchId && u.isActive !== false,
+      )
+    : safeUsers.filter((u) => u.isActive !== false);
 
   const { t, i18n } = useTranslation();
   const currentLang =
@@ -96,7 +100,9 @@ export const AdminRequests: React.FC<Props> = ({
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
-  const [creatorFilter, setCreatorFilter] = useState<"ALL" | "ADMIN" | "SUPERVISOR">("ALL");
+  const [creatorFilter, setCreatorFilter] = useState<
+    "ALL" | "ADMIN" | "SUPERVISOR"
+  >("ALL");
   const [branchFilter, setBranchFilter] = useState<string>("ALL");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState<string | null>(
@@ -126,7 +132,9 @@ export const AdminRequests: React.FC<Props> = ({
     if (isSupervisor) {
       const isMine = r.createdBy === currentUser?.userId;
       const isMyBranch = r.branchId === currentUser?.branchId;
-      const isTargeted = (r.targetBranches || []).includes(currentUser?.branchId || "");
+      const isTargeted = (r.targetBranches || []).includes(
+        currentUser?.branchId || "",
+      );
       if (!isMine && !isMyBranch && !isTargeted) return false;
     }
 
@@ -200,8 +208,12 @@ export const AdminRequests: React.FC<Props> = ({
           targetEntityLabelEn: data.targetEntityLabelEn,
           dueAt: new Date(data.dueAt).toISOString(),
           dueDate: data.dueAt,
-          branchId: isSupervisor ? (currentUser?.branchId || "") : (data.targetBranches?.[0] || ""),
-          targetBranches: isSupervisor ? [currentUser?.branchId || ""] : data.targetBranches,
+          branchId: isSupervisor
+            ? currentUser?.branchId || ""
+            : data.targetBranches?.[0] || "",
+          targetBranches: isSupervisor
+            ? [currentUser?.branchId || ""]
+            : data.targetBranches,
           targetRegions: data.targetRegions,
           allowEditAfterSubmit: data.allowEditAfterSubmit,
           requireSupervisorApproval: data.requireSupervisorApproval,

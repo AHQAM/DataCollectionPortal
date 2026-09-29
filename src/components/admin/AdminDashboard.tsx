@@ -14,12 +14,22 @@ interface Props {
 
 export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
   const { lang } = useUIStore();
-  const { requests: allRequests, records, users, branches, auditLogs } = useDataStore();
+  const {
+    requests: allRequests,
+    records,
+    users,
+    branches,
+    auditLogs,
+  } = useDataStore();
   const { currentUser } = useApp();
   const isAdmin = currentUser ? currentUser.role === "ADMIN" : true;
   const isSupervisor = currentUser?.role === "SUPERVISOR";
-  
-  const requests = allRequests.filter(r => !isSupervisor || (r.targetBranches || []).includes(currentUser?.branchId || ""));
+
+  const requests = allRequests.filter(
+    (r) =>
+      !isSupervisor ||
+      (r.targetBranches || []).includes(currentUser?.branchId || ""),
+  );
 
   // Calculations
   const activeRequests = requests.filter(
@@ -61,7 +71,11 @@ export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
 
   return (
     <div className="space-y-6">
-      <DashboardBanner lang={lang} onNavigate={onNavigate} role={currentUser?.role} />
+      <DashboardBanner
+        lang={lang}
+        onNavigate={onNavigate}
+        role={currentUser?.role}
+      />
 
       <KpiCardsGrid
         lang={lang}
@@ -76,7 +90,9 @@ export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
         role={currentUser?.role}
       />
 
-      <div className={`grid grid-cols-1 ${isAdmin ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} gap-6`}>
+      <div
+        className={`grid grid-cols-1 ${isAdmin ? "lg:grid-cols-3" : "lg:grid-cols-1"} gap-6`}
+      >
         {isAdmin && (
           <BranchProgress
             lang={lang}

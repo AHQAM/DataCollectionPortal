@@ -11,13 +11,24 @@ import { ReportDataTable } from "./reports/ReportDataTable";
 
 export const AdminReports: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { lang, requests: allRequests, records, branches, recordResponses, fields, currentUser } =
-    useApp();
+  const {
+    lang,
+    requests: allRequests,
+    records,
+    branches,
+    recordResponses,
+    fields,
+    currentUser,
+  } = useApp();
   const currentLang =
     (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
 
   const isSupervisor = currentUser?.role === "SUPERVISOR";
-  const requests = allRequests.filter(r => !isSupervisor || (r.targetBranches || []).includes(currentUser?.branchId || ""));
+  const requests = allRequests.filter(
+    (r) =>
+      !isSupervisor ||
+      (r.targetBranches || []).includes(currentUser?.branchId || ""),
+  );
 
   const [selectedReqId, setSelectedReqId] = useState<string>(
     requests.length > 0 ? requests[0].requestId : "",
@@ -234,7 +245,7 @@ export const AdminReports: React.FC = () => {
       <ReportFilters
         lang={lang}
         requests={requests}
-        branches={branches.filter(b => b.isActive !== false)}
+        branches={branches.filter((b) => b.isActive !== false)}
         selectedReqId={selectedReqId}
         setSelectedReqId={setSelectedReqId}
         selectedBranchId={selectedBranchId}

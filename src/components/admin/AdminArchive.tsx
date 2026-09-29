@@ -12,7 +12,12 @@ export const AdminArchive: React.FC = () => {
   const [exportNotice, setExportNotice] = useState<string | null>(null);
 
   const isSupervisor = currentUser?.role === "SUPERVISOR";
-  const archivedRequests = requests.filter((r) => r.status === "Archived" && (!isSupervisor || (r.targetBranches || []).includes(currentUser?.branchId || "")));
+  const archivedRequests = requests.filter(
+    (r) =>
+      r.status === "Archived" &&
+      (!isSupervisor ||
+        (r.targetBranches || []).includes(currentUser?.branchId || "")),
+  );
 
   const filtered = archivedRequests.filter((r) => {
     if (searchQuery.trim()) {

@@ -298,10 +298,16 @@ export const TopNavbar: React.FC = () => {
                           markAllNotificationsAsRead(currentUser?.userId)
                         }
                         className="text-[11px] text-purple-600 hover:text-purple-800 font-semibold hover:underline flex items-center gap-1 cursor-pointer"
-                        title={lang === "ar" ? "تحديد الكل كمقروء" : "Mark all as read"}
+                        title={
+                          lang === "ar"
+                            ? "تحديد الكل كمقروء"
+                            : "Mark all as read"
+                        }
                       >
                         <CheckCheck className="w-3.5 h-3.5" />
-                        <span>{lang === "ar" ? "قراءة الكل" : "Mark all read"}</span>
+                        <span>
+                          {lang === "ar" ? "قراءة الكل" : "Mark all read"}
+                        </span>
                       </button>
                     )}
                   </div>
@@ -371,9 +377,7 @@ export const TopNavbar: React.FC = () => {
                                   }}
                                   className="text-[10px] text-purple-600 hover:text-purple-800 font-bold hover:underline"
                                 >
-                                  {lang === "ar"
-                                    ? "تحديد كمقروء"
-                                    : "Mark read"}
+                                  {lang === "ar" ? "تحديد كمقروء" : "Mark read"}
                                 </button>
                               )}
                             </div>
@@ -395,7 +399,11 @@ export const TopNavbar: React.FC = () => {
                 closeAllMenus();
               }}
               className="p-2 rounded-lg bg-purple-900/60 hover:bg-purple-800/80 border border-purple-700/50 text-purple-200 hover:text-white transition-all cursor-pointer"
-              title={lang === "ar" ? "الملف الشخصي والأمان" : "User Profile & Security"}
+              title={
+                lang === "ar"
+                  ? "الملف الشخصي والأمان"
+                  : "User Profile & Security"
+              }
             >
               <User className="w-4 h-4" />
             </button>

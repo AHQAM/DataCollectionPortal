@@ -33,7 +33,9 @@ export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
   const isAdmin = role !== undefined ? role === "ADMIN" : true;
 
   return (
-    <div className={`grid grid-cols-2 ${isAdmin ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
+    <div
+      className={`grid grid-cols-2 ${isAdmin ? "lg:grid-cols-4" : "lg:grid-cols-3"} gap-4`}
+    >
       {/* Active Requests */}
       <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80">
         <div className="flex items-center justify-between text-slate-500 mb-2">

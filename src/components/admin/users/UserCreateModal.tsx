@@ -112,11 +112,13 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
                 onChange={(e) => setNewBranchId(e.target.value)}
                 className="w-full h-10 px-3 rounded-xl border border-slate-300 font-bold"
               >
-                {branches.filter(b => b.isActive !== false).map((b) => (
-                  <option key={b.branchId} value={b.branchId}>
-                    {currentLang === "ar" ? b.branchNameAr : b.branchNameEn}
-                  </option>
-                ))}
+                {branches
+                  .filter((b) => b.isActive !== false)
+                  .map((b) => (
+                    <option key={b.branchId} value={b.branchId}>
+                      {currentLang === "ar" ? b.branchNameAr : b.branchNameEn}
+                    </option>
+                  ))}
               </select>
             </div>
           </div>
@@ -201,38 +203,42 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
               {t("users.authorizedRegionsLabel", { lng: currentLang })}
             </label>
             <div className="flex flex-wrap gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 max-h-32 overflow-y-auto">
-              {regions.filter(r => r.isActive !== false).map((reg) => {
-                const isChecked = newAllowedRegions.includes(reg.regionNo);
-                return (
-                  <label
-                    key={reg.regionNo}
-                    className={`px-2.5 py-1 rounded-lg border text-xs font-mono font-bold cursor-pointer transition-all ${
-                      isChecked
-                        ? "bg-purple-900 text-white border-purple-900"
-                        : "bg-white text-slate-700 border-slate-300"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setNewAllowedRegions([
-                            ...newAllowedRegions,
-                            reg.regionNo,
-                          ]);
-                        } else {
-                          setNewAllowedRegions(
-                            newAllowedRegions.filter((r) => r !== reg.regionNo),
-                          );
-                        }
-                      }}
-                      className="hidden"
-                    />
-                    #{reg.regionNo}
-                  </label>
-                );
-              })}
+              {regions
+                .filter((r) => r.isActive !== false)
+                .map((reg) => {
+                  const isChecked = newAllowedRegions.includes(reg.regionNo);
+                  return (
+                    <label
+                      key={reg.regionNo}
+                      className={`px-2.5 py-1 rounded-lg border text-xs font-mono font-bold cursor-pointer transition-all ${
+                        isChecked
+                          ? "bg-purple-900 text-white border-purple-900"
+                          : "bg-white text-slate-700 border-slate-300"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setNewAllowedRegions([
+                              ...newAllowedRegions,
+                              reg.regionNo,
+                            ]);
+                          } else {
+                            setNewAllowedRegions(
+                              newAllowedRegions.filter(
+                                (r) => r !== reg.regionNo,
+                              ),
+                            );
+                          }
+                        }}
+                        className="hidden"
+                      />
+                      #{reg.regionNo}
+                    </label>
+                  );
+                })}
             </div>
           </div>
 

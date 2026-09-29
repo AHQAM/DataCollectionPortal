@@ -150,6 +150,7 @@ export interface User {
   sessionVersion: number;
   deviceBindingStatus: "UNBOUND" | "BOUND" | "RELEASE_REQUESTED";
   boundDeviceId?: string;
+  boundDeviceIdHash?: string | null;
   boundDevicePlatform?: "Android" | "iOS" | "Web";
   boundDeviceLabel?: string;
   maxAllowedDevices: number;

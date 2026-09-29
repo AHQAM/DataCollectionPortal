@@ -118,7 +118,7 @@ export const deleteBranch = onCallGen2(async (data, context) => {
     .collection("regions")
     .where("branchId", "==", branchId)
     .get();
-  
+
   regionsSnap.docs.forEach((doc) => {
     batch.delete(doc.ref);
   });
@@ -128,7 +128,7 @@ export const deleteBranch = onCallGen2(async (data, context) => {
     .collection("users")
     .where("branchId", "==", branchId)
     .get();
-  
+
   for (const doc of usersSnap.docs) {
     try {
       await admin.auth().deleteUser(doc.id);
@@ -139,9 +139,9 @@ export const deleteBranch = onCallGen2(async (data, context) => {
   }
 
   // 3. Hard delete associated assignments
-  const regionNos = regionsSnap.docs.map(doc => doc.id);
+  const regionNos = regionsSnap.docs.map((doc) => doc.id);
   if (regionNos.length > 0) {
-    // Firestore 'in' query supports up to 30 items. 
+    // Firestore 'in' query supports up to 30 items.
     // We process in chunks of 30.
     for (let i = 0; i < regionNos.length; i += 30) {
       const chunk = regionNos.slice(i, i + 30);
@@ -158,7 +158,7 @@ export const deleteBranch = onCallGen2(async (data, context) => {
   // Hard delete branch
   const branchRef = db().collection("branches").doc(branchId);
   batch.delete(branchRef);
-  
+
   await batch.commit();
 
   await logAuditSafe({
@@ -280,7 +280,7 @@ export const deleteRegion = onCallGen2(async (data, context) => {
     .collection("users")
     .where("regionNo", "==", regionNo)
     .get();
-  
+
   for (const doc of usersSnap.docs) {
     try {
       await admin.auth().deleteUser(doc.id);
@@ -295,7 +295,7 @@ export const deleteRegion = onCallGen2(async (data, context) => {
     .collection("assignments")
     .where("regionNo", "==", regionNo)
     .get();
-    
+
   asgSnap.docs.forEach((doc) => {
     batch.delete(doc.ref);
   });
@@ -303,7 +303,7 @@ export const deleteRegion = onCallGen2(async (data, context) => {
   // Hard delete region
   const regionRef = db().collection("regions").doc(regionNo);
   batch.delete(regionRef);
-  
+
   await batch.commit();
 
   await logAuditSafe({

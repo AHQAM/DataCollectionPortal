@@ -338,7 +338,7 @@ export const AdminSupervisorMatrix: React.FC = () => {
         isOpen={showAddSupervisorModal}
         onClose={() => setShowAddSupervisorModal(false)}
         onSubmit={handleCreateSupervisor}
-        branches={branches.filter(b => b.isActive !== false)}
+        branches={branches.filter((b) => b.isActive !== false)}
         lang={lang}
       />
     </div>

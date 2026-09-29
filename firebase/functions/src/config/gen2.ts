@@ -1,4 +1,9 @@
-import { onCall, CallableOptions, CallableRequest, HttpsError as Gen2HttpsError } from "firebase-functions/v2/https";
+import {
+  onCall,
+  CallableOptions,
+  CallableRequest,
+  HttpsError as Gen2HttpsError,
+} from "firebase-functions/v2/https";
 import { verifyAppCheck } from "./appCheck";
 
 export const HttpsError = Gen2HttpsError;
@@ -26,7 +31,10 @@ export function onCallGen2<TData = any, TResp = any>(
   ) => Promise<TResp> | TResp,
 ) {
   let options: CallableOptions = { memory: "256MiB", timeoutSeconds: 60 };
-  let handler: (data: TData, context: CallableContextCompat) => Promise<TResp> | TResp;
+  let handler: (
+    data: TData,
+    context: CallableContextCompat,
+  ) => Promise<TResp> | TResp;
 
   if (typeof optionsOrHandler === "function") {
     handler = optionsOrHandler;
@@ -35,14 +43,41 @@ export function onCallGen2<TData = any, TResp = any>(
     handler = handlerOrUndefined!;
   }
 
-  return onCall(options, async (request: CallableRequest) => {
-    const context: CallableContextCompat = {
-      auth: request.auth,
-      app: request.app,
-      rawRequest: request.rawRequest,
-    };
-    
-    verifyAppCheck(context);
-    return handler(request.data, context);
-  });
+  const func: any = onCall(
+    options,
+    async (requestOrData: any, maybeContext?: any) => {
+      let callData: any;
+      let context: CallableContextCompat;
+
+      if (maybeContext !== undefined) {
+        // Invoked via testEnv.wrap(fn)(data, context)
+        callData = requestOrData;
+        context = {
+          auth: maybeContext?.auth ?? null,
+          app: maybeContext?.app,
+          rawRequest: maybeContext?.rawRequest,
+        };
+      } else if (
+        requestOrData &&
+        typeof requestOrData === "object" &&
+        ("data" in requestOrData || "auth" in requestOrData)
+      ) {
+        // Standard Gen 2 runtime: requestOrData is CallableRequest
+        callData = requestOrData.data;
+        context = {
+          auth: requestOrData.auth ?? null,
+          app: requestOrData.app,
+          rawRequest: requestOrData.rawRequest,
+        };
+      } else {
+        callData = requestOrData;
+        context = { auth: null };
+      }
+
+      verifyAppCheck(context);
+      return handler(callData, context);
+    },
+  );
+
+  return func;
 }

@@ -1,7 +1,14 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { User } from "../../../types";
-import { Smartphone, Lock, CheckCircle2, KeyRound, Unlock, Trash2 } from "lucide-react";
+import {
+  Smartphone,
+  Lock,
+  CheckCircle2,
+  KeyRound,
+  Unlock,
+  Trash2,
+} from "lucide-react";
 
 interface UserTableRowProps {
   user: User;
@@ -9,7 +16,8 @@ interface UserTableRowProps {
   onResetPassword: (userId: string) => void;
   onUnlockUser: (userId: string) => void;
   onReleaseDevice: (userId: string) => void;
-  onDeleteUser: (userId: string) => void;
+  onDeleteUser?: (userId: string) => void;
+  onDeactivateUser?: (user: User) => void;
 }
 
 export const UserTableRow: React.FC<UserTableRowProps> = ({
@@ -19,6 +27,7 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
   onUnlockUser,
   onReleaseDevice,
   onDeleteUser,
+  onDeactivateUser,
 }) => {
   const { t, i18n } = useTranslation();
   const currentLang =
@@ -68,7 +77,9 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
               <span>{user.boundDeviceLabel || "Google Pixel"}</span>
             </span>
             <span className="block text-[9px] text-slate-400 font-mono truncate max-w-[120px] mt-0.5">
-              {user.boundDeviceId || user.boundDeviceIdHash?.slice(0, 16) || "Active"}
+              {user.boundDeviceId ||
+                user.boundDeviceIdHash?.slice(0, 16) ||
+                "Active"}
             </span>
           </div>
         ) : (
@@ -139,13 +150,20 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
           )}
 
           {/* Delete User */}
-          <button
-            onClick={() => onDeleteUser(user.userId)}
-            className="p-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold"
-            title={t("users.deleteUser", { lng: currentLang }) || "Delete User"}
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          {(onDeleteUser || onDeactivateUser) && (
+            <button
+              onClick={() => {
+                if (onDeleteUser) onDeleteUser(user.userId);
+                else if (onDeactivateUser) onDeactivateUser(user);
+              }}
+              className="p-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold"
+              title={
+                t("users.deleteUser", { lng: currentLang }) || "Delete User"
+              }
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </td>
     </tr>

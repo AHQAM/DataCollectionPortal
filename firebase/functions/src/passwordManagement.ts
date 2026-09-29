@@ -32,6 +32,13 @@ export const changePassword = onCallGen2(async (data, context) => {
     );
   }
 
+  if (currentPassword === "") {
+    throw new HttpsError(
+      "invalid-argument",
+      "كلمة المرور الحالية مطلوبة. | Current password is required.",
+    );
+  }
+
   if (typeof newPassword !== "string" || newPassword.length < 6) {
     throw new HttpsError(
       "invalid-argument",
@@ -125,7 +132,10 @@ export const changePassword = onCallGen2(async (data, context) => {
     } catch (authErr: any) {
       // Ignore if user does not exist in Native Auth (e.g. REP users)
       if (authErr.code !== "auth/user-not-found") {
-        console.warn(`Failed to update native auth password for ${userId}:`, authErr);
+        console.warn(
+          `Failed to update native auth password for ${userId}:`,
+          authErr,
+        );
       }
     }
 
@@ -306,7 +316,9 @@ export const adminResetPassword = onCallGen2(async (data, context) => {
 
     // Update Native Firebase Auth password if user exists there
     try {
-      await admin.auth().updateUser(targetUserId, { password: temporaryPassword });
+      await admin
+        .auth()
+        .updateUser(targetUserId, { password: temporaryPassword });
       await admin.auth().revokeRefreshTokens(targetUserId);
     } catch (e: any) {
       if (e.code !== "auth/user-not-found") {

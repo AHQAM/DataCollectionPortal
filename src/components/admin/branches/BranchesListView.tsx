@@ -57,21 +57,21 @@ export const BranchesListView: React.FC<BranchesListViewProps> = ({
                   <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-900 font-bold flex items-center justify-center shrink-0 border border-purple-100">
                     <Building2 className="w-5 h-5" />
                   </div>
-                    <div className="flex flex-col gap-1 items-start">
-                      <h3 className="font-extrabold text-sm text-slate-900 leading-none">
-                        {currentLang === "ar" ? b.branchNameAr : b.branchNameEn}
-                      </h3>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-[10px] text-purple-700 font-mono font-bold bg-purple-50 px-1.5 py-0.5 rounded leading-none">
-                          {b.branchId}
+                  <div className="flex flex-col gap-1 items-start">
+                    <h3 className="font-extrabold text-sm text-slate-900 leading-none">
+                      {currentLang === "ar" ? b.branchNameAr : b.branchNameEn}
+                    </h3>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="text-[10px] text-purple-700 font-mono font-bold bg-purple-50 px-1.5 py-0.5 rounded leading-none">
+                        {b.branchId}
+                      </span>
+                      {b.isActive === false && (
+                        <span className="text-[10px] text-red-700 font-bold bg-red-50 px-1.5 py-0.5 rounded leading-none">
+                          {currentLang === "ar" ? "غير مفعل" : "Inactive"}
                         </span>
-                        {b.isActive === false && (
-                          <span className="text-[10px] text-red-700 font-bold bg-red-50 px-1.5 py-0.5 rounded leading-none">
-                            {currentLang === "ar" ? "غير مفعل" : "Inactive"}
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-1">

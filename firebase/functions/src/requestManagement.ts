@@ -67,9 +67,7 @@ export const createRequest = onCallGen2(async (data, context) => {
       : data.branchId || null;
 
   const finalTargetBranches: string[] =
-    isSupervisor && callerBranchId
-      ? [callerBranchId]
-      : targetBranches || [];
+    isSupervisor && callerBranchId ? [callerBranchId] : targetBranches || [];
 
   const requestId =
     "REQ-" + Math.random().toString(36).substring(2, 8).toUpperCase();

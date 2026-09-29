@@ -3,7 +3,15 @@ import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "../../firebase";
-import { User, Lock, X, Check, AlertCircle, Shield, UserCircle2 } from "lucide-react";
+import {
+  User,
+  Lock,
+  X,
+  Check,
+  AlertCircle,
+  Shield,
+  UserCircle2,
+} from "lucide-react";
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -48,9 +56,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
     if (newPassword && newPassword !== confirmPassword) {
       setError(
-        lang === "ar"
-          ? "كلمتا المرور غير متطابقتين"
-          : "Passwords do not match",
+        lang === "ar" ? "كلمتا المرور غير متطابقتين" : "Passwords do not match",
       );
       return;
     }
@@ -115,7 +121,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 {lang === "ar" ? "الملف الشخصي" : "User Profile"}
               </h2>
               <p className="text-[11px] text-purple-300">
-                {currentUser.role} • #{currentUser.regionNo || currentUser.branchId}
+                {currentUser.role} • #
+                {currentUser.regionNo || currentUser.branchId}
               </p>
             </div>
           </div>
@@ -144,7 +151,9 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           )}
 
           {/* Email (Read-Only) */}
-          {(currentUser.email || currentUser.role === "SUPERVISOR" || currentUser.role === "ADMIN") && (
+          {(currentUser.email ||
+            currentUser.role === "SUPERVISOR" ||
+            currentUser.role === "ADMIN") && (
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="font-bold text-slate-700">
@@ -157,7 +166,9 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               <input
                 type="text"
                 disabled
-                value={currentUser.email || (lang === "ar" ? "غير مسجل" : "Not set")}
+                value={
+                  currentUser.email || (lang === "ar" ? "غير مسجل" : "Not set")
+                }
                 className="w-full h-9 px-3 rounded-xl border border-slate-200 bg-slate-100 text-slate-500 font-mono text-xs cursor-not-allowed"
               />
             </div>
@@ -168,7 +179,9 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="font-bold text-slate-700">
-                  {lang === "ar" ? "رقم المنطقة المخصصة" : "Assigned Region Number"}
+                  {lang === "ar"
+                    ? "رقم المنطقة المخصصة"
+                    : "Assigned Region Number"}
                 </label>
                 <span className="text-[10px] text-slate-400 font-medium">
                   {lang === "ar" ? "(غير قابل للتعديل)" : "(Read-only)"}
@@ -177,7 +190,10 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               <input
                 type="text"
                 disabled
-                value={currentUser.regionNo || (lang === "ar" ? "غير محدد" : "Not assigned")}
+                value={
+                  currentUser.regionNo ||
+                  (lang === "ar" ? "غير محدد" : "Not assigned")
+                }
                 className="w-full h-9 px-3 rounded-xl border border-slate-200 bg-slate-100 text-slate-500 font-mono text-xs cursor-not-allowed font-bold"
               />
             </div>
@@ -186,7 +202,9 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           {/* Username */}
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {lang === "ar" ? "اسم المستخدم (لتسجيل الدخول)" : "Username (Login ID)"}
+              {lang === "ar"
+                ? "اسم المستخدم (لتسجيل الدخول)"
+                : "Username (Login ID)"}
             </label>
             <div className="relative">
               <User className="w-3.5 h-3.5 text-slate-400 absolute top-3 right-3" />

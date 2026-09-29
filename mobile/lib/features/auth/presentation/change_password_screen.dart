@@ -49,7 +49,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     ref.listen<AsyncValue>(authControllerProvider, (previous, state) {
       if (!state.isLoading && state.hasError) {
         AppErrorFormatter.showSnackBar(context, state.error);
-      } else if (!state.isLoading && !state.hasError && previous?.isLoading == true) {
+      } else if (!state.isLoading &&
+          !state.hasError &&
+          previous?.isLoading == true) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -102,8 +104,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                           isForced
                               ? l10n.mustChangePasswordMsg
                               : (isAr
-                                  ? 'يمكنك هنا تعيين كلمة مرور جديدة لحسابك.'
-                                  : 'You can update your account password here.'),
+                                    ? 'يمكنك هنا تعيين كلمة مرور جديدة لحسابك.'
+                                    : 'You can update your account password here.'),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w500,
@@ -166,8 +168,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton(
-                  onPressed:
-                      authState.isLoading ? null : () => _changePassword(isForced),
+                  onPressed: authState.isLoading
+                      ? null
+                      : () => _changePassword(isForced),
                   child: authState.isLoading
                       ? const SizedBox(
                           height: 24,

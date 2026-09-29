@@ -170,8 +170,8 @@ export const AdminLayout: React.FC = () => {
     },
   ];
 
-  const visibleMenuItems = menuItems.filter(
-    (item) => item.allowedRoles.includes(currentUser?.role || "")
+  const visibleMenuItems = menuItems.filter((item) =>
+    item.allowedRoles.includes(currentUser?.role || ""),
   );
 
   const handleOpenFormBuilder = (requestId: string) => {
@@ -396,7 +396,11 @@ export const AdminLayout: React.FC = () => {
           <button
             onClick={() => setShowProfileModal(true)}
             className="p-1.5 rounded-lg text-slate-400 hover:text-purple-900 hover:bg-purple-100 transition-colors cursor-pointer"
-            title={lang === "ar" ? "تعديل الملف الشخصي والأمان" : "Edit Profile & Security"}
+            title={
+              lang === "ar"
+                ? "تعديل الملف الشخصي والأمان"
+                : "Edit Profile & Security"
+            }
           >
             <Settings className="w-4 h-4" />
           </button>

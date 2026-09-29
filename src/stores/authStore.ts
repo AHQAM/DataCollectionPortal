@@ -128,49 +128,49 @@ export const useAuthStore = create<AuthStore>((set, get) => {
           functions,
           "authenticateWithRegionPassword",
         );
-          const response = await authFunction({
-            regionNo: trimmedInput,
-            password: passwordInput,
-            installationDeviceId: get().simulatedDeviceId,
-            platform: "Web",
-            appVersion: import.meta.env.VITE_APP_VERSION || "1.0.0",
-          });
+        const response = await authFunction({
+          regionNo: trimmedInput,
+          password: passwordInput,
+          installationDeviceId: get().simulatedDeviceId,
+          platform: "Web",
+          appVersion: import.meta.env.VITE_APP_VERSION || "1.0.0",
+        });
 
-          const data = response.data as AuthResponseData;
-          if (data.success && data.token) {
-            await signInWithCustomToken(auth, data.token);
-            const loggedInUser: User = {
-              userId: data.userId || data.uid || trimmedInput,
-              username: trimmedInput,
-              regionNo: data.regionNo,
-              allowedRegionNos: data.allowedRegionNos || [data.regionNo],
-              userNo: data.userNo || data.regionNo,
-              userNameAr: data.userNameAr || trimmedInput,
-              userNameEn: data.userNameEn || undefined,
-              branchId: data.branchId,
-              role: data.role,
-              mustChangePassword: Boolean(data.mustChangePassword),
-              isActive: true,
-              failedLoginCount: 0,
-              sessionVersion: Number(data.sessionVersion || 0),
-              deviceBindingStatus: "UNBOUND",
-              maxAllowedDevices: 1,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            };
+        const data = response.data as AuthResponseData;
+        if (data.success && data.token) {
+          await signInWithCustomToken(auth, data.token);
+          const loggedInUser: User = {
+            userId: data.userId || data.uid || trimmedInput,
+            username: trimmedInput,
+            regionNo: data.regionNo,
+            allowedRegionNos: data.allowedRegionNos || [data.regionNo],
+            userNo: data.userNo || data.regionNo,
+            userNameAr: data.userNameAr || trimmedInput,
+            userNameEn: data.userNameEn || undefined,
+            branchId: data.branchId,
+            role: data.role,
+            mustChangePassword: Boolean(data.mustChangePassword),
+            isActive: true,
+            failedLoginCount: 0,
+            sessionVersion: Number(data.sessionVersion || 0),
+            deviceBindingStatus: "UNBOUND",
+            maxAllowedDevices: 1,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
 
-            get().setCurrentUser(loggedInUser);
-            return {
-              success: true,
-              mustChangePassword: loggedInUser.mustChangePassword,
-            };
-          } else {
-            return {
-              success: false,
-              messageAr: "بيانات تسجيل الدخول غير صحيحة.",
-              messageEn: "Invalid login credentials.",
-            };
-          }
+          get().setCurrentUser(loggedInUser);
+          return {
+            success: true,
+            mustChangePassword: loggedInUser.mustChangePassword,
+          };
+        } else {
+          return {
+            success: false,
+            messageAr: "بيانات تسجيل الدخول غير صحيحة.",
+            messageEn: "Invalid login credentials.",
+          };
+        }
       } catch (err: any) {
         console.error("Login Error:", err);
         let errorAr = "فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.";

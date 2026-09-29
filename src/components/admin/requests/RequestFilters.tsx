@@ -103,7 +103,9 @@ export const RequestFilters: React.FC<RequestFiltersProps> = ({
                 </option>
                 {branches.map((b) => (
                   <option key={b.branchId} value={b.branchId}>
-                    {currentLang === "ar" ? b.branchNameAr : b.branchNameEn || b.branchNameAr}
+                    {currentLang === "ar"
+                      ? b.branchNameAr
+                      : b.branchNameEn || b.branchNameAr}
                   </option>
                 ))}
               </select>

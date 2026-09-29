@@ -9,7 +9,7 @@ class AdminPortalScreen extends ConsumerWidget {
 
   Future<void> _launchAdminPortal(BuildContext context) async {
     // Note: Change this to your production web URL
-    final Uri url = Uri.parse('https://landsurvey-ebb3b.web.app/'); 
+    final Uri url = Uri.parse('https://landsurvey-ebb3b.web.app/');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -39,7 +39,11 @@ class AdminPortalScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.admin_panel_settings, size: 80, color: Colors.deepPurple),
+              const Icon(
+                Icons.admin_panel_settings,
+                size: 80,
+                color: Colors.deepPurple,
+              ),
               const SizedBox(height: 24),
               const Text(
                 'Welcome, Supervisor!',
@@ -57,7 +61,10 @@ class AdminPortalScreen extends ConsumerWidget {
                 icon: const Icon(Icons.open_in_browser),
                 label: const Text('Open Web Admin'),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -66,7 +73,10 @@ class AdminPortalScreen extends ConsumerWidget {
                 icon: const Icon(Icons.lock_reset),
                 label: const Text('Change Password / تغيير كلمة المرور'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 14,
+                  ),
                 ),
               ),
             ],

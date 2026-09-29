@@ -69,9 +69,7 @@ class AppErrorFormatter {
     }
     if (lower.contains('already-exists') ||
         lower.contains('username already taken')) {
-      return isAr
-          ? 'اسم المستخدم مسجل مسبقاً.'
-          : 'Username is already taken.';
+      return isAr ? 'اسم المستخدم مسجل مسبقاً.' : 'Username is already taken.';
     }
     if (lower.contains('deadline-exceeded') || lower.contains('timeout')) {
       return isAr
@@ -93,8 +91,8 @@ class AppErrorFormatter {
     return firstLine.isNotEmpty
         ? firstLine
         : (isAr
-            ? 'حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.'
-            : 'An unexpected error occurred. Please try again.');
+              ? 'حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.'
+              : 'An unexpected error occurred. Please try again.');
   }
 
   static void showSnackBar(BuildContext context, dynamic error) {
@@ -137,7 +135,11 @@ class AppErrorFormatter {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+            const Icon(
+              Icons.check_circle_outline,
+              color: Colors.white,
+              size: 20,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(

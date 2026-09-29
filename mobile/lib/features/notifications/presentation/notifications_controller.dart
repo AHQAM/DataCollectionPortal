@@ -34,9 +34,7 @@ class NotificationsController extends _$NotificationsController {
     final repository = ref.read(notificationsRepositoryProvider);
     if (repository == null) return;
 
-    final result = await AsyncValue.guard(
-      () => repository.markAllAsRead(),
-    );
+    final result = await AsyncValue.guard(() => repository.markAllAsRead());
     if (ref.mounted) {
       state = result;
     }

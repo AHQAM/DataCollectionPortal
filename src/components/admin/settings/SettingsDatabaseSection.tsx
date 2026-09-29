@@ -86,8 +86,6 @@ export const SettingsDatabaseSection: React.FC<
           </div>
         </div>
 
-
-
         <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="text-slate-600 text-[11px]">
             {t("settings.database.backupDesc", { lng: currentLang })}
@@ -152,7 +150,6 @@ export const SettingsDatabaseSection: React.FC<
           )}
         </div>
       )}
-
     </>
   );
 };

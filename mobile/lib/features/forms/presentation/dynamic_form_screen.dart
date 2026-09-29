@@ -172,7 +172,10 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       if (submitState.hasError) {
         AppErrorFormatter.showSnackBar(context, submitState.error);
       } else {
-        AppErrorFormatter.showSuccessSnackBar(context, 'تم حفظ البيانات بنجاح ✓');
+        AppErrorFormatter.showSuccessSnackBar(
+          context,
+          'تم حفظ البيانات بنجاح ✓',
+        );
         Navigator.of(context).pop();
       }
     }
@@ -204,11 +207,15 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
                 Text(
                   AppErrorFormatter.format(error, context),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  onPressed: () => ref.refresh(formFieldsProvider(widget.activityId)),
+                  onPressed: () =>
+                      ref.refresh(formFieldsProvider(widget.activityId)),
                   icon: const Icon(Icons.refresh, size: 18),
                   label: Text(isArabic ? 'إعادة المحاولة' : 'Retry'),
                 ),

@@ -32,10 +32,10 @@ class AuthController extends _$AuthController {
           .doc(user.uid)
           .snapshots()
           .listen((doc) {
-        if (doc.exists && doc.data()?['isActive'] == false) {
-          logout();
-        }
-      });
+            if (doc.exists && doc.data()?['isActive'] == false) {
+              logout();
+            }
+          });
       ref.onDispose(() => subscription.cancel());
     }
     return user;

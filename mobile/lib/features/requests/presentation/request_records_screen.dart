@@ -180,16 +180,25 @@ class _RequestRecordsScreenState extends ConsumerState<RequestRecordsScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.red,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         AppErrorFormatter.format(err, context),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
-                        onPressed: () => ref.refresh(requestRecordsProvider(widget.requestId)),
+                        onPressed: () => ref.refresh(
+                          requestRecordsProvider(widget.requestId),
+                        ),
                         icon: const Icon(Icons.refresh, size: 18),
                         label: Text(isArabic ? 'إعادة المحاولة' : 'Retry'),
                       ),

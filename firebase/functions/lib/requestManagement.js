@@ -73,9 +73,7 @@ exports.createRequest = (0, gen2_1.onCallGen2)(async (data, context) => {
         : targetBranches && targetBranches.length === 1
             ? targetBranches[0]
             : data.branchId || null;
-    const finalTargetBranches = isSupervisor && callerBranchId
-        ? [callerBranchId]
-        : targetBranches || [];
+    const finalTargetBranches = isSupervisor && callerBranchId ? [callerBranchId] : targetBranches || [];
     const requestId = "REQ-" + Math.random().toString(36).substring(2, 8).toUpperCase();
     const finalRequestCode = requestCode || "REQ-" + Math.floor(100 + Math.random() * 900);
     const requestRef = db_1.db.collection("requests").doc(requestId);

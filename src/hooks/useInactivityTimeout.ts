@@ -19,7 +19,9 @@ export const useInactivityTimeout = () => {
         clearTimeout(timerRef.current);
       }
       timerRef.current = setTimeout(() => {
-        console.warn("User inactive for 15 minutes. Automatically logging out.");
+        console.warn(
+          "User inactive for 15 minutes. Automatically logging out.",
+        );
         logout();
       }, INACTIVITY_TIMEOUT_MS);
     };

@@ -24,13 +24,21 @@ export const userApi = {
   deleteUser: async (targetUserId: string) => {
     const fn = httpsCallable(functions, "deleteUser");
     const res = await fn({ targetUserId });
-    return res.data as { success: boolean; messageAr?: string; messageEn?: string };
+    return res.data as {
+      success: boolean;
+      messageAr?: string;
+      messageEn?: string;
+    };
   },
 
   deactivateUser: async (targetUserId: string) => {
     const fn = httpsCallable(functions, "deleteUser");
     const res = await fn({ targetUserId });
-    return res.data as { success: boolean; messageAr?: string; messageEn?: string };
+    return res.data as {
+      success: boolean;
+      messageAr?: string;
+      messageEn?: string;
+    };
   },
 
   requestPasswordReset: async (regionNo: string) => {

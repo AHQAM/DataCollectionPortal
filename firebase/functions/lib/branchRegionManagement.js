@@ -146,9 +146,9 @@ exports.deleteBranch = (0, gen2_1.onCallGen2)(async (data, context) => {
         batch.delete(doc.ref);
     }
     // 3. Hard delete associated assignments
-    const regionNos = regionsSnap.docs.map(doc => doc.id);
+    const regionNos = regionsSnap.docs.map((doc) => doc.id);
     if (regionNos.length > 0) {
-        // Firestore 'in' query supports up to 30 items. 
+        // Firestore 'in' query supports up to 30 items.
         // We process in chunks of 30.
         for (let i = 0; i < regionNos.length; i += 30) {
             const chunk = regionNos.slice(i, i + 30);

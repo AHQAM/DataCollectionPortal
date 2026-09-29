@@ -94,7 +94,10 @@ export const useUIStore = create<UIStore>((set, get) => {
           readAt: now,
         });
       } catch (e) {
-        console.warn("Could not sync notification read status to firestore:", e);
+        console.warn(
+          "Could not sync notification read status to firestore:",
+          e,
+        );
       }
     },
     markAllNotificationsAsRead: async (userId) => {

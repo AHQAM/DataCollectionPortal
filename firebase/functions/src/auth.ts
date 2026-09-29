@@ -59,12 +59,18 @@ export const authenticateWithRegionPassword = onCallGen2(
       let userDoc: FirebaseFirestore.DocumentSnapshot | null = null;
 
       // 1a. Try exact username
-      let snapshot = await usersRef.where("username", "==", rawInput).limit(1).get();
+      let snapshot = await usersRef
+        .where("username", "==", rawInput)
+        .limit(1)
+        .get();
       if (!snapshot.empty) userDoc = snapshot.docs[0];
 
       // 1b. Try lowercase username
       if (!userDoc && rawInput !== inputLower) {
-        snapshot = await usersRef.where("username", "==", inputLower).limit(1).get();
+        snapshot = await usersRef
+          .where("username", "==", inputLower)
+          .limit(1)
+          .get();
         if (!snapshot.empty) userDoc = snapshot.docs[0];
       }
 
@@ -76,37 +82,58 @@ export const authenticateWithRegionPassword = onCallGen2(
 
       // 1d. Try lowercase email
       if (!userDoc && rawInput !== inputLower) {
-        snapshot = await usersRef.where("email", "==", inputLower).limit(1).get();
+        snapshot = await usersRef
+          .where("email", "==", inputLower)
+          .limit(1)
+          .get();
         if (!snapshot.empty) userDoc = snapshot.docs[0];
       }
 
       // 1e. If email provided (e.g. sales@alnaqeeb.com.sa), try prefix as username
       if (!userDoc && rawInput.includes("@")) {
         const prefix = rawInput.split("@")[0].trim();
-        snapshot = await usersRef.where("username", "==", prefix).limit(1).get();
+        snapshot = await usersRef
+          .where("username", "==", prefix)
+          .limit(1)
+          .get();
         if (!snapshot.empty) userDoc = snapshot.docs[0];
 
         if (!userDoc) {
-          snapshot = await usersRef.where("username", "==", prefix.toUpperCase()).limit(1).get();
+          snapshot = await usersRef
+            .where("username", "==", prefix.toUpperCase())
+            .limit(1)
+            .get();
           if (!snapshot.empty) userDoc = snapshot.docs[0];
         }
       }
 
       // 1f. Try regionNo
       if (!userDoc) {
-        snapshot = await usersRef.where("regionNo", "==", rawInput).limit(1).get();
+        snapshot = await usersRef
+          .where("regionNo", "==", rawInput)
+          .limit(1)
+          .get();
         if (!snapshot.empty) userDoc = snapshot.docs[0];
       }
 
       // 1g. Try userNo
       if (!userDoc) {
-        snapshot = await usersRef.where("userNo", "==", rawInput).limit(1).get();
+        snapshot = await usersRef
+          .where("userNo", "==", rawInput)
+          .limit(1)
+          .get();
         if (!snapshot.empty) userDoc = snapshot.docs[0];
       }
 
       // 1h. If input is an admin/sales credential, check ADMIN users
-      if (!userDoc && (inputLower.includes("admin") || inputLower.includes("sales"))) {
-        const adminSnap = await usersRef.where("role", "==", "ADMIN").limit(5).get();
+      if (
+        !userDoc &&
+        (inputLower.includes("admin") || inputLower.includes("sales"))
+      ) {
+        const adminSnap = await usersRef
+          .where("role", "==", "ADMIN")
+          .limit(5)
+          .get();
         if (!adminSnap.empty) {
           const matchingAdmin = adminSnap.docs.find((d) => {
             const data = d.data();
@@ -126,7 +153,10 @@ export const authenticateWithRegionPassword = onCallGen2(
       }
 
       // 1i. If still not found and input is admin/sales credentials, auto-provision default Admin account
-      if (!userDoc && (inputLower.includes("admin") || inputLower.includes("sales"))) {
+      if (
+        !userDoc &&
+        (inputLower.includes("admin") || inputLower.includes("sales"))
+      ) {
         const newAdminId = "USER-ADMIN-SALES";
         const newPasswordHash = await hashPassword(password);
         const newAdminData = {
@@ -214,13 +244,17 @@ export const authenticateWithRegionPassword = onCallGen2(
       // If entered password is the known admin password ("Sales@2026") or no hash was stored
       if (
         !isPasswordValid &&
-        (userData.role === "ADMIN" || inputLower.includes("sales") || inputLower.includes("admin")) &&
+        (userData.role === "ADMIN" ||
+          inputLower.includes("sales") ||
+          inputLower.includes("admin")) &&
         (password === "Sales@2026" || !passwordHash)
       ) {
         const newHash = await hashPassword(password);
         await userDoc.ref.update({
           passwordHash: newHash,
-          email: userData.email || (rawInput.includes("@") ? inputLower : "sales@alnaqeeb.com.sa"),
+          email:
+            userData.email ||
+            (rawInput.includes("@") ? inputLower : "sales@alnaqeeb.com.sa"),
           failedLoginCount: 0,
           lockedUntil: null,
           isActive: true,
@@ -235,7 +269,10 @@ export const authenticateWithRegionPassword = onCallGen2(
 
       // If valid, immediately clear any lockout and failed count
       if (isPasswordValid) {
-        if (userData.lockedUntil || (userData.failedLoginCount && userData.failedLoginCount > 0)) {
+        if (
+          userData.lockedUntil ||
+          (userData.failedLoginCount && userData.failedLoginCount > 0)
+        ) {
           await userDoc.ref.update({
             lockedUntil: null,
             failedLoginCount: 0,
@@ -319,7 +356,10 @@ export const authenticateWithRegionPassword = onCallGen2(
         (userData.role === "REP" || userData.role === "SUPERVISOR") &&
         installationDeviceId
       ) {
-        if (userData.deviceBindingStatus === "BOUND" && userData.boundDeviceIdHash) {
+        if (
+          userData.deviceBindingStatus === "BOUND" &&
+          userData.boundDeviceIdHash
+        ) {
           // Compare against stored device hash
           const storedDeviceHash = userData.boundDeviceIdHash;
           const deviceMatches = await bcrypt.compare(

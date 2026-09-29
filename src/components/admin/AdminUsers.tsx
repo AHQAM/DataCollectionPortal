@@ -201,14 +201,22 @@ export const AdminUsers: React.FC = () => {
                       );
                     }}
                     onDeleteUser={(id) => {
-                      if (window.confirm("Are you sure you want to delete this user?")) {
-                        void deleteUser(id).then((result: { success: boolean }) => {
-                          showToast(
-                            result.success
-                              ? t("users.accountDeletedSuccess", { lng: currentLang }) || "User deleted successfully"
-                              : "Failed to delete user"
-                          );
-                        });
+                      if (
+                        window.confirm(
+                          "Are you sure you want to delete this user?",
+                        )
+                      ) {
+                        void deleteUser(id).then(
+                          (result: { success: boolean }) => {
+                            showToast(
+                              result.success
+                                ? t("users.accountDeletedSuccess", {
+                                    lng: currentLang,
+                                  }) || "User deleted successfully"
+                                : "Failed to delete user",
+                            );
+                          },
+                        );
                       }
                     }}
                   />

@@ -4,13 +4,26 @@ import { useApp } from "../../context/AppContext";
 import { Layers, Search, ArrowRightLeft, X } from "lucide-react";
 
 export const AdminAssignments: React.FC = () => {
-  const { requests: allRequests, records, users, branches: allBranches, reassignRecord, currentUser } = useApp();
+  const {
+    requests: allRequests,
+    records,
+    users,
+    branches: allBranches,
+    reassignRecord,
+    currentUser,
+  } = useApp();
   const { t, i18n } = useTranslation();
   const currentLang = (i18n.language as "ar" | "en") || "ar";
 
   const isSupervisor = currentUser?.role === "SUPERVISOR";
-  const requests = allRequests.filter(r => !isSupervisor || (r.targetBranches || []).includes(currentUser?.branchId || ""));
-  const branches = allBranches.filter(b => !isSupervisor || b.branchId === currentUser?.branchId);
+  const requests = allRequests.filter(
+    (r) =>
+      !isSupervisor ||
+      (r.targetBranches || []).includes(currentUser?.branchId || ""),
+  );
+  const branches = allBranches.filter(
+    (b) => !isSupervisor || b.branchId === currentUser?.branchId,
+  );
 
   const [selectedReqId, setSelectedReqId] = useState<string>(
     requests.length > 0 ? requests[0].requestId : "",
@@ -23,7 +36,11 @@ export const AdminAssignments: React.FC = () => {
   const [targetRepId, setTargetRepId] = useState<string>("");
   const [reassignReason, setReassignReason] = useState<string>("");
 
-  const repUsers = users.filter((u) => u.role === "REP" && (!isSupervisor || u.branchId === currentUser?.branchId));
+  const repUsers = users.filter(
+    (u) =>
+      u.role === "REP" &&
+      (!isSupervisor || u.branchId === currentUser?.branchId),
+  );
 
   const activeReq = requests.find((r) => r.requestId === selectedReqId);
   const targetEntityLabel =

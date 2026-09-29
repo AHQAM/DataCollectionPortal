@@ -30,14 +30,19 @@ class NotificationsScreen extends ConsumerWidget {
                 if (context.mounted) {
                   AppErrorFormatter.showSuccessSnackBar(
                     context,
-                    isAr ? 'تم تحديد جميع الإشعارات كمقروءة' : 'All notifications marked as read',
+                    isAr
+                        ? 'تم تحديد جميع الإشعارات كمقروءة'
+                        : 'All notifications marked as read',
                   );
                 }
               },
               icon: const Icon(Icons.done_all, size: 18),
               label: Text(
                 isAr ? 'تحديد الكل كمقروء' : 'Mark all read',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
               ),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.primary,
@@ -107,13 +112,17 @@ class NotificationsScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isUnread
-                          ? Theme.of(context).primaryColor.withValues(alpha: 0.35)
+                          ? Theme.of(
+                              context,
+                            ).primaryColor.withValues(alpha: 0.35)
                           : Colors.grey.shade200,
                       width: isUnread ? 1.5 : 1.0,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: isUnread ? 0.04 : 0.02),
+                        color: Colors.black.withValues(
+                          alpha: isUnread ? 0.04 : 0.02,
+                        ),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -131,7 +140,9 @@ class NotificationsScreen extends ConsumerWidget {
                             height: 42,
                             decoration: BoxDecoration(
                               color: isUnread
-                                  ? Theme.of(context).primaryColor.withValues(alpha: 0.15)
+                                  ? Theme.of(
+                                      context,
+                                    ).primaryColor.withValues(alpha: 0.15)
                                   : Colors.grey.shade100,
                               shape: BoxShape.circle,
                             ),
@@ -155,7 +166,10 @@ class NotificationsScreen extends ConsumerWidget {
                                 decoration: BoxDecoration(
                                   color: Colors.red.shade600,
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
                                 ),
                               ),
                             ),
@@ -172,17 +186,26 @@ class NotificationsScreen extends ConsumerWidget {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    isAr ? notification.titleAr : notification.titleEn,
+                                    isAr
+                                        ? notification.titleAr
+                                        : notification.titleEn,
                                     style: TextStyle(
-                                      fontWeight: isUnread ? FontWeight.bold : FontWeight.w600,
+                                      fontWeight: isUnread
+                                          ? FontWeight.bold
+                                          : FontWeight.w600,
                                       fontSize: 14,
-                                      color: isUnread ? Colors.black87 : Colors.grey.shade800,
+                                      color: isUnread
+                                          ? Colors.black87
+                                          : Colors.grey.shade800,
                                     ),
                                   ),
                                 ),
                                 if (isUnread)
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).primaryColor,
                                       borderRadius: BorderRadius.circular(10),
@@ -203,7 +226,9 @@ class NotificationsScreen extends ConsumerWidget {
                               isAr ? notification.bodyAr : notification.bodyEn,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: isUnread ? Colors.black87 : Colors.grey.shade600,
+                                color: isUnread
+                                    ? Colors.black87
+                                    : Colors.grey.shade600,
                                 height: 1.35,
                               ),
                             ),
@@ -212,7 +237,9 @@ class NotificationsScreen extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  DateFormat.yMd().add_jm().format(notification.sentAt),
+                                  DateFormat.yMd().add_jm().format(
+                                    notification.sentAt,
+                                  ),
                                   style: TextStyle(
                                     fontSize: 11,
                                     color: Colors.grey.shade500,
@@ -223,11 +250,19 @@ class NotificationsScreen extends ConsumerWidget {
                                   InkWell(
                                     onTap: () {
                                       ref
-                                          .read(notificationsControllerProvider.notifier)
-                                          .markAsRead(notification.notificationId);
+                                          .read(
+                                            notificationsControllerProvider
+                                                .notifier,
+                                          )
+                                          .markAsRead(
+                                            notification.notificationId,
+                                          );
                                     },
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                        vertical: 2,
+                                      ),
                                       child: Text(
                                         isAr ? 'تحديد كمقروء' : 'Mark as read',
                                         style: TextStyle(
@@ -262,7 +297,10 @@ class NotificationsScreen extends ConsumerWidget {
                 Text(
                   AppErrorFormatter.format(error, context),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(

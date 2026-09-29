@@ -75,6 +75,4 @@ describe("User Management Cloud Functions", () => {
       ).rejects.toThrow(/Role must be REP or SUPERVISOR/i);
     });
   });
-
-
 });

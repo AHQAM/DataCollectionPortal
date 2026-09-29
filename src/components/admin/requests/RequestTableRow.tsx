@@ -68,7 +68,8 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
           <span>{req.requestCode}</span>
           <span>•</span>
           <span>
-            {fieldsCount} {t("requests.dynamicFieldsCount", { lng: currentLang })}
+            {fieldsCount}{" "}
+            {t("requests.dynamicFieldsCount", { lng: currentLang })}
           </span>
           {req.creatorName && (
             <>
@@ -83,7 +84,9 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
                 <span>{currentLang === "ar" ? "المنشئ:" : "By:"}</span>
                 <span>{req.creatorName}</span>
                 {req.creatorBranchNameAr && (
-                  <span className="opacity-80">({req.creatorBranchNameAr})</span>
+                  <span className="opacity-80">
+                    ({req.creatorBranchNameAr})
+                  </span>
                 )}
               </span>
             </>

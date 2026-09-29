@@ -2,10 +2,20 @@ import fft from "firebase-functions-test";
 
 const testEnv = fft();
 
+const mockDoc = {
+  get: jest.fn().mockResolvedValue({
+    exists: true,
+    data: () => ({ mustChangePassword: false, passwordHash: "mockHash" }),
+  }),
+  update: jest.fn().mockResolvedValue({}),
+};
+
 jest.mock("../config/db", () => ({
   DATABASE_ID: "datacollectionportal",
   db: {
-    collection: jest.fn(),
+    collection: jest.fn().mockReturnValue({
+      doc: jest.fn().mockReturnValue(mockDoc),
+    }),
   },
 }));
 
