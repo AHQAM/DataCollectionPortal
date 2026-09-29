@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../core/utils/error_formatter.dart';
 
 import 'requests_controller.dart';
 import '../../auth/presentation/auth_controller.dart';
@@ -25,6 +27,9 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final requestsAsyncValue = ref.watch(myRequestsProvider);
+    final userState = ref.watch(authControllerProvider);
+    final isSupervisorOrAdmin = userState.value?.role == 'SUPERVISOR' ||
+        userState.value?.role == 'ADMIN';
 
     return Scaffold(
       appBar: AppBar(
@@ -34,6 +39,11 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
             icon: const Icon(Icons.notifications_outlined),
             tooltip: isArabic ? 'الإشعارات' : 'Notifications',
             onPressed: () => context.push('/notifications'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.lock_reset),
+            tooltip: isArabic ? 'تغيير كلمة المرور' : 'Change Password',
+            onPressed: () => context.push('/change-password'),
           ),
           IconButton(
             icon: const Icon(Icons.sync),
@@ -50,6 +60,40 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
       ),
       body: Column(
         children: [
+          if (isSupervisorOrAdmin)
+            Container(
+              width: double.infinity,
+              color: Colors.indigo.shade50,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.admin_panel_settings, color: Colors.indigo.shade700),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      isArabic ? 'فتح لوحة تحكم الإدارة' : 'Open Web Admin',
+                      style: TextStyle(
+                        color: Colors.indigo.shade900,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final url = Uri.parse('https://landsurvey-ebb3b.web.app/');
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.indigo,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text(isArabic ? 'فتح' : 'Open'),
+                  ),
+                ],
+              ),
+            ),
           // Search and filter chips section
           RequestSearchFilterBar(
             isArabic: isArabic,
@@ -135,9 +179,26 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
               },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => Center(
-                child: Text(
-                  '${l10n.errorGeneric}\n$error',
-                  textAlign: TextAlign.center,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                      const SizedBox(height: 12),
+                      Text(
+                        AppErrorFormatter.format(error, context),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: () => ref.refresh(myRequestsProvider),
+                        icon: const Icon(Icons.refresh, size: 18),
+                        label: Text(isArabic ? 'إعادة المحاولة' : 'Retry'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

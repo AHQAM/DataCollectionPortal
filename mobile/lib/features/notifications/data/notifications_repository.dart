@@ -64,6 +64,25 @@ class NotificationsRepository {
       'status': 'READ',
     });
   }
+
+  Future<void> markAllAsRead() async {
+    final snapshot = await _firestore
+        .collection('notifications')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    final batch = _firestore.batch();
+    int count = 0;
+    for (final doc in snapshot.docs) {
+      if (doc.data()['status'] != 'READ') {
+        batch.update(doc.reference, {'status': 'READ'});
+        count++;
+      }
+    }
+    if (count > 0) {
+      await batch.commit();
+    }
+  }
 }
 
 @riverpod

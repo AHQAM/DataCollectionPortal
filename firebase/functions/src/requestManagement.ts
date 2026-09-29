@@ -43,6 +43,34 @@ export const createRequest = onCallGen2(async (data, context) => {
     throw new HttpsError("invalid-argument", "Title (Ar) is required.");
   }
 
+  const callerId = context.auth!.uid;
+  const callerUserDoc = await db.collection("users").doc(callerId).get();
+  const callerUserData = callerUserDoc.exists ? callerUserDoc.data() : null;
+  const callerRole =
+    callerUserData?.role || (context.auth!.token.role as string) || "ADMIN";
+  const callerName =
+    callerUserData?.userNameAr ||
+    callerUserData?.username ||
+    callerUserData?.userNo ||
+    "User";
+  const callerBranchId =
+    callerUserData?.branchId ||
+    (context.auth!.token.branchId as string) ||
+    null;
+  const callerBranchNameAr = callerUserData?.branchNameAr || "";
+
+  const isSupervisor = callerRole === "SUPERVISOR";
+  const finalBranchId = isSupervisor
+    ? callerBranchId
+    : targetBranches && targetBranches.length === 1
+      ? targetBranches[0]
+      : data.branchId || null;
+
+  const finalTargetBranches: string[] =
+    isSupervisor && callerBranchId
+      ? [callerBranchId]
+      : targetBranches || [];
+
   const requestId =
     "REQ-" + Math.random().toString(36).substring(2, 8).toUpperCase();
   const finalRequestCode =
@@ -76,11 +104,17 @@ export const createRequest = onCallGen2(async (data, context) => {
     formSchemaVersion: 1,
     totalRecords: 0,
     totalAssignments: 0,
-    targetBranches: targetBranches || [],
+    branchId: finalBranchId,
+    branchNameAr: callerBranchNameAr,
+    targetBranches: finalTargetBranches,
     targetRegions: data.targetRegions || [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    createdBy: context.auth!.uid,
+    createdBy: callerId,
+    creatorName: callerName,
+    creatorRole: callerRole,
+    creatorBranchId: callerBranchId,
+    creatorBranchNameAr: callerBranchNameAr,
   });
 
   return { success: true, requestId: requestId, activityId: requestId };

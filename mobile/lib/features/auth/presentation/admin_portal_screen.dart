@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 import 'auth_controller.dart';
 
 class AdminPortalScreen extends ConsumerWidget {
@@ -57,6 +58,15 @@ class AdminPortalScreen extends ConsumerWidget {
                 label: const Text('Open Web Admin'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => context.push('/change-password'),
+                icon: const Icon(Icons.lock_reset),
+                label: const Text('Change Password / تغيير كلمة المرور'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                 ),
               ),
             ],

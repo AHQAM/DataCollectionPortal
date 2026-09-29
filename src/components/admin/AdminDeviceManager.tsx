@@ -20,8 +20,8 @@ export const AdminDeviceManager: React.FC = () => {
     if (statusFilter !== "ALL" && b.status !== statusFilter) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchName = b.userNameAr.toLowerCase().includes(q);
-      const matchReg = b.regionNo.includes(q);
+      const matchName = (b.userNameAr || "").toLowerCase().includes(q);
+      const matchReg = (b.regionNo || "").toLowerCase().includes(q);
       const matchDevice = (b.deviceLabel || "").toLowerCase().includes(q);
       const matchUuid = (b.deviceIdHash || "").toLowerCase().includes(q);
       if (!matchName && !matchReg && !matchDevice && !matchUuid) return false;

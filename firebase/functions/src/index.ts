@@ -18,8 +18,9 @@ export {
 export {
   createUser,
   updateUser,
-  deactivateUser,
+  deleteUser,
   importUsersBatch,
+  updateUserProfile,
 } from "./userManagement";
 
 // Device Binding

@@ -13,7 +13,6 @@ export const AdminSettings: React.FC = () => {
     appSettings,
     updateAppSettings,
     resetAllData,
-    wipeDemoDataForProduction,
     records,
     requests,
     branches,
@@ -25,11 +24,6 @@ export const AdminSettings: React.FC = () => {
 
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-
-  // Wipe Demo Data Modal State
-  const [showWipeModal, setShowWipeModal] = useState(false);
-  const [wipeBranchesAlso, setWipeBranchesAlso] = useState(false);
-  const [wipeSuccessMsg, setWipeSuccessMsg] = useState<string | null>(null);
 
   // JSON Backup export / import
   const [backupSuccessMsg, setBackupSuccessMsg] = useState<string | null>(null);
@@ -67,13 +61,6 @@ export const AdminSettings: React.FC = () => {
 
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);
-  };
-
-  const handleConfirmWipe = () => {
-    wipeDemoDataForProduction({ wipeBranchesAndRegions: wipeBranchesAlso });
-    setShowWipeModal(false);
-    setWipeSuccessMsg(t("settings.wipeSuccess", { lng: currentLang }));
-    setTimeout(() => setWipeSuccessMsg(null), 5000);
   };
 
   // Export full JSON database backup
@@ -157,21 +144,6 @@ export const AdminSettings: React.FC = () => {
       </form>
 
       {/* Success Notifications */}
-      {wipeSuccessMsg && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs font-bold text-emerald-900 flex items-center justify-between gap-2 shadow-xs animate-in fade-in">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-            <span>{wipeSuccessMsg}</span>
-          </div>
-          <button
-            onClick={() => setWipeSuccessMsg(null)}
-            className="text-emerald-700 hover:text-emerald-900 text-xs cursor-pointer font-bold"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
       {backupSuccessMsg && (
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-2xl text-xs font-bold text-blue-900 flex items-center justify-between gap-2 shadow-xs animate-in fade-in">
           <div className="flex items-center gap-2">
@@ -193,15 +165,10 @@ export const AdminSettings: React.FC = () => {
         requestsLength={requests.length}
         branchesLength={branches.length}
         regionsLength={regions.length}
-        setWipeBranchesAlso={setWipeBranchesAlso}
-        setShowWipeModal={setShowWipeModal}
         handleExportBackup={handleExportBackup}
         showResetConfirm={showResetConfirm}
         setShowResetConfirm={setShowResetConfirm}
         resetAllData={resetAllData}
-        wipeBranchesAlso={wipeBranchesAlso}
-        showWipeModal={showWipeModal}
-        handleConfirmWipe={handleConfirmWipe}
       />
     </div>
   );

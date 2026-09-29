@@ -27,16 +27,14 @@ jest.mock("../auth", () => ({
   hashPassword: jest.fn().mockResolvedValue("mockHashedPassword"),
 }));
 
-import { createUser, deactivateUser } from "../userManagement";
+import { createUser } from "../userManagement";
 
 describe("User Management Cloud Functions", () => {
   let wrappedCreateUser: any;
-  let wrappedDeactivateUser: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
     wrappedCreateUser = testEnv.wrap(createUser);
-    wrappedDeactivateUser = testEnv.wrap(deactivateUser);
   });
 
   afterAll(() => {
@@ -78,14 +76,5 @@ describe("User Management Cloud Functions", () => {
     });
   });
 
-  describe("deactivateUser", () => {
-    it("throws permission-denied if caller is not ADMIN", async () => {
-      await expect(
-        wrappedDeactivateUser(
-          { targetUserId: "u2" },
-          { auth: { uid: "u1", token: { role: "REP" } } },
-        ),
-      ).rejects.toThrow();
-    });
-  });
+
 });

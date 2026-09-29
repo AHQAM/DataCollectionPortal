@@ -55,6 +55,27 @@ exports.createRequest = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!titleAr) {
         throw new gen2_1.HttpsError("invalid-argument", "Title (Ar) is required.");
     }
+    const callerId = context.auth.uid;
+    const callerUserDoc = await db_1.db.collection("users").doc(callerId).get();
+    const callerUserData = callerUserDoc.exists ? callerUserDoc.data() : null;
+    const callerRole = callerUserData?.role || context.auth.token.role || "ADMIN";
+    const callerName = callerUserData?.userNameAr ||
+        callerUserData?.username ||
+        callerUserData?.userNo ||
+        "User";
+    const callerBranchId = callerUserData?.branchId ||
+        context.auth.token.branchId ||
+        null;
+    const callerBranchNameAr = callerUserData?.branchNameAr || "";
+    const isSupervisor = callerRole === "SUPERVISOR";
+    const finalBranchId = isSupervisor
+        ? callerBranchId
+        : targetBranches && targetBranches.length === 1
+            ? targetBranches[0]
+            : data.branchId || null;
+    const finalTargetBranches = isSupervisor && callerBranchId
+        ? [callerBranchId]
+        : targetBranches || [];
     const requestId = "REQ-" + Math.random().toString(36).substring(2, 8).toUpperCase();
     const finalRequestCode = requestCode || "REQ-" + Math.floor(100 + Math.random() * 900);
     const requestRef = db_1.db.collection("requests").doc(requestId);
@@ -84,11 +105,17 @@ exports.createRequest = (0, gen2_1.onCallGen2)(async (data, context) => {
         formSchemaVersion: 1,
         totalRecords: 0,
         totalAssignments: 0,
-        targetBranches: targetBranches || [],
+        branchId: finalBranchId,
+        branchNameAr: callerBranchNameAr,
+        targetBranches: finalTargetBranches,
         targetRegions: data.targetRegions || [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        createdBy: context.auth.uid,
+        createdBy: callerId,
+        creatorName: callerName,
+        creatorRole: callerRole,
+        creatorBranchId: callerBranchId,
+        creatorBranchNameAr: callerBranchNameAr,
     });
     return { success: true, requestId: requestId, activityId: requestId };
 });

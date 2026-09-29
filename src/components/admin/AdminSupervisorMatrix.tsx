@@ -44,10 +44,10 @@ export const AdminSupervisorMatrix: React.FC = () => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchName =
-        sup.userNameAr.toLowerCase().includes(q) ||
+        (sup.userNameAr || "").toLowerCase().includes(q) ||
         (sup.userNameEn || "").toLowerCase().includes(q);
       const matchNo = (sup.userNo || "").toLowerCase().includes(q);
-      const matchUsername = sup.username.toLowerCase().includes(q);
+      const matchUsername = (sup.username || "").toLowerCase().includes(q);
       if (!matchName && !matchNo && !matchUsername) return false;
     }
     return true;

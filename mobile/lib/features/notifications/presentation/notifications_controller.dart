@@ -22,7 +22,23 @@ class NotificationsController extends _$NotificationsController {
     final repository = ref.read(notificationsRepositoryProvider);
     if (repository == null) return;
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => repository.markAsRead(notificationId));
+    final result = await AsyncValue.guard(
+      () => repository.markAsRead(notificationId),
+    );
+    if (ref.mounted) {
+      state = result;
+    }
+  }
+
+  Future<void> markAllAsRead() async {
+    final repository = ref.read(notificationsRepositoryProvider);
+    if (repository == null) return;
+
+    final result = await AsyncValue.guard(
+      () => repository.markAllAsRead(),
+    );
+    if (ref.mounted) {
+      state = result;
+    }
   }
 }

@@ -109,7 +109,7 @@ service cloud.firestore {
       // Supervisor: read requests within branch scope
       // Rep: read only Published/Closed/Archived requests that have assignments for this user
       allow read: if isAdmin()
-        || (isSupervisor() && hasBranchAccess(resource.data.get('branchId', '')))
+        || isSupervisor()
         || (isRep() && resource.data.status in ['Published', 'Closed', 'Archived']);
 
       // Only Admin/Cloud Functions can write requests
@@ -288,6 +288,15 @@ service cloud.firestore {
 
       // Never allow update or delete — audit logs are immutable
       allow update, delete: if false;
+    }
+
+    // ============================================================
+    // NOTIFICATIONS
+    // ============================================================
+    match /notifications/{notificationId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow update: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'readAt']));
+      allow create, delete: if isAdmin();
     }
 
     // ============================================================

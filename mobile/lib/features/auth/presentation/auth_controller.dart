@@ -67,12 +67,8 @@ class AuthController extends _$AuthController {
   }
 
   Future<void> logout() async {
-    final currentUser = state.value;
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      if (currentUser != null) {
-        await ref.read(fcmServiceProvider).clearToken(currentUser.uid);
-      }
       await ref.read(authRepositoryProvider).logout();
       return null;
     });

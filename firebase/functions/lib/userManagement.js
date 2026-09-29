@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.importUsersBatch = exports.deactivateUser = exports.updateUser = exports.createUser = void 0;
+exports.updateUserProfile = exports.importUsersBatch = exports.deleteUser = exports.updateUser = exports.createUser = void 0;
 const admin = __importStar(require("firebase-admin"));
 const gen2_1 = require("./config/gen2");
 const db_1 = require("./config/db");
@@ -225,11 +225,12 @@ exports.updateUser = (0, gen2_1.onCallGen2)(async (data, context) => {
     }
 });
 /**
- * Cloud Function: deactivateUser
+/**
+ * Cloud Function: deleteUser
  *
- * Admin-only soft-delete: deactivates a user, revokes sessions.
+ * Admin-only delete: deletes a user from Firestore and Auth.
  */
-exports.deactivateUser = (0, gen2_1.onCallGen2)(async (data, context) => {
+exports.deleteUser = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!context.auth || context.auth.token.role !== roles_1.USER_ROLES.ADMIN) {
         throw new gen2_1.HttpsError("permission-denied", "صلاحية المسؤول مطلوبة. | Admin permission required.");
     }
@@ -237,9 +238,9 @@ exports.deactivateUser = (0, gen2_1.onCallGen2)(async (data, context) => {
     if (!targetUserId) {
         throw new gen2_1.HttpsError("invalid-argument", "معرف المستخدم مطلوب. | User ID is required.");
     }
-    // Prevent self-deactivation
+    // Prevent self-deletion
     if (targetUserId === context.auth.uid) {
-        throw new gen2_1.HttpsError("failed-precondition", "لا يمكنك تعطيل حسابك الخاص. | Cannot deactivate your own account.");
+        throw new gen2_1.HttpsError("failed-precondition", "لا يمكنك حذف حسابك الخاص. | Cannot delete your own account.");
     }
     try {
         const userRef = db_1.db.collection("users").doc(targetUserId);
@@ -247,31 +248,27 @@ exports.deactivateUser = (0, gen2_1.onCallGen2)(async (data, context) => {
         if (!userDoc.exists) {
             throw new gen2_1.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
         }
-        await userRef.update({
-            isActive: false,
-            deletedAt: admin.firestore.FieldValue.serverTimestamp(),
-            deletedBy: context.auth.uid,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        // Revoke auth tokens
+        // Hard delete from Auth
         try {
-            await admin.auth().revokeRefreshTokens(targetUserId);
+            await admin.auth().deleteUser(targetUserId);
         }
         catch (e) {
-            console.warn("Could not revoke tokens:", e);
+            console.warn("Could not delete from auth:", e);
         }
+        // Hard delete from Firestore
+        await userRef.delete();
         await (0, auditLogger_1.logAuditSafe)({
             userId: context.auth.uid,
             userRole: "ADMIN",
-            action: "USER_DEACTIVATED",
+            action: "USER_DELETED",
             entityType: "USER",
             entityId: targetUserId,
-            details: { reason: reason || "Admin deactivation" },
+            details: { reason: reason || "Admin deletion" },
         });
         return {
             success: true,
-            messageAr: "تم تعطيل الحساب بنجاح.",
-            messageEn: "Account deactivated successfully.",
+            messageAr: "تم حذف الحساب بنجاح.",
+            messageEn: "Account deleted successfully.",
         };
     }
     catch (error) {
@@ -377,6 +374,28 @@ exports.importUsersBatch = (0, gen2_1.onCallGen2)(async (data, context) => {
                 deletedAt: null,
                 deletedBy: null,
             });
+            if (user.role === "SUPERVISOR" || user.role === "ADMIN") {
+                try {
+                    const createPayload = {
+                        uid: userId,
+                        password: temporaryPassword,
+                        displayName: user.userNameAr.trim(),
+                    };
+                    if (user.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email)) {
+                        createPayload.email = user.email;
+                    }
+                    await admin.auth().createUser(createPayload);
+                    await admin.auth().setCustomUserClaims(userId, {
+                        role: user.role,
+                        branchId: user.branchId || null,
+                        allowedRegionNos: allowedRegions,
+                        mustChangePassword: true,
+                    });
+                }
+                catch (e) {
+                    console.warn(`Could not create auth user for ${username}:`, e);
+                }
+            }
             existingUsernames.add(username);
             results.temporaryPasswords.push({
                 username,
@@ -415,6 +434,110 @@ exports.importUsersBatch = (0, gen2_1.onCallGen2)(async (data, context) => {
             throw error;
         }
         console.error("Import users batch error:", error);
+        throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
+    }
+});
+/**
+ * Cloud Function: updateUserProfile
+ *
+ * Allows ANY authenticated user (Admin, Supervisor, Rep) to update
+ * their own username and/or password.
+ */
+exports.updateUserProfile = (0, gen2_1.onCallGen2)(async (data, context) => {
+    if (!context.auth) {
+        throw new gen2_1.HttpsError("unauthenticated", "يجب تسجيل الدخول أولاً. | Authentication required.");
+    }
+    const userId = context.auth.uid;
+    const { newUsername, newPassword, userNameAr, userNameEn } = data || {};
+    try {
+        const userRef = db_1.db.collection("users").doc(userId);
+        const userDoc = await userRef.get();
+        if (!userDoc.exists) {
+            throw new gen2_1.HttpsError("not-found", "المستخدم غير موجود. | User not found.");
+        }
+        const userData = userDoc.data();
+        const updates = {
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        };
+        // If updating username:
+        if (newUsername && typeof newUsername === "string" && newUsername.trim()) {
+            const cleanUsername = newUsername.trim();
+            if (cleanUsername !== userData.username) {
+                // Check uniqueness across users
+                const existing = await db_1.db
+                    .collection("users")
+                    .where("username", "==", cleanUsername)
+                    .limit(1)
+                    .get();
+                if (!existing.empty && existing.docs[0].id !== userId) {
+                    throw new gen2_1.HttpsError("already-exists", "اسم المستخدم مستخدم بالفعل. | Username already taken.");
+                }
+                updates.username = cleanUsername;
+            }
+        }
+        if (userNameAr && typeof userNameAr === "string" && userNameAr.trim()) {
+            updates.userNameAr = userNameAr.trim();
+        }
+        if (userNameEn !== undefined && typeof userNameEn === "string") {
+            updates.userNameEn = userNameEn.trim();
+        }
+        // If updating password:
+        if (newPassword && typeof newPassword === "string" && newPassword.trim()) {
+            if (newPassword.length < 6) {
+                throw new gen2_1.HttpsError("invalid-argument", "كلمة المرور يجب أن تكون 6 أحرف على الأقل. | Password must be at least 6 characters.");
+            }
+            const newHash = await (0, auth_1.hashPassword)(newPassword);
+            updates.passwordHash = newHash;
+            updates.mustChangePassword = false;
+            updates.passwordChangedAt = admin.firestore.FieldValue.serverTimestamp();
+            updates.sessionVersion = (userData.sessionVersion || 0) + 1;
+            // Update Native Firebase Auth password if exists
+            try {
+                await admin.auth().updateUser(userId, { password: newPassword });
+            }
+            catch (authErr) {
+                if (authErr.code !== "auth/user-not-found") {
+                    console.warn(`Failed to update native auth password for ${userId}:`, authErr);
+                }
+            }
+        }
+        await userRef.update(updates);
+        // Update display name in native auth if userNameAr was updated
+        if (updates.userNameAr || updates.username) {
+            try {
+                await admin.auth().updateUser(userId, {
+                    displayName: updates.userNameAr || updates.username,
+                });
+            }
+            catch (_) { }
+        }
+        await (0, auditLogger_1.logAuditSafe)({
+            userId,
+            userRole: userData.role,
+            action: "PROFILE_UPDATED",
+            entityType: "USER",
+            entityId: userId,
+            details: {
+                usernameChanged: !!updates.username,
+                passwordChanged: !!updates.passwordHash,
+            },
+        });
+        return {
+            success: true,
+            messageAr: "تم تحديث الملف الشخصي بنجاح.",
+            messageEn: "Profile updated successfully.",
+            user: {
+                username: updates.username || userData.username,
+                userNameAr: updates.userNameAr || userData.userNameAr,
+                userNameEn: updates.userNameEn || userData.userNameEn,
+            },
+        };
+    }
+    catch (error) {
+        if (error instanceof gen2_1.HttpsError) {
+            throw error;
+        }
+        console.error("Update profile error:", error);
         throw new gen2_1.HttpsError("internal", "حدث خطأ في الخادم. | Internal server error.");
     }
 });

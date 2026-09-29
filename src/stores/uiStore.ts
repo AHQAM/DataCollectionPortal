@@ -8,6 +8,8 @@ import {
   getNotificationPermissionStatus,
   isNotificationSupported,
 } from "../utils/webNotification";
+import { db } from "../firebase";
+import { doc, updateDoc, writeBatch } from "firebase/firestore";
 
 const STORAGE_PREFIX = "sales_collection_hub_v1_";
 
@@ -23,6 +25,7 @@ interface UIStore {
   notifications: NotificationItem[];
   setNotifications: (notifications: NotificationItem[]) => void;
   markNotificationAsRead: (notificationId: string) => Promise<void>;
+  markAllNotificationsAsRead: (userId?: string) => Promise<void>;
 
   isPushSupported: boolean;
   pushPermission: NotificationPermission | "unsupported";
@@ -77,13 +80,51 @@ export const useUIStore = create<UIStore>((set, get) => {
     notifications: [],
     setNotifications: (notifications) => set({ notifications }),
     markNotificationAsRead: async (notificationId) => {
+      const now = new Date().toISOString();
       set((state) => ({
         notifications: state.notifications.map((n) =>
           n.notificationId === notificationId
-            ? { ...n, status: "READ", readAt: new Date().toISOString() }
+            ? { ...n, status: "READ", readAt: now }
             : n,
         ),
       }));
+      try {
+        await updateDoc(doc(db, "notifications", notificationId), {
+          status: "READ",
+          readAt: now,
+        });
+      } catch (e) {
+        console.warn("Could not sync notification read status to firestore:", e);
+      }
+    },
+    markAllNotificationsAsRead: async (userId) => {
+      const { notifications } = get();
+      const unread = notifications.filter(
+        (n) => n.status !== "READ" && (!userId || n.userId === userId),
+      );
+      if (unread.length === 0) return;
+
+      const now = new Date().toISOString();
+      set((state) => ({
+        notifications: state.notifications.map((n) =>
+          n.status !== "READ" && (!userId || n.userId === userId)
+            ? { ...n, status: "READ", readAt: now }
+            : n,
+        ),
+      }));
+
+      try {
+        const batch = writeBatch(db);
+        unread.forEach((n) => {
+          batch.update(doc(db, "notifications", n.notificationId), {
+            status: "READ",
+            readAt: now,
+          });
+        });
+        await batch.commit();
+      } catch (e) {
+        console.warn("Could not batch update notifications in firestore:", e);
+      }
     },
 
     isPushSupported: isNotificationSupported(),

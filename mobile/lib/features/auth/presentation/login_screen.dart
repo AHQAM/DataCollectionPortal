@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'auth_controller.dart';
+import '../../../core/utils/error_formatter.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -39,12 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // Show error if any
     ref.listen<AsyncValue>(authControllerProvider, (_, state) {
       if (!state.isLoading && state.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(state.error.toString()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        AppErrorFormatter.showSnackBar(context, state.error);
       }
     });
 

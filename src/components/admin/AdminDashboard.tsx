@@ -1,6 +1,7 @@
 import React from "react";
 import { useUIStore } from "../../stores/uiStore";
 import { useDataStore } from "../../stores/dataStore";
+import { useApp } from "../../context/AppContext";
 import { DashboardBanner } from "./dashboard/DashboardBanner";
 import { KpiCardsGrid } from "./dashboard/KpiCardsGrid";
 import { BranchProgress } from "./dashboard/BranchProgress";
@@ -13,7 +14,12 @@ interface Props {
 
 export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
   const { lang } = useUIStore();
-  const { requests, records, users, branches, auditLogs } = useDataStore();
+  const { requests: allRequests, records, users, branches, auditLogs } = useDataStore();
+  const { currentUser } = useApp();
+  const isAdmin = currentUser ? currentUser.role === "ADMIN" : true;
+  const isSupervisor = currentUser?.role === "SUPERVISOR";
+  
+  const requests = allRequests.filter(r => !isSupervisor || (r.targetBranches || []).includes(currentUser?.branchId || ""));
 
   // Calculations
   const activeRequests = requests.filter(
@@ -55,7 +61,7 @@ export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
 
   return (
     <div className="space-y-6">
-      <DashboardBanner lang={lang} onNavigate={onNavigate} />
+      <DashboardBanner lang={lang} onNavigate={onNavigate} role={currentUser?.role} />
 
       <KpiCardsGrid
         lang={lang}
@@ -67,14 +73,17 @@ export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
         pendingRecords={pendingRecords}
         users={users}
         lockedUsersCount={lockedUsersCount}
+        role={currentUser?.role}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <BranchProgress
-          lang={lang}
-          onNavigate={onNavigate}
-          branchStats={branchStats}
-        />
+      <div className={`grid grid-cols-1 ${isAdmin ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} gap-6`}>
+        {isAdmin && (
+          <BranchProgress
+            lang={lang}
+            onNavigate={onNavigate}
+            branchStats={branchStats}
+          />
+        )}
 
         <CurrentCampaignsList
           lang={lang}
@@ -83,11 +92,13 @@ export const AdminDashboard: React.FC<Props> = ({ onNavigate }) => {
         />
       </div>
 
-      <RecentAuditActivity
-        lang={lang}
-        onNavigate={onNavigate}
-        auditLogs={auditLogs}
-      />
+      {isAdmin && (
+        <RecentAuditActivity
+          lang={lang}
+          onNavigate={onNavigate}
+          auditLogs={auditLogs}
+        />
+      )}
     </div>
   );
 };

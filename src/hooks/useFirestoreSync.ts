@@ -63,13 +63,9 @@ export const useFirestoreSync = () => {
             where("userId", "==", currentUser.userId),
           );
 
-    const requestsQuery = isAdmin
-      ? collection(db, "requests")
-      : isSupervisor
-        ? query(
-            collection(db, "requests"),
-            where("branchId", "==", currentUser.branchId),
-          )
+    const requestsQuery =
+      isAdmin || isSupervisor
+        ? collection(db, "requests")
         : query(
             collection(db, "requests"),
             where("assignedUserId", "==", currentUser.userId),

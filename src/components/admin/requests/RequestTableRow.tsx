@@ -64,9 +64,30 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
         <div className="font-extrabold text-slate-900">
           {currentLang === "ar" ? req.titleAr : req.titleEn || req.titleAr}
         </div>
-        <div className="text-[11px] text-purple-700 font-mono font-bold mt-0.5">
-          {req.requestCode} • {fieldsCount}{" "}
-          {t("requests.dynamicFieldsCount", { lng: currentLang })}
+        <div className="text-[11px] text-purple-700 font-mono font-bold mt-1 flex items-center gap-1.5 flex-wrap">
+          <span>{req.requestCode}</span>
+          <span>•</span>
+          <span>
+            {fieldsCount} {t("requests.dynamicFieldsCount", { lng: currentLang })}
+          </span>
+          {req.creatorName && (
+            <>
+              <span>•</span>
+              <span
+                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                  req.creatorRole === "SUPERVISOR"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-purple-100 text-purple-900"
+                }`}
+              >
+                <span>{currentLang === "ar" ? "المنشئ:" : "By:"}</span>
+                <span>{req.creatorName}</span>
+                {req.creatorBranchNameAr && (
+                  <span className="opacity-80">({req.creatorBranchNameAr})</span>
+                )}
+              </span>
+            </>
+          )}
         </div>
       </td>
 

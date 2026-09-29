@@ -18,7 +18,7 @@ export const AdminUsers: React.FC = () => {
     unlockUser,
     releaseUserDevice,
     createUser,
-    deactivateUser,
+    deleteUser,
   } = useApp();
 
   const { t, i18n } = useTranslation();
@@ -55,11 +55,20 @@ export const AdminUsers: React.FC = () => {
     if (roleFilter !== "ALL" && u.role !== roleFilter) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchNameAr = u.userNameAr.toLowerCase().includes(q);
+      const matchNameAr = (u.userNameAr || "").toLowerCase().includes(q);
       const matchNameEn = (u.userNameEn || "").toLowerCase().includes(q);
-      const matchReg = u.regionNo.includes(q);
+      const matchReg = (u.regionNo || "").toLowerCase().includes(q);
       const matchRepNo = (u.userNo || "").toLowerCase().includes(q);
-      if (!matchNameAr && !matchNameEn && !matchReg && !matchRepNo)
+      const matchUsername = (u.username || "").toLowerCase().includes(q);
+      const matchEmail = (u.email || "").toLowerCase().includes(q);
+      if (
+        !matchNameAr &&
+        !matchNameEn &&
+        !matchReg &&
+        !matchRepNo &&
+        !matchUsername &&
+        !matchEmail
+      )
         return false;
     }
     return true;
@@ -191,13 +200,13 @@ export const AdminUsers: React.FC = () => {
                         t("users.deviceUnlinkedSuccess", { lng: currentLang }),
                       );
                     }}
-                    onDeactivateUser={(id) => {
-                      if (window.confirm("Are you sure you want to delete/deactivate this user?")) {
-                        void deactivateUser(id).then((result: { success: boolean }) => {
+                    onDeleteUser={(id) => {
+                      if (window.confirm("Are you sure you want to delete this user?")) {
+                        void deleteUser(id).then((result: { success: boolean }) => {
                           showToast(
                             result.success
-                              ? t("users.accountDeactivatedSuccess", { lng: currentLang }) || "User deactivated successfully"
-                              : "Failed to deactivate user"
+                              ? t("users.accountDeletedSuccess", { lng: currentLang }) || "User deleted successfully"
+                              : "Failed to delete user"
                           );
                         });
                       }

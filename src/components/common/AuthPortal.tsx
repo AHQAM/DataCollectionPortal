@@ -95,13 +95,16 @@ export const AuthPortal: React.FC = () => {
             )}
 
             <div>
-              <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
+              <label htmlFor="portal-identifier" className="block text-xs font-extrabold text-slate-700 mb-1.5">
                 {t("auth.email")}
               </label>
               <div className="relative">
                 <UserIcon className="w-4 h-4 text-slate-400 absolute top-3.5 right-3" />
                 <input
-                  type="email"
+                  id="portal-identifier"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -112,13 +115,16 @@ export const AuthPortal: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-extrabold text-slate-700 mb-1.5">
+              <label htmlFor="portal-password" className="block text-xs font-extrabold text-slate-700 mb-1.5">
                 {t("auth.password")}
               </label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute top-3.5 right-3" />
                 <input
+                  id="portal-password"
+                  name="password"
                   type="password"
+                  autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -149,7 +155,6 @@ export const AuthPortal: React.FC = () => {
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>{t("auth.portalEncrypted")}</span>
           </span>
-          <span className="font-mono text-[10px] text-slate-400">v2.4.0</span>
         </div>
       </div>
     </div>

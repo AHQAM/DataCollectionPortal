@@ -11,10 +11,13 @@ import { ReportDataTable } from "./reports/ReportDataTable";
 
 export const AdminReports: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { lang, requests, records, branches, recordResponses, fields } =
+  const { lang, requests: allRequests, records, branches, recordResponses, fields, currentUser } =
     useApp();
   const currentLang =
     (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
+
+  const isSupervisor = currentUser?.role === "SUPERVISOR";
+  const requests = allRequests.filter(r => !isSupervisor || (r.targetBranches || []).includes(currentUser?.branchId || ""));
 
   const [selectedReqId, setSelectedReqId] = useState<string>(
     requests.length > 0 ? requests[0].requestId : "",
@@ -47,11 +50,11 @@ export const AdminReports: React.FC = () => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchCustomer =
-        r.targetName?.toLowerCase().includes(q) ||
-        r.targetId?.toLowerCase().includes(q);
+        (r.targetName || "").toLowerCase().includes(q) ||
+        (r.targetId || "").toLowerCase().includes(q);
       const matchRep =
-        r.userName?.toLowerCase().includes(q) ||
-        r.assignedRegionNo?.toLowerCase().includes(q);
+        (r.userName || "").toLowerCase().includes(q) ||
+        (r.assignedRegionNo || "").toLowerCase().includes(q);
       if (!matchCustomer && !matchRep) return false;
     }
     return true;

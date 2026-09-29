@@ -123,34 +123,47 @@ exports.deleteBranch = (0, gen2_1.onCallGen2)(async (data, context) => {
         throw new gen2_1.HttpsError("invalid-argument", "Branch ID required.");
     }
     const batch = db().batch();
-    // 1. Soft delete associated regions
+    // 1. Hard delete associated regions
     const regionsSnap = await db()
         .collection("regions")
         .where("branchId", "==", branchId)
         .get();
     regionsSnap.docs.forEach((doc) => {
-        batch.update(doc.ref, {
-            isActive: false,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+        batch.delete(doc.ref);
     });
-    // 2. Soft delete associated users
+    // 2. Hard delete associated users
     const usersSnap = await db()
         .collection("users")
         .where("branchId", "==", branchId)
         .get();
-    usersSnap.docs.forEach((doc) => {
-        batch.update(doc.ref, {
-            isActive: false,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-    });
-    // Soft delete branch
+    for (const doc of usersSnap.docs) {
+        try {
+            await admin.auth().deleteUser(doc.id);
+        }
+        catch (e) {
+            console.error("Failed to delete auth user:", doc.id, e);
+        }
+        batch.delete(doc.ref);
+    }
+    // 3. Hard delete associated assignments
+    const regionNos = regionsSnap.docs.map(doc => doc.id);
+    if (regionNos.length > 0) {
+        // Firestore 'in' query supports up to 30 items. 
+        // We process in chunks of 30.
+        for (let i = 0; i < regionNos.length; i += 30) {
+            const chunk = regionNos.slice(i, i + 30);
+            const asgSnap = await db()
+                .collection("assignments")
+                .where("regionNo", "in", chunk)
+                .get();
+            asgSnap.docs.forEach((doc) => {
+                batch.delete(doc.ref);
+            });
+        }
+    }
+    // Hard delete branch
     const branchRef = db().collection("branches").doc(branchId);
-    batch.update(branchRef, {
-        isActive: false,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    batch.delete(branchRef);
     await batch.commit();
     await (0, auditLogger_1.logAuditSafe)({
         userId: context.auth.uid,
@@ -244,34 +257,31 @@ exports.deleteRegion = (0, gen2_1.onCallGen2)(async (data, context) => {
         throw new gen2_1.HttpsError("invalid-argument", "Region number required.");
     }
     const batch = db().batch();
-    // Soft delete users assigned to this region
+    // Hard delete users assigned to this region
     const usersSnap = await db()
         .collection("users")
         .where("regionNo", "==", regionNo)
         .get();
-    usersSnap.docs.forEach((doc) => {
-        batch.update(doc.ref, {
-            isActive: false,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-    });
-    // Cancel assignments for this region
+    for (const doc of usersSnap.docs) {
+        try {
+            await admin.auth().deleteUser(doc.id);
+        }
+        catch (e) {
+            console.error("Failed to delete auth user:", doc.id, e);
+        }
+        batch.delete(doc.ref);
+    }
+    // Hard delete assignments for this region
     const asgSnap = await db()
         .collection("assignments")
         .where("regionNo", "==", regionNo)
         .get();
     asgSnap.docs.forEach((doc) => {
-        batch.update(doc.ref, {
-            status: "Cancelled",
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+        batch.delete(doc.ref);
     });
-    // Soft delete region
+    // Hard delete region
     const regionRef = db().collection("regions").doc(regionNo);
-    batch.update(regionRef, {
-        isActive: false,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    batch.delete(regionRef);
     await batch.commit();
     await (0, auditLogger_1.logAuditSafe)({
         userId: context.auth.uid,

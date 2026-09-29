@@ -105,6 +105,20 @@ export const useUserOps = () => {
       }
     },
 
+    deleteUser: async (userId: string) => {
+      try {
+        const res = await userApi.deleteUser(userId);
+        if (res?.success === false) {
+          throw new Error("Failed to delete user");
+        }
+        logAudit("USER_DELETED_CF", "User", userId, {});
+        return { success: true };
+      } catch (err: any) {
+        console.error("userApi delete error:", err);
+        return { success: false, error: err };
+      }
+    },
+
     deactivateUser: async (userId: string) => {
       try {
         const res = await userApi.deactivateUser(userId);

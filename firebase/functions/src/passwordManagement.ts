@@ -25,10 +25,10 @@ export const changePassword = onCallGen2(async (data, context) => {
 
   const { currentPassword, newPassword } = data;
 
-  if (!currentPassword || !newPassword) {
+  if (!newPassword) {
     throw new HttpsError(
       "invalid-argument",
-      "كلمة المرور الحالية والجديدة مطلوبة. | Current and new password are required.",
+      "كلمة المرور الجديدة مطلوبة. | New password is required.",
     );
   }
 
@@ -60,26 +60,36 @@ export const changePassword = onCallGen2(async (data, context) => {
     }
 
     const userData = userDoc.data()!;
+    const isForcedChange = userData.mustChangePassword === true;
 
-    // Verify current password
-    const isCurrentValid = await verifyPassword(
-      currentPassword,
-      userData.passwordHash,
-    );
+    // Verify current password only if NOT a forced first-login change
+    if (!isForcedChange) {
+      if (!currentPassword) {
+        throw new HttpsError(
+          "invalid-argument",
+          "كلمة المرور الحالية مطلوبة. | Current password is required.",
+        );
+      }
 
-    if (!isCurrentValid) {
-      await logAuditSafe({
-        userId,
-        userRole: userData.role,
-        action: "PASSWORD_CHANGE_FAILED_WRONG_CURRENT",
-        entityType: "AUTH",
-        entityId: userId,
-      });
-
-      throw new HttpsError(
-        "unauthenticated",
-        "كلمة المرور الحالية غير صحيحة. | Current password is incorrect.",
+      const isCurrentValid = await verifyPassword(
+        currentPassword,
+        userData.passwordHash,
       );
+
+      if (!isCurrentValid) {
+        await logAuditSafe({
+          userId,
+          userRole: userData.role,
+          action: "PASSWORD_CHANGE_FAILED_WRONG_CURRENT",
+          entityType: "AUTH",
+          entityId: userId,
+        });
+
+        throw new HttpsError(
+          "unauthenticated",
+          "كلمة المرور الحالية غير صحيحة. | Current password is incorrect.",
+        );
+      }
     }
 
     // Prevent reuse of current password

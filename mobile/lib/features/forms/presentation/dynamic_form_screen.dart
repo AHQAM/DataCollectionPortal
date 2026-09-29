@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/l10n/app_localizations.dart';
+import '../../../core/utils/error_formatter.dart';
 
 import 'form_fields_controller.dart';
 import '../domain/form_field_model.dart';
@@ -169,16 +170,9 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       if (!mounted) return;
 
       if (submitState.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(submitState.error.toString()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        AppErrorFormatter.showSnackBar(context, submitState.error);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم حفظ البيانات بنجاح ✓')),
-        );
+        AppErrorFormatter.showSuccessSnackBar(context, 'تم حفظ البيانات بنجاح ✓');
         Navigator.of(context).pop();
       }
     }
@@ -208,8 +202,15 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
                 const Icon(Icons.error_outline, size: 48, color: Colors.red),
                 const SizedBox(height: 16),
                 Text(
-                  'تعذّر تحميل حقول النموذج\n$error',
+                  AppErrorFormatter.format(error, context),
                   textAlign: TextAlign.center,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () => ref.refresh(formFieldsProvider(widget.activityId)),
+                  icon: const Icon(Icons.refresh, size: 18),
+                  label: Text(isArabic ? 'إعادة المحاولة' : 'Retry'),
                 ),
               ],
             ),

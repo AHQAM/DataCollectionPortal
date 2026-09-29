@@ -117,7 +117,7 @@ endpoints:
     labels: {}
     callableTrigger: {}
     entryPoint: updateUser
-  deactivateUser:
+  deleteUser:
     availableMemoryMb: 256
     timeoutSeconds: 60
     minInstances: null
@@ -129,7 +129,7 @@ endpoints:
     platform: gcfv2
     labels: {}
     callableTrigger: {}
-    entryPoint: deactivateUser
+    entryPoint: deleteUser
   importUsersBatch:
     availableMemoryMb: 256
     timeoutSeconds: 60
@@ -143,6 +143,19 @@ endpoints:
     labels: {}
     callableTrigger: {}
     entryPoint: importUsersBatch
+  updateUserProfile:
+    availableMemoryMb: 256
+    timeoutSeconds: 60
+    minInstances: null
+    maxInstances: null
+    ingressSettings: null
+    concurrency: null
+    serviceAccountEmail: null
+    vpc: null
+    platform: gcfv2
+    labels: {}
+    callableTrigger: {}
+    entryPoint: updateUserProfile
   releaseDevice:
     availableMemoryMb: 256
     timeoutSeconds: 60

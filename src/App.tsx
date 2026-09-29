@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { AppProvider, useApp } from "./context/AppContext";
 import { TopNavbar } from "./components/common/TopNavbar";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { useInactivityTimeout } from "./hooks/useInactivityTimeout";
 
 const AuthPortal = lazy(() =>
   import("./components/common/AuthPortal").then((m) => ({
@@ -19,6 +20,8 @@ const MainAppContent: React.FC = () => {
   const { t } = useTranslation();
   const { lang, dir, currentUser, authReady, setIsOnline, syncOfflineQueue } =
     useApp();
+
+  useInactivityTimeout();
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -86,18 +89,13 @@ const MainAppContent: React.FC = () => {
         </Suspense>
       </div>
 
-      {/* Global Brand & Security Compliance Footer */}
+      {/* Global Brand Footer */}
       <footer className="bg-white border-t border-slate-200/80 py-2.5 px-4 text-center text-[11px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
           <span className="font-semibold text-slate-700">
             {t("app.footerTitle", { lng: lang })}
           </span>
-          <span className="text-slate-400 font-mono">v2.4.0 Enterprise</span>
-        </div>
-
-        <div className="text-[10px] text-slate-400">
-          {t("app.footerCompliance", { lng: lang })}
         </div>
       </footer>
     </div>

@@ -15,11 +15,11 @@ export const AdminAuditLogs: React.FC = () => {
     if (actionFilter !== "ALL" && l.action !== actionFilter) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchUser = l.userName.toLowerCase().includes(q);
+      const matchUser = (l.userName || "").toLowerCase().includes(q);
       const matchEntity =
-        l.entityType.toLowerCase().includes(q) ||
-        l.entityId.toLowerCase().includes(q);
-      const matchAction = l.action.toLowerCase().includes(q);
+        (l.entityType || "").toLowerCase().includes(q) ||
+        (l.entityId || "").toLowerCase().includes(q);
+      const matchAction = (l.action || "").toLowerCase().includes(q);
       if (!matchUser && !matchEntity && !matchAction) return false;
     }
     return true;

@@ -13,9 +13,14 @@ const resources = {
   },
 };
 
+const savedLang =
+  (typeof window !== "undefined" &&
+    (localStorage.getItem("sales_collection_hub_v1_lang") as "ar" | "en")) ||
+  "ar";
+
 i18n.use(initReactI18next).init({
   resources,
-  lng: "ar",
+  lng: savedLang,
   fallbackLng: "ar",
   interpolation: {
     escapeValue: false, // react already safes from xss

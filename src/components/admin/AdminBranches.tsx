@@ -247,9 +247,9 @@ export const AdminBranches: React.FC = () => {
   const filteredBranches = branches.filter((b) => {
     const q = searchQuery.toLowerCase();
     return (
-      b.branchNameAr.toLowerCase().includes(q) ||
-      b.branchNameEn.toLowerCase().includes(q) ||
-      b.branchId.toLowerCase().includes(q)
+      (b.branchNameAr || "").toLowerCase().includes(q) ||
+      (b.branchNameEn || "").toLowerCase().includes(q) ||
+      (b.branchId || "").toLowerCase().includes(q)
     );
   });
 
@@ -258,9 +258,9 @@ export const AdminBranches: React.FC = () => {
       return false;
     const q = searchQuery.toLowerCase();
     return (
-      r.regionNo.includes(q) ||
-      r.regionNameAr.toLowerCase().includes(q) ||
-      r.regionNameEn.toLowerCase().includes(q)
+      (r.regionNo || "").toLowerCase().includes(q) ||
+      (r.regionNameAr || "").toLowerCase().includes(q) ||
+      (r.regionNameEn || "").toLowerCase().includes(q)
     );
   });
 

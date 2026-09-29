@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile/l10n/app_localizations.dart';
+import '../../../core/utils/error_formatter.dart';
 
 import 'requests_controller.dart';
 import 'widgets/request_records_header.dart';
@@ -30,7 +30,6 @@ class _RequestRecordsScreenState extends ConsumerState<RequestRecordsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final recordsAsync = ref.watch(requestRecordsProvider(widget.requestId));
 
@@ -176,9 +175,26 @@ class _RequestRecordsScreenState extends ConsumerState<RequestRecordsScreen> {
               },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, _) => Center(
-                child: Text(
-                  '${l10n.errorGeneric}\n$err',
-                  textAlign: TextAlign.center,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                      const SizedBox(height: 12),
+                      Text(
+                        AppErrorFormatter.format(err, context),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: () => ref.refresh(requestRecordsProvider(widget.requestId)),
+                        icon: const Icon(Icons.refresh, size: 18),
+                        label: Text(isArabic ? 'إعادة المحاولة' : 'Retry'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

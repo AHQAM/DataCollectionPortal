@@ -4,9 +4,13 @@ import { useApp } from "../../context/AppContext";
 import { Layers, Search, ArrowRightLeft, X } from "lucide-react";
 
 export const AdminAssignments: React.FC = () => {
-  const { requests, records, users, branches, reassignRecord } = useApp();
+  const { requests: allRequests, records, users, branches: allBranches, reassignRecord, currentUser } = useApp();
   const { t, i18n } = useTranslation();
   const currentLang = (i18n.language as "ar" | "en") || "ar";
+
+  const isSupervisor = currentUser?.role === "SUPERVISOR";
+  const requests = allRequests.filter(r => !isSupervisor || (r.targetBranches || []).includes(currentUser?.branchId || ""));
+  const branches = allBranches.filter(b => !isSupervisor || b.branchId === currentUser?.branchId);
 
   const [selectedReqId, setSelectedReqId] = useState<string>(
     requests.length > 0 ? requests[0].requestId : "",
@@ -19,7 +23,7 @@ export const AdminAssignments: React.FC = () => {
   const [targetRepId, setTargetRepId] = useState<string>("");
   const [reassignReason, setReassignReason] = useState<string>("");
 
-  const repUsers = users.filter((u) => u.role === "REP");
+  const repUsers = users.filter((u) => u.role === "REP" && (!isSupervisor || u.branchId === currentUser?.branchId));
 
   const activeReq = requests.find((r) => r.requestId === selectedReqId);
   const targetEntityLabel =
@@ -35,10 +39,11 @@ export const AdminAssignments: React.FC = () => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchCust =
-        r.targetName.toLowerCase().includes(q) ||
-        r.targetId.toLowerCase().includes(q);
+        (r.targetName || "").toLowerCase().includes(q) ||
+        (r.targetId || "").toLowerCase().includes(q);
       const matchRep =
-        r.userName.toLowerCase().includes(q) || r.assignedRegionNo.includes(q);
+        (r.userName || "").toLowerCase().includes(q) ||
+        (r.assignedRegionNo || "").toLowerCase().includes(q);
       if (!matchCust && !matchRep) return false;
     }
     return true;

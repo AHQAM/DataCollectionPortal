@@ -13,6 +13,7 @@ interface KpiCardsGridProps {
   pendingRecords: number;
   users: User[];
   lockedUsersCount: number;
+  role?: string;
 }
 
 export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
@@ -25,12 +26,14 @@ export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
   pendingRecords,
   users,
   lockedUsersCount,
+  role,
 }) => {
   const { t, i18n } = useTranslation();
   const currentLang = lang || (i18n.language as "ar" | "en") || "ar";
+  const isAdmin = role !== undefined ? role === "ADMIN" : true;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className={`grid grid-cols-2 ${isAdmin ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
       {/* Active Requests */}
       <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80">
         <div className="flex items-center justify-between text-slate-500 mb-2">
@@ -96,27 +99,29 @@ export const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({
       </div>
 
       {/* Security & Lockouts */}
-      <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80">
-        <div className="flex items-center justify-between text-slate-500 mb-2">
-          <span className="text-xs font-bold">
-            {t("dashboard.securityAccess", { lng: currentLang })}
-          </span>
-          <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
-            <ShieldCheck className="w-4 h-4" />
+      {isAdmin && (
+        <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-xs font-bold">
+              {t("dashboard.securityAccess", { lng: currentLang })}
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-2xl font-black text-slate-900">
+            {users.filter((u) => u.role === "REP").length}
+          </div>
+          <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+            <span>{t("dashboard.authorizedUsers", { lng: currentLang })}</span>
+            {lockedUsersCount > 0 && (
+              <span className="text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded">
+                {lockedUsersCount} {t("status.locked", { lng: currentLang })}
+              </span>
+            )}
           </div>
         </div>
-        <div className="text-2xl font-black text-slate-900">
-          {users.filter((u) => u.role === "REP").length}
-        </div>
-        <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
-          <span>{t("dashboard.authorizedUsers", { lng: currentLang })}</span>
-          {lockedUsersCount > 0 && (
-            <span className="text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded">
-              {lockedUsersCount} {t("status.locked", { lng: currentLang })}
-            </span>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 };

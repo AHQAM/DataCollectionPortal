@@ -4,22 +4,23 @@ import { useApp } from "../../context/AppContext";
 import { Archive, Search, RotateCcw, Calendar, Cloud } from "lucide-react";
 
 export const AdminArchive: React.FC = () => {
-  const { requests, records, reopenRequest } = useApp();
+  const { requests, records, reopenRequest, currentUser } = useApp();
   const { t, i18n } = useTranslation();
   const currentLang = (i18n.language as "ar" | "en") || "ar";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [exportNotice, setExportNotice] = useState<string | null>(null);
 
-  const archivedRequests = requests.filter((r) => r.status === "Archived");
+  const isSupervisor = currentUser?.role === "SUPERVISOR";
+  const archivedRequests = requests.filter((r) => r.status === "Archived" && (!isSupervisor || (r.targetBranches || []).includes(currentUser?.branchId || "")));
 
   const filtered = archivedRequests.filter((r) => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       return (
-        r.titleAr.toLowerCase().includes(q) ||
-        r.titleEn.toLowerCase().includes(q) ||
-        r.requestCode.toLowerCase().includes(q)
+        (r.titleAr || "").toLowerCase().includes(q) ||
+        (r.titleEn || "").toLowerCase().includes(q) ||
+        (r.requestCode || "").toLowerCase().includes(q)
       );
     }
     return true;

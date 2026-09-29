@@ -58,6 +58,7 @@ export const AdminRequests: React.FC<Props> = ({
   const {
     lang,
     dir,
+    currentUser,
     requests,
     fields,
     branches,
@@ -75,12 +76,28 @@ export const AdminRequests: React.FC<Props> = ({
     saveAsTemplate,
   } = useApp();
 
+  const isSupervisor = currentUser?.role === "SUPERVISOR";
+  
+  const safeBranches = branches || [];
+  const safeUsers = users || [];
+  const safeRegions = regions || [];
+
+  const allowedBranches = isSupervisor 
+    ? safeBranches.filter(b => b.branchId === currentUser?.branchId && b.isActive !== false)
+    : safeBranches.filter(b => b.isActive !== false);
+
+  const allowedUsers = isSupervisor
+    ? safeUsers.filter(u => u.branchId === currentUser?.branchId && u.isActive !== false)
+    : safeUsers.filter(u => u.isActive !== false);
+
   const { t, i18n } = useTranslation();
   const currentLang =
     (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [creatorFilter, setCreatorFilter] = useState<"ALL" | "ADMIN" | "SUPERVISOR">("ALL");
+  const [branchFilter, setBranchFilter] = useState<string>("ALL");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState<string | null>(
     null,
@@ -105,13 +122,50 @@ export const AdminRequests: React.FC<Props> = ({
   };
 
   const filteredRequests = requests.filter((r) => {
+    // 1. Supervisor scope: Requests created by supervisor OR belonging to supervisor's branch
+    if (isSupervisor) {
+      const isMine = r.createdBy === currentUser?.userId;
+      const isMyBranch = r.branchId === currentUser?.branchId;
+      const isTargeted = (r.targetBranches || []).includes(currentUser?.branchId || "");
+      if (!isMine && !isMyBranch && !isTargeted) return false;
+    }
+
+    // 2. Admin creator filter: My Requests (Admin) vs Supervisor Requests
+    if (!isSupervisor && creatorFilter !== "ALL") {
+      if (creatorFilter === "ADMIN") {
+        const isAdminCreated =
+          r.creatorRole === "ADMIN" ||
+          r.createdBy === currentUser?.userId ||
+          (!r.creatorRole && !r.creatorBranchId);
+        if (!isAdminCreated) return false;
+      } else if (creatorFilter === "SUPERVISOR") {
+        const isSupervisorCreated =
+          r.creatorRole === "SUPERVISOR" ||
+          Boolean(r.creatorBranchId && r.createdBy !== currentUser?.userId);
+        if (!isSupervisorCreated) return false;
+      }
+    }
+
+    // 3. Admin branch filter
+    if (!isSupervisor && branchFilter !== "ALL") {
+      const matchesBranch =
+        r.branchId === branchFilter ||
+        r.creatorBranchId === branchFilter ||
+        (r.targetBranches || []).includes(branchFilter);
+      if (!matchesBranch) return false;
+    }
+
+    // 4. Status filter
     if (statusFilter !== "ALL" && r.status !== statusFilter) return false;
+
+    // 5. Search query (now supports searching by title, code, or creator name)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchAr = r.titleAr.toLowerCase().includes(q);
-      const matchEn = r.titleEn.toLowerCase().includes(q);
-      const matchCode = r.requestCode.toLowerCase().includes(q);
-      if (!matchAr && !matchEn && !matchCode) return false;
+      const matchAr = (r.titleAr || "").toLowerCase().includes(q);
+      const matchEn = (r.titleEn || "").toLowerCase().includes(q);
+      const matchCode = (r.requestCode || "").toLowerCase().includes(q);
+      const matchCreator = (r.creatorName || "").toLowerCase().includes(q);
+      if (!matchAr && !matchEn && !matchCode && !matchCreator) return false;
     }
     return true;
   });
@@ -146,10 +200,15 @@ export const AdminRequests: React.FC<Props> = ({
           targetEntityLabelEn: data.targetEntityLabelEn,
           dueAt: new Date(data.dueAt).toISOString(),
           dueDate: data.dueAt,
-          targetBranches: data.targetBranches,
+          branchId: isSupervisor ? (currentUser?.branchId || "") : (data.targetBranches?.[0] || ""),
+          targetBranches: isSupervisor ? [currentUser?.branchId || ""] : data.targetBranches,
           targetRegions: data.targetRegions,
           allowEditAfterSubmit: data.allowEditAfterSubmit,
           requireSupervisorApproval: data.requireSupervisorApproval,
+          creatorName: currentUser?.userNameAr || currentUser?.username || "",
+          creatorRole: currentUser?.role || "ADMIN",
+          creatorBranchId: currentUser?.branchId || "",
+          creatorBranchNameAr: currentUser?.branchNameAr || "",
         },
         [],
       );
@@ -169,6 +228,9 @@ export const AdminRequests: React.FC<Props> = ({
     updates: Partial<RequestItem>,
   ) => {
     try {
+      if (isSupervisor && updates.targetBranches) {
+        updates.targetBranches = [currentUser?.branchId || ""];
+      }
       await updateRequest(requestId, updates);
       setEditingRequest(null);
     } catch (err) {
@@ -308,6 +370,12 @@ export const AdminRequests: React.FC<Props> = ({
         setSearchQuery={setSearchQuery}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
+        creatorFilter={creatorFilter}
+        setCreatorFilter={setCreatorFilter}
+        branchFilter={branchFilter}
+        setBranchFilter={setBranchFilter}
+        branches={branches}
+        isAdmin={!isSupervisor}
         lang={lang}
         onAddRequest={() => setShowCreateModal(true)}
       />
@@ -347,8 +415,8 @@ export const AdminRequests: React.FC<Props> = ({
       <CreateRequestModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        branches={branches.filter(b => b.isActive !== false)}
-        regions={regions.filter(r => r.isActive !== false)}
+        branches={allowedBranches}
+        regions={safeRegions.filter((r) => r.isActive !== false)}
         lang={lang}
         defaultCode={`REQ-${Math.floor(100 + Math.random() * 900)}`}
         onSubmit={handleCreateSubmit}
@@ -358,8 +426,8 @@ export const AdminRequests: React.FC<Props> = ({
       <EditRequestModal
         request={editingRequest}
         onClose={() => setEditingRequest(null)}
-        branches={branches.filter(b => b.isActive !== false)}
-        regions={regions.filter(r => r.isActive !== false)}
+        branches={allowedBranches}
+        regions={safeRegions.filter((r) => r.isActive !== false)}
         lang={lang}
         onSubmit={handleEditSubmit}
       />
@@ -369,8 +437,8 @@ export const AdminRequests: React.FC<Props> = ({
         request={viewingAssignmentsRequest}
         onClose={() => setViewingAssignmentsRequest(null)}
         assignments={assignments}
-        users={users.filter((u) => u.isActive !== false)}
-        branches={branches.filter(b => b.isActive !== false)}
+        users={allowedUsers}
+        branches={allowedBranches}
         lang={lang}
         onOpenImportWizard={onOpenImportWizard}
       />

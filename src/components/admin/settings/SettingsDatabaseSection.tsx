@@ -15,15 +15,10 @@ interface SettingsDatabaseSectionProps {
   requestsLength: number;
   branchesLength: number;
   regionsLength: number;
-  setWipeBranchesAlso: (v: boolean) => void;
-  setShowWipeModal: (v: boolean) => void;
   handleExportBackup: () => void;
   showResetConfirm: boolean;
   setShowResetConfirm: (v: boolean) => void;
   resetAllData: () => void;
-  wipeBranchesAlso: boolean;
-  showWipeModal: boolean;
-  handleConfirmWipe: () => void;
 }
 
 export const SettingsDatabaseSection: React.FC<
@@ -34,15 +29,10 @@ export const SettingsDatabaseSection: React.FC<
   requestsLength,
   branchesLength,
   regionsLength,
-  setWipeBranchesAlso,
-  setShowWipeModal,
   handleExportBackup,
   showResetConfirm,
   setShowResetConfirm,
   resetAllData,
-  wipeBranchesAlso,
-  showWipeModal,
-  handleConfirmWipe,
 }) => {
   const { t, i18n } = useTranslation();
   const currentLang =
@@ -163,78 +153,6 @@ export const SettingsDatabaseSection: React.FC<
         </div>
       )}
 
-      {showWipeModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-rose-200 animate-in zoom-in-95 duration-150">
-            <div className="text-center space-y-3">
-              <div className="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center mx-auto text-rose-600">
-                <AlertOctagon className="w-8 h-8" />
-              </div>
-              <h3 className="text-lg font-black text-slate-900">
-                {t("settings.database.wipeModalTitle", { lng: currentLang })}
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed max-w-md mx-auto">
-                {t("settings.database.wipeModalDesc", { lng: currentLang })}
-              </p>
-            </div>
-
-            <div className="my-4 p-4 bg-rose-50/60 rounded-2xl border border-rose-200/80 space-y-2 text-xs">
-              <div className="font-extrabold text-rose-950 flex items-center gap-2">
-                <Check className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>
-                  {t("settings.database.wipeCheckRecords", {
-                    lng: currentLang,
-                  })}
-                </span>
-              </div>
-              <div className="font-extrabold text-rose-950 flex items-center gap-2">
-                <Check className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>
-                  {t("settings.database.wipeCheckAdmin", { lng: currentLang })}
-                </span>
-              </div>
-
-              <div className="pt-2 border-t border-rose-200 mt-2">
-                <label className="flex items-start gap-2.5 cursor-pointer text-slate-800 font-bold select-none">
-                  <input
-                    type="checkbox"
-                    checked={wipeBranchesAlso}
-                    onChange={(e) => setWipeBranchesAlso(e.target.checked)}
-                    className="mt-0.5 rounded text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer"
-                  />
-                  <span>
-                    {t("settings.database.wipeBranchesCheckbox", {
-                      lng: currentLang,
-                    })}
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setShowWipeModal(false)}
-                className="px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer"
-              >
-                {t("settings.database.cancelWipe", { lng: currentLang })}
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmWipe}
-                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-md transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>
-                  {t("settings.database.confirmWipeBtn", {
-                    lng: currentLang,
-                  })}
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };

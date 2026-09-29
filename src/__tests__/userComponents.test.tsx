@@ -93,6 +93,7 @@ describe("User Presentation Components", () => {
               onResetPassword={onReset}
               onUnlockUser={onUnlock}
               onReleaseDevice={onRelease}
+              onDeactivateUser={vi.fn()}
             />
           </tbody>
         </table>,
@@ -129,6 +130,7 @@ describe("User Presentation Components", () => {
               onResetPassword={vi.fn()}
               onUnlockUser={onUnlock}
               onReleaseDevice={vi.fn()}
+              onDeactivateUser={vi.fn()}
             />
           </tbody>
         </table>,

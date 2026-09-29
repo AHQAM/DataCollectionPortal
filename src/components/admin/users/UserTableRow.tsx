@@ -9,7 +9,7 @@ interface UserTableRowProps {
   onResetPassword: (userId: string) => void;
   onUnlockUser: (userId: string) => void;
   onReleaseDevice: (userId: string) => void;
-  onDeactivateUser: (userId: string) => void;
+  onDeleteUser: (userId: string) => void;
 }
 
 export const UserTableRow: React.FC<UserTableRowProps> = ({
@@ -18,14 +18,17 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
   onResetPassword,
   onUnlockUser,
   onReleaseDevice,
-  onDeactivateUser,
+  onDeleteUser,
 }) => {
   const { t, i18n } = useTranslation();
   const currentLang =
     (lang as "ar" | "en") || (i18n.language as "ar" | "en") || "ar";
 
   const isLocked = user.lockedUntil && new Date(user.lockedUntil) > new Date();
-  const isDeviceBound = !!user.boundDeviceId;
+  const isDeviceBound =
+    user.deviceBindingStatus === "BOUND" ||
+    !!user.boundDeviceId ||
+    !!user.boundDeviceIdHash;
 
   return (
     <tr className="hover:bg-slate-50/80 transition-all">
@@ -65,7 +68,7 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
               <span>{user.boundDeviceLabel || "Google Pixel"}</span>
             </span>
             <span className="block text-[9px] text-slate-400 font-mono truncate max-w-[120px] mt-0.5">
-              {user.boundDeviceId}
+              {user.boundDeviceId || user.boundDeviceIdHash?.slice(0, 16) || "Active"}
             </span>
           </div>
         ) : (
@@ -135,11 +138,11 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
             </button>
           )}
 
-          {/* Delete / Deactivate User */}
+          {/* Delete User */}
           <button
-            onClick={() => onDeactivateUser(user.userId)}
+            onClick={() => onDeleteUser(user.userId)}
             className="p-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold"
-            title={t("users.deactivateUser", { lng: currentLang }) || "Deactivate User"}
+            title={t("users.deleteUser", { lng: currentLang }) || "Delete User"}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>

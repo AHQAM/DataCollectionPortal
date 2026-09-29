@@ -8,6 +8,12 @@ import "./i18n";
 
 initMonitoring();
 
+// Handle Vite dynamic import chunk errors after new deployments
+window.addEventListener("vite:preloadError", (event) => {
+  event.preventDefault();
+  window.location.reload();
+});
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

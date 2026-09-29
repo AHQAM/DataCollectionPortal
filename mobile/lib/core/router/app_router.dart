@@ -35,11 +35,11 @@ GoRouter appRouter(Ref ref) {
         } else {
           // Logged in, no forced password change
           if (user.role == 'ADMIN' || user.role == 'SUPERVISOR') {
-            if (isLoggingIn || state.uri.path == '/change-password') {
+            if (isLoggingIn) {
               return '/admin-portal';
             }
           } else {
-            if (isLoggingIn || state.uri.path == '/change-password') {
+            if (isLoggingIn) {
               return '/requests';
             }
           }

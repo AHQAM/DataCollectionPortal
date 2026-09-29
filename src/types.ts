@@ -207,11 +207,17 @@ export interface RequestItem {
   cancelledAt?: string;
   totalRecords: number;
   totalAssignments: number;
+  branchId?: string;
   targetBranches?: string[];
   targetRegions?: string[];
   activityId?: string;
   targetEntityLabelAr?: string;
   targetEntityLabelEn?: string;
+  creatorName?: string;
+  creatorRole?: string;
+  creatorBranchId?: string;
+  creatorBranchNameAr?: string;
+  creatorBranchNameEn?: string;
 }
 
 export interface RequestTemplate {

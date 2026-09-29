@@ -79,6 +79,8 @@ const AdminSettings = React.lazy(() =>
   })),
 );
 
+import { UserProfileModal } from "../common/UserProfileModal";
+
 export const AdminLayout: React.FC = () => {
   const { t } = useTranslation();
   const { lang, dir, currentUser } = useApp();
@@ -91,69 +93,86 @@ export const AdminLayout: React.FC = () => {
     string | null
   >(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const menuItems = [
     {
       id: "dashboard",
-      label: t("nav.dashboard"),
+      label: t("nav.dashboard", { lng: lang }),
       icon: LayoutDashboard,
+      allowedRoles: ["ADMIN", "SUPERVISOR"],
     },
     {
       id: "branches",
-      label: t("nav.branches"),
+      label: t("nav.branches", { lng: lang }),
       icon: Building2,
+      allowedRoles: ["ADMIN"],
     },
     {
       id: "supervisor_matrix",
-      label: t("nav.supervisorMatrix"),
+      label: t("nav.supervisorMatrix", { lng: lang }),
       icon: ShieldCheck,
+      allowedRoles: ["ADMIN"],
     },
     {
       id: "users",
-      label: t("nav.users"),
+      label: t("nav.users", { lng: lang }),
       icon: Users,
+      allowedRoles: ["ADMIN"],
     },
     {
       id: "requests",
-      label: t("nav.requests"),
+      label: t("nav.requests", { lng: lang }),
       icon: FileText,
+      allowedRoles: ["ADMIN", "SUPERVISOR"],
     },
     {
       id: "import",
-      label: t("nav.import"),
+      label: t("nav.import", { lng: lang }),
       icon: UploadCloud,
+      allowedRoles: ["ADMIN"],
     },
     {
       id: "devices",
-      label: t("nav.devices"),
+      label: t("nav.devices", { lng: lang }),
       icon: Smartphone,
+      allowedRoles: ["ADMIN"],
     },
     {
       id: "assignments",
-      label: t("nav.assignments"),
+      label: t("nav.assignments", { lng: lang }),
       icon: Layers,
+      allowedRoles: ["ADMIN"],
     },
     {
       id: "reports",
-      label: t("nav.reports"),
+      label: t("nav.reports", { lng: lang }),
       icon: FileSpreadsheet,
+      allowedRoles: ["ADMIN", "SUPERVISOR"],
     },
     {
       id: "archive",
-      label: t("nav.archive"),
+      label: t("nav.archive", { lng: lang }),
       icon: Archive,
+      allowedRoles: ["ADMIN", "SUPERVISOR"],
     },
     {
       id: "audit",
-      label: t("nav.audit"),
+      label: t("nav.audit", { lng: lang }),
       icon: ShieldCheck,
+      allowedRoles: ["ADMIN"],
     },
     {
       id: "settings",
-      label: t("nav.settings"),
+      label: t("nav.settings", { lng: lang }),
       icon: Settings,
+      allowedRoles: ["ADMIN"],
     },
   ];
+
+  const visibleMenuItems = menuItems.filter(
+    (item) => item.allowedRoles.includes(currentUser?.role || "")
+  );
 
   const handleOpenFormBuilder = (requestId: string) => {
     setActiveBuilderRequestId(requestId);
@@ -241,7 +260,7 @@ export const AdminLayout: React.FC = () => {
               <div className="p-4 border-b border-slate-100 flex items-center justify-between">
                 <div className="text-xs font-extrabold uppercase tracking-wider text-purple-900 flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-purple-700" />
-                  <span>{t("nav.managementPortal")}</span>
+                  <span>{t("nav.managementPortal", { lng: lang })}</span>
                 </div>
                 <button
                   onClick={() => setIsSidebarOpen(false)}
@@ -255,7 +274,7 @@ export const AdminLayout: React.FC = () => {
               {/* Navigation Links */}
               <div className="p-3 overflow-y-auto max-h-[calc(100vh-140px)]">
                 <nav className="space-y-1">
-                  {menuItems.map((item) => {
+                  {visibleMenuItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = currentModule === item.id;
 
@@ -284,8 +303,8 @@ export const AdminLayout: React.FC = () => {
             </div>
 
             {/* Mobile Drawer Footer with Current User */}
-            <div className="p-3.5 border-t border-slate-200/80 bg-slate-50/70">
-              <div className="flex items-center gap-2.5">
+            <div className="p-3.5 border-t border-slate-200/80 bg-slate-50/70 flex items-center justify-between">
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
                 <div className="w-8 h-8 rounded-xl bg-purple-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
                   {currentUser?.userNameAr?.charAt(0) ||
                     currentUser?.username?.charAt(0) ||
@@ -295,15 +314,25 @@ export const AdminLayout: React.FC = () => {
                   <div className="font-extrabold text-xs text-slate-900 truncate">
                     {currentUser?.userNameAr ||
                       currentUser?.username ||
-                      t("roles.user")}
+                      t("roles.user", { lng: lang })}
                   </div>
                   <div className="text-[10px] text-purple-700 font-bold truncate">
                     {currentUser?.role === "ADMIN"
-                      ? t("roles.adminFull")
-                      : t("roles.supervisor")}
+                      ? t("roles.adminFull", { lng: lang })
+                      : t("roles.supervisor", { lng: lang })}
                   </div>
                 </div>
               </div>
+              <button
+                onClick={() => {
+                  setShowProfileModal(true);
+                  setIsSidebarOpen(false);
+                }}
+                className="p-1.5 rounded-lg text-slate-500 hover:text-purple-900 hover:bg-purple-100 transition-colors cursor-pointer"
+                title={lang === "ar" ? "الملف الشخصي" : "Profile"}
+              >
+                <Settings className="w-4 h-4" />
+              </button>
             </div>
           </aside>
         </div>
@@ -313,11 +342,11 @@ export const AdminLayout: React.FC = () => {
       <aside className="hidden lg:flex w-64 shrink-0 bg-white border-e border-slate-200 sticky top-16 h-[calc(100vh-4rem)] flex-col justify-between z-20">
         <div className="p-4 overflow-y-auto">
           <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 px-3 mb-2">
-            {t("nav.managementPortal")}
+            {t("nav.managementPortal", { lng: lang })}
           </div>
 
           <nav className="space-y-1">
-            {menuItems.map((item) => {
+            {visibleMenuItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentModule === item.id;
 
@@ -344,8 +373,8 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* User Info Bar at bottom of desktop sidebar */}
-        <div className="p-3.5 border-t border-slate-200/80 bg-slate-50/50">
-          <div className="flex items-center gap-2.5">
+        <div className="p-3.5 border-t border-slate-200/80 bg-slate-50/50 flex items-center justify-between">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-8 h-8 rounded-xl bg-purple-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
               {currentUser?.userNameAr?.charAt(0) ||
                 currentUser?.username?.charAt(0) ||
@@ -355,15 +384,22 @@ export const AdminLayout: React.FC = () => {
               <div className="font-extrabold text-xs text-slate-900 truncate">
                 {currentUser?.userNameAr ||
                   currentUser?.username ||
-                  t("roles.user")}
+                  t("roles.user", { lng: lang })}
               </div>
               <div className="text-[10px] text-purple-700 font-bold truncate">
                 {currentUser?.role === "ADMIN"
-                  ? t("roles.adminFull")
-                  : t("roles.supervisor")}
+                  ? t("roles.adminFull", { lng: lang })
+                  : t("roles.supervisor", { lng: lang })}
               </div>
             </div>
           </div>
+          <button
+            onClick={() => setShowProfileModal(true)}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-purple-900 hover:bg-purple-100 transition-colors cursor-pointer"
+            title={lang === "ar" ? "تعديل الملف الشخصي والأمان" : "Edit Profile & Security"}
+          >
+            <Settings className="w-4 h-4" />
+          </button>
         </div>
       </aside>
 
@@ -376,7 +412,7 @@ export const AdminLayout: React.FC = () => {
             className="flex items-center gap-2 text-xs font-bold text-purple-900 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg border border-purple-200 transition-colors"
           >
             <Menu className="w-4 h-4 text-purple-700" />
-            <span>{t("nav.adminMenu")}</span>
+            <span>{t("nav.adminMenu", { lng: lang })}</span>
           </button>
           <span className="text-xs font-bold text-purple-900">
             {menuItems.find((m) => m.id === currentModule)?.label || ""}
@@ -386,13 +422,19 @@ export const AdminLayout: React.FC = () => {
         <React.Suspense
           fallback={
             <div className="flex items-center justify-center p-12 text-sm text-slate-500 font-bold">
-              {t("common.loading")}
+              {t("common.loading", { lng: lang })}
             </div>
           }
         >
           {renderModuleContent()}
         </React.Suspense>
       </main>
+
+      {/* User Profile Modal */}
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </div>
   );
 };
