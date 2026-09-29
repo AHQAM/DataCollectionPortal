@@ -19,64 +19,56 @@ import {
   X,
   Sliders,
 } from "lucide-react";
-const AdminDashboard = React.lazy(() =>
-  import("./AdminDashboard").then((module) => ({
-    default: module.AdminDashboard,
-  })),
+import { lazyWithRetry } from "../../utils/lazyWithRetry";
+
+const AdminDashboard = lazyWithRetry(
+  () => import("./AdminDashboard"),
+  "AdminDashboard",
 );
-const AdminRequests = React.lazy(() =>
-  import("./AdminRequests").then((module) => ({
-    default: module.AdminRequests,
-  })),
+const AdminRequests = lazyWithRetry(
+  () => import("./AdminRequests"),
+  "AdminRequests",
 );
-const AdminFormBuilder = React.lazy(() =>
-  import("./AdminFormBuilder").then((module) => ({
-    default: module.AdminFormBuilder,
-  })),
+const AdminFormBuilder = lazyWithRetry(
+  () => import("./AdminFormBuilder"),
+  "AdminFormBuilder",
 );
-const AdminImportWizard = React.lazy(() =>
-  import("./AdminImportWizard").then((module) => ({
-    default: module.AdminImportWizard,
-  })),
+const AdminImportWizard = lazyWithRetry(
+  () => import("./AdminImportWizard"),
+  "AdminImportWizard",
 );
-const AdminBranches = React.lazy(() =>
-  import("./AdminBranches").then((module) => ({
-    default: module.AdminBranches,
-  })),
+const AdminBranches = lazyWithRetry(
+  () => import("./AdminBranches"),
+  "AdminBranches",
 );
-const AdminSupervisorMatrix = React.lazy(() =>
-  import("./AdminSupervisorMatrix").then((module) => ({
-    default: module.AdminSupervisorMatrix,
-  })),
+const AdminSupervisorMatrix = lazyWithRetry(
+  () => import("./AdminSupervisorMatrix"),
+  "AdminSupervisorMatrix",
 );
-const AdminUsers = React.lazy(() =>
-  import("./AdminUsers").then((module) => ({ default: module.AdminUsers })),
+const AdminUsers = lazyWithRetry(() => import("./AdminUsers"), "AdminUsers");
+const AdminDeviceManager = lazyWithRetry(
+  () => import("./AdminDeviceManager"),
+  "AdminDeviceManager",
 );
-const AdminDeviceManager = React.lazy(() =>
-  import("./AdminDeviceManager").then((module) => ({
-    default: module.AdminDeviceManager,
-  })),
+const AdminAssignments = lazyWithRetry(
+  () => import("./AdminAssignments"),
+  "AdminAssignments",
 );
-const AdminAssignments = React.lazy(() =>
-  import("./AdminAssignments").then((module) => ({
-    default: module.AdminAssignments,
-  })),
+const AdminReports = lazyWithRetry(
+  () => import("./AdminReports"),
+  "AdminReports",
 );
-const AdminReports = React.lazy(() =>
-  import("./AdminReports").then((module) => ({ default: module.AdminReports })),
+const AdminArchive = lazyWithRetry(
+  () => import("./AdminArchive"),
+  "AdminArchive",
 );
-const AdminArchive = React.lazy(() =>
-  import("./AdminArchive").then((module) => ({ default: module.AdminArchive })),
+const AdminAuditLogs = lazyWithRetry(
+  () => import("./AdminAuditLogs"),
+  "AdminAuditLogs",
 );
-const AdminAuditLogs = React.lazy(() =>
-  import("./AdminAuditLogs").then((module) => ({
-    default: module.AdminAuditLogs,
-  })),
-);
-const AdminSettings = React.lazy(() =>
-  import("./AdminSettings").then((module) => ({
-    default: module.AdminSettings,
-  })),
+const AdminSettings = lazyWithRetry(
+  () => import("./AdminSettings"),
+  "AdminSettings",
 );
 
 import { UserProfileModal } from "../common/UserProfileModal";

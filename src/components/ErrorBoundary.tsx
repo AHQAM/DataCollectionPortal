@@ -27,10 +27,44 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
+
+    // Auto-reload once on dynamic import / stale chunk failures after new deployments
+    const errorMessage = String(error?.message || error || "");
+    const isChunkOrDeployError =
+      errorMessage.includes("Failed to fetch dynamically imported module") ||
+      errorMessage.includes("Cannot read properties of undefined") ||
+      errorMessage.includes("Loading chunk") ||
+      errorMessage.includes("not found in the dynamically loaded chunk") ||
+      errorMessage.includes("MIME type") ||
+      error?.name === "ChunkLoadError";
+
+    const reloadKey = "error_boundary_chunk_reload";
+    let hasReloaded = false;
+    try {
+      hasReloaded = !!sessionStorage.getItem(reloadKey);
+    } catch {
+      // Ignore
+    }
+
+    if (isChunkOrDeployError && !hasReloaded && typeof window !== "undefined") {
+      try {
+        sessionStorage.setItem(reloadKey, "true");
+      } catch {
+        // Ignore
+      }
+      window.location.reload();
+      return;
+    }
+
     captureException(error, { componentStack: errorInfo.componentStack });
   }
 
   private handleReload = () => {
+    try {
+      sessionStorage.removeItem("error_boundary_chunk_reload");
+    } catch {
+      // Ignore
+    }
     window.location.reload();
   };
 

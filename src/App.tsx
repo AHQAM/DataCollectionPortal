@@ -1,19 +1,18 @@
-import React, { useEffect, Suspense, lazy } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { AppProvider, useApp } from "./context/AppContext";
 import { TopNavbar } from "./components/common/TopNavbar";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { useInactivityTimeout } from "./hooks/useInactivityTimeout";
+import { lazyWithRetry } from "./utils/lazyWithRetry";
 
-const AuthPortal = lazy(() =>
-  import("./components/common/AuthPortal").then((m) => ({
-    default: m.AuthPortal,
-  })),
+const AuthPortal = lazyWithRetry(
+  () => import("./components/common/AuthPortal"),
+  "AuthPortal",
 );
-const AdminLayout = lazy(() =>
-  import("./components/admin/AdminLayout").then((m) => ({
-    default: m.AdminLayout,
-  })),
+const AdminLayout = lazyWithRetry(
+  () => import("./components/admin/AdminLayout"),
+  "AdminLayout",
 );
 
 const MainAppContent: React.FC = () => {
