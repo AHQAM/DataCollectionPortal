@@ -11,6 +11,9 @@ const mockTransaction = {
   update: jest.fn(() => {
     hasWritten = true;
   }),
+  create: jest.fn(() => {
+    hasWritten = true;
+  }),
   get: jest.fn((ref) => {
     if (hasWritten) {
       throw new Error(
@@ -107,6 +110,20 @@ describe("Response Management Cloud Functions & Concurrency", () => {
       ).rejects.toThrow(/Invalid response payload/i);
     });
 
+    it("rejects oversized response payloads before opening a transaction", async () => {
+      await expect(
+        wrappedSubmitResponse(
+          {
+            requestId: "req-1",
+            recordId: "rec-1",
+            formData: { answer: "x".repeat(256 * 1024) },
+          },
+          { auth: { uid: "rep-1", token: { role: "REP" } } },
+        ),
+      ).rejects.toThrow(/payload is too large/i);
+      expect(db.runTransaction).not.toHaveBeenCalled();
+    });
+
     it("executes atomic transaction to save response and complete record", async () => {
       hasWritten = false;
       mockTransaction.get.mockImplementation(async () => {
@@ -194,6 +211,67 @@ describe("Response Management Cloud Functions & Concurrency", () => {
         (call: any[]) => call[1] && "completedRecords" in call[1],
       );
       expect(assignmentUpdates.length).toBe(0);
+    });
+
+    it("returns success without writing when the idempotency key was already processed", async () => {
+      hasWritten = false;
+      mockTransaction.get.mockImplementation(
+        async () =>
+          ({
+            exists: true,
+            data: () => ({
+              fingerprint:
+                "97ccd79f94f3d850f0cce6a49b4c4aa60e565b50e7991e101de353d2945cc885",
+              result: {
+                success: true,
+                duplicate: true,
+                responseId: "mockDocId",
+              },
+            }),
+          }) as any,
+      );
+
+      const result = await wrappedSubmitResponse(
+        {
+          requestId: "req-1",
+          recordId: "rec-1",
+          idempotencyKey: "submission-1",
+          formData: { answer1: "Yes" },
+        },
+        { auth: { uid: "rep-1", token: { role: "REP" } } },
+      );
+
+      expect(result).toMatchObject({
+        success: true,
+        duplicate: true,
+        responseId: "mockDocId",
+      });
+      expect(mockTransaction.set).not.toHaveBeenCalled();
+      expect(mockTransaction.update).not.toHaveBeenCalled();
+    });
+
+    it("rejects reuse of an idempotency key for different data", async () => {
+      mockTransaction.get.mockResolvedValueOnce({
+        exists: true,
+        data: () => ({
+          fingerprint: "different-fingerprint",
+          result: { success: true, responseId: "mockDocId" },
+        }),
+      } as any);
+
+      await expect(
+        wrappedSubmitResponse(
+          {
+            requestId: "req-1",
+            recordId: "rec-1",
+            idempotencyKey: "submission-1",
+            formData: { answer1: "No" },
+          },
+          { auth: { uid: "rep-1", token: { role: "REP" } } },
+        ),
+      ).rejects.toThrow(/already been used for different data/i);
+      expect(mockTransaction.set).not.toHaveBeenCalled();
+      expect(mockTransaction.update).not.toHaveBeenCalled();
     });
 
     it("handles concurrent submissions safely through transaction retries", async () => {

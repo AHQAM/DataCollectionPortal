@@ -5,6 +5,20 @@ import { useDataStore } from "../stores/dataStore";
 import { logAudit } from "../utils/audit";
 import { User } from "../types";
 
+vi.mock("../firebase", () => ({
+  auth: {},
+  db: {},
+  functions: {},
+}));
+vi.mock("firebase/auth", () => ({
+  onAuthStateChanged: vi.fn(),
+}));
+vi.mock("firebase/firestore", () => ({
+  doc: vi.fn(),
+  updateDoc: vi.fn().mockResolvedValue(undefined),
+  writeBatch: vi.fn(),
+}));
+
 describe("UIStore and Client Audit Logging", () => {
   beforeEach(() => {
     localStorage.clear();

@@ -23,7 +23,7 @@ graph TD
 
     subgraph MobileApp [Flutter Mobile Client]
         Riverpod[Riverpod State]
-        HiveDB[(Hive Offline Storage)]
+        HiveDB[(Encrypted Hive Offline Storage)]
         SyncManager[Sync Manager]
     end
 
@@ -83,8 +83,10 @@ Typed wrappers around Firebase Callable Cloud Functions and Firestore queries:
 ### D. Security & App Check
 
 - **App Check**: Verifies incoming web and mobile traffic against reCAPTCHA v3 / Play Integrity tokens.
+- **Callable Session Validation**: Production-issued session version claims are checked against the active Firestore user session before callable handlers run; inactive users and revoked sessions are rejected.
 - **Role-Based Access Control (RBAC)**: Enforced via Firebase Custom Claims (`token.role === 'ADMIN' | 'SUPERVISOR' | 'REP'`).
 - **Device Binding**: Mobile representatives are bound to authorized physical devices, preventing account sharing.
+- **Mobile Offline Data**: Hive requests, records, and synchronization queues are encrypted with a key stored in the platform secure keystore/keychain. Synchronization failures are retained in a recoverable failed-action queue instead of being silently discarded. Response submissions carry a stable idempotency key derived from the queued action, so retries do not duplicate writes or assignment progress.
 - **Audit Logging**: Immutable audit logs recorded on every state-altering administrative and field action.
 
 ### E. Localization Architecture Decision

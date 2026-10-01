@@ -5,6 +5,7 @@ import {
   HttpsError as Gen2HttpsError,
 } from "firebase-functions/v2/https";
 import { verifyAppCheck } from "./appCheck";
+import { verifyActiveSession } from "./session";
 
 export const HttpsError = Gen2HttpsError;
 
@@ -75,6 +76,7 @@ export function onCallGen2<TData = any, TResp = any>(
       }
 
       verifyAppCheck(context);
+      await verifyActiveSession(context);
       return handler(callData, context);
     },
   );

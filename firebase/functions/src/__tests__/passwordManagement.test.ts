@@ -70,7 +70,7 @@ describe("Password Management Cloud Functions", () => {
           { currentPassword: "oldPassword", newPassword: "123" },
           { auth: { uid: "u1" } },
         ),
-      ).rejects.toThrow(/at least 6 characters/i);
+      ).rejects.toThrow(/at least 8 characters/i);
     });
   });
 

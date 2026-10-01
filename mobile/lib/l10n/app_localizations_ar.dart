@@ -94,4 +94,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noNotifications => 'لا توجد إشعارات جديدة';
+
+  @override
+  String get failedSubmissions => 'الإرسالات الفاشلة';
+
+  @override
+  String get noFailedSubmissions => 'لا توجد إرسالات فاشلة';
+
+  @override
+  String get retry => 'إعادة المحاولة';
+
+  @override
+  String get discard => 'حذف';
+
+  @override
+  String get failedSubmissionReason => 'السبب';
 }

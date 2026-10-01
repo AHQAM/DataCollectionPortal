@@ -136,6 +136,32 @@ export const sendBroadcastNotification = onCallGen2(async (data, context) => {
   if (!titleAr || !titleEn || !bodyAr || !bodyEn) {
     throw new HttpsError("invalid-argument", "Missing title or body.");
   }
+  if (
+    typeof targetAudience !== "undefined" &&
+    !["ALL", "REPRESENTATIVES", "SUPERVISORS"].includes(targetAudience)
+  ) {
+    throw new HttpsError("invalid-argument", "Invalid target audience.");
+  }
+  if (
+    [titleAr, titleEn, bodyAr, bodyEn].some(
+      (value) => typeof value !== "string" || value.length > 5000,
+    )
+  ) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Notification content is too long.",
+    );
+  }
+  if (payload !== undefined) {
+    if (
+      typeof payload !== "object" ||
+      payload === null ||
+      Array.isArray(payload) ||
+      Buffer.byteLength(JSON.stringify(payload), "utf8") > 32 * 1024
+    ) {
+      throw new HttpsError("invalid-argument", "Invalid notification payload.");
+    }
+  }
 
   let usersQuery: admin.firestore.Query = db
     .collection("users")

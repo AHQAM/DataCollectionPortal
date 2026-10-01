@@ -73,7 +73,12 @@ service firebase.storage {
 
       // Rep can read own files
       allow read: if isAuthenticated()
-        && (request.auth.uid == userId || isAdmin() || isSupervisor());
+        && (request.auth.uid == userId
+          || isAdmin()
+          || (isSupervisor()
+            && firestore.get(
+              /databases/datacollectionportal/documents/records/$(recordId)
+            ).data.branchId == request.auth.token.branchId));
 
       // No updates or deletes
       allow update, delete: if isAdmin();

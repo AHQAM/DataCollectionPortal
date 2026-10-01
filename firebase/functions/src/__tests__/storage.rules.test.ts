@@ -8,10 +8,7 @@ import {
 } from "@firebase/rules-unit-testing";
 import { ref, uploadBytes, deleteObject } from "firebase/storage";
 
-const describeIfStorageRules =
-  process.env.FIREBASE_STORAGE_RULES_TEST === "1" ? describe : describe.skip;
-
-describeIfStorageRules("Storage access rules", () => {
+describe("Storage access rules", () => {
   let testEnv: RulesTestEnvironment;
 
   beforeAll(async () => {

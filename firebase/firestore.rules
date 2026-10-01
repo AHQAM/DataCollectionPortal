@@ -32,6 +32,16 @@ service cloud.firestore {
       return isAdmin() || (isSupervisor() && request.auth.token.branchId == branchId);
     }
 
+    function hasRequestBranchAccess() {
+      let data = resource.data;
+      return isAdmin()
+        || (isSupervisor()
+            && (data.get('branchId', '') == request.auth.token.branchId
+              || data.get('targetBranches', []).hasAny([request.auth.token.branchId])))
+        || (isRep()
+            && data.get('branchId', '') == request.auth.token.branchId);
+    }
+
     function isValidBranch() {
       let data = request.resource.data;
       return data.keys().hasAll(['branchId', 'branchNameAr', 'branchNameEn', 'isActive', 'createdAt', 'updatedAt'])
@@ -108,9 +118,8 @@ service cloud.firestore {
       // Admin: full access
       // Supervisor: read requests within branch scope
       // Rep: read only Published/Closed/Archived requests that have assignments for this user
-      allow read: if isAdmin()
-        || isSupervisor()
-        || (isRep() && resource.data.status in ['Published', 'Closed', 'Archived']);
+      allow read: if resource.data.status in ['Published', 'Closed', 'Archived']
+        && hasRequestBranchAccess();
 
       // Only Admin/Cloud Functions can write requests
       allow create, update: if false;

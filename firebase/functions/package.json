@@ -10,7 +10,8 @@
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
     "test": "jest --config jest.config.js",
-    "test:rules": "jest --config jest.config.js --runInBand --runTestsByPath src/__tests__/firestore.rules.test.ts"
+    "test:coverage": "jest --config jest.coverage.config.js --runInBand",
+    "test:rules": "firebase emulators:exec --config ../firebase.json --project data-collection-portal-rules-test --only firestore,storage \"npx jest --config jest.rules.config.js --runInBand\""
   },
   "engines": {
     "node": "22"
