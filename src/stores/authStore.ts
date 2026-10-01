@@ -124,6 +124,54 @@ export const useAuthStore = create<AuthStore>((set, get) => {
       }
 
       try {
+        if (trimmedInput.includes("@")) {
+          const credential = await signInWithEmailAndPassword(
+            auth,
+            trimmedInput,
+            passwordInput,
+          );
+          const tokenResult = await credential.user.getIdTokenResult(true);
+          const tokenRole = tokenResult.claims.role;
+
+          if (tokenRole !== "ADMIN" && tokenRole !== "SUPERVISOR") {
+            await signOut(auth);
+            return {
+              success: false,
+              messageAr: "هذه البوابة مخصصة للمديرين والمشرفين فقط.",
+              messageEn:
+                "This portal is for administrators and supervisors only.",
+            };
+          }
+
+          const userSnapshot = await getDoc(
+            doc(db, "users", credential.user.uid),
+          );
+          const userData = userSnapshot.exists()
+            ? (userSnapshot.data() as User)
+            : null;
+
+          if (
+            !userData ||
+            userData.role !== tokenRole ||
+            userData.isActive === false
+          ) {
+            await signOut(auth);
+            return {
+              success: false,
+              messageAr:
+                "تعذر التحقق من صلاحية الحساب. يرجى التواصل مع الإدارة.",
+              messageEn:
+                "Unable to verify account access. Please contact an administrator.",
+            };
+          }
+
+          get().setCurrentUser(userData);
+          return {
+            success: true,
+            mustChangePassword: Boolean(userData.mustChangePassword),
+          };
+        }
+
         const authFunction = httpsCallable(
           functions,
           "authenticateWithRegionPassword",
