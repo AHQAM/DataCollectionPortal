@@ -30,15 +30,39 @@ export const db = getFirestore(
 export const functions = getFunctions(app);
 export const storage = getStorage(app);
 
+export function resolveAppCheckProvider({
+  enterpriseSiteKey,
+  v3SiteKey,
+  preferredProvider,
+}: {
+  enterpriseSiteKey?: string;
+  v3SiteKey?: string;
+  preferredProvider?: "enterprise" | "v3";
+}) {
+  const provider =
+    preferredProvider ?? (enterpriseSiteKey ? "enterprise" : "v3");
+  const siteKey = provider === "v3" ? v3SiteKey : enterpriseSiteKey;
+
+  return siteKey ? { provider, siteKey } : null;
+}
+
 // Modularized Firebase App Check initialization
 export async function initAppCheck(appInstance = app) {
   if (typeof window === "undefined" || !firebaseConfig.apiKey) {
     return null;
   }
-  const recaptchaKey =
-    import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY ||
-    import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY;
-  if (!recaptchaKey) {
+  const enterpriseSiteKey = import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY;
+  const v3SiteKey = import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY;
+  const configuredProvider = import.meta.env.VITE_RECAPTCHA_PROVIDER;
+  const appCheckConfig = resolveAppCheckProvider({
+    enterpriseSiteKey,
+    v3SiteKey,
+    preferredProvider:
+      configuredProvider === "enterprise" || configuredProvider === "v3"
+        ? configuredProvider
+        : undefined,
+  });
+  if (!appCheckConfig) {
     return null;
   }
 
@@ -56,10 +80,10 @@ export async function initAppCheck(appInstance = app) {
       ReCaptchaV3Provider,
     } = await import("firebase/app-check");
 
-    const isV3 = import.meta.env.VITE_RECAPTCHA_PROVIDER === "v3";
-    const provider = isV3
-      ? new ReCaptchaV3Provider(recaptchaKey)
-      : new ReCaptchaEnterpriseProvider(recaptchaKey);
+    const provider =
+      appCheckConfig.provider === "v3"
+        ? new ReCaptchaV3Provider(appCheckConfig.siteKey)
+        : new ReCaptchaEnterpriseProvider(appCheckConfig.siteKey);
 
     return initializeAppCheck(appInstance, {
       provider,
