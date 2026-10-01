@@ -147,7 +147,10 @@ export const sendBroadcastNotification = onCallGen2(async (data, context) => {
       (value) => typeof value !== "string" || value.length > 5000,
     )
   ) {
-    throw new HttpsError("invalid-argument", "Notification content is too long.");
+    throw new HttpsError(
+      "invalid-argument",
+      "Notification content is too long.",
+    );
   }
   if (payload !== undefined) {
     if (

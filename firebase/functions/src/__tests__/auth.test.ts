@@ -52,9 +52,9 @@ describe("Auth Module - Password Hashing", () => {
     });
 
     it("rejects missing login fields", async () => {
-      await expect(
-        wrappedAuthenticate({}, { auth: null }),
-      ).rejects.toThrow(/Missing required fields/i);
+      await expect(wrappedAuthenticate({}, { auth: null })).rejects.toThrow(
+        /Missing required fields/i,
+      );
     });
 
     it("rejects invalid login field types", async () => {
@@ -110,7 +110,8 @@ describe("Auth Module - Password Hashing", () => {
 
   describe("Login rate limiting", () => {
     it("rejects the eleventh attempt in a ten-minute window", async () => {
-      const transaction = (jest.requireMock("../config/db") as any).__transaction;
+      const transaction = (jest.requireMock("../config/db") as any)
+        .__transaction;
       transaction.get.mockResolvedValue({
         exists: true,
         data: () => ({ attempts: 10, windowStartedAt: Date.now() }),

@@ -71,29 +71,16 @@ describe("Firestore access rules", () => {
       role: "SUPERVISOR",
       branchId: "branch-1",
     });
-    const otherBranchSupervisor = testEnv.authenticatedContext(
-      "supervisor-2",
-      {
-        role: "SUPERVISOR",
-        branchId: "branch-2",
-      },
-    );
+    const otherBranchSupervisor = testEnv.authenticatedContext("supervisor-2", {
+      role: "SUPERVISOR",
+      branchId: "branch-2",
+    });
 
     await assertSucceeds(
-      getDoc(
-        doc(
-          sameBranchSupervisor.firestore(),
-          "requests/REQ-BRANCH-1",
-        ),
-      ),
+      getDoc(doc(sameBranchSupervisor.firestore(), "requests/REQ-BRANCH-1")),
     );
     await assertFails(
-      getDoc(
-        doc(
-          otherBranchSupervisor.firestore(),
-          "requests/REQ-BRANCH-1",
-        ),
-      ),
+      getDoc(doc(otherBranchSupervisor.firestore(), "requests/REQ-BRANCH-1")),
     );
   });
 

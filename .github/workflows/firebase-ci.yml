@@ -23,6 +23,9 @@ jobs:
       - name: Install dependencies
         run: cd firebase/functions && npm ci
 
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools@latest
+
       - name: Dependency Security Audit
         run: cd firebase/functions && npm audit --audit-level=critical
 

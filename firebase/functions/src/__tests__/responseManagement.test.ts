@@ -215,18 +215,21 @@ describe("Response Management Cloud Functions & Concurrency", () => {
 
     it("returns success without writing when the idempotency key was already processed", async () => {
       hasWritten = false;
-      mockTransaction.get.mockImplementation(async () => ({
-        exists: true,
-        data: () => ({
-          fingerprint:
-            "97ccd79f94f3d850f0cce6a49b4c4aa60e565b50e7991e101de353d2945cc885",
-          result: {
-            success: true,
-            duplicate: true,
-            responseId: "mockDocId",
-          },
-        }),
-      } as any));
+      mockTransaction.get.mockImplementation(
+        async () =>
+          ({
+            exists: true,
+            data: () => ({
+              fingerprint:
+                "97ccd79f94f3d850f0cce6a49b4c4aa60e565b50e7991e101de353d2945cc885",
+              result: {
+                success: true,
+                duplicate: true,
+                responseId: "mockDocId",
+              },
+            }),
+          }) as any,
+      );
 
       const result = await wrappedSubmitResponse(
         {

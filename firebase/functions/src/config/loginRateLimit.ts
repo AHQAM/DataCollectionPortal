@@ -15,7 +15,9 @@ export async function assertLoginAllowed(
   identifier: string,
   deviceId: string,
 ): Promise<void> {
-  const ref = db.collection("loginRateLimits").doc(rateLimitId(identifier, deviceId));
+  const ref = db
+    .collection("loginRateLimits")
+    .doc(rateLimitId(identifier, deviceId));
   const now = Date.now();
 
   await db.runTransaction(async (transaction) => {
@@ -50,6 +52,8 @@ export async function clearLoginRateLimit(
   identifier: string,
   deviceId: string,
 ): Promise<void> {
-  const ref = db.collection("loginRateLimits").doc(rateLimitId(identifier, deviceId));
+  const ref = db
+    .collection("loginRateLimits")
+    .doc(rateLimitId(identifier, deviceId));
   await ref.delete();
 }

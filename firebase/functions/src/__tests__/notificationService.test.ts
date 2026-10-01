@@ -102,14 +102,10 @@ describe("Notification Service Cloud Functions", () => {
         get,
       }));
 
-      await sendNotificationInternal(
-        "user-1",
-        "عنوان",
-        "Title",
-        "نص",
-        "Body",
-        { requestId: 42, empty: null },
-      );
+      await sendNotificationInternal("user-1", "عنوان", "Title", "نص", "Body", {
+        requestId: 42,
+        empty: null,
+      });
 
       expect(set).toHaveBeenCalledWith(
         expect.objectContaining({

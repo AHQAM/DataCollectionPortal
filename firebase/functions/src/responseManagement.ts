@@ -71,7 +71,9 @@ export const submitResponse = onCallGen2(async (data, context) => {
   ) {
     throw new HttpsError("invalid-argument", "Invalid response payload.");
   }
-  if (Buffer.byteLength(JSON.stringify(formData), "utf8") > MAX_FORM_DATA_BYTES) {
+  if (
+    Buffer.byteLength(JSON.stringify(formData), "utf8") > MAX_FORM_DATA_BYTES
+  ) {
     throw new HttpsError("invalid-argument", "Response payload is too large.");
   }
   if (
