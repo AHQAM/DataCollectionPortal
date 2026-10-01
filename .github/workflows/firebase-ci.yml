@@ -27,7 +27,10 @@ jobs:
         run: cd firebase/functions && npm audit --audit-level=critical
 
       - name: Run tests
-        run: cd firebase/functions && npm run test
+        run: cd firebase/functions && npm run test:coverage
+
+      - name: Run Firestore and Storage rules tests
+        run: cd firebase/functions && npm run test:rules
 
       - name: Build
         run: cd firebase/functions && npm run build

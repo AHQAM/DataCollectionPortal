@@ -3,6 +3,10 @@ import { onCallGen2, HttpsError } from "./config/gen2";
 import { db } from "./config/db";
 import * as bcrypt from "bcrypt";
 import { logAuditSafe } from "./auditLogger";
+import {
+  assertLoginAllowed,
+  clearLoginRateLimit,
+} from "./config/loginRateLimit";
 
 const BCRYPT_SALT_ROUNDS = 12;
 const MAX_FAILED_ATTEMPTS = 5;
@@ -37,8 +41,19 @@ export const authenticateWithRegionPassword = onCallGen2(
       throw new HttpsError("invalid-argument", "Missing required fields.");
     }
 
-    if (typeof regionNo !== "string" || typeof password !== "string") {
+    if (
+      typeof regionNo !== "string" ||
+      typeof password !== "string" ||
+      typeof installationDeviceId !== "string"
+    ) {
       throw new HttpsError("invalid-argument", "Invalid input types.");
+    }
+    if (
+      regionNo.trim().length === 0 ||
+      regionNo.length > 128 ||
+      installationDeviceId.length > 256
+    ) {
+      throw new HttpsError("invalid-argument", "Invalid login fields.");
     }
 
     // Basic rate limiting: reject very rapid requests
@@ -54,6 +69,7 @@ export const authenticateWithRegionPassword = onCallGen2(
       // 1. Find user by username, email, regionNo, userNo, etc.
       const rawInput = String(regionNo).trim();
       const inputLower = rawInput.toLowerCase();
+      await assertLoginAllowed(rawInput, installationDeviceId);
       const usersRef = db.collection("users");
 
       let userDoc: FirebaseFirestore.DocumentSnapshot | null = null;
@@ -125,66 +141,6 @@ export const authenticateWithRegionPassword = onCallGen2(
         if (!snapshot.empty) userDoc = snapshot.docs[0];
       }
 
-      // 1h. If input is an admin/sales credential, check ADMIN users
-      if (
-        !userDoc &&
-        (inputLower.includes("admin") || inputLower.includes("sales"))
-      ) {
-        const adminSnap = await usersRef
-          .where("role", "==", "ADMIN")
-          .limit(5)
-          .get();
-        if (!adminSnap.empty) {
-          const matchingAdmin = adminSnap.docs.find((d) => {
-            const data = d.data();
-            const u = String(data.username || "").toLowerCase();
-            const em = String(data.email || "").toLowerCase();
-            return (
-              u === inputLower ||
-              em === inputLower ||
-              u.includes("admin") ||
-              u.includes("sales") ||
-              em.includes("admin") ||
-              em.includes("sales")
-            );
-          });
-          userDoc = matchingAdmin || adminSnap.docs[0];
-        }
-      }
-
-      // 1i. If still not found and input is admin/sales credentials, auto-provision default Admin account
-      if (
-        !userDoc &&
-        (inputLower.includes("admin") || inputLower.includes("sales"))
-      ) {
-        const newAdminId = "USER-ADMIN-SALES";
-        const newPasswordHash = await hashPassword(password);
-        const newAdminData = {
-          userId: newAdminId,
-          username: rawInput,
-          email: rawInput.includes("@") ? inputLower : "sales@alnaqeeb.com.sa",
-          regionNo: "ADMIN",
-          allowedRegionNos: ["*"],
-          userNo: "ADMIN",
-          userNameAr: "مدير النظام",
-          userNameEn: "System Administrator",
-          branchId: "MAIN",
-          role: "ADMIN",
-          passwordHash: newPasswordHash,
-          mustChangePassword: false,
-          isActive: true,
-          failedLoginCount: 0,
-          lockedUntil: null,
-          lastLoginAt: admin.firestore.FieldValue.serverTimestamp(),
-          sessionVersion: 1,
-          deviceBindingStatus: "UNBOUND",
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        };
-        await usersRef.doc(newAdminId).set(newAdminData);
-        userDoc = await usersRef.doc(newAdminId).get();
-      }
-
       if (!userDoc || !userDoc.exists) {
         // Don't reveal whether user exists — generic message
         await logAuditSafe({
@@ -195,7 +151,6 @@ export const authenticateWithRegionPassword = onCallGen2(
           entityId: String(regionNo),
           details: { regionNo, platform },
         });
-
         throw new HttpsError(
           "unauthenticated",
           "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
@@ -238,33 +193,6 @@ export const authenticateWithRegionPassword = onCallGen2(
         } catch {
           isPasswordValid = false;
         }
-      }
-
-      // Self-healing for ADMIN accounts:
-      // If entered password is the known admin password ("Sales@2026") or no hash was stored
-      if (
-        !isPasswordValid &&
-        (userData.role === "ADMIN" ||
-          inputLower.includes("sales") ||
-          inputLower.includes("admin")) &&
-        (password === "Sales@2026" || !passwordHash)
-      ) {
-        const newHash = await hashPassword(password);
-        await userDoc.ref.update({
-          passwordHash: newHash,
-          email:
-            userData.email ||
-            (rawInput.includes("@") ? inputLower : "sales@alnaqeeb.com.sa"),
-          failedLoginCount: 0,
-          lockedUntil: null,
-          isActive: true,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        isPasswordValid = true;
-        passwordHash = newHash;
-        userData.passwordHash = newHash;
-        userData.failedLoginCount = 0;
-        userData.lockedUntil = null;
       }
 
       // If valid, immediately clear any lockout and failed count
@@ -500,6 +428,7 @@ export const authenticateWithRegionPassword = onCallGen2(
       const token = await admin.auth().createCustomToken(userId, customClaims);
 
       // 11. Audit log — successful login
+      await clearLoginRateLimit(rawInput, installationDeviceId);
       await logAuditSafe({
         userId,
         userRole: userData.role,

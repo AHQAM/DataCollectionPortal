@@ -28,5 +28,10 @@
   "passwordLengthError": "Password must be at least 6 characters",
   "mustChangePasswordMsg": "You must change your password to continue",
   "notifications": "Notifications",
-  "noNotifications": "No new notifications"
+  "noNotifications": "No new notifications",
+  "failedSubmissions": "Failed submissions",
+  "noFailedSubmissions": "No failed submissions",
+  "retry": "Retry",
+  "discard": "Discard",
+  "failedSubmissionReason": "Reason"
 }

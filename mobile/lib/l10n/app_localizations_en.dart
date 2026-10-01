@@ -95,4 +95,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noNotifications => 'No new notifications';
+
+  @override
+  String get failedSubmissions => 'Failed submissions';
+
+  @override
+  String get noFailedSubmissions => 'No failed submissions';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get discard => 'Discard';
+
+  @override
+  String get failedSubmissionReason => 'Reason';
 }

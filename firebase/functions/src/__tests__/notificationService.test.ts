@@ -18,7 +18,11 @@ jest.mock("firebase-admin", () => ({
   }),
 }));
 
-import { sendBroadcastNotification } from "../notificationService";
+import {
+  sendBroadcastNotification,
+  sendNotificationInternal,
+} from "../notificationService";
+import { db } from "../config/db";
 
 describe("Notification Service Cloud Functions", () => {
   let wrappedSendBroadcast: any;
@@ -49,6 +53,70 @@ describe("Notification Service Cloud Functions", () => {
           { auth: { uid: "admin1", token: { role: "ADMIN" } } },
         ),
       ).rejects.toThrow(/Missing title or body/i);
+    });
+
+    it("rejects invalid audiences and oversized content", async () => {
+      await expect(
+        wrappedSendBroadcast(
+          {
+            targetAudience: "EVERYONE",
+            titleAr: "تنبيه",
+            titleEn: "Alert",
+            bodyAr: "نص",
+            bodyEn: "Text",
+          },
+          { auth: { uid: "admin1", token: { role: "ADMIN" } } },
+        ),
+      ).rejects.toThrow(/Invalid target audience/i);
+
+      await expect(
+        wrappedSendBroadcast(
+          {
+            titleAr: "x".repeat(5001),
+            titleEn: "Alert",
+            bodyAr: "نص",
+            bodyEn: "Text",
+          },
+          { auth: { uid: "admin1", token: { role: "ADMIN" } } },
+        ),
+      ).rejects.toThrow(/content is too long/i);
+    });
+
+    it("stores a notification and sends all valid user tokens", async () => {
+      const set = jest.fn().mockResolvedValue(undefined);
+      const get = jest.fn().mockResolvedValue({
+        exists: true,
+        data: () => ({
+          preferredLanguage: "en",
+          fcmToken: "token-1",
+          fcmTokens: ["token-1", "token-2", ""],
+        }),
+      });
+      (db.collection as jest.Mock).mockImplementation((name: string) => ({
+        doc: jest.fn().mockReturnValue({
+          id: "notification-1",
+          set,
+          get,
+          update: jest.fn(),
+        }),
+        get,
+      }));
+
+      await sendNotificationInternal(
+        "user-1",
+        "عنوان",
+        "Title",
+        "نص",
+        "Body",
+        { requestId: 42, empty: null },
+      );
+
+      expect(set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: "user-1",
+          data: { requestId: "42" },
+        }),
+      );
     });
   });
 });

@@ -13,6 +13,7 @@ export const recordApi = {
     responseId?: string;
     message?: string;
     conflict?: boolean;
+    duplicate?: boolean;
     reason?: string;
   }> => {
     try {
@@ -24,17 +25,20 @@ export const recordApi = {
         formData,
         submittedAt: clientUpdatedAt || new Date().toISOString(),
         clientUpdatedAt: clientUpdatedAt || new Date().toISOString(),
+        idempotencyKey: `${requestId}:${recordId}:${clientUpdatedAt || "now"}`,
       });
       const data = res.data as {
         success: boolean;
         responseId?: string;
         conflict?: boolean;
+        duplicate?: boolean;
         reason?: string;
       };
       return {
         success: data.success,
         responseId: data.responseId,
         conflict: data.conflict,
+        duplicate: data.duplicate,
         reason: data.reason,
       };
     } catch (err: any) {

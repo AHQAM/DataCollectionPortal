@@ -4,6 +4,9 @@ import { onCallGen2, HttpsError } from "./config/gen2";
 import { USER_ROLES } from "./roles";
 import { logAuditSafe } from "./auditLogger";
 
+const MAX_EXPORT_RECORDS = 5000;
+const MAX_EXPORT_CSV_BYTES = 5 * 1024 * 1024;
+
 export const exportReport = onCallGen2(async (data, context) => {
   if (
     !context.auth ||
@@ -20,16 +23,31 @@ export const exportReport = onCallGen2(async (data, context) => {
   const callerBranchId = context.auth.token.branchId;
   const { requestId, branchId, status } = data || {};
   if (
+    typeof requestId !== "string" ||
+    requestId.trim().length === 0 ||
+    requestId.length > 128
+  ) {
+    throw new HttpsError("invalid-argument", "Invalid requestId.");
+  }
+  if (
+    branchId !== undefined &&
+    (typeof branchId !== "string" || branchId.length > 128)
+  ) {
+    throw new HttpsError("invalid-argument", "Invalid branchId.");
+  }
+  if (
+    status !== undefined &&
+    (typeof status !== "string" || status.length > 64)
+  ) {
+    throw new HttpsError("invalid-argument", "Invalid status.");
+  }
+  if (
     callerRole === USER_ROLES.SUPERVISOR &&
     branchId &&
     branchId !== "ALL" &&
     branchId !== callerBranchId
   ) {
     throw new HttpsError("permission-denied", "Branch is outside your scope.");
-  }
-
-  if (!requestId) {
-    throw new HttpsError("invalid-argument", "Missing requestId.");
   }
 
   let recordsQuery: admin.firestore.Query = db
@@ -44,14 +62,14 @@ export const exportReport = onCallGen2(async (data, context) => {
     recordsQuery = recordsQuery.where("recordStatus", "==", status);
   }
 
-  const recordsSnap = await recordsQuery.limit(5000).get();
+  const recordsSnap = await recordsQuery.limit(MAX_EXPORT_RECORDS).get();
   const records = recordsSnap.docs.map((d) => d.data());
 
   // Fetch responses
   const responsesSnap = await db
     .collection("responses")
     .where("requestId", "==", requestId)
-    .limit(5000)
+    .limit(MAX_EXPORT_RECORDS)
     .get();
   const responsesMap: Record<string, any> = {};
   responsesSnap.docs.forEach((doc) => {
@@ -115,6 +133,12 @@ export const exportReport = onCallGen2(async (data, context) => {
   });
 
   const csvString = [allHeaders.map(escapeCsv).join(","), ...rows].join("\n");
+  if (Buffer.byteLength(csvString, "utf8") > MAX_EXPORT_CSV_BYTES) {
+    throw new HttpsError(
+      "resource-exhausted",
+      "Report exceeds the maximum export size.",
+    );
+  }
 
   // Audit
   await logAuditSafe({

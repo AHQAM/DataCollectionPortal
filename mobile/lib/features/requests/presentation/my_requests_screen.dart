@@ -52,6 +52,11 @@ class _MyRequestsScreenState extends ConsumerState<MyRequestsScreen> {
             onPressed: () => SyncStatusBottomSheet.show(context, ref, isArabic),
           ),
           IconButton(
+            icon: const Icon(Icons.error_outline),
+            tooltip: l10n.failedSubmissions,
+            onPressed: () => context.push('/failed-submissions'),
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
               ref.read(authControllerProvider.notifier).logout();

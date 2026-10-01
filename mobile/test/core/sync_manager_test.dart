@@ -30,6 +30,7 @@ void main() {
   late MockNetworkInfo mockNetworkInfo;
   late MockFirebaseFirestore mockFirestore;
   late MockBox<String> mockBox;
+  late MockBox<String> failedBox;
   late SyncManager syncManager;
 
   setUp(() {
@@ -37,8 +38,10 @@ void main() {
     mockNetworkInfo = MockNetworkInfo();
     mockFirestore = MockFirebaseFirestore();
     mockBox = MockBox<String>();
+    failedBox = MockBox<String>();
 
     when(() => mockHiveService.syncQueueBox).thenReturn(mockBox);
+    when(() => mockHiveService.failedSyncQueueBox).thenReturn(failedBox);
     when(
       () => mockNetworkInfo.onConnectivityChanged,
     ).thenAnswer((_) => Stream.value(false));
@@ -95,4 +98,32 @@ void main() {
     verify(() => mockFirestore.collection('records')).called(1);
     verify(() => mockBox.delete('test_id')).called(1);
   });
+
+  test(
+    'moves exhausted actions to the failed queue instead of deleting them',
+    () async {
+      when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+      final action = SyncAction(
+        id: 'failed_id',
+        type: 'CREATE_RECORD',
+        payload: '{"collection": "records", "data": {"key": "value"}}',
+        createdAt: DateTime.now(),
+        retryCount: SyncManager.maxRetries,
+      );
+
+      when(() => mockBox.put(any(), any())).thenAnswer((_) async => {});
+      when(() => mockBox.keys).thenReturn(['failed_id']);
+      when(
+        () => mockBox.get('failed_id'),
+      ).thenReturn(jsonEncode(action.toJson()));
+      when(() => mockBox.delete('failed_id')).thenAnswer((_) async => {});
+      when(() => failedBox.put(any(), any())).thenAnswer((_) async => {});
+
+      await syncManager.enqueueAction(action);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      verify(() => failedBox.put('failed_id', any())).called(1);
+      verify(() => mockBox.delete('failed_id')).called(1);
+    },
+  );
 }

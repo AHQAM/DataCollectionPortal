@@ -9,6 +9,7 @@ import '../../features/requests/presentation/my_requests_screen.dart';
 import '../../features/requests/presentation/request_records_screen.dart';
 import '../../features/forms/presentation/dynamic_form_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/sync/presentation/failed_submissions_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -91,6 +92,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/notifications',
         builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/failed-submissions',
+        builder: (context, state) => const FailedSubmissionsScreen(),
       ),
     ],
   );

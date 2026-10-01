@@ -5,6 +5,7 @@ import { sendNotificationInternal } from "./notificationService";
 import { USER_ROLES } from "./roles";
 const MAX_IMPORT_ROWS = 2000;
 const MAX_IMPORT_FILENAME_LENGTH = 255;
+const MAX_IMPORT_PAYLOAD_BYTES = 10 * 1024 * 1024;
 
 const checkAdminOrSupervisor = (context: CallableContextCompat) => {
   if (!context.auth) {
@@ -29,7 +30,7 @@ export const importDataPreview = onCallGen2(async (data, context) => {
 export const commitImport = onCallGen2(async (data, context) => {
   checkAdminOrSupervisor(context);
 
-  const { requestId, importedRows, mapping, fileName, lang } = data;
+  const { requestId, importedRows, mapping, fileName, lang } = data || {};
 
   if (
     typeof requestId !== "string" ||
@@ -41,6 +42,32 @@ export const commitImport = onCallGen2(async (data, context) => {
     Array.isArray(mapping)
   ) {
     throw new HttpsError("invalid-argument", "Missing required fields.");
+  }
+  if (
+    Buffer.byteLength(JSON.stringify(importedRows), "utf8") >
+    MAX_IMPORT_PAYLOAD_BYTES
+  ) {
+    throw new HttpsError("resource-exhausted", "Import payload is too large.");
+  }
+  if (
+    importedRows.some(
+      (row) => !row || typeof row !== "object" || Array.isArray(row),
+    )
+  ) {
+    throw new HttpsError("invalid-argument", "Import rows must be objects.");
+  }
+  if (
+    Object.keys(mapping).length > 200 ||
+    Object.keys(mapping).some(
+      (key) =>
+        typeof key !== "string" ||
+        key.length === 0 ||
+        key.length > 128 ||
+        typeof mapping[key] !== "string" ||
+        mapping[key].length > 128,
+    )
+  ) {
+    throw new HttpsError("invalid-argument", "Invalid import mapping.");
   }
 
   if (

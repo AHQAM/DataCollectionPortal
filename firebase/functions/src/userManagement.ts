@@ -6,6 +6,7 @@ import { randomBytes } from "crypto";
 import { logAuditSafe } from "./auditLogger";
 import { hashPassword } from "./auth";
 import { USER_ROLES } from "./roles";
+import { validatePassword } from "./config/passwordPolicy";
 
 /**
  * Cloud Function: createUser
@@ -359,6 +360,20 @@ export const importUsersBatch = onCallGen2(async (data, context) => {
       "الحد الأقصى 100 مستخدم في الدفعة الواحدة. | Maximum 100 users per batch.",
     );
   }
+  if (
+    users.some(
+      (user) =>
+        !user ||
+        typeof user !== "object" ||
+        Array.isArray(user) ||
+        Buffer.byteLength(JSON.stringify(user), "utf8") > 32 * 1024,
+    )
+  ) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Each user entry must be a valid object under 32 KB.",
+    );
+  }
 
   try {
     // Check for duplicate usernames
@@ -594,12 +609,7 @@ export const updateUserProfile = onCallGen2(async (data, context) => {
 
     // If updating password:
     if (newPassword && typeof newPassword === "string" && newPassword.trim()) {
-      if (newPassword.length < 6) {
-        throw new HttpsError(
-          "invalid-argument",
-          "كلمة المرور يجب أن تكون 6 أحرف على الأقل. | Password must be at least 6 characters.",
-        );
-      }
+      validatePassword(newPassword, "كلمة المرور | Password");
       const newHash = await hashPassword(newPassword);
       updates.passwordHash = newHash;
       updates.mustChangePassword = false;

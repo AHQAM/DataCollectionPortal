@@ -54,23 +54,24 @@ class FormFieldsRepository {
     required String regionNo,
     required Map<String, dynamic> formData,
   }) async {
-    final docId = '${requestId}_$activityId';
+    final submittedAt = DateTime.now().toIso8601String();
+    final actionId = 'submit_response_$recordId';
 
     final payload = {
       'collection': AppConstants.recordsCollection,
-      'docId': docId,
+      'docId': recordId,
       'data': {
         'requestId': requestId,
         'recordId': recordId,
         'activityId': activityId,
         'formData': formData,
         'recordStatus': 'Submitted',
-        'submittedAt': DateTime.now().toIso8601String(),
+        'submittedAt': submittedAt,
       },
     };
 
     final action = SyncAction(
-      id: docId,
+      id: actionId,
       type: 'SUBMIT_RESPONSE',
       payload: jsonEncode(payload),
       retryCount: 0,

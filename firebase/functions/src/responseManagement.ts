@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { createHash } from "crypto";
 import { onCallGen2, HttpsError } from "./config/gen2";
 import { db } from "./config/db";
 import { USER_ROLES } from "./roles";
@@ -13,8 +14,38 @@ function parseTimestampMillis(ts: any): number | null {
     const parsed = Date.parse(ts);
     return isNaN(parsed) ? null : parsed;
   }
+
   if (typeof ts === "number") return ts;
   return null;
+}
+
+function stableSerialize(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map(stableSerialize).join(",")}]`;
+  }
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value as Record<string, unknown>)
+      .sort()
+      .map(
+        (key) =>
+          `${JSON.stringify(key)}:${stableSerialize(
+            (value as Record<string, unknown>)[key],
+          )}`,
+      )
+      .join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
+const MAX_IDENTIFIER_LENGTH = 128;
+const MAX_FORM_DATA_BYTES = 256 * 1024;
+
+function isValidIdentifier(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    value.trim().length > 0 &&
+    value.length <= MAX_IDENTIFIER_LENGTH
+  );
 }
 
 export const submitResponse = onCallGen2(async (data, context) => {
@@ -29,16 +60,42 @@ export const submitResponse = onCallGen2(async (data, context) => {
     formData,
     submittedAt,
     clientUpdatedAt,
+    idempotencyKey,
   } = data || {};
   if (
-    typeof requestId !== "string" ||
-    typeof recordId !== "string" ||
+    !isValidIdentifier(requestId) ||
+    !isValidIdentifier(recordId) ||
     !formData ||
     typeof formData !== "object" ||
     Array.isArray(formData)
   ) {
     throw new HttpsError("invalid-argument", "Invalid response payload.");
   }
+  if (Buffer.byteLength(JSON.stringify(formData), "utf8") > MAX_FORM_DATA_BYTES) {
+    throw new HttpsError("invalid-argument", "Response payload is too large.");
+  }
+  if (
+    idempotencyKey !== undefined &&
+    (typeof idempotencyKey !== "string" ||
+      idempotencyKey.length < 1 ||
+      idempotencyKey.length > 200)
+  ) {
+    throw new HttpsError("invalid-argument", "Invalid idempotency key.");
+  }
+
+  const submissionIdempotencyKey =
+    idempotencyKey || `${context.auth.uid}:${requestId}:${recordId}`;
+  const idempotencyFingerprint = createHash("sha256")
+    .update(
+      stableSerialize({
+        activityId: activityId || requestId,
+        formData,
+        recordId,
+        requestId,
+        submittedBy: context.auth.uid,
+      }),
+    )
+    .digest("hex");
 
   const recordRef = db.collection("records").doc(recordId);
   const record = await recordRef.get();
@@ -108,13 +165,49 @@ export const submitResponse = onCallGen2(async (data, context) => {
   }
 
   const responseRef = db.collection("responses").doc(recordId);
+  const idempotencyRef =
+    idempotencyKey === undefined
+      ? null
+      : db
+          .collection("responseIdempotencyKeys")
+          .doc(
+            createHash("sha256")
+              .update(`${context.auth.uid}:${submissionIdempotencyKey}`)
+              .digest("hex"),
+          );
   const now = admin.firestore.FieldValue.serverTimestamp();
 
   const txResult = await db.runTransaction(async (transaction) => {
     // --- STEP 1: ALL READS MUST OCCUR BEFORE ANY WRITES ---
+    const idempotencyDoc = idempotencyRef
+      ? await transaction.get(idempotencyRef)
+      : null;
+    if (idempotencyDoc?.exists) {
+      const stored = idempotencyDoc.data()!;
+      if (stored.fingerprint !== idempotencyFingerprint) {
+        throw new HttpsError(
+          "already-exists",
+          "Idempotency key has already been used for different data.",
+        );
+      }
+      return stored.result;
+    }
+
     const recordDoc = await transaction.get(recordRef);
     const isDocNew = !recordDoc.exists;
     const currentRecData = isDocNew ? recData : recordDoc.data()!;
+
+    if (
+      idempotencyRef === null &&
+      !isDocNew &&
+      currentRecData.lastSubmissionIdempotencyKey === submissionIdempotencyKey
+    ) {
+      return {
+        success: true,
+        duplicate: true,
+        responseId: responseRef.id,
+      };
+    }
 
     let asgDoc: FirebaseFirestore.DocumentSnapshot | null = null;
     let asgRef: FirebaseFirestore.DocumentReference | null = null;
@@ -143,6 +236,12 @@ export const submitResponse = onCallGen2(async (data, context) => {
     }
 
     if (isConflict) {
+      const result = {
+        success: true,
+        conflict: true,
+        responseId: responseRef.id,
+        reason: "SERVER_NEWER_SUBMISSION",
+      };
       transaction.set(
         responseRef,
         {
@@ -159,12 +258,14 @@ export const submitResponse = onCallGen2(async (data, context) => {
         },
         { merge: true },
       );
-      return {
-        success: true,
-        conflict: true,
-        responseId: responseRef.id,
-        reason: "SERVER_NEWER_SUBMISSION",
-      };
+      if (idempotencyRef) {
+        transaction.create(idempotencyRef, {
+          fingerprint: idempotencyFingerprint,
+          result,
+          createdAt: now,
+        });
+      }
+      return result;
     }
 
     // 1. Save response data
@@ -189,6 +290,7 @@ export const submitResponse = onCallGen2(async (data, context) => {
         ...recData,
         lastSavedAt: now,
         lastSavedBy: context.auth!.uid,
+        lastSubmissionIdempotencyKey: submissionIdempotencyKey,
         updatedAt: now,
       });
     } else {
@@ -199,6 +301,7 @@ export const submitResponse = onCallGen2(async (data, context) => {
         completedAt: submittedAt || now,
         lastSavedAt: now,
         lastSavedBy: context.auth!.uid,
+        lastSubmissionIdempotencyKey: submissionIdempotencyKey,
         updatedAt: now,
       });
     }
@@ -229,7 +332,15 @@ export const submitResponse = onCallGen2(async (data, context) => {
       }
     }
 
-    return { success: true, responseId: responseRef.id };
+    const result = { success: true, responseId: responseRef.id };
+    if (idempotencyRef) {
+      transaction.create(idempotencyRef, {
+        fingerprint: idempotencyFingerprint,
+        result,
+        createdAt: now,
+      });
+    }
+    return result;
   });
 
   if (txResult?.conflict) {

@@ -17,7 +17,7 @@ jest.mock("firebase-admin", () => ({
 }));
 
 import { db } from "../config/db";
-import { publishRequest } from "../requestManagement";
+import { publishRequest, updateDraftRequest } from "../requestManagement";
 
 describe("Request Management - publishRequest", () => {
   let dbMock: any;
@@ -102,6 +102,40 @@ describe("Request Management - publishRequest", () => {
         ],
       }),
     );
+  });
+
+  it("rejects unauthenticated publish requests", async () => {
+    await expect(
+      wrappedPublishRequest({ requestId: "REQ-123" }, { auth: null }),
+    ).rejects.toThrow(/User must be authenticated/i);
+  });
+
+  it("rejects representative publish requests", async () => {
+    await expect(
+      wrappedPublishRequest(
+        { requestId: "REQ-123" },
+        { auth: { uid: "rep-1", token: { role: "REP" } } },
+      ),
+    ).rejects.toThrow(/Only admins or supervisors/i);
+  });
+
+  it("rejects publish requests without a request id", async () => {
+    await expect(
+      wrappedPublishRequest(
+        {},
+        { auth: { uid: "admin-uid", token: { role: "ADMIN" } } },
+      ),
+    ).rejects.toThrow(/requestId is required/i);
+  });
+
+  it("rejects incomplete draft updates", async () => {
+    const wrappedUpdateDraftRequest = testEnv.wrap(updateDraftRequest);
+    await expect(
+      wrappedUpdateDraftRequest(
+        { requestId: "REQ-123" },
+        { auth: { uid: "admin-uid", token: { role: "ADMIN" } } },
+      ),
+    ).rejects.toThrow(/requestId and updates are required/i);
   });
 
   it("should NOT snapshot schema if it already exists", async () => {

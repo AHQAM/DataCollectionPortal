@@ -73,5 +73,18 @@ describe("Import Wizard Cloud Functions", () => {
         ),
       ).rejects.toThrow(/Missing required fields/i);
     });
+
+    it("rejects non-object import rows", async () => {
+      await expect(
+        wrappedCommitImport(
+          {
+            requestId: "req1",
+            importedRows: ["invalid"],
+            mapping: {},
+          },
+          { auth: { uid: "admin1", token: { role: "ADMIN" } } },
+        ),
+      ).rejects.toThrow(/Import rows must be objects/i);
+    });
   });
 });

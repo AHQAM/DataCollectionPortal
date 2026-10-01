@@ -37,20 +37,64 @@ describe("Firestore access rules", () => {
         requestId: "REQ-1",
         status: "Published",
         assignedUserId: "rep-1",
+        branchId: "branch-1",
+        targetBranches: ["branch-1"],
       });
     });
 
     const rep = testEnv.authenticatedContext("rep-1", {
       role: "REP",
+      branchId: "branch-1",
       allowedRegionNos: ["101"],
     });
     const otherRep = testEnv.authenticatedContext("rep-2", {
       role: "REP",
+      branchId: "branch-2",
       allowedRegionNos: ["101"],
     });
 
     await assertSucceeds(getDoc(doc(rep.firestore(), "requests/REQ-1")));
     await assertFails(getDoc(doc(otherRep.firestore(), "requests/REQ-1")));
+  });
+
+  it("restricts supervisors to requests in their branch", async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), "requests/REQ-BRANCH-1"), {
+        requestId: "REQ-BRANCH-1",
+        status: "Published",
+        branchId: "branch-1",
+        targetBranches: ["branch-1"],
+      });
+    });
+
+    const sameBranchSupervisor = testEnv.authenticatedContext("supervisor-1", {
+      role: "SUPERVISOR",
+      branchId: "branch-1",
+    });
+    const otherBranchSupervisor = testEnv.authenticatedContext(
+      "supervisor-2",
+      {
+        role: "SUPERVISOR",
+        branchId: "branch-2",
+      },
+    );
+
+    await assertSucceeds(
+      getDoc(
+        doc(
+          sameBranchSupervisor.firestore(),
+          "requests/REQ-BRANCH-1",
+        ),
+      ),
+    );
+    await assertFails(
+      getDoc(
+        doc(
+          otherBranchSupervisor.firestore(),
+          "requests/REQ-BRANCH-1",
+        ),
+      ),
+    );
   });
 
   it("rejects direct workflow writes by administrators", async () => {

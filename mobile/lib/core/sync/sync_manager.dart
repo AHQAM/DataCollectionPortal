@@ -60,8 +60,9 @@ class SyncManager {
 
         if (action.retryCount >= maxRetries) {
           debugPrint(
-            'Action ${action.id} exceeded max retries. Removing from active queue.',
+            'Action ${action.id} exceeded max retries. Moving to failed queue.',
           );
+          await _moveToFailedQueue(action, 'Maximum retry count exceeded');
           await box.delete(key);
           continue;
         }
@@ -74,7 +75,11 @@ class SyncManager {
           final nextRetry = action.retryCount + 1;
           if (nextRetry >= maxRetries) {
             debugPrint(
-              'Action ${action.id} reached max retries ($maxRetries). Removing from active queue.',
+              'Action ${action.id} reached max retries ($maxRetries). Moving to failed queue.',
+            );
+            await _moveToFailedQueue(
+              action.copyWith(retryCount: nextRetry),
+              'Maximum retry count exceeded',
             );
             await box.delete(key);
           } else {
@@ -94,15 +99,25 @@ class SyncManager {
 
       switch (action.type) {
         case 'SUBMIT_RESPONSE':
+          final data = payload['data'];
+          if (data is! Map<String, dynamic> ||
+              data['requestId'] is! String ||
+              data['recordId'] is! String ||
+              data['formData'] is! Map<String, dynamic> ||
+              data['submittedAt'] is! String) {
+            debugPrint('Invalid SUBMIT_RESPONSE payload: ${action.id}');
+            return false;
+          }
           final callable = FirebaseFunctions.instanceFor(
             region: 'us-central1',
           ).httpsCallable('submitResponse');
           await callable.call(<String, dynamic>{
-            'requestId': payload['data']['requestId'],
-            'recordId': payload['data']['recordId'],
-            'activityId': payload['data']['activityId'],
-            'formData': payload['data']['formData'],
-            'submittedAt': payload['data']['submittedAt'],
+            'requestId': data['requestId'],
+            'recordId': data['recordId'],
+            'activityId': data['activityId'],
+            'formData': data['formData'],
+            'submittedAt': data['submittedAt'],
+            'idempotencyKey': action.id,
           });
           return true;
 
@@ -127,15 +142,17 @@ class SyncManager {
 
         default:
           debugPrint('Unknown sync action type: ${action.type}');
-          return true; // Mark as true to discard unknown actions
+          return false;
       }
     } on FirebaseFunctionsException catch (e) {
       if (e.code == 'permission-denied' ||
           e.code == 'invalid-argument' ||
           e.code == 'failed-precondition' ||
           e.code == 'not-found') {
-        debugPrint('Permanent sync failure for ${action.id}: ${e.code}');
-        return true;
+        debugPrint(
+          'Permanent sync failure for ${action.id}: ${e.code}; retaining for recovery',
+        );
+        return false;
       }
       debugPrint('Retryable sync failure ${action.id}: ${e.code}');
       return false;
@@ -143,6 +160,48 @@ class SyncManager {
       debugPrint('Failed to execute sync action ${action.id}: $e');
       return false; // Will retry
     }
+  }
+
+  Future<void> _moveToFailedQueue(SyncAction action, String reason) async {
+    final failedAction = <String, dynamic>{
+      'action': action.toJson(),
+      'reason': reason,
+      'failedAt': DateTime.now().toIso8601String(),
+    };
+    await _hiveService.failedSyncQueueBox.put(
+      action.id,
+      jsonEncode(failedAction),
+    );
+  }
+
+  List<Map<String, dynamic>> getFailedActions() {
+    return _hiveService.failedSyncQueueBox.values
+        .whereType<String>()
+        .map((value) => jsonDecode(value) as Map<String, dynamic>)
+        .toList(growable: false);
+  }
+
+  Future<void> retryFailedAction(String actionId) async {
+    final failedBox = _hiveService.failedSyncQueueBox;
+    final encoded = failedBox.get(actionId) as String?;
+    if (encoded == null) return;
+
+    final failed = jsonDecode(encoded) as Map<String, dynamic>;
+    final action = SyncAction.fromJson(
+      Map<String, dynamic>.from(failed['action'] as Map),
+    );
+    await _hiveService.syncQueueBox.put(
+      action.id,
+      jsonEncode(action.copyWith(retryCount: 0).toJson()),
+    );
+    await failedBox.delete(actionId);
+    if (await _networkInfo.isConnected) {
+      await _processQueue();
+    }
+  }
+
+  Future<void> discardFailedAction(String actionId) async {
+    await _hiveService.failedSyncQueueBox.delete(actionId);
   }
 }
 

@@ -5,6 +5,7 @@ import { onCallGen2, HttpsError } from "./config/gen2";
 import { logAuditSafe } from "./auditLogger";
 import { USER_ROLES } from "./roles";
 import { hashPassword, verifyPassword } from "./auth";
+import { validatePassword } from "./config/passwordPolicy";
 
 /**
  * Cloud Function: changePassword
@@ -39,19 +40,7 @@ export const changePassword = onCallGen2(async (data, context) => {
     );
   }
 
-  if (typeof newPassword !== "string" || newPassword.length < 6) {
-    throw new HttpsError(
-      "invalid-argument",
-      "كلمة المرور يجب أن تكون 6 أحرف على الأقل. | Password must be at least 6 characters.",
-    );
-  }
-
-  if (newPassword.length > 128) {
-    throw new HttpsError(
-      "invalid-argument",
-      "كلمة المرور طويلة جداً. | Password is too long.",
-    );
-  }
+  validatePassword(newPassword, "كلمة المرور | Password");
 
   const userId = context.auth.uid;
 

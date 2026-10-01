@@ -28,5 +28,10 @@
   "passwordLengthError": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
   "mustChangePasswordMsg": "يجب تغيير كلمة المرور للمتابعة",
   "notifications": "الإشعارات",
-  "noNotifications": "لا توجد إشعارات جديدة"
+  "noNotifications": "لا توجد إشعارات جديدة",
+  "failedSubmissions": "الإرسالات الفاشلة",
+  "noFailedSubmissions": "لا توجد إرسالات فاشلة",
+  "retry": "إعادة المحاولة",
+  "discard": "حذف",
+  "failedSubmissionReason": "السبب"
 }

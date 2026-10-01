@@ -68,7 +68,16 @@ describe("Report Export Cloud Functions (Gen 2)", () => {
         {},
         { auth: { uid: "admin1", token: { role: "ADMIN" } } },
       ),
-    ).rejects.toThrow(/Missing requestId/i);
+    ).rejects.toThrow(/Invalid requestId/i);
+  });
+
+  it("rejects an oversized request identifier", async () => {
+    await expect(
+      wrappedExportReport(
+        { requestId: "x".repeat(129) },
+        { auth: { uid: "admin1", token: { role: "ADMIN" } } },
+      ),
+    ).rejects.toThrow(/Invalid requestId/i);
   });
 
   it("exports CSV string successfully for valid request", async () => {

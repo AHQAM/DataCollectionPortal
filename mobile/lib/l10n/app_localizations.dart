@@ -271,6 +271,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'لا توجد إشعارات جديدة'**
   String get noNotifications;
+
+  /// No description provided for @failedSubmissions.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإرسالات الفاشلة'**
+  String get failedSubmissions;
+
+  /// No description provided for @noFailedSubmissions.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد إرسالات فاشلة'**
+  String get noFailedSubmissions;
+
+  /// No description provided for @retry.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة المحاولة'**
+  String get retry;
+
+  /// No description provided for @discard.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف'**
+  String get discard;
+
+  /// No description provided for @failedSubmissionReason.
+  ///
+  /// In ar, this message translates to:
+  /// **'السبب'**
+  String get failedSubmissionReason;
 }
 
 class _AppLocalizationsDelegate
