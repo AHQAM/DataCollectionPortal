@@ -20,6 +20,12 @@ jobs:
         with:
           node-version: 22
 
+      - name: Setup Java for Firebase emulators
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
       - name: Install dependencies
         run: cd firebase/functions && npm ci
 
