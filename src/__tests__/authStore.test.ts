@@ -30,6 +30,11 @@ vi.mock("../firebase", () => ({
 
 import { useAuthStore } from "../stores/authStore";
 import { User } from "../types";
+import {
+  signInWithEmailAndPassword,
+  signInWithCustomToken,
+} from "firebase/auth";
+import { getDoc } from "firebase/firestore";
 
 const mockUser: User = {
   userId: "user-auth-1",
@@ -146,5 +151,82 @@ describe("useAuthStore", () => {
       targetUserId: "user-target",
       reason: "Replaced phone",
     });
+  });
+
+  it.each(["ADMIN", "SUPERVISOR"] as const)(
+    "authenticates %s by email without calling the representative login function",
+    async (role) => {
+      const adminUser = {
+        ...mockUser,
+        userId: "admin-auth-1",
+        email: "admin@example.com",
+        role,
+        isActive: true,
+      };
+      vi.mocked(signInWithEmailAndPassword).mockResolvedValueOnce({
+        user: {
+          uid: "admin-auth-1",
+          getIdTokenResult: vi.fn().mockResolvedValue({
+            claims: { role },
+          }),
+        },
+      } as never);
+      vi.mocked(getDoc).mockResolvedValueOnce({
+        exists: () => true,
+        data: () => adminUser,
+      } as never);
+
+      const result = await useAuthStore
+        .getState()
+        .login("admin@example.com", "correct-password");
+
+      expect(result.success).toBe(true);
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
+        expect.anything(),
+        "admin@example.com",
+        "correct-password",
+      );
+      expect(mockFn).not.toHaveBeenCalled();
+      expect(signInWithCustomToken).not.toHaveBeenCalled();
+      expect(useAuthStore.getState().currentUser).toEqual(adminUser);
+    },
+  );
+
+  it("rejects an email login unless the Firebase role is ADMIN or SUPERVISOR", async () => {
+    vi.mocked(signInWithEmailAndPassword).mockResolvedValueOnce({
+      user: {
+        uid: "rep-auth-1",
+        getIdTokenResult: vi.fn().mockResolvedValue({
+          claims: { role: "REP" },
+        }),
+      },
+    } as never);
+
+    const result = await useAuthStore
+      .getState()
+      .login("rep@example.com", "correct-password");
+
+    expect(result.success).toBe(false);
+    expect(mockFn).not.toHaveBeenCalled();
+  });
+
+  it("authenticates representatives by region number through the callable", async () => {
+    mockFn.mockResolvedValueOnce({
+      data: {
+        success: true,
+        token: "rep-custom-token",
+        userId: "rep-101",
+        regionNo: "101",
+        role: "REP",
+      },
+    });
+
+    const result = await useAuthStore.getState().login("101", "rep-password");
+
+    expect(result.success).toBe(true);
+    expect(mockFn).toHaveBeenCalledWith(
+      expect.objectContaining({ regionNo: "101", password: "rep-password" }),
+    );
+    expect(signInWithCustomToken).toHaveBeenCalled();
   });
 });
