@@ -1,10 +1,31 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { loadEnv } from "vite";
 import { defineConfig } from "vitest/config";
 import { VitePWA } from "vite-plugin-pwa";
 
-export default defineConfig(() => {
+export default defineConfig(({ command, mode }) => {
+  if (command === "build") {
+    const env = loadEnv(mode, process.cwd(), "");
+    const requiredFirebaseConfig = [
+      "VITE_FIREBASE_API_KEY",
+      "VITE_FIREBASE_AUTH_DOMAIN",
+      "VITE_FIREBASE_PROJECT_ID",
+      "VITE_FIREBASE_STORAGE_BUCKET",
+      "VITE_FIREBASE_MESSAGING_SENDER_ID",
+      "VITE_FIREBASE_APP_ID",
+      "VITE_RECAPTCHA_V3_SITE_KEY",
+    ];
+    const missingConfig = requiredFirebaseConfig.filter((key) => !env[key]);
+
+    if (missingConfig.length > 0) {
+      throw new Error(
+        `Missing required Firebase configuration: ${missingConfig.join(", ")}`,
+      );
+    }
+  }
+
   return {
     plugins: [
       react(),

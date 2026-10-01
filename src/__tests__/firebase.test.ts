@@ -6,6 +6,7 @@ import {
   storage,
   initAppCheck,
   connectEmulators,
+  resolveAppCheckProvider,
 } from "../firebase";
 import * as firebaseAuth from "firebase/auth";
 import * as firebaseFirestore from "firebase/firestore";
@@ -28,5 +29,30 @@ describe("Firebase Initialization Module", () => {
     const result = await initAppCheck();
     // In test environment without explicit recaptcha site key env set, it safely returns null or initialized instance
     expect(result === null || typeof result === "object").toBe(true);
+  });
+
+  it("uses the V3 provider when only a V3 site key is configured", () => {
+    expect(resolveAppCheckProvider({ v3SiteKey: "v3-key" })).toEqual({
+      provider: "v3",
+      siteKey: "v3-key",
+    });
+  });
+
+  it("uses the Enterprise provider when only an Enterprise site key is configured", () => {
+    expect(
+      resolveAppCheckProvider({ enterpriseSiteKey: "enterprise-key" }),
+    ).toEqual({
+      provider: "enterprise",
+      siteKey: "enterprise-key",
+    });
+  });
+
+  it("returns no provider when the explicitly selected key is missing", () => {
+    expect(
+      resolveAppCheckProvider({
+        v3SiteKey: "v3-key",
+        preferredProvider: "enterprise",
+      }),
+    ).toBeNull();
   });
 });
