@@ -36,14 +36,14 @@ jobs:
       - name: Test
         run: npm run test:coverage
         env:
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_FIREBASE_DATABASE_ID: ${{ secrets.VITE_FIREBASE_DATABASE_ID }}
-          VITE_RECAPTCHA_V3_SITE_KEY: ${{ secrets.VITE_RECAPTCHA_V3_SITE_KEY }}
+          VITE_FIREBASE_API_KEY: ci-test-api-key
+          VITE_FIREBASE_AUTH_DOMAIN: ci-test.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID: ci-test-project
+          VITE_FIREBASE_STORAGE_BUCKET: ci-test-project.appspot.com
+          VITE_FIREBASE_MESSAGING_SENDER_ID: "123456789"
+          VITE_FIREBASE_APP_ID: 1:123456789:web:ci-test
+          VITE_FIREBASE_DATABASE_ID: ci-test-database
+          VITE_RECAPTCHA_V3_SITE_KEY: ci-test-recaptcha-key
           VITE_RECAPTCHA_PROVIDER: v3
           VITE_APP_VERSION: "1.0.0"
 
@@ -52,8 +52,35 @@ jobs:
 
       - name: Run E2E Smoke Tests
         run: npm run test:e2e
+        env:
+          VITE_FIREBASE_API_KEY: ci-test-api-key
+          VITE_FIREBASE_AUTH_DOMAIN: ci-test.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID: ci-test-project
+          VITE_FIREBASE_STORAGE_BUCKET: ci-test-project.appspot.com
+          VITE_FIREBASE_MESSAGING_SENDER_ID: "123456789"
+          VITE_FIREBASE_APP_ID: 1:123456789:web:ci-test
+          VITE_FIREBASE_DATABASE_ID: ci-test-database
+          VITE_RECAPTCHA_V3_SITE_KEY: ci-test-recaptcha-key
+          VITE_RECAPTCHA_PROVIDER: v3
+          VITE_APP_VERSION: "1.0.0"
 
-      - name: Build
+      - name: Build pull request
+        if: github.event_name == 'pull_request'
+        run: npm run build
+        env:
+          VITE_FIREBASE_API_KEY: ci-test-api-key
+          VITE_FIREBASE_AUTH_DOMAIN: ci-test.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID: ci-test-project
+          VITE_FIREBASE_STORAGE_BUCKET: ci-test-project.appspot.com
+          VITE_FIREBASE_MESSAGING_SENDER_ID: "123456789"
+          VITE_FIREBASE_APP_ID: 1:123456789:web:ci-test
+          VITE_FIREBASE_DATABASE_ID: ci-test-database
+          VITE_RECAPTCHA_V3_SITE_KEY: ci-test-recaptcha-key
+          VITE_RECAPTCHA_PROVIDER: v3
+          VITE_APP_VERSION: "1.0.0"
+
+      - name: Build production
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: npm run build
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
