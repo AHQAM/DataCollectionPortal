@@ -244,7 +244,6 @@ export const commitImport = onCallGen2(async (data, context) => {
 
     const recordId =
       "REC-IMP-" + Math.random().toString(36).substring(2, 9).toUpperCase();
-    newResponses[recordId] = rowResponses;
 
     const newRec = {
       recordId,
@@ -274,6 +273,14 @@ export const commitImport = onCallGen2(async (data, context) => {
       completionPercent: 0,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+    };
+    newResponses[recordId] = {
+      responseId: recordId,
+      requestId,
+      recordId,
+      submittedBy: matchedUser?.userId || "IMPORT",
+      branchId,
+      data: rowResponses,
     };
 
     if (regionVal) {

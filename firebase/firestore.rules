@@ -34,12 +34,9 @@ service cloud.firestore {
 
     function hasRequestBranchAccess() {
       let data = resource.data;
-      return isAdmin()
-        || (isSupervisor()
-            && (data.get('branchId', '') == request.auth.token.branchId
-              || data.get('targetBranches', []).hasAny([request.auth.token.branchId])))
-        || (isRep()
-            && data.get('branchId', '') == request.auth.token.branchId);
+      return isSupervisor()
+        && (data.get('branchId', '') == request.auth.token.branchId
+          || data.get('targetBranches', []).hasAny([request.auth.token.branchId]));
     }
 
     function isValidBranch() {
@@ -115,11 +112,15 @@ service cloud.firestore {
     // REQUESTS COLLECTION
     // ============================================================
     match /requests/{requestId} {
-      // Admin: full access
-      // Supervisor: read requests within branch scope
-      // Rep: read only Published/Closed/Archived requests that have assignments for this user
-      allow read: if resource.data.status in ['Published', 'Closed', 'Archived']
-        && hasRequestBranchAccess();
+      // Admin: full read; supervisors: requests in their branch scope.
+      // Reps: published requests targeted to one of their authorized regions.
+      allow read: if isAdmin()
+        || (isSupervisor() && hasRequestBranchAccess())
+        || (isRep()
+            && resource.data.status in ['Published', 'Closed', 'Archived']
+            && (resource.data.get('targetRegions', []).size() == 0
+                || resource.data.get('targetRegions', [])
+                     .hasAny(request.auth.token.get('allowedRegionNos', []))));
 
       // Only Admin/Cloud Functions can write requests
       allow create, update: if false;

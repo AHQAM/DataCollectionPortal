@@ -252,6 +252,7 @@ export const submitResponse = onCallGen2(async (data, context) => {
           activityId: activityId || currentRecData.activityId || requestId,
           recordId,
           submittedBy: context.auth!.uid,
+          branchId: currentRecData.branchId || "",
           data: formData,
           submittedAt: submittedAt || now,
           updatedAt: now,
@@ -279,6 +280,7 @@ export const submitResponse = onCallGen2(async (data, context) => {
         activityId: activityId || currentRecData.activityId || requestId,
         recordId,
         submittedBy: context.auth!.uid,
+        branchId: currentRecData.branchId || "",
         data: formData,
         submittedAt: submittedAt || now,
         updatedAt: now,
@@ -455,14 +457,18 @@ export const saveDraftResponse = onCallGen2(async (data, context) => {
     }
 
     // 2. ALL WRITES AFTER READS
+    const currentRecordData = isExisting ? recordDoc.data() : recData;
     transaction.set(
       responseRef,
       {
         responseId: responseRef.id,
-        requestId: requestId || recordDoc.data()?.requestId || "",
-        activityId: activityId || recordDoc.data()?.activityId || "",
+        requestId: requestId || currentRecordData?.requestId || "",
+        activityId: activityId || currentRecordData?.activityId || "",
         recordId,
+        submittedBy: context.auth!.uid,
         savedBy: context.auth!.uid,
+        branchId:
+          currentRecordData?.branchId || context.auth!.token.branchId || "",
         data: formData,
         updatedAt: now,
       },

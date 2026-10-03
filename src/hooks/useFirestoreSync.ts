@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuthStore } from "../stores/authStore";
 import { useDataStore } from "../stores/dataStore";
@@ -50,26 +50,50 @@ export const useFirestoreSync = () => {
 
     const isAdmin = currentUser.role === "ADMIN";
     const isSupervisor = currentUser.role === "SUPERVISOR";
+    const isRep = currentUser.role === "REP";
 
     const usersQuery = isAdmin
       ? collection(db, "users")
-      : isSupervisor
-        ? query(
-            collection(db, "users"),
-            where("branchId", "==", currentUser.branchId),
-          )
-        : query(
-            collection(db, "users"),
-            where("userId", "==", currentUser.userId),
-          );
+      : query(
+          collection(db, "users"),
+          where("branchId", "==", currentUser.branchId),
+        );
 
-    const requestsQuery =
-      isAdmin || isSupervisor
-        ? collection(db, "requests")
-        : query(
-            collection(db, "requests"),
-            where("assignedUserId", "==", currentUser.userId),
-          );
+    const requestsCollection = collection(db, "requests");
+    const allowedRegionNos = currentUser.allowedRegionNos?.length
+      ? Array.from(new Set(currentUser.allowedRegionNos))
+      : [currentUser.regionNo];
+    const allowedRegionChunks = Array.from(
+      { length: Math.ceil(allowedRegionNos.length / 30) },
+      (_, index) => allowedRegionNos.slice(index * 30, (index + 1) * 30),
+    );
+    const requestsQueries = isAdmin
+      ? [requestsCollection]
+      : isSupervisor
+        ? [
+            query(
+              requestsCollection,
+              where("branchId", "==", currentUser.branchId),
+            ),
+            query(
+              requestsCollection,
+              where("targetBranches", "array-contains", currentUser.branchId),
+            ),
+          ]
+        : [
+            ...allowedRegionChunks.map((regionNos) =>
+              query(
+                requestsCollection,
+                where("targetRegions", "array-contains-any", regionNos),
+                where("status", "in", ["Published", "Closed", "Archived"]),
+              ),
+            ),
+            query(
+              requestsCollection,
+              where("targetRegions", "==", []),
+              where("status", "in", ["Published", "Closed", "Archived"]),
+            ),
+          ];
 
     const assignmentsQuery = isAdmin
       ? collection(db, "assignments")
@@ -97,10 +121,15 @@ export const useFirestoreSync = () => {
 
     const responsesQuery = isAdmin
       ? collection(db, "responses")
-      : query(
-          collection(db, "responses"),
-          where("submittedBy", "==", currentUser.userId),
-        );
+      : isSupervisor
+        ? query(
+            collection(db, "responses"),
+            where("branchId", "==", currentUser.branchId),
+          )
+        : query(
+            collection(db, "responses"),
+            where("submittedBy", "==", currentUser.userId),
+          );
 
     const notificationsQuery = isAdmin
       ? collection(db, "notifications")
@@ -109,26 +138,46 @@ export const useFirestoreSync = () => {
           where("userId", "==", currentUser.userId),
         );
 
-    const unsubUsers = onSnapshot(
-      usersQuery,
-      (snapshot) => {
-        const firestoreUsers: User[] = [];
-        snapshot.forEach((docSnap) =>
-          firestoreUsers.push(docSnap.data() as User),
+    const unsubUsers = isRep
+      ? onSnapshot(
+          doc(db, "users", currentUser.userId),
+          (snapshot) => {
+            setUsers(snapshot.exists() ? [snapshot.data() as User] : []);
+          },
+          (error) => console.error("Error listening to users:", error),
+        )
+      : onSnapshot(
+          usersQuery,
+          (snapshot) => {
+            const firestoreUsers: User[] = [];
+            snapshot.forEach((docSnap) =>
+              firestoreUsers.push(docSnap.data() as User),
+            );
+            if (firestoreUsers.length > 0) setUsers(firestoreUsers);
+          },
+          (error) => console.error("Error listening to users:", error),
         );
-        if (firestoreUsers.length > 0) setUsers(firestoreUsers);
-      },
-      (error) => console.error("Error listening to users:", error),
-    );
 
-    const unsubRequests = onSnapshot(
-      requestsQuery,
-      (snapshot) => {
-        const data: RequestItem[] = [];
-        snapshot.forEach((docSnap) => data.push(docSnap.data() as RequestItem));
-        setRequests(data);
-      },
-      (error) => console.error("Error listening to requests:", error),
+    const requestSnapshots = new Map<number, RequestItem[]>();
+    const unsubRequests = requestsQueries.map((requestsQuery, index) =>
+      onSnapshot(
+        requestsQuery,
+        (snapshot) => {
+          const data: RequestItem[] = [];
+          snapshot.forEach((docSnap) =>
+            data.push(docSnap.data() as RequestItem),
+          );
+          requestSnapshots.set(index, data);
+          const mergedRequests = new Map<string, RequestItem>();
+          requestSnapshots.forEach((requests) =>
+            requests.forEach((request) =>
+              mergedRequests.set(request.requestId, request),
+            ),
+          );
+          setRequests(Array.from(mergedRequests.values()));
+        },
+        (error) => console.error("Error listening to requests:", error),
+      ),
     );
 
     const unsubFields = onSnapshot(
@@ -248,7 +297,7 @@ export const useFirestoreSync = () => {
 
     return () => {
       unsubUsers();
-      unsubRequests();
+      unsubRequests.forEach((unsubscribe) => unsubscribe());
       unsubFields();
       unsubAssignments();
       unsubRecords();

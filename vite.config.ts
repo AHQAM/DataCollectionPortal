@@ -15,9 +15,23 @@ export default defineConfig(({ command, mode }) => {
       "VITE_FIREBASE_STORAGE_BUCKET",
       "VITE_FIREBASE_MESSAGING_SENDER_ID",
       "VITE_FIREBASE_APP_ID",
-      "VITE_RECAPTCHA_V3_SITE_KEY",
     ];
     const missingConfig = requiredFirebaseConfig.filter((key) => !env[key]);
+
+    const recaptchaProvider = env.VITE_RECAPTCHA_PROVIDER || "v3";
+    if (recaptchaProvider !== "enterprise" && recaptchaProvider !== "v3") {
+      throw new Error(
+        "VITE_RECAPTCHA_PROVIDER must be either enterprise or v3.",
+      );
+    }
+
+    const recaptchaSiteKey =
+      recaptchaProvider === "enterprise"
+        ? "VITE_RECAPTCHA_ENTERPRISE_SITE_KEY"
+        : "VITE_RECAPTCHA_V3_SITE_KEY";
+    if (!env[recaptchaSiteKey]) {
+      missingConfig.push(recaptchaSiteKey);
+    }
 
     if (missingConfig.length > 0) {
       throw new Error(

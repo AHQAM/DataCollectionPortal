@@ -4,14 +4,16 @@ import { useFirestoreSync } from "../hooks/useFirestoreSync";
 import { useAuthStore } from "../stores/authStore";
 import { useDataStore } from "../stores/dataStore";
 import { useUIStore } from "../stores/uiStore";
-import { onSnapshot } from "firebase/firestore";
+import { onSnapshot, where } from "firebase/firestore";
 
 vi.mock("firebase/firestore", () => {
   return {
     collection: (db: any, path: string) => path,
+    doc: (db: any, collectionPath: string, documentId: string) =>
+      `${collectionPath}/${documentId}`,
     query: (collectionPath: string, ...rest: any[]) =>
       `${collectionPath}_query`,
-    where: () => "where_clause",
+    where: vi.fn(() => "where_clause"),
     onSnapshot: vi.fn(),
   };
 });
@@ -116,6 +118,13 @@ describe("useFirestoreSync Hook", () => {
 
     renderHook(() => useFirestoreSync());
 
+    expect(where).toHaveBeenCalledWith("branchId", "==", "b1");
+    expect(where).toHaveBeenCalledWith(
+      "targetBranches",
+      "array-contains",
+      "b1",
+    );
+
     // Trigger responses callback
     const mockDoc = {
       id: "rec1",
@@ -128,6 +137,35 @@ describe("useFirestoreSync Hook", () => {
     expect(useDataStore.getState().recordResponses).toEqual({
       rec1: { q1: "yes" },
     });
+  });
+
+  it("limits representative requests to assigned regions and global requests", () => {
+    useAuthStore.setState({
+      currentUser: {
+        userId: "rep1",
+        role: "REP",
+        regionNo: "101",
+        allowedRegionNos: ["101", "102"],
+      } as any,
+    });
+
+    renderHook(() => useFirestoreSync());
+
+    expect(where).toHaveBeenCalledWith("targetRegions", "array-contains-any", [
+      "101",
+      "102",
+    ]);
+    expect(where).toHaveBeenCalledWith("targetRegions", "==", []);
+    expect(where).toHaveBeenCalledWith("status", "in", [
+      "Published",
+      "Closed",
+      "Archived",
+    ]);
+    expect(onSnapshot).toHaveBeenCalledWith(
+      "users/rep1",
+      expect.any(Function),
+      expect.any(Function),
+    );
   });
 
   it("processes deviceBindings and passwordResetRequests for ADMIN", () => {

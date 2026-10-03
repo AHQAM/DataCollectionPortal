@@ -14,22 +14,23 @@ const mockTransaction = {
   create: jest.fn(() => {
     hasWritten = true;
   }),
-  get: jest.fn((ref) => {
+  get: jest.fn(async (ref): Promise<any> => {
     if (hasWritten) {
       throw new Error(
         "Firestore transactions require all reads to be executed before all writes.",
       );
     }
-    return Promise.resolve({
+    return {
       exists: true,
       data: () => ({
         recordId: "rec-1",
         requestId: "req-1",
         assignedUserId: "rep-1",
         assignmentId: "asg-1",
+        branchId: "branch-1",
         recordStatus: "In Progress",
       }),
-    });
+    };
   }),
 };
 
@@ -47,6 +48,7 @@ jest.mock("../config/db", () => {
               requestId: "req-1",
               assignedUserId: "rep-1",
               assignmentId: "asg-1",
+              branchId: "branch-1",
               recordStatus: "In Progress",
             }),
           }),
@@ -139,6 +141,7 @@ describe("Response Management Cloud Functions & Concurrency", () => {
             requestId: "req-1",
             assignedUserId: "rep-1",
             assignmentId: "asg-1",
+            branchId: "branch-1",
             recordStatus: "In Progress",
             totalRecords: 5,
             completedRecords: 1,
@@ -157,7 +160,11 @@ describe("Response Management Cloud Functions & Concurrency", () => {
 
       expect(result).toHaveProperty("success", true);
       expect(db.runTransaction).toHaveBeenCalledTimes(1);
-      expect(mockTransaction.set).toHaveBeenCalled();
+      expect(mockTransaction.set).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ branchId: "branch-1" }),
+        { merge: true },
+      );
       expect(mockTransaction.update).toHaveBeenCalled();
     });
 
@@ -321,12 +328,24 @@ describe("Response Management Cloud Functions & Concurrency", () => {
           recordId: "rec-1",
           formData: { draftQuestion: "Pending" },
         },
-        { auth: { uid: "rep-1", token: { role: "REP" } } },
+        {
+          auth: {
+            uid: "rep-1",
+            token: { role: "REP", branchId: "branch-1" },
+          },
+        },
       );
 
       expect(result).toHaveProperty("success", true);
       expect(db.runTransaction).toHaveBeenCalledTimes(1);
-      expect(mockTransaction.set).toHaveBeenCalled();
+      expect(mockTransaction.set).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          submittedBy: "rep-1",
+          branchId: "branch-1",
+        }),
+        { merge: true },
+      );
     });
 
     it("detects conflict and refuses to overwrite when record is already submitted or server is newer", async () => {
