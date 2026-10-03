@@ -43,3 +43,18 @@ jobs:
 
       - name: Build
         run: cd firebase/functions && npm run build
+
+      - name: Authenticate to Google Cloud
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LANDSURVEY_EBB3B }}
+
+      - name: Deploy Firestore rules and indexes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          firebase deploy \
+            --only firestore:rules,firestore:indexes \
+            --project landsurvey-ebb3b \
+            --config firebase/firebase.json \
+            --non-interactive
