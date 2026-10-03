@@ -34,8 +34,8 @@ class MonitoringService {
           integrations: [
             Sentry.browserTracingIntegration(),
             Sentry.replayIntegration({
-              maskAllText: false,
-              blockAllMedia: false,
+              maskAllText: true,
+              blockAllMedia: true,
             }),
           ],
           tracesSampleRate: import.meta.env.PROD ? 0.2 : 1.0,
