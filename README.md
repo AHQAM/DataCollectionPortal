@@ -65,7 +65,7 @@ npm run build
 firebase deploy --only functions,firestore:rules,storage
 ```
 
-On pushes to `main`, Firebase Functions CI runs the rules tests and build, then deploys the Firestore rules and indexes using the configured Firebase service account. Cloud Functions and Storage rules remain part of the manual backend deployment above.
+On pushes to `main`, Firebase Functions CI runs the tests and build, then deploys Cloud Functions, Firestore rules, and indexes using the configured Firebase service account. Cloud Storage rules remain part of the manual backend deployment above.
 
 Production web error reporting is enabled by configuring the GitHub Actions secret `VITE_SENTRY_DSN`; session replay masks all text and blocks media by default.
 

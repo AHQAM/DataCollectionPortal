@@ -50,11 +50,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LANDSURVEY_EBB3B }}
 
-      - name: Deploy Firestore rules and indexes
+      - name: Deploy Cloud Functions, Firestore rules, and indexes
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           firebase deploy \
-            --only firestore:rules,firestore:indexes \
+            --only functions,firestore:rules,firestore:indexes \
             --project landsurvey-ebb3b \
             --config firebase/firebase.json \
             --non-interactive
