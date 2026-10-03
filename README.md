@@ -65,6 +65,8 @@ npm run build
 firebase deploy --only functions,firestore:rules,storage
 ```
 
+On pushes to `main`, Firebase Functions CI runs the rules tests and build, then deploys the Firestore rules and indexes using the configured Firebase service account. Cloud Functions and Storage rules remain part of the manual backend deployment above.
+
 ### 2. React Admin Dashboard
 
 ```bash
