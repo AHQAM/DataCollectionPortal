@@ -41,19 +41,20 @@ describe("Firestore access rules", () => {
 
   it("allows a representative to read only requests targeted to an authorized region", async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
-      await setDoc(doc(context.firestore(), "requests/REQ-1"), {
+      const firestore = context.firestore();
+      await setDoc(doc(firestore, "requests/REQ-1"), {
         requestId: "REQ-1",
         status: "Published",
         branchId: "branch-1",
         targetRegions: ["101"],
       });
-      await setDoc(doc(context.firestore(), "requests/REQ-2"), {
+      await setDoc(doc(firestore, "requests/REQ-2"), {
         requestId: "REQ-2",
         status: "Published",
         branchId: "branch-1",
         targetRegions: ["202"],
       });
-      await setDoc(doc(context.firestore(), "requests/REQ-ALL"), {
+      await setDoc(doc(firestore, "requests/REQ-ALL"), {
         requestId: "REQ-ALL",
         status: "Published",
         branchId: "branch-1",
@@ -98,19 +99,20 @@ describe("Firestore access rules", () => {
 
   it("allows supervisors to query requests in their branch scope only", async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
-      await setDoc(doc(context.firestore(), "requests/REQ-BRANCH-1"), {
+      const firestore = context.firestore();
+      await setDoc(doc(firestore, "requests/REQ-BRANCH-1"), {
         requestId: "REQ-BRANCH-1",
         status: "Draft",
         branchId: "branch-1",
         targetBranches: ["branch-1"],
       });
-      await setDoc(doc(context.firestore(), "requests/REQ-TARGET-BRANCH-1"), {
+      await setDoc(doc(firestore, "requests/REQ-TARGET-BRANCH-1"), {
         requestId: "REQ-TARGET-BRANCH-1",
         status: "Published",
         branchId: "branch-2",
         targetBranches: ["branch-1"],
       });
-      await setDoc(doc(context.firestore(), "requests/REQ-BRANCH-2"), {
+      await setDoc(doc(firestore, "requests/REQ-BRANCH-2"), {
         requestId: "REQ-BRANCH-2",
         status: "Published",
         branchId: "branch-2",
@@ -167,12 +169,13 @@ describe("Firestore access rules", () => {
 
   it("allows supervisors to query responses from their branch only", async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
-      await setDoc(doc(context.firestore(), "responses/REC-BRANCH-1"), {
+      const firestore = context.firestore();
+      await setDoc(doc(firestore, "responses/REC-BRANCH-1"), {
         responseId: "REC-BRANCH-1",
         branchId: "branch-1",
         submittedBy: "rep-1",
       });
-      await setDoc(doc(context.firestore(), "responses/REC-BRANCH-2"), {
+      await setDoc(doc(firestore, "responses/REC-BRANCH-2"), {
         responseId: "REC-BRANCH-2",
         branchId: "branch-2",
         submittedBy: "rep-2",
