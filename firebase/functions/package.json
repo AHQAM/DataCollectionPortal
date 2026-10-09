@@ -30,8 +30,8 @@
     "@types/uuid": "^10.0.0",
     "firebase": "^10.14.1",
     "firebase-functions-test": "^3.1.0",
-    "jest": "^30.5.1",
-    "ts-jest": "^29.4.12",
+    "jest": "^30.5.2",
+    "ts-jest": "^29.4.14",
     "typescript": "^5.5.0"
   },
   "private": true
