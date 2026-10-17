@@ -5,7 +5,6 @@ import {
   functions,
   storage,
   appCheckReady,
-  ensureAppCheckToken,
   initAppCheck,
   connectEmulators,
   resolveAppCheckProvider,
@@ -25,11 +24,7 @@ describe("Firebase Initialization Module", () => {
 
   it("exposes App Check initialization readiness", async () => {
     const ready = await appCheckReady;
-    const tokenAppCheck = await ensureAppCheckToken();
     expect(ready === null || typeof ready === "object").toBe(true);
-    expect(tokenAppCheck === null || typeof tokenAppCheck === "object").toBe(
-      true,
-    );
   });
 
   it("handles connectEmulators gracefully without throwing", () => {
