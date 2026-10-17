@@ -50,15 +50,7 @@ export function onCallGen2<TData = any, TResp = any>(
       let callData: any;
       let context: CallableContextCompat;
 
-      if (maybeContext !== undefined) {
-        // Invoked via testEnv.wrap(fn)(data, context)
-        callData = requestOrData;
-        context = {
-          auth: maybeContext?.auth ?? null,
-          app: maybeContext?.app,
-          rawRequest: maybeContext?.rawRequest,
-        };
-      } else if (
+      if (
         requestOrData &&
         typeof requestOrData === "object" &&
         ("data" in requestOrData || "auth" in requestOrData)
@@ -69,6 +61,14 @@ export function onCallGen2<TData = any, TResp = any>(
           auth: requestOrData.auth ?? null,
           app: requestOrData.app,
           rawRequest: requestOrData.rawRequest,
+        };
+      } else if (maybeContext !== undefined) {
+        // Invoked via testEnv.wrap(fn)(data, context)
+        callData = requestOrData;
+        context = {
+          auth: maybeContext?.auth ?? null,
+          app: maybeContext?.app,
+          rawRequest: maybeContext?.rawRequest,
         };
       } else {
         callData = requestOrData;
