@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { httpsCallable } from "firebase/functions";
 import { useTranslation } from "react-i18next";
-import { functions } from "../../firebase";
+import { ensureAppCheckToken, functions } from "../../firebase";
 import { useApp } from "../../context/AppContext";
 import { Send, X, AlertCircle, CheckCircle2, Radio, Users } from "lucide-react";
 
@@ -52,6 +52,7 @@ export const BroadcastNotificationModal: React.FC<
     setStatusMessage(null);
 
     try {
+      await ensureAppCheckToken();
       const sendBroadcast = httpsCallable<
         {
           targetAudience: string;

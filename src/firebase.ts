@@ -113,9 +113,19 @@ export function connectEmulators(
   }
 }
 
-// Auto-initialize App Check in browser environment
-if (typeof window !== "undefined") {
-  initAppCheck();
+// Share initialization with actions that must not run before App Check is ready.
+export const appCheckReady =
+  typeof window !== "undefined" ? initAppCheck() : Promise.resolve(null);
+
+export async function ensureAppCheckToken() {
+  const appCheck = await appCheckReady;
+  if (!appCheck) {
+    return null;
+  }
+
+  const { getToken } = await import("firebase/app-check");
+  await getToken(appCheck);
+  return appCheck;
 }
 
 // Use Emulators if in development mode and VITE_USE_FIREBASE_EMULATOR is true
