@@ -156,6 +156,21 @@ graph TD
 
 ---
 
+### Runbook E: Callable App Check Rejection
+
+- **Symptoms:** A callable action returns `App Check verification failed. The request originated from an unauthorized client. [400]`, while a standalone App Check token exchange may succeed.
+- **Diagnosis Steps:**
+  1. Confirm the deployed web bundle uses the Enterprise site key registered for the production Firebase web app.
+  2. Perform a hard refresh and unregister the old service worker to rule out a stale PWA bundle.
+  3. Confirm the action waits for App Check initialization and token acquisition before creating its callable request.
+  4. In browser developer tools, record only whether the callable request has an `X-Firebase-AppCheck` header; never copy or log its value.
+  5. Check Cloud Functions logs for the callable name and verify the failure is not an authentication or role error.
+- **Recovery:**
+  1. Retry after App Check readiness completes; do not disable backend App Check verification as a production workaround.
+  2. If the web client still fails, validate the mobile client separately because Android Play Integrity and Apple DeviceCheck use different attestation paths.
+
+---
+
 ## 6. Post-Mortem (RCA) Template
 
 All P1/P2 incidents must document the following structure within `docs/post-mortems/YYYY-MM-DD-incident-title.md`:
