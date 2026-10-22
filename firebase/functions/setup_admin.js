@@ -9,6 +9,11 @@ const db = getFirestore("datacollectionportal");
 
 async function setupAdmin() {
   try {
+    const targetUid = process.env.ADMIN_SETUP_UID;
+    if (!targetUid) {
+      throw new Error("ADMIN_SETUP_UID must identify the intended admin user.");
+    }
+
     // 1. List all users in Firebase Auth
     const listUsersResult = await admin.auth().listUsers();
 
@@ -17,8 +22,12 @@ async function setupAdmin() {
       return;
     }
 
-    // We assume the first user is the admin (since they added one manually)
-    const adminAuthUser = listUsersResult.users[0];
+    const adminAuthUser = listUsersResult.users.find(
+      (user) => user.uid === targetUid,
+    );
+    if (!adminAuthUser) {
+      throw new Error(`No Firebase Auth user found for ADMIN_SETUP_UID.`);
+    }
     console.log(
       `Found user: ${adminAuthUser.email} (UID: ${adminAuthUser.uid})`,
     );

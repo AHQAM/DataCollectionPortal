@@ -357,6 +357,12 @@ export const RecordResponseModal: React.FC<Props> = ({
         <div
           className="fixed inset-0 z-60 bg-black/80 flex items-center justify-center p-4 cursor-pointer"
           onClick={() => setActiveImagePreview(null)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") setActiveImagePreview(null);
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="Close image preview"
         >
           <div className="relative max-w-4xl max-h-[90vh] bg-transparent flex flex-col items-center">
             <img

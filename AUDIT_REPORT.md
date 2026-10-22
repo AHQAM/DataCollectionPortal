@@ -1,24 +1,26 @@
 # Security & System Audit Report - Data Collection Portal
 
-**Date:** 2026-09-20  
-**Status:** Fully Remediated & Production Hardened (Enterprise Rating: 10/10)  
-**Evaluated by:** Antigravity AI Architecture Team
+**Date:** 2026-10-22 (revalidated during remediation)
+**Status:** Remediation in progress — do not treat this document as a production certification
+**Evaluated by:** Project engineering review
 
 ---
 
 ## Executive Summary
 
-The **Data Collection Portal** (Sales Collection Hub) has undergone comprehensive architectural remediation, transitioning from a prototype/MVP state into a production-hardened, **10/10 Enterprise-grade** data collection and field operations system.
+The **Data Collection Portal** has a solid foundation, but the latest review identified security, dependency, CI, and data-quality gaps that must be closed before expanding into Field Operations.
 
-All prior audit findings, technical debts, and evaluator recommendations have been systematically resolved across all three tiers:
+The current remediation batch addresses the highest-risk issues first:
 
-1. **Cloud Backend**: 40 Cloud Functions deployed in `us-central1` with centralized database configuration, custom bcrypt authentication, device binding, and automated FCM push notifications.
-2. **Web Frontend**: Fully modularized React/TypeScript admin dashboard, zero monolithic files, strict TypeScript typing, and CI/CD-driven automated deployments to Firebase Hosting.
-3. **Mobile Client**: Flutter application with clean layered architecture, offline Hive storage, background/foreground push notification lifecycle (`FcmService`), and modular UI components.
+1. **Cloud Backend**: lockout ordering, identifier-based throttling, hashed device identifiers, session invalidation, and stricter Firestore state validation.
+2. **Web Frontend and CI**: security headers, corrected ESLint configuration, and a lint step in CI.
+3. **Remaining gates**: dependency vulnerability remediation, complete device-replacement lifecycle, lint cleanup, rules emulator coverage, and production validation remain required.
 
 ---
 
 ## 1. Remediation Matrix & Current State
+
+> The historical matrix below records completed architectural work; its entries do not override the current status above. A finding is only production-ready after targeted tests, CI, and deployment validation pass.
 
 | Audit Finding / Technical Debt                  | Prior State                                                                                                                                                      | Remediated Production State                                                                                                                                                                                                                                          |   Status    |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------: |

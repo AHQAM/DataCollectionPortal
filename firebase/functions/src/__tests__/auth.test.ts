@@ -117,7 +117,7 @@ describe("Auth Module - Password Hashing", () => {
         data: () => ({ attempts: 10, windowStartedAt: Date.now() }),
       });
 
-      await expect(assertLoginAllowed("rep-1", "device-1")).rejects.toThrow(
+      await expect(assertLoginAllowed("rep-1")).rejects.toThrow(
         /Too many login attempts/i,
       );
       expect(db.runTransaction).toHaveBeenCalled();

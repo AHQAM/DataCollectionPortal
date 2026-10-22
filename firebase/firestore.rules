@@ -166,7 +166,14 @@ service cloud.firestore {
         || (isRep() && resource.data.userId == request.auth.uid);
 
       // Only Cloud Functions create/update assignments
-      allow write: if isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasAll([
+          'assignmentId', 'requestId', 'userId', 'regionNo', 'branchId',
+          'assignmentStatus', 'assignedAt', 'assignedBy', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.assignmentStatus
+           in ['Active', 'Completed', 'Pending', 'Reassigned'];
+      allow delete: if false;
     }
 
     // ============================================================
@@ -183,6 +190,9 @@ service cloud.firestore {
       // Rep can update own records with limited fields (status, draft/submit)
       allow update: if isRep()
         && resource.data.assignedUserId == request.auth.uid
+        && request.resource.data.recordStatus
+           in ['Pending', 'InProgress', 'DraftSaved', 'Submitted',
+               'Completed', 'Rejected', 'Reopened']
         && request.resource.data.diff(resource.data).affectedKeys()
            .hasOnly([
              'recordStatus', 'completionPercent',
@@ -191,10 +201,21 @@ service cloud.firestore {
            ]);
 
       // Admin can update any record
-      allow update: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.recordStatus
+           in ['Pending', 'InProgress', 'DraftSaved', 'Submitted',
+               'Completed', 'Rejected', 'Reopened'];
 
       // Admin or Cloud Functions can create records (via import)
-      allow create: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasAll([
+          'recordId', 'requestId', 'assignmentId', 'assignedUserId',
+          'branchId', 'regionNo', 'recordStatus', 'completionPercent',
+          'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.recordStatus
+           in ['Pending', 'InProgress', 'DraftSaved', 'Submitted',
+               'Completed', 'Rejected', 'Reopened'];
       allow delete: if false;
     }
 
@@ -217,10 +238,14 @@ service cloud.firestore {
         && request.resource.data.requestId is string
         && exists(/databases/$(database)/documents/records/$(request.resource.data.recordId))
         && get(/databases/$(database)/documents/records/$(request.resource.data.recordId)).data.assignedUserId == request.auth.uid
-        && get(/databases/$(database)/documents/records/$(request.resource.data.recordId)).data.requestId == request.resource.data.requestId;
+        && get(/databases/$(database)/documents/records/$(request.resource.data.recordId)).data.requestId == request.resource.data.requestId
+        && get(/databases/$(database)/documents/records/$(request.resource.data.recordId)).data.recordStatus
+           in ['Pending', 'InProgress', 'DraftSaved'];
 
       allow update: if isRep()
         && resource.data.submittedBy == request.auth.uid
+        && get(/databases/$(database)/documents/records/$(resource.data.recordId)).data.recordStatus
+           in ['DraftSaved', 'InProgress']
         && request.resource.data.submittedBy == request.auth.uid
         && request.resource.data.recordId == resource.data.recordId
         && request.resource.data.requestId == resource.data.requestId
@@ -238,7 +263,16 @@ service cloud.firestore {
     // ============================================================
     match /imports/{importId} {
       allow read: if isAdmin();
-      allow write: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasAll([
+          'importId', 'requestId', 'importedBy', 'importedAt',
+          'totalRows', 'validRows', 'invalidRows', 'duplicateRows',
+          'unmatchedRows', 'mappingJson', 'importStatus'
+        ])
+        && request.resource.data.importStatus in ['SUCCESS', 'FAILED', 'PARTIAL'];
+      allow update: if isAdmin()
+        && request.resource.data.importStatus in ['SUCCESS', 'FAILED', 'PARTIAL'];
+      allow delete: if false;
     }
 
     // ============================================================
@@ -298,15 +332,6 @@ service cloud.firestore {
 
       // Never allow update or delete — audit logs are immutable
       allow update, delete: if false;
-    }
-
-    // ============================================================
-    // NOTIFICATIONS
-    // ============================================================
-    match /notifications/{notificationId} {
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow update: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'readAt']));
-      allow create, delete: if isAdmin();
     }
 
     // ============================================================

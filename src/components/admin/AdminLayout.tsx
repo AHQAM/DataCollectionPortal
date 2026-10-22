@@ -242,6 +242,14 @@ export const AdminLayout: React.FC = () => {
           {/* Backdrop */}
           <div
             onClick={() => setIsSidebarOpen(false)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                setIsSidebarOpen(false);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={t("common.close")}
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
           />
 

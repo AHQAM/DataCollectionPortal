@@ -385,7 +385,7 @@ export const saveDraftResponse = onCallGen2(async (data, context) => {
   const recordRef = db.collection("records").doc(recordId);
   const record = await recordRef.get();
 
-  let isNewRecord = !record.exists;
+  const isNewRecord = !record.exists;
   let recData: FirebaseFirestore.DocumentData | null = null;
 
   if (isNewRecord && requestId) {

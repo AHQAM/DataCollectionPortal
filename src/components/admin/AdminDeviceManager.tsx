@@ -3,6 +3,19 @@ import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
 import { Smartphone, Search } from "lucide-react";
 
+function formatBindingDate(
+  value: string | { toDate: () => Date } | null | undefined,
+  locale: string,
+): string {
+  const date =
+    value && typeof value === "object" && "toDate" in value
+      ? value.toDate()
+      : value
+        ? new Date(value as string)
+        : new Date(0);
+  return date.toLocaleDateString(locale);
+}
+
 export const AdminDeviceManager: React.FC = () => {
   const {
     deviceBindings,
@@ -157,7 +170,8 @@ export const AdminDeviceManager: React.FC = () => {
                       </td>
 
                       <td className="px-4 py-3.5 text-slate-500">
-                        {new Date(b.boundAt).toLocaleDateString(
+                        {formatBindingDate(
+                          b.boundAt,
                           currentLang === "ar" ? "ar-SA" : "en-US",
                         )}
                       </td>
@@ -196,7 +210,7 @@ export const AdminDeviceManager: React.FC = () => {
                             <>
                               <button
                                 onClick={() =>
-                                  approveDeviceReplacement(b.bindingId)
+                                  approveDeviceReplacement(b.userId)
                                 }
                                 className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px]"
                               >

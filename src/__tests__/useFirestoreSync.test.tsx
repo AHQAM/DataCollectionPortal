@@ -64,7 +64,7 @@ describe("useFirestoreSync Hook", () => {
 
     vi.mocked(onSnapshot).mockImplementation(((
       queryRef: string,
-      callback: Function,
+      callback: (...args: unknown[]) => unknown,
     ) => {
       if (queryRef === "users") {
         usersCallback = callback;
@@ -108,7 +108,7 @@ describe("useFirestoreSync Hook", () => {
 
     vi.mocked(onSnapshot).mockImplementation(((
       queryRef: string,
-      callback: Function,
+      callback: (...args: unknown[]) => unknown,
     ) => {
       if (queryRef.includes("responses")) {
         responsesCallback = callback;
@@ -173,13 +173,13 @@ describe("useFirestoreSync Hook", () => {
       currentUser: { userId: "admin1", role: "ADMIN" } as any,
     });
 
-    const callbacks: Record<string, Function> = {};
-    const errorCallbacks: Record<string, Function> = {};
+    const callbacks: Record<string, (...args: unknown[]) => unknown> = {};
+    const errorCallbacks: Record<string, (...args: unknown[]) => unknown> = {};
 
     vi.mocked(onSnapshot).mockImplementation(((
       queryRef: string,
-      callback: Function,
-      errorCb?: Function,
+      callback: (...args: unknown[]) => unknown,
+      errorCb?: (...args: unknown[]) => unknown,
     ) => {
       callbacks[queryRef] = callback;
       if (errorCb) errorCallbacks[queryRef] = errorCb;
