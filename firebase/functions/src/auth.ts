@@ -69,7 +69,7 @@ export const authenticateWithRegionPassword = onCallGen2(
       // 1. Find user by username, email, regionNo, userNo, etc.
       const rawInput = String(regionNo).trim();
       const inputLower = rawInput.toLowerCase();
-      await assertLoginAllowed(rawInput, installationDeviceId);
+      await assertLoginAllowed(rawInput);
       const usersRef = db.collection("users");
 
       let userDoc: FirebaseFirestore.DocumentSnapshot | null = null;
@@ -160,6 +160,19 @@ export const authenticateWithRegionPassword = onCallGen2(
       const userData = userDoc.data()!;
       const userId = userDoc.id;
 
+      if (userData.lockedUntil) {
+        const lockDate = userData.lockedUntil.toDate
+          ? userData.lockedUntil.toDate()
+          : new Date(userData.lockedUntil);
+
+        if (lockDate > new Date()) {
+          throw new HttpsError(
+            "permission-denied",
+            "الحساب مقفل مؤقتاً. حاول لاحقاً. | Account is temporarily locked. Try again later.",
+          );
+        }
+      }
+
       if (!["REP", "SUPERVISOR", "ADMIN"].includes(userData.role)) {
         throw new HttpsError(
           "unauthenticated",
@@ -184,7 +197,7 @@ export const authenticateWithRegionPassword = onCallGen2(
       }
 
       // 3. Password Verification & Self-Healing
-      let passwordHash = userData.passwordHash;
+      const passwordHash = userData.passwordHash;
       let isPasswordValid = false;
 
       if (passwordHash) {
@@ -195,7 +208,8 @@ export const authenticateWithRegionPassword = onCallGen2(
         }
       }
 
-      // If valid, immediately clear any lockout and failed count
+      // Clear the failed-attempt counter only after a valid password and a
+      // lockout check has already passed.
       if (isPasswordValid) {
         if (
           userData.lockedUntil ||
@@ -319,7 +333,6 @@ export const authenticateWithRegionPassword = onCallGen2(
 
           await userDoc.ref.update({
             deviceBindingStatus: "BOUND",
-            boundDeviceId: installationDeviceId,
             boundDeviceIdHash: deviceIdHash,
             boundDevicePlatform: platform || "Unknown",
             boundDeviceLabel: `${platform || "Unknown"} - ${appVersion || "Unknown"}`,
@@ -428,7 +441,7 @@ export const authenticateWithRegionPassword = onCallGen2(
       const token = await admin.auth().createCustomToken(userId, customClaims);
 
       // 11. Audit log — successful login
-      await clearLoginRateLimit(rawInput, installationDeviceId);
+      await clearLoginRateLimit(rawInput);
       await logAuditSafe({
         userId,
         userRole: userData.role,

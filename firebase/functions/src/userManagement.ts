@@ -637,7 +637,9 @@ export const updateUserProfile = onCallGen2(async (data, context) => {
         await admin.auth().updateUser(userId, {
           displayName: updates.userNameAr || updates.username,
         });
-      } catch (_) {}
+      } catch (error) {
+        console.warn("Could not update native auth display name:", error);
+      }
     }
 
     await logAuditSafe({

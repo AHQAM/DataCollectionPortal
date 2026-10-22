@@ -56,6 +56,7 @@ export const releaseDevice = onCallGen2(async (data, context) => {
       boundDeviceLabel: null,
       fcmToken: null,
       fcmTokenUpdatedAt: null,
+      sessionVersion: (userData.sessionVersion || 0) + 1,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
@@ -158,6 +159,7 @@ export const replaceDevice = onCallGen2(async (data, context) => {
       boundDeviceIdHash: null,
       boundDevicePlatform: null,
       boundDeviceLabel: null,
+      sessionVersion: (userDoc.data()?.sessionVersion || 0) + 1,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
@@ -261,6 +263,8 @@ export const forceLogoutUser = onCallGen2(async (data, context) => {
           role: userData.role,
           branchId: userData.branchId || null,
           allowedRegionNos: userData.allowedRegionNos || [userData.regionNo],
+          regionNo: userData.regionNo || null,
+          userNameAr: userData.userNameAr || userData.username || null,
           sessionVersion: newSessionVersion,
           mustChangePassword: userData.mustChangePassword || false,
         });
@@ -331,7 +335,11 @@ export const rejectDeviceReplacement = onCallGen2(async (data, context) => {
       const snap = await db
         .collection("deviceBindings")
         .where("userId", "==", targetUserId)
-        .where("status", "in", ["PENDING", "PENDING_APPROVAL", "ACTIVE"])
+        .where("status", "in", [
+          "PENDING_REPLACEMENT",
+          "PENDING",
+          "PENDING_APPROVAL",
+        ])
         .limit(1)
         .get();
       if (!snap.empty) {
@@ -340,6 +348,7 @@ export const rejectDeviceReplacement = onCallGen2(async (data, context) => {
     }
 
     if (targetDoc) {
+      const targetUserId = targetDoc.data()?.userId;
       await targetDoc.ref.update({
         status: "REJECTED",
         rejectedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -347,6 +356,12 @@ export const rejectDeviceReplacement = onCallGen2(async (data, context) => {
         rejectionReason: reason || "Admin rejected replacement",
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
+      if (targetDoc.data()?.status === "PENDING_REPLACEMENT" && targetUserId) {
+        await db.collection("users").doc(targetUserId).update({
+          deviceBindingStatus: "BOUND",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
     }
 
     await logAuditSafe({

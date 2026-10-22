@@ -221,15 +221,20 @@ export const SupervisorCardView: React.FC<SupervisorCardViewProps> = ({
                         return (
                           <label
                             key={region.regionId}
-                            onClick={() =>
-                              onToggleRegion(supervisor, region.regionNo)
-                            }
                             className={`p-2.5 rounded-xl border flex items-start gap-2.5 cursor-pointer transition-all select-none ${
                               isChecked
                                 ? "bg-purple-900 text-white border-purple-900 shadow-xs"
                                 : "bg-white text-slate-700 border-slate-200 hover:border-purple-300 hover:bg-purple-50/30"
                             }`}
                           >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() =>
+                                onToggleRegion(supervisor, region.regionNo)
+                              }
+                              className="sr-only"
+                            />
                             <div
                               className={`w-4 h-4 rounded-md mt-0.5 shrink-0 flex items-center justify-center transition-all ${
                                 isChecked

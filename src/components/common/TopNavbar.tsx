@@ -332,6 +332,16 @@ export const TopNavbar: React.FC = () => {
                                 markNotificationAsRead(notif.notificationId);
                               }
                             }}
+                            onKeyDown={(event) => {
+                              if (
+                                isUnread &&
+                                (event.key === "Enter" || event.key === " ")
+                              ) {
+                                markNotificationAsRead(notif.notificationId);
+                              }
+                            }}
+                            role={isUnread ? "button" : undefined}
+                            tabIndex={isUnread ? 0 : undefined}
                             className={`p-2.5 rounded-lg transition-colors cursor-pointer ${
                               isUnread
                                 ? "bg-purple-50/70 hover:bg-purple-100/70 border-s-2 border-purple-600"

@@ -77,9 +77,7 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
               <span>{user.boundDeviceLabel || "Google Pixel"}</span>
             </span>
             <span className="block text-[9px] text-slate-400 font-mono truncate max-w-[120px] mt-0.5">
-              {user.boundDeviceId ||
-                user.boundDeviceIdHash?.slice(0, 16) ||
-                "Active"}
+              {user.boundDeviceIdHash?.slice(0, 16) || "Active"}
             </span>
           </div>
         ) : (

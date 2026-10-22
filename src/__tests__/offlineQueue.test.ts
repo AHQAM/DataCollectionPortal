@@ -25,7 +25,6 @@ class MockIndexedDB {
   private data: Map<string, QueuedRecord> = new Map();
 
   open() {
-    const self = this;
     const req: any = {
       result: {
         objectStoreNames: { contains: () => true },
@@ -33,7 +32,7 @@ class MockIndexedDB {
         transaction: () => ({
           objectStore: () => ({
             add: (item: QueuedRecord) => {
-              self.data.set(item.id, item);
+              this.data.set(item.id, item);
               const addReq: any = {};
               setTimeout(() => addReq.onsuccess?.(), 0);
               return addReq;
@@ -41,13 +40,13 @@ class MockIndexedDB {
             getAll: () => {
               const getReq: any = {};
               setTimeout(() => {
-                getReq.result = Array.from(self.data.values());
+                getReq.result = Array.from(this.data.values());
                 getReq.onsuccess?.();
               }, 0);
               return getReq;
             },
             delete: (id: string) => {
-              self.data.delete(id);
+              this.data.delete(id);
               const delReq: any = {};
               setTimeout(() => delReq.onsuccess?.(), 0);
               return delReq;
@@ -55,7 +54,7 @@ class MockIndexedDB {
             count: () => {
               const countReq: any = {};
               setTimeout(() => {
-                countReq.result = self.data.size;
+                countReq.result = this.data.size;
                 countReq.onsuccess?.();
               }, 0);
               return countReq;
@@ -74,7 +73,7 @@ class MockIndexedDB {
 }
 
 const mockIDB = new MockIndexedDB();
-// @ts-ignore
+// @ts-expect-error The mock intentionally implements only the IndexedDB surface used by this test.
 globalThis.indexedDB = mockIDB;
 
 describe("IndexedDB Offline Queue", () => {

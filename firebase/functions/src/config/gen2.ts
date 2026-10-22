@@ -1,7 +1,6 @@
 import {
   onCall,
   CallableOptions,
-  CallableRequest,
   HttpsError as Gen2HttpsError,
 } from "firebase-functions/v2/https";
 import { verifyAppCheck } from "./appCheck";
@@ -31,7 +30,11 @@ export function onCallGen2<TData = any, TResp = any>(
     context: CallableContextCompat,
   ) => Promise<TResp> | TResp,
 ) {
-  let options: CallableOptions = { memory: "256MiB", timeoutSeconds: 60 };
+  let options: CallableOptions = {
+    memory: "256MiB",
+    timeoutSeconds: 60,
+    enforceAppCheck: true,
+  };
   let handler: (
     data: TData,
     context: CallableContextCompat,

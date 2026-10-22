@@ -21,6 +21,13 @@ admin.initializeApp({
 const db = getFirestore("datacollectionportal");
 
 async function seedTestUser() {
+  const initialPassword = process.env.SEED_TEST_PASSWORD;
+  if (!initialPassword || initialPassword.length < 12) {
+    throw new Error(
+      "SEED_TEST_PASSWORD must be set and at least 12 characters.",
+    );
+  }
+
   const BCRYPT_SALT_ROUNDS = 12;
 
   // ---- Change these values as needed ----
@@ -31,7 +38,7 @@ async function seedTestUser() {
     repNameEn: "Test User",
     role: "REP", // "REP" or "SUPERVISOR"
     branchId: "BRANCH-001",
-    password: "1234", // Initial password (mustChangePassword = true)
+    password: initialPassword,
     allowedRegionNos: ["101"],
   };
   // ----------------------------------------

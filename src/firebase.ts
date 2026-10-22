@@ -68,7 +68,7 @@ export async function initAppCheck(appInstance = app) {
 
   if (import.meta.env.DEV) {
     // Allow debug token for development and staging tests
-    // @ts-ignore
+    // @ts-expect-error Firebase exposes this debug hook on the global scope.
     self.FIREBASE_APPCHECK_DEBUG_TOKEN =
       import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
   }

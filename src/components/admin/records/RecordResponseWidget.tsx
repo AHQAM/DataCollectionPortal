@@ -72,6 +72,14 @@ export const RecordResponseWidget: React.FC<RecordResponseWidgetProps> = ({
             key={idx}
             className="relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-50 w-24 h-24 cursor-pointer shadow-xs hover:shadow-md transition-all"
             onClick={() => setActiveImagePreview(url)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                setActiveImagePreview(url);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Open image preview"
           >
             <img
               src={url}

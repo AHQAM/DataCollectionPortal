@@ -98,6 +98,14 @@ export const UserImportDropzone: React.FC<UserImportDropzoneProps> = ({
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            fileInputRef.current?.click();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={t("import.selectFile", { lng: currentLang })}
         className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
           isDragging
             ? "border-purple-600 bg-purple-50"

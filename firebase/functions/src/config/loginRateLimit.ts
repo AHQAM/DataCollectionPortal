@@ -5,19 +5,14 @@ import { db } from "./db";
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_ATTEMPTS = 10;
 
-function rateLimitId(identifier: string, deviceId: string): string {
+function rateLimitId(identifier: string): string {
   return createHash("sha256")
-    .update(`${identifier.trim().toLowerCase()}:${deviceId}`)
+    .update(identifier.trim().toLowerCase())
     .digest("hex");
 }
 
-export async function assertLoginAllowed(
-  identifier: string,
-  deviceId: string,
-): Promise<void> {
-  const ref = db
-    .collection("loginRateLimits")
-    .doc(rateLimitId(identifier, deviceId));
+export async function assertLoginAllowed(identifier: string): Promise<void> {
+  const ref = db.collection("loginRateLimits").doc(rateLimitId(identifier));
   const now = Date.now();
 
   await db.runTransaction(async (transaction) => {
@@ -48,12 +43,7 @@ export async function assertLoginAllowed(
   });
 }
 
-export async function clearLoginRateLimit(
-  identifier: string,
-  deviceId: string,
-): Promise<void> {
-  const ref = db
-    .collection("loginRateLimits")
-    .doc(rateLimitId(identifier, deviceId));
+export async function clearLoginRateLimit(identifier: string): Promise<void> {
+  const ref = db.collection("loginRateLimits").doc(rateLimitId(identifier));
   await ref.delete();
 }

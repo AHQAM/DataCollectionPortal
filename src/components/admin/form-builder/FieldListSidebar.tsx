@@ -49,7 +49,17 @@ export const FieldListSidebar: React.FC<FieldListSidebarProps> = ({
             return (
               <div
                 key={field.fieldId}
-                onClick={() => onSelectField(field.fieldId)}
+                onClick={(event) => {
+                  if ((event.target as HTMLElement).closest("button")) return;
+                  onSelectField(field.fieldId);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    onSelectField(field.fieldId);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
                 className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-center justify-between gap-1.5 ${
                   isSelected
                     ? "bg-purple-900 text-white border-purple-900 shadow-xs"
@@ -88,10 +98,7 @@ export const FieldListSidebar: React.FC<FieldListSidebarProps> = ({
                   </div>
                 </div>
 
-                <div
-                  className="flex items-center gap-0.5 shrink-0"
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <div className="flex items-center gap-0.5 shrink-0">
                   <button
                     onClick={() => onMoveField(idx, "up")}
                     disabled={idx === 0}

@@ -273,7 +273,7 @@ export function parseExcelRows(jsonRows: any[]): {
 
   const rawList = jsonRows.map((row) => {
     const keys = Object.keys(row);
-    let rawRepNoVal =
+    const rawRepNoVal =
       row["رقم_المستخدم (المعرف)"] ??
       row["رقم_المستخدم"] ??
       row["رقم المستخدم"] ??
@@ -291,7 +291,7 @@ export function parseExcelRows(jsonRows: any[]): {
       row["RegionNo"] ??
       (keys[0] ? row[keys[0]] : "");
 
-    let rawRepNameVal =
+    const rawRepNameVal =
       row["اسم_المستخدم"] ??
       row["اسم المستخدم"] ??
       row["اسم_المندوب"] ??
