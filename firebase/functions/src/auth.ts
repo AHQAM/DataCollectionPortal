@@ -167,8 +167,8 @@ export const authenticateWithRegionPassword = onCallGen2(
 
         if (lockDate > new Date()) {
           throw new HttpsError(
-            "permission-denied",
-            "الحساب مقفل مؤقتاً. حاول لاحقاً. | Account is temporarily locked. Try again later.",
+            "unauthenticated",
+            "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
           );
         }
       }
@@ -191,8 +191,8 @@ export const authenticateWithRegionPassword = onCallGen2(
         });
 
         throw new HttpsError(
-          "permission-denied",
-          "الحساب غير مفعل. يرجى التواصل مع الإدارة. | Account is deactivated. Please contact administration.",
+          "unauthenticated",
+          "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
         );
       }
 
@@ -244,8 +244,8 @@ export const authenticateWithRegionPassword = onCallGen2(
             });
 
             throw new HttpsError(
-              "permission-denied",
-              `الحساب مقفل مؤقتاً. حاول بعد ${remainingMinutes} دقيقة. | Account is temporarily locked. Try again in ${remainingMinutes} minutes.`,
+              "unauthenticated",
+              "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
             );
           }
         }
@@ -350,8 +350,8 @@ export const authenticateWithRegionPassword = onCallGen2(
             });
 
             throw new HttpsError(
-              "permission-denied",
-              "هذا الحساب مرتبط بجهاز آخر. يرجى التواصل مع الإدارة لفك ارتباط الجهاز. | This account is linked to another device. Please contact the administrator to release the device.",
+              "unauthenticated",
+              "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
             );
           }
         } else {

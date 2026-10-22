@@ -81,7 +81,7 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
                     : "bg-purple-100 text-purple-900"
                 }`}
               >
-                <span>{currentLang === "ar" ? "المنشئ:" : "By:"}</span>
+                <span>{t("requests.createdBy", { lng: currentLang })}</span>
                 <span>{req.creatorName}</span>
                 {req.creatorBranchNameAr && (
                   <span className="opacity-80">
@@ -114,7 +114,16 @@ export const RequestTableRow: React.FC<RequestTableRowProps> = ({
                 : "bg-blue-100 text-blue-800"
           }`}
         >
-          {req.priority}
+          {t(
+            req.priority === "Low"
+              ? "requests.priorityLow"
+              : req.priority === "Normal"
+                ? "requests.priorityMedium"
+                : req.priority === "High"
+                  ? "requests.priorityHigh"
+                  : "requests.priorityUrgent",
+            { lng: currentLang },
+          )}
         </span>
       </td>
 

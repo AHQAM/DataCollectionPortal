@@ -9,6 +9,7 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
+    "migrate:device-identifiers": "node scripts/migrate-device-identifiers.js",
     "test": "jest --config jest.config.js",
     "test:coverage": "jest --config jest.coverage.config.js --runInBand",
     "test:rules": "firebase emulators:exec --config ../firebase.json --project data-collection-portal-rules-test --only firestore,storage \"npx jest --config jest.rules.config.js --runInBand\""
