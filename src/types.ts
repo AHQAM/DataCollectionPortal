@@ -359,7 +359,8 @@ export interface DeviceBinding {
   platform?: string;
   deviceLabel: string;
   appVersion: string;
-  status: "ACTIVE" | "RELEASED" | "PENDING_REPLACEMENT";
+  status:
+    "ACTIVE" | "RELEASED" | "REPLACED" | "REJECTED" | "PENDING_REPLACEMENT";
   bindingStatus?: "Bound" | "Unbound" | "ReplacementPending" | string;
   installationDeviceId?: string;
   boundAt: string;

@@ -310,6 +310,36 @@ export const authenticateWithRegionPassword = onCallGen2(
           );
 
           if (!deviceMatches) {
+            const pendingSnapshot = await db
+              .collection("deviceBindings")
+              .where("userId", "==", userId)
+              .where("status", "==", "PENDING_REPLACEMENT")
+              .limit(1)
+              .get();
+
+            if (pendingSnapshot.empty) {
+              const pendingHash = await bcrypt.hash(
+                installationDeviceId,
+                BCRYPT_SALT_ROUNDS,
+              );
+              const pendingRef = db.collection("deviceBindings").doc();
+              await pendingRef.set({
+                bindingId: pendingRef.id,
+                userId,
+                userNameAr: userData.userNameAr || userData.username || "",
+                regionNo: userData.regionNo || "",
+                branchId: userData.branchId || "",
+                deviceIdHash: pendingHash,
+                devicePlatform: platform || "Unknown",
+                deviceLabel: `${platform || "Unknown"} - ${appVersion || "Unknown"}`,
+                appVersion: appVersion || "Unknown",
+                status: "PENDING_REPLACEMENT",
+                requestedAt: admin.firestore.FieldValue.serverTimestamp(),
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+              });
+            }
+
             await logAuditSafe({
               userId,
               userRole: userData.role,
@@ -347,7 +377,6 @@ export const authenticateWithRegionPassword = onCallGen2(
             userNameAr: userData.userNameAr || userData.username || "",
             regionNo: userData.regionNo || "",
             branchId: userData.branchId || "",
-            deviceId: installationDeviceId,
             deviceIdHash,
             devicePlatform: platform || "Unknown",
             deviceLabel: `${platform || "Unknown"} - ${appVersion || "Unknown"}`,

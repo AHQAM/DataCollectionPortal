@@ -1,7 +1,7 @@
 /**
- * Lazy loader for XLSX library.
- * Keeps initial bundle size light (~430KB saved) until user needs Excel import/export.
+ * Lazy loader for the maintained SheetJS-compatible package.
+ * Keeps the initial bundle light until Excel import/export is requested.
  */
 export const getXLSX = async () => {
-  return await import("xlsx");
+  return await import("@e965/xlsx");
 };
