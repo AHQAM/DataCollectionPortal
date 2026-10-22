@@ -153,36 +153,53 @@ export const replaceDevice = onCallGen2(async (data, context) => {
       );
     }
 
-    // Set status to UNBOUND — next login binds new device
-    await userRef.update({
-      deviceBindingStatus: "UNBOUND",
-      boundDeviceIdHash: null,
-      boundDevicePlatform: null,
-      boundDeviceLabel: null,
-      sessionVersion: (userDoc.data()?.sessionVersion || 0) + 1,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    const pendingSnapshot = await db
+      .collection("deviceBindings")
+      .where("userId", "==", targetUserId)
+      .where("status", "==", "PENDING_REPLACEMENT")
+      .limit(1)
+      .get();
 
-    // Mark existing bindings as replaced
-    const snapshot = await db
+    if (pendingSnapshot.empty) {
+      throw new HttpsError(
+        "failed-precondition",
+        "لا يوجد طلب استبدال معلق. | No pending device replacement request.",
+      );
+    }
+
+    const pendingBinding = pendingSnapshot.docs[0];
+    const pendingData = pendingBinding.data();
+    const activeSnapshot = await db
       .collection("deviceBindings")
       .where("userId", "==", targetUserId)
       .where("status", "==", "ACTIVE")
       .get();
 
-    if (!snapshot.empty) {
-      const batch = db.batch();
-      snapshot.docs.forEach((doc) => {
-        batch.update(doc.ref, {
-          status: "REPLACED",
-          releasedAt: admin.firestore.FieldValue.serverTimestamp(),
-          releasedBy: context.auth!.uid,
-          releaseReason: reason || "Device replacement",
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+    const batch = db.batch();
+    activeSnapshot.docs.forEach((doc) => {
+      batch.update(doc.ref, {
+        status: "REPLACED",
+        releasedAt: admin.firestore.FieldValue.serverTimestamp(),
+        releasedBy: context.auth!.uid,
+        releaseReason: reason || "Device replacement",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-      await batch.commit();
-    }
+    });
+    batch.update(pendingBinding.ref, {
+      status: "ACTIVE",
+      approvedAt: admin.firestore.FieldValue.serverTimestamp(),
+      approvedBy: context.auth!.uid,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    batch.update(userRef, {
+      deviceBindingStatus: "BOUND",
+      boundDeviceIdHash: pendingData.deviceIdHash,
+      boundDevicePlatform: pendingData.devicePlatform || "Unknown",
+      boundDeviceLabel: pendingData.deviceLabel || "Unknown",
+      sessionVersion: (userDoc.data()?.sessionVersion || 0) + 1,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    await batch.commit();
 
     // Revoke tokens to force re-login
     try {
@@ -348,7 +365,18 @@ export const rejectDeviceReplacement = onCallGen2(async (data, context) => {
     }
 
     if (targetDoc) {
-      const targetUserId = targetDoc.data()?.userId;
+      const pendingData = targetDoc.data()!;
+      const pendingUserId = pendingData.userId as string | undefined;
+      if (
+        !["PENDING_REPLACEMENT", "PENDING", "PENDING_APPROVAL"].includes(
+          pendingData.status,
+        )
+      ) {
+        throw new HttpsError(
+          "failed-precondition",
+          "لا يمكن رفض ربط غير معلق. | Only pending replacement requests can be rejected.",
+        );
+      }
       await targetDoc.ref.update({
         status: "REJECTED",
         rejectedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -356,11 +384,20 @@ export const rejectDeviceReplacement = onCallGen2(async (data, context) => {
         rejectionReason: reason || "Admin rejected replacement",
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-      if (targetDoc.data()?.status === "PENDING_REPLACEMENT" && targetUserId) {
-        await db.collection("users").doc(targetUserId).update({
-          deviceBindingStatus: "BOUND",
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+      if (pendingUserId) {
+        const activeSnapshot = await db
+          .collection("deviceBindings")
+          .where("userId", "==", pendingUserId)
+          .where("status", "==", "ACTIVE")
+          .limit(1)
+          .get();
+        await db
+          .collection("users")
+          .doc(pendingUserId)
+          .update({
+            deviceBindingStatus: activeSnapshot.empty ? "UNBOUND" : "BOUND",
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
       }
     }
 

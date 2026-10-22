@@ -396,6 +396,7 @@
     "priorityMedium": "متوسطة",
     "priorityHigh": "عالية",
     "priorityUrgent": "حرجة / عاجلة",
+    "createdBy": "المنشئ:",
     "titleArLabel": "عنوان الطلب (بالعربية)",
     "titleArPlaceholder": "مثال: استبيان التحقق من توافر الأصناف الرئيسية...",
     "titleEnLabel": "عنوان الطلب (بالإنجليزية - اختياري)",

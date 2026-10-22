@@ -396,6 +396,7 @@
     "priorityMedium": "Medium",
     "priorityHigh": "High",
     "priorityUrgent": "Urgent",
+    "createdBy": "By:",
     "titleArLabel": "Request Title (Arabic)",
     "titleArPlaceholder": "e.g. Main items availability survey...",
     "titleEnLabel": "Request Title (English - Optional)",

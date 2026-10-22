@@ -167,8 +167,8 @@ export const authenticateWithRegionPassword = onCallGen2(
 
         if (lockDate > new Date()) {
           throw new HttpsError(
-            "permission-denied",
-            "الحساب مقفل مؤقتاً. حاول لاحقاً. | Account is temporarily locked. Try again later.",
+            "unauthenticated",
+            "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
           );
         }
       }
@@ -191,8 +191,8 @@ export const authenticateWithRegionPassword = onCallGen2(
         });
 
         throw new HttpsError(
-          "permission-denied",
-          "الحساب غير مفعل. يرجى التواصل مع الإدارة. | Account is deactivated. Please contact administration.",
+          "unauthenticated",
+          "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
         );
       }
 
@@ -244,8 +244,8 @@ export const authenticateWithRegionPassword = onCallGen2(
             });
 
             throw new HttpsError(
-              "permission-denied",
-              `الحساب مقفل مؤقتاً. حاول بعد ${remainingMinutes} دقيقة. | Account is temporarily locked. Try again in ${remainingMinutes} minutes.`,
+              "unauthenticated",
+              "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
             );
           }
         }
@@ -310,6 +310,36 @@ export const authenticateWithRegionPassword = onCallGen2(
           );
 
           if (!deviceMatches) {
+            const pendingSnapshot = await db
+              .collection("deviceBindings")
+              .where("userId", "==", userId)
+              .where("status", "==", "PENDING_REPLACEMENT")
+              .limit(1)
+              .get();
+
+            if (pendingSnapshot.empty) {
+              const pendingHash = await bcrypt.hash(
+                installationDeviceId,
+                BCRYPT_SALT_ROUNDS,
+              );
+              const pendingRef = db.collection("deviceBindings").doc();
+              await pendingRef.set({
+                bindingId: pendingRef.id,
+                userId,
+                userNameAr: userData.userNameAr || userData.username || "",
+                regionNo: userData.regionNo || "",
+                branchId: userData.branchId || "",
+                deviceIdHash: pendingHash,
+                devicePlatform: platform || "Unknown",
+                deviceLabel: `${platform || "Unknown"} - ${appVersion || "Unknown"}`,
+                appVersion: appVersion || "Unknown",
+                status: "PENDING_REPLACEMENT",
+                requestedAt: admin.firestore.FieldValue.serverTimestamp(),
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+              });
+            }
+
             await logAuditSafe({
               userId,
               userRole: userData.role,
@@ -320,8 +350,8 @@ export const authenticateWithRegionPassword = onCallGen2(
             });
 
             throw new HttpsError(
-              "permission-denied",
-              "هذا الحساب مرتبط بجهاز آخر. يرجى التواصل مع الإدارة لفك ارتباط الجهاز. | This account is linked to another device. Please contact the administrator to release the device.",
+              "unauthenticated",
+              "بيانات الاعتماد غير صحيحة. | Invalid credentials.",
             );
           }
         } else {
@@ -347,7 +377,6 @@ export const authenticateWithRegionPassword = onCallGen2(
             userNameAr: userData.userNameAr || userData.username || "",
             regionNo: userData.regionNo || "",
             branchId: userData.branchId || "",
-            deviceId: installationDeviceId,
             deviceIdHash,
             devicePlatform: platform || "Unknown",
             deviceLabel: `${platform || "Unknown"} - ${appVersion || "Unknown"}`,

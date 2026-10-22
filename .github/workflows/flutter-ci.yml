@@ -3,12 +3,23 @@ name: Flutter CI
 on:
   push:
     branches: ["main"]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/flutter-ci.yml"
   pull_request:
     branches: ["main"]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/flutter-ci.yml"
+
+concurrency:
+  group: flutter-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +28,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+          cache: true
 
       - name: Install dependencies
         run: cd mobile && flutter pub get
@@ -31,12 +43,14 @@ jobs:
         run: cd mobile && flutter test
 
       - name: Build debug-signed release validation APK
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         working-directory: mobile
         env:
           ALLOW_DEBUG_RELEASE_SIGNING: "true"
         run: flutter build apk --release
 
       - name: Upload release validation APK
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: field-data-hub-debug-signed-release-validation-apk
