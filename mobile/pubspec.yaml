@@ -21,16 +21,16 @@ dependencies:
   firebase_messaging: any
   firebase_crashlytics: any
   firebase_storage: any
-  firebase_app_check: any
-  shared_preferences: ^2.2.1
-  flutter_secure_storage: any
+  firebase_app_check: 0.5.0
+  shared_preferences: ^2.5.6
+  flutter_secure_storage: 11.2.0
   flutter_riverpod: any
   riverpod_annotation: any
   go_router: any
-  device_info_plus: any
-  connectivity_plus: any
+  device_info_plus: 13.3.0
+  connectivity_plus: 7.3.2
   geolocator: any
-  image_picker: ^1.1.0
+  image_picker: ^1.2.4
   signature: ^6.4.0
   uuid: ^4.3.0
   intl: ^0.20.3
@@ -38,7 +38,7 @@ dependencies:
   hive_flutter: ^1.1.0
   freezed_annotation: ^3.1.0
   json_annotation: ^4.12.0
-  url_launcher: ^6.3.2
+  url_launcher: ^6.3.3
 
 dev_dependencies:
   flutter_test:
@@ -46,10 +46,10 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  build_runner: ^2.4.9
+  build_runner: ^2.16.2
   riverpod_generator: ^4.0.9
   mocktail: ^1.0.5
-  freezed: ^4.0.1
+  freezed: ^4.0.3
   json_serializable: ^6.14.1
   flutter_launcher_icons: ^0.14.4
 
